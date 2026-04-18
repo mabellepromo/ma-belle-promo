@@ -1,109 +1,135 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import PageHero from "../components/PageHero";
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useContent } from "../lib/localStore";
 import { evenements as evenementsStatic } from "../data/evenements";
 import { articles as articlesStatic } from "../data/articles";
 
-
-const typeColors = {
-  "Webinaire":        "bg-blue-100 text-blue-700",
-  "Conférence":       "bg-purple-100 text-purple-700",
-  "Gala":             "bg-amber-100 text-amber-700",
-  "Projet éditorial": "bg-green-100 text-green-700",
+const TYPE_STYLE = {
+  "Webinaire":        { badge: "bg-blue-100 text-blue-700",   accent: "bg-blue-500" },
+  "Conférence":       { badge: "bg-purple-100 text-purple-700", accent: "bg-purple-500" },
+  "Gala":             { badge: "bg-amber-100 text-amber-700",  accent: "bg-amber-500" },
+  "Projet éditorial": { badge: "bg-green-100 text-green-700",  accent: "bg-green-500" },
 };
 
 export default function Evenements() {
   const evenements = useContent("evenements", evenementsStatic);
   const articles   = useContent("articles",   articlesStatic);
 
-  // Supprimer la première carte (id:1) quelle que soit la source
-  const liste = evenements.filter(e => String(e.id) !== "1");
+  const liste = useMemo(() =>
+    evenements
+      .filter(e => String(e.id) !== "1")
+      .map((evt, idx) => {
+        const article = evt.articleId ? articles.find(a => a.id === evt.articleId) : null;
+        return { ...evt, article, image: article?.image || evt.image, num: idx + 1 };
+      }),
+    [evenements, articles]
+  );
 
   return (
-    <div>
-      <PageHero title="Événements" subtitle="Activités — Nos rendez-vous" />
+    <div className="min-h-screen bg-background">
 
-      <section className="py-20 max-w-5xl mx-auto px-6">
-        <div className="space-y-8">
-          {liste.map((evt, i) => {
-            // Article lié via articleId de l'événement
-            const article = evt.articleId
-              ? articles.find(a => a.id === evt.articleId)
-              : null;
+      {/* En-tête éditorial */}
+      <div className="bg-gradient-to-br from-foreground/5 via-background to-primary/5 border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Ma Belle Promo</p>
+            <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground leading-tight mb-4">
+              Événements
+            </h1>
+            <p className="text-muted-foreground text-sm max-w-xl">
+              Conférences, webinaires, galas — les rendez-vous qui ont marqué l'histoire de l'association.
+            </p>
+          </motion.div>
+        </div>
+      </div>
 
-            // Image : priorité à l'image de l'article lié, sinon image de l'événement
-            const image = article?.image || evt.image;
+      <section className="max-w-5xl mx-auto px-6 py-12 space-y-6">
+        {liste.map((evt, i) => {
+          const style = TYPE_STYLE[evt.type] || { badge: "bg-gray-100 text-gray-700", accent: "bg-gray-400" };
 
-            return (
-              <motion.article
-                key={evt.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="grid md:grid-cols-3 gap-0">
-                  {/* Image */}
-                  <div className="relative h-52 md:h-full overflow-hidden">
-                    <img
-                      src={image}
-                      alt={evt.titre}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${typeColors[evt.type] || "bg-gray-100 text-gray-700"}`}>
-                        {evt.type}
+          return (
+            <motion.article
+              key={evt.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
+              className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-400"
+            >
+              {/* Barre accent gauche */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${style.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+
+              <div className="flex flex-col md:flex-row">
+
+                {/* Image */}
+                <div className="relative md:w-72 lg:w-80 h-52 md:h-auto flex-shrink-0 overflow-hidden">
+                  <img
+                    src={evt.image}
+                    alt={evt.titre}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 md:block hidden" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent md:hidden" />
+
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex gap-2">
+                    <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full ${style.badge}`}>
+                      {evt.type}
+                    </span>
+                    {evt.statut === "Passé" && (
+                      <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-black/60 text-white backdrop-blur-sm">
+                        Passé
                       </span>
-                      {evt.statut === "Passé" && (
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-black/60 text-white backdrop-blur-sm">
-                          Passé
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Contenu */}
-                  <div className="md:col-span-2 p-7 flex flex-col justify-between">
-                    <div>
-                      <h2 className="font-heading text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                        {evt.titre}
-                      </h2>
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4 text-primary" />{evt.date}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-primary" />{evt.heures}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="w-4 h-4 text-primary" />{evt.lieu}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground leading-relaxed text-sm line-clamp-3">
-                        {evt.description}
-                      </p>
-                    </div>
-
-                    {/* Lien vers l'article détaillé */}
-                    {article && (
-                      <div className="mt-5 pt-4 border-t border-border/50">
-                        <Link
-                          to={`/actualites/${article.id}`}
-                          className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors group/link"
-                        >
-                          <span>Lire le compte-rendu</span>
-                          <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200" />
-                        </Link>
-                      </div>
                     )}
                   </div>
+
+                  {/* Numéro décoratif */}
+                  <div className="absolute bottom-3 right-3 font-heading text-5xl font-black text-white/20 leading-none select-none">
+                    {String(evt.num).padStart(2, "0")}
+                  </div>
                 </div>
-              </motion.article>
-            );
-          })}
-        </div>
+
+                {/* Contenu */}
+                <div className="flex flex-col justify-between flex-1 p-6 md:p-8">
+                  <div>
+                    <h2 className="font-heading text-xl md:text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors leading-snug">
+                      {evt.titre}
+                    </h2>
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground mb-4">
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.date}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.heures}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.lieu}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+                      {evt.description}
+                    </p>
+                  </div>
+
+                  {evt.article && (
+                    <div className="mt-5 pt-4 border-t border-border/50">
+                      <Link
+                        to={`/actualites/${evt.article.id}`}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all group/link"
+                      >
+                        Lire le compte-rendu
+                        <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </motion.article>
+          );
+        })}
       </section>
     </div>
   );
