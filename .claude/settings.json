@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(python3 -c ':*)",
+      "Bash(npm run:*)",
+      "Bash(vercel --prod)",
+      "Bash(npm install:*)",
+      "Bash(vercel --prod --yes)",
+      "Bash(vercel --prod --yes --force)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "Bash(node -e \"const { Expand, Images } = require\\('lucide-react'\\); console.log\\('Expand:', Expand ? 'OK' : 'MISSING'\\); console.log\\('Images:', Images ? 'OK' : 'MISSING'\\);\")",
+      "Bash(node -e \"const { ZoomIn, Grid } = require\\('lucide-react'\\); console.log\\('ZoomIn:', ZoomIn ? 'OK' : 'MISSING'\\); console.log\\('Grid:', Grid ? 'OK' : 'MISSING'\\);\")",
+      "Bash(node -e \"const lucide = require\\('lucide-react'\\); const icons = Object.keys\\(lucide\\).filter\\(k => k.match\\(/zoom|grid|image|photo|expand|gallery|layout/i\\)\\); console.log\\(icons.join\\(', '\\)\\);\")",
+      "Bash(node -e \"const lucide = require\\('lucide-react'\\); console.log\\(Object.keys\\(lucide\\).filter\\(k => typeof lucide[k] === 'function'\\).slice\\(0,30\\).join\\(', '\\)\\);\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\maman\\.claude\\projects\\c--Users-maman-Downloads-Clone-Ma-Belle-Promo\\memory"
+    ]
+  }
+}

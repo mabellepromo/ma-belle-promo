@@ -1,0 +1,167 @@
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as SonnerToaster } from "@/components/ui/sonner"
+import { WindowFrame } from './components/WindowFrame'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClientInstance } from '@/lib/query-client'
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+
+const SITE = "Ma Belle Promo";
+
+const PAGE_TITLES = {
+  "/":                           "Accueil",
+  "/association/credo":          "Notre Credo",
+  "/association/ambition":       "Notre Ambition",
+  "/association/equipe":         "Notre Équipe",
+  "/association/sponsors":       "Nos Sponsors",
+  "/activites/evenements":       "Événements",
+  "/activites/projets":          "Nos Réalisations",
+  "/activites/programmes":       "Nos Programmes",
+  "/implications/adhesion":      "Adhésion",
+  "/implications/cotisation":    "Cotisation",
+  "/implications/soutenir":      "Nous Soutenir",
+  "/informations/actualites":    "Actualités",
+  "/informations/mediatheque":   "Médiathèque",
+  "/informations/documents":     "Documents",
+  "/informations/contacts":      "Contacts",
+  "/informations/communiques":   "Communiqués",
+  "/don":                        "Faire un Don",
+  "/don/merci":                  "Merci !",
+  "/espace-membre":              "Mon Espace",
+  "/blog":                       "Blog & Ressources",
+  "/annuaire":                   "Annuaire des Membres",
+  "/ressources":                 "Ressources Juridiques",
+  "/login":                      "Connexion",
+  "/dashboard":                  "Tableau de Bord",
+};
+
+function PageTitleUpdater() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const label =
+      PAGE_TITLES[pathname] ??
+      (pathname.startsWith("/actualites/") ? "Article" : null);
+    document.title = label ? `${label} — ${SITE}` : SITE;
+  }, [pathname]);
+  return null;
+}
+import PageNotFound from './lib/PageNotFound';
+import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
+import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+// Add page imports here
+import Home from './pages/Home';
+import Layout from './components/Layout';
+import Credo from './pages/Credo';
+import Ambition from './pages/Ambition';
+import Equipe from './pages/Equipe';
+import Sponsors from './pages/Sponsors';
+import Evenements from './pages/Evenements';
+import Projets from './pages/Projets';
+import Programmes from './pages/Programmes';
+import Adhesion from './pages/Adhesion';
+import Cotisation from './pages/Cotisation';
+import NousSoutenir from './pages/NousSoutenir';
+import Actualites from './pages/Actualites';
+import Mediatheque from './pages/Mediatheque';
+import Documents from './pages/Documents';
+import Contacts from './pages/Contacts';
+import Communiques from './pages/Communiques';
+import ArticleDetail from './pages/ArticleDetail';
+import ProjetDetail from './pages/ProjetDetail';
+import Don from './pages/Don';
+import MerciDon from './pages/MerciDon';
+import EspaceMembre from './pages/EspaceMembre';
+import Blog from './pages/Blog';
+import AnnuaireMembres from './pages/AnnuaireMembres';
+import Ressources from './pages/Ressources';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+
+function PrivateRoute({ children }) {
+  const { session } = useLocalAuth();
+  const location = useLocation();
+  if (!session) {
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+  return children;
+}
+
+const AuthenticatedApp = () => {
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  if (isLoadingPublicSettings || isLoadingAuth) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    if (authError.type === 'user_not_registered') {
+      return <UserNotRegisteredError />;
+    } else if (authError.type === 'auth_required') {
+      navigateToLogin();
+      return null;
+    }
+    // mode local_dev : authError inconnu → on affiche le site quand même
+  }
+
+  return (
+    <>
+    <PageTitleUpdater />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route element={<Layout />}>
+        <Route path="/association/credo" element={<Credo />} />
+        <Route path="/association/ambition" element={<Ambition />} />
+        <Route path="/association/equipe" element={<Equipe />} />
+        <Route path="/association/sponsors" element={<Sponsors />} />
+        <Route path="/activites/evenements" element={<Evenements />} />
+        <Route path="/activites/projets" element={<Projets />} />
+        <Route path="/activites/projets/:id" element={<ProjetDetail />} />
+        <Route path="/activites/programmes" element={<Programmes />} />
+        <Route path="/implications/adherents" element={<Navigate to="/annuaire" replace />} />
+        <Route path="/implications/adhesion" element={<Adhesion />} />
+        <Route path="/implications/cotisation" element={<Cotisation />} />
+        <Route path="/implications/soutenir" element={<NousSoutenir />} />
+        <Route path="/informations/actualites" element={<Actualites />} />
+        <Route path="/informations/mediatheque" element={<PrivateRoute><Mediatheque /></PrivateRoute>} />
+        <Route path="/informations/documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
+        <Route path="/informations/contacts" element={<Contacts />} />
+        <Route path="/informations/communiques" element={<Communiques />} />
+        <Route path="/actualites/:id" element={<ArticleDetail />} />
+        <Route path="/don" element={<Don />} />
+        <Route path="/don/merci" element={<MerciDon />} />
+        <Route path="/espace-membre" element={<EspaceMembre />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/annuaire" element={<PrivateRoute><AnnuaireMembres /></PrivateRoute>} />
+        <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
+      </Route>
+      <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="*" element={<PageNotFound />} />
+    </Routes>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <LocalAuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+          <SonnerToaster richColors position="top-right" />
+        </QueryClientProvider>
+        <WindowFrame />
+      </LocalAuthProvider>
+    </AuthProvider>
+  );
+}
+
+export default App
