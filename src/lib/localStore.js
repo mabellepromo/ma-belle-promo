@@ -63,12 +63,21 @@ export const localStore = {
 };
 
 export function useContent(key, staticData) {
-  const [data, setData] = useState(staticData);
+  // Initialisation synchrone depuis le cache localStorage — évite le flash des données statiques
+  const [data, setData] = useState(() => {
+    const cached = cacheGet(key);
+    return cached ? mergeWithStatic(cached, staticData) : staticData;
+  });
 
   useEffect(() => {
     sbGet(PREFIX + key).then(remote => {
-      if (remote !== null) setData(mergeWithStatic(remote, staticData));
-      else setData(staticData);
+      if (remote !== null) {
+        const merged = mergeWithStatic(remote, staticData);
+        setData(merged);
+        cacheSet(key, merged);
+      } else {
+        setData(staticData);
+      }
     });
   }, [key]);
 
