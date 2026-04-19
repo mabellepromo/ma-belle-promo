@@ -33,10 +33,15 @@ export default function ContactSection() {
     };
 
     try {
-      const existing = await sbGet("mbp_contact_messages") || [];
-      await sbSet("mbp_contact_messages", [msg, ...existing]);
+      // Sauvegarde Supabase non bloquante
+      try {
+        const existing = await sbGet("mbp_contact_messages") || [];
+        await sbSet("mbp_contact_messages", [msg, ...existing]);
+      } catch (saveErr) {
+        console.warn("Sauvegarde mbp_store échouée (non bloquant):", saveErr);
+      }
 
-      const ejsResult = await emailjs.send(
+      await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
         {
