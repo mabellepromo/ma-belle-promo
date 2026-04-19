@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useContent } from "../lib/localStore";
-import { projets as projetsStatic } from "../data/projets";
+import { useProjets } from "../hooks/useProjets";
 import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
@@ -21,13 +20,10 @@ const catAccent = {
 
 export default function ProjetDetail() {
   const { id } = useParams();
-  const allProjets = useContent("projets", projetsStatic);
-  const projet = allProjets.find((p) => String(p.id) === String(id));
-  const staticProjet = projetsStatic.find((p) => String(p.id) === String(id));
+  const { projets } = useProjets();
+  const projet = projets.find((p) => String(p.id) === String(id));
 
-  const galleryPhotos = projet?.photos?.length > 0
-    ? projet.photos
-    : (staticProjet?.photos || []);
+  const galleryPhotos = projet?.photos?.length > 0 ? projet.photos : [];
 
 
   if (!projet) {

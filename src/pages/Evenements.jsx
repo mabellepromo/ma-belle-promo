@@ -2,8 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
-import { useContent } from "../lib/localStore";
-import { evenements as evenementsStatic } from "../data/evenements";
+import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
 
 const TYPE_STYLE = {
@@ -14,7 +13,7 @@ const TYPE_STYLE = {
 };
 
 export default function Evenements() {
-  const evenements = useContent("evenements", evenementsStatic);
+  const { evenements } = useEvenements();
   const { articles } = useArticles();
 
   const liste = useMemo(() =>

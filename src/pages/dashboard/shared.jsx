@@ -213,7 +213,7 @@ export function SectionLoader() {
   );
 }
 
-export function CrudHeader({ title, count, onAdd }) {
+export function CrudHeader({ title, count, onAdd, seedBtn }) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
@@ -222,10 +222,20 @@ export function CrudHeader({ title, count, onAdd }) {
           {count} élément{count !== 1 ? "s" : ""}
         </p>
       </div>
-      <button onClick={onAdd}
-        className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
-        <Plus className="w-4 h-4" /> Ajouter
-      </button>
+      <div className="flex items-center gap-2">
+        {seedBtn && (
+          <button onClick={seedBtn.onClick} disabled={seedBtn.loading}
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
+            {seedBtn.loading
+              ? <><div className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /> Migration…</>
+              : <>☁️ Migrer les données initiales</>}
+          </button>
+        )}
+        <button onClick={onAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
+          <Plus className="w-4 h-4" /> Ajouter
+        </button>
+      </div>
     </div>
   );
 }

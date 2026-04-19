@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Search, Tag, ArrowUpRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useContent } from "../lib/localStore";
-import { projets as projetsStatic } from "../data/projets";
+import { useProjets } from "../hooks/useProjets";
 
 const catLight = {
   "Solidarité":    "bg-rose-100 text-rose-700",
@@ -119,7 +118,7 @@ function ListCard({ projet, index }) {
 
 /* ── Page principale ── */
 export default function Projets() {
-  const projets = useContent("projets", projetsStatic);
+  const { projets } = useProjets();
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("Tous");
 

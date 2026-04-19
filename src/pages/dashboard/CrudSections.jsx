@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+
+const ReactQuill = lazy(() => import("../../components/RichEditor.jsx"));
 import { useArticles } from "../../hooks/useArticles";
+import { useEvenements } from "../../hooks/useEvenements";
+import { useProjets } from "../../hooks/useProjets";
+import { useEquipe } from "../../hooks/useEquipe";
 import { articles as articlesStatic } from "../../data/articles.js";
-import { evenements as evenementsStatic } from "../../data/evenements.js";
-import { projets as projetsStatic } from "../../data/projets.js";
 import { programmes as programmesStatic } from "../../data/programmes.js";
-import { equipe as equipeStatic } from "../../data/equipe.js";
 import { sponsors as sponsorsStatic } from "../../data/sponsors.js";
 import { communiques as communiquesStatic } from "../../data/communiques.js";
 import { mediaVideos as videosStatic, mediaPhotos as photosStatic } from "../../data/mediatheque.js";
@@ -83,7 +83,9 @@ export function ArticlesSection() {
             <div className="md:col-span-2">
               <Field label="Contenu" required>
                 <div className="rounded-lg border border-border overflow-hidden [&_.ql-toolbar]:bg-muted [&_.ql-container]:bg-background [&_.ql-container]:min-h-[180px] [&_.ql-editor]:text-sm [&_.ql-editor]:text-foreground">
-                  <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} modules={quillModules} />
+                  <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
+                    <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} modules={quillModules} />
+                  </Suspense>
                 </div>
               </Field>
             </div>
@@ -105,8 +107,9 @@ export function ArticlesSection() {
 
 /* ─── Événements ─── */
 export function EvenementsSection() {
-  const { items, add, update, remove, loading } = useCrud("evenements", evenementsStatic);
+  const { evenements: items, add, update, remove, loading, isSeeded, seedFromStatic } = useEvenements();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { titre: "", date: "", heures: "", lieu: "", type: "Conférence", statut: "À venir", description: "", image: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES = ["Webinaire", "Conférence", "Gala", "Projet éditorial", "Autre"];
@@ -119,11 +122,18 @@ export function EvenementsSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les événements statiques dans Supabase ?")) return;
+    setSeeding(true);
+    await seedFromStatic();
+    setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Événements" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Événements" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier l'événement" : "Nouvel événement"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
@@ -155,25 +165,32 @@ export function EvenementsSection() {
 
 /* ─── Projets ─── */
 export function ProjetsSection() {
-  const { items, add, update, remove, loading } = useCrud("projets", projetsStatic);
+  const { projets: items, add, update, remove, loading, isSeeded, seedFromStatic } = useProjets();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { id: "", titre: "", extrait: "", description: "", contenu: "", date: "", categorie: "Solidarité", image: "", photos: [], videos: [] };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Solidarité", "Éducation", "Santé publique", "Autre"];
 
   async function doSave() {
     if (!form.titre || !form.description) { toast.error("Titre et description obligatoires"); return; }
-    const id = form.id || slugify(form.titre) + "-" + Date.now();
-    if (form._editing) await update(form._editing, { ...form, id, _editing: undefined });
-    else await add({ ...form, id });
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
+  }
+
+  async function handleSeed() {
+    if (!confirm("Importer les projets statiques dans Supabase ?")) return;
+    setSeeding(true);
+    await seedFromStatic();
+    setSeeding(false);
   }
 
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Projets & Réalisations" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Projets & Réalisations" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier le projet" : "Nouveau projet"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
@@ -184,7 +201,9 @@ export function ProjetsSection() {
             <div className="md:col-span-2"><Field label="Description courte" required><textarea className={ta} rows={3} value={form.description} onChange={f("description")} /></Field></div>
             <div className="md:col-span-2">
               <Field label="Contenu détaillé (page projet)">
-                <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} className="bg-background rounded-lg" style={{ minHeight: 180 }} />
+                <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
+                  <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} className="bg-background rounded-lg" style={{ minHeight: 180 }} />
+                </Suspense>
               </Field>
             </div>
             <div className="md:col-span-2"><ImgField label="Image d'accroche" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
@@ -249,8 +268,9 @@ export function ProgrammesSection() {
 
 /* ─── Équipe ─── */
 export function EquipeSection() {
-  const { items, add, update, remove, loading } = useCrud("equipe", equipeStatic);
+  const { equipe: items, add, update, remove, loading, isSeeded, seedFromStatic } = useEquipe();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { nom: "", role: "", profession: "", email: "", tel: "", photo: "", linkedin: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -261,11 +281,18 @@ export function EquipeSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les membres du bureau dans Supabase ?")) return;
+    setSeeding(true);
+    await seedFromStatic();
+    setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Équipe / Bureau exécutif" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Équipe / Bureau exécutif" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier le membre" : "Nouveau membre du bureau"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">

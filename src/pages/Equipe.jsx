@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { Mail, Phone, Linkedin } from "lucide-react";
-import { useContent } from "../lib/localStore";
-import { equipe as equipeStatic } from "../data/equipe";
+import { useEquipe } from "../hooks/useEquipe";
 
 export default function Equipe() {
-  const equipe = useContent("equipe", equipeStatic);
+  const { equipe } = useEquipe();
   return (
     <div>
       <PageHero title="Notre Équipe" subtitle="L'Association — Bureau exécutif" />
