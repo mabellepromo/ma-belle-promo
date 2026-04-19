@@ -20,9 +20,10 @@ import { mediaVideos as videosStatic, mediaPhotos as photosStatic } from "../dat
 import { programmes as programmesStatic } from "../data/programmes.js";
 import { sponsors as sponsorsStatic } from "../data/sponsors.js";
 import { ressources as ressourcesStatic } from "../data/ressources.js";
+import { galeries as galeriesStatic } from "../data/galeries.js";
 import {
   Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock,
-  ExternalLink, Search, BookOpen, Image, Mail, Phone, MapPin, Star,
+  ExternalLink, Search, BookOpen, Image, Images, Mail, Phone, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Save, Upload, Video, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, Reply, Send, PenSquare, Paperclip
@@ -1380,6 +1381,74 @@ function ComposeModal({ onClose }) {
   );
 }
 
+/* ─── Galeries ─── */
+function GaleriesSection() {
+  const { items, add, update, remove, loading } = useCrud("galeries", galeriesStatic);
+  const [form, setForm] = useState(null);
+  const empty = { id: "", titre: "", date: "", lieu: "", description: "", cover: "", photos: [], access: "membres" };
+  const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  function doSave() {
+    if (!form.titre || !form.date) { alert("Titre et date obligatoires"); return; }
+    const id = form.id || slugify(form.titre) + "-" + Date.now();
+    if (form._editing) update(form._editing, { ...form, id, _editing: undefined });
+    else add({ ...form, id });
+    setForm(null);
+  }
+
+  const ACCESS_COLORS = {
+    "membres": "bg-amber-100 text-amber-700",
+    "public":  "bg-green-100 text-green-700",
+  };
+
+  if (loading) return <SectionLoader />;
+
+  return (
+    <div>
+      <CrudHeader title="Galeries photos" count={items.length} onAdd={() => setForm({ ...empty })} />
+      {form && (
+        <FormPanel title={form._editing ? "Modifier la galerie" : "Nouvelle galerie"} onClose={() => setForm(null)} onSave={doSave}>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="md:col-span-2"><Field label="Titre" required><input className={inp} value={form.titre} onChange={f("titre")} /></Field></div>
+            <Field label="Date" required><input className={inp} placeholder="ex: 30 Juillet 2022" value={form.date} onChange={f("date")} /></Field>
+            <Field label="Lieu"><input className={inp} placeholder="ex: Lomé, Togo" value={form.lieu} onChange={f("lieu")} /></Field>
+            <Field label="Accès">
+              <select className={sel} value={form.access} onChange={f("access")}>
+                <option value="membres">Membres uniquement</option>
+                <option value="public">Public</option>
+              </select>
+            </Field>
+            <div className="md:col-span-2"><Field label="Description"><textarea className={ta} rows={2} value={form.description} onChange={f("description")} /></Field></div>
+            <div className="md:col-span-2"><ImgField label="Photo de couverture" value={form.cover} onChange={v => setForm(p => ({ ...p, cover: v }))} /></div>
+            <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
+          </div>
+        </FormPanel>
+      )}
+      {items.length === 0 && (
+        <div className="text-center py-16 text-muted-foreground">
+          <Images className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Aucune galerie. Cliquez sur <strong>+ Ajouter</strong> pour en créer une.</p>
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {items.map(g => (
+          <ItemRow
+            key={g.id}
+            img={g.cover}
+            title={g.titre}
+            subtitle={`${g.date}${g.lieu ? " · " + g.lieu : ""} · ${(g.photos || []).length} photo${(g.photos || []).length !== 1 ? "s" : ""}`}
+            badge={g.access === "public" ? "Public" : "Membres"}
+            badgeColor={ACCESS_COLORS[g.access]}
+            extraLink={`/galeries/${g.id}`}
+            onEdit={() => setForm({ ...g, _editing: g.id })}
+            onDelete={() => remove(g.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════
    DASHBOARD PRINCIPAL
 ══════════════════════════════════════════════════════ */
@@ -1480,6 +1549,7 @@ export default function Dashboard() {
     { key: "communiques", label: "Communiqués", icon: Mail },
     { key: "mediatheque", label: "Médiathèque", icon: Image },
     { key: "documents",   label: "Documents",   icon: Download },
+    { key: "galeries",   label: "Galeries",    icon: Images },
   ];
 
   const stats = [
@@ -1793,6 +1863,7 @@ export default function Dashboard() {
         {tab === "communiques" && <CommuniquesSection />}
         {tab === "mediatheque" && <MediathequeSection />}
         {tab === "documents"   && <DocumentsSection />}
+        {tab === "galeries"    && <GaleriesSection />}
 
         </div>{/* fin contenu principal */}
       </div>{/* fin flex body */}

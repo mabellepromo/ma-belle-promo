@@ -33,6 +33,7 @@ const PAGE_TITLES = {
   "/ressources":                 "Ressources Juridiques",
   "/login":                      "Connexion",
   "/dashboard":                  "Tableau de Bord",
+  "/galeries":                   "Galeries photos",
 };
 
 function PageTitleUpdater() {
@@ -77,6 +78,8 @@ import AnnuaireMembres from './pages/AnnuaireMembres';
 import Ressources from './pages/Ressources';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Galeries from './pages/Galeries';
+import GalerieDetail from './pages/GalerieDetail';
 
 function PrivateRoute({ children }) {
   const { session } = useLocalAuth();
@@ -138,6 +141,8 @@ const AuthenticatedApp = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/annuaire" element={<PrivateRoute><AnnuaireMembres /></PrivateRoute>} />
         <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
+        <Route path="/galeries" element={<Galeries />} />
+        <Route path="/galeries/:id" element={<GalerieDetail />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
