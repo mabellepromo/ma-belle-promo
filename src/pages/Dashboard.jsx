@@ -1704,23 +1704,30 @@ export default function Dashboard() {
 
       {compose && <ComposeModal onClose={() => setCompose(false)} />}
 
-      {/* Header */}
-      <div className="bg-background border-b border-border sticky top-0 z-40 h-14 flex-shrink-0">
-        <div className="h-14 px-4 sm:px-6 flex items-center justify-between gap-4">
+      {/* Header premium */}
+      <div className="sticky top-0 z-40 flex-shrink-0" style={{ background: "hsl(150,30%,10%)" }}>
+        <div className="h-16 px-4 sm:px-6 flex items-center justify-between gap-4">
+          {/* Logo + titre */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center"><LayoutDashboard className="w-4 h-4 text-primary" /></div>
-            <span className="font-heading font-bold text-foreground text-sm">Tableau de bord · MBP</span>
+            <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+              alt="MBP" className="w-9 h-9 rounded-full ring-2 ring-white/20" />
+            <div>
+              <p className="font-heading font-bold text-white text-sm leading-tight">Ma Belle Promo</p>
+              <p className="text-white/50 text-[10px] tracking-widest uppercase leading-tight">Tableau de bord</p>
+            </div>
           </div>
+          {/* Actions */}
           <div className="flex items-center gap-2">
             <button onClick={() => setCompose(true)}
-              className="flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 px-3 py-1.5 rounded-lg transition-opacity">
+              className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-lg transition-colors">
               <PenSquare className="w-3.5 h-3.5" /> Composer
             </button>
-            <Link to="/" target="_blank" className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted">
+            <Link to="/" target="_blank"
+              className="hidden sm:flex items-center gap-1 text-xs text-white/60 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
               <Globe className="w-3.5 h-3.5" /> Site
             </Link>
             <button onClick={() => { logout(); navigate("/login"); }}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-500 px-2.5 py-1.5 rounded-lg hover:bg-red-50">
+              className="flex items-center gap-1 text-xs text-white/60 hover:text-red-300 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
               <LogOut className="w-3.5 h-3.5" /> Déconnexion
             </button>
           </div>
@@ -1731,29 +1738,63 @@ export default function Dashboard() {
       <div className="flex flex-1">
 
         {/* Sidebar */}
-        <aside className="w-52 flex-shrink-0 bg-background border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
-          <nav className="p-3 space-y-0.5">
+        <aside className="w-56 flex-shrink-0 bg-background border-r border-border sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex flex-col">
+          {/* Profil admin */}
+          <div className="px-4 py-4 border-b border-border">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-foreground truncate">Administrateur</p>
+                <p className="text-[10px] text-muted-foreground truncate">{session?.email || "mabellepromo@gmail.com"}</p>
+              </div>
+            </div>
+          </div>
+          {/* Navigation */}
+          <nav className="p-3 space-y-0.5 flex-1">
             {TABS.map(({ key, label, icon: Icon, alert }) => (
               <button key={key} onClick={() => setTab(key)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${
                   tab === key
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "bg-primary/10 text-primary font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}>
+                {tab === key && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />}
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1 truncate">{label}</span>
-                {alert && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tab === key ? "bg-white" : "bg-amber-500"}`} />}
+                {alert && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tab === key ? "bg-primary" : "bg-amber-500"}`} />}
               </button>
             ))}
           </nav>
+          {/* Footer sidebar */}
+          <div className="px-4 py-3 border-t border-border">
+            <p className="text-[10px] text-muted-foreground text-center">FDD · Université de Lomé</p>
+            <p className="text-[10px] text-muted-foreground text-center">Promotion 1994–2000</p>
+          </div>
         </aside>
 
         {/* Contenu principal */}
-        <div className="flex-1 p-6 md:p-8 min-w-0">
+        <div className="flex-1 p-6 md:p-8 min-w-0 max-w-6xl">
 
         {/* ── VUE D'ENSEMBLE ── */}
         {tab === "overview" && (
           <div className="space-y-8">
+
+            {/* Bannière de bienvenue */}
+            <div className="relative overflow-hidden rounded-2xl p-6 md:p-8" style={{ background: "hsl(150,30%,10%)" }}>
+              <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 0%, transparent 60%)" }} />
+              <div className="relative flex items-center gap-5">
+                <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+                  alt="MBP" className="w-14 h-14 rounded-full ring-2 ring-white/20 flex-shrink-0 hidden sm:block" />
+                <div>
+                  <p className="text-white/60 text-xs tracking-widest uppercase mb-1">Bienvenue</p>
+                  <h1 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight">Tableau de bord</h1>
+                  <p className="text-white/60 text-sm mt-1">FDD — Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {stats.map(({ label, value, icon: Icon, color, sub, alert, onClick }, i) => (
                 <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
