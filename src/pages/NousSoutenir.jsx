@@ -51,7 +51,7 @@ export default function NousSoutenir() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
             <div className="h-48 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=500&h=300&fit=crop" alt="Bénévolat" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src="https://images.unsplash.com/photo-1760784879929-eb7ea4ee6958?w=500&h=300&fit=crop" alt="Bénévolat" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-7">
               <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
@@ -68,7 +68,7 @@ export default function NousSoutenir() {
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
             <div className="h-48 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=500&h=300&fit=crop" alt="Don" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=500&h=300&fit=crop" alt="Don" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-7">
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">

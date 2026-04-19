@@ -1,6 +1,6 @@
 export default function PageHero({ title, subtitle }) {
   return (
-    <div className="relative py-10 md:py-14 text-center overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-foreground">
+    <div className="relative py-10 md:py-14 text-center overflow-hidden bg-foreground">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 opacity-10">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">

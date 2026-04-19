@@ -12,19 +12,19 @@ export default function Galeries() {
     <div className="min-h-screen bg-background">
 
       {/* En-tête */}
-      <div className="bg-gradient-to-br from-foreground/5 via-background to-primary/5 border-b border-border">
+      <div className="bg-foreground border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary">Ma Belle Promo</p>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary/70">Ma Belle Promo</p>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 text-white/70 text-[10px] font-bold">
                 <Lock className="w-3 h-3" /> Membres uniquement
               </span>
             </div>
-            <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground leading-tight mb-4">
+            <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
               Galeries photos
             </h1>
-            <p className="text-muted-foreground text-sm max-w-xl">
+            <p className="text-white/50 text-sm max-w-xl">
               Vos souvenirs en images — retrouvailles, galas, conférences et moments partagés, réservés aux membres de l'association.
             </p>
           </motion.div>
