@@ -41,6 +41,7 @@ export default function FooterSection() {
           {/* Brand */}
           <div className="flex items-center gap-3 shrink-0">
             <img
+              loading="lazy"
               src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
               alt="Logo Ma Belle Promo"
               className="w-10 h-10 rounded-full opacity-90"

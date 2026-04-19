@@ -103,7 +103,7 @@ export default function TestimonialsSection() {
                   <div className="flex-shrink-0">
                     <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-primary/20 border-2 border-accent/30 shadow-lg">
                       {t.photo ? (
-                        <img src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
+                        <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <span className="font-heading text-3xl font-bold text-accent">{t.name.charAt(0)}</span>

@@ -84,6 +84,7 @@ export default function MissionSection() {
           >
             <div className="rounded-2xl overflow-hidden shadow-2xl">
               <img
+                loading="lazy"
                 src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop"
                 alt="Soirée de Gala Ma Belle Promo"
                 className="w-full h-80 md:h-96 object-cover object-top"

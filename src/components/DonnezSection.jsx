@@ -15,6 +15,7 @@ export default function DonnezSection() {
         {/* Background image with overlay */}
         <div className="relative h-64 md:h-72 flex items-center justify-center">
           <img
+            loading="lazy"
             src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop"
             alt="Notre détermination"
             className="absolute inset-0 w-full h-full object-cover object-center"

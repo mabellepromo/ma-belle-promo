@@ -35,6 +35,7 @@ export default function ActualitesSection() {
             >
               <div className="relative h-52 overflow-hidden">
                 <img
+                  loading="lazy"
                   src={article.image}
                   alt={article.titre}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -91,6 +92,7 @@ export default function ActualitesSection() {
             </div>
             <div className="relative h-64 md:h-80">
               <img
+                loading="lazy"
                 src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=450&fit=crop"
                 alt="Campus de l'Université de Lomé"
                 className="w-full h-full object-cover"
