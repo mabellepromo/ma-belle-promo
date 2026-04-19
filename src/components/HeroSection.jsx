@@ -74,7 +74,7 @@ export default function HeroSection() {
       ref={ref}
       id="hero"
       className="relative min-h-screen flex flex-col overflow-hidden"
-      style={{ background: "linear-gradient(150deg, #064e2b 0%, #0a6e3a 40%, #065a30 70%, #043d20 100%)" }}
+      style={{ background: "linear-gradient(150deg, hsl(150,30%,7%) 0%, hsl(150,32%,12%) 40%, hsl(150,30%,10%) 70%, hsl(150,28%,6%) 100%)" }}
     >
       {/* Image fond subtile */}
       <motion.div style={{ y: bgY }} className="absolute inset-0">
@@ -85,7 +85,7 @@ export default function HeroSection() {
           style={{ opacity: 0.07, mixBlendMode: "luminosity" }}
         />
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(150deg, rgba(6,78,43,0.88) 0%, rgba(10,110,58,0.70) 50%, rgba(4,61,32,0.90) 100%)",
+          background: "linear-gradient(150deg, hsla(150,30%,7%,0.88) 0%, hsla(150,32%,12%,0.70) 50%, hsla(150,28%,6%,0.90) 100%)",
         }} />
       </motion.div>
 
@@ -294,7 +294,7 @@ export default function HeroSection() {
                 className="w-full h-full object-cover object-top"
               />
               <div className="absolute bottom-0 left-0 right-0 h-1/3"
-                style={{ background: "linear-gradient(to top, rgba(4,61,32,0.82) 0%, transparent 100%)" }} />
+                style={{ background: "linear-gradient(to top, hsla(150,30%,7%,0.82) 0%, transparent 100%)" }} />
               <div className="absolute bottom-4 left-4 right-4 rounded-xl px-4 py-3"
                 style={{ background: "rgba(0,0,0,0.22)", backdropFilter: "blur(14px)", border: "1px solid rgba(255,255,255,0.15)" }}>
                 <p className="text-white font-heading text-sm font-bold leading-tight">Fabienne SENAYA-ATAYI</p>
