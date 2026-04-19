@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Search, Tag, Calendar, ArrowRight, BookOpen, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useContent } from "../lib/localStore";
-import { articles as articlesStatic } from "../data/articles";
+import { useArticles } from "../hooks/useArticles";
 import PageHero from "../components/PageHero";
 
 const CATEGORIES = [
@@ -43,7 +42,7 @@ function articleMatchesCategory(article, catId) {
 }
 
 export default function Blog() {
-  const articles = useContent("articles", articlesStatic);
+  const { articles } = useArticles();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 

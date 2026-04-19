@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Search, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useContent } from "../lib/localStore";
-import { articles as articlesStatic } from "../data/articles";
+import { useArticles } from "../hooks/useArticles";
 
 const catPills = {
   "Webinaire":   "bg-blue-500/90 text-white",
@@ -179,7 +178,7 @@ function ListCard({ article, index }) {
 
 /* ── Page principale ── */
 export default function Actualites() {
-  const articles = useContent("articles", articlesStatic);
+  const { articles } = useArticles();
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("Tous");
 

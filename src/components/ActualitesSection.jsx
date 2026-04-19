@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, Clock } from "lucide-react";
-import { articles } from "../data/articles";
+import { useArticles } from "../hooks/useArticles";
 import { useContent } from "../lib/localStore";
 import { evenements as evenementsStatic } from "../data/evenements";
 
 export default function ActualitesSection() {
+  const { articles } = useArticles();
   const evenements = useContent("evenements", evenementsStatic);
   const prochains = evenements
     .filter(e => e.statut?.toLowerCase() !== "passé")

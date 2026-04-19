@@ -5,6 +5,7 @@ import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
 import PhotoGallery from "../components/PhotoGallery";
+import DOMPurify from "dompurify";
 
 const catColors = {
   "Solidarité":    "bg-rose-100 text-rose-700 ring-rose-200",
@@ -156,7 +157,7 @@ export default function ProjetDetail() {
             prose-strong:text-foreground
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
             {projet.contenu.trim().startsWith("<")
-              ? <div dangerouslySetInnerHTML={{ __html: projet.contenu }} />
+              ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(projet.contenu) }} />
               : <ReactMarkdown>{projet.contenu}</ReactMarkdown>
             }
           </article>

@@ -1,10 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { useContent } from "../lib/localStore";
-import { articles as articlesStatic } from "../data/articles";
+import { useArticles } from "../hooks/useArticles";
 import { Calendar, ArrowLeft, Clock, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useState } from "react";
 import PhotoGallery from "../components/PhotoGallery";
+import DOMPurify from "dompurify";
 
 const catColors = {
   "Webinaire":   "bg-blue-100 text-blue-700 ring-blue-200",
@@ -22,12 +22,9 @@ function readingTime(content) {
 
 export default function ArticleDetail() {
   const { id } = useParams();
-  const allArticles = useContent("articles", articlesStatic);
+  const { articles: allArticles } = useArticles();
   const article = allArticles.find((a) => String(a.id) === String(id));
-  const staticArticle = articlesStatic.find((a) => String(a.id) === String(id));
-  const galleryPhotos = article?.photos?.length > 0
-    ? article.photos
-    : (staticArticle?.photos || []);
+  const galleryPhotos = article?.photos?.length > 0 ? article.photos : [];
 
 
   if (!article) {
@@ -125,7 +122,7 @@ export default function ArticleDetail() {
           prose-a:text-primary prose-a:no-underline hover:prose-a:underline
           prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:font-medium">
           {article.contenu?.trim().startsWith("<")
-            ? <div dangerouslySetInnerHTML={{ __html: article.contenu }} />
+            ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.contenu) }} />
             : <ReactMarkdown>{article.contenu}</ReactMarkdown>
           }
         </article>

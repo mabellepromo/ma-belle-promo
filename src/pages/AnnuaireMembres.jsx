@@ -247,7 +247,7 @@ function MemberModal({ member, onClose, session, onEdit }) {
 
         <div className="relative h-80 bg-muted">
           {member.photo
-            ? <img src={member.photo} alt={member.nom} className="w-full h-full object-cover"
+            ? <img loading="lazy" src={member.photo} alt={member.nom} className="w-full h-full object-cover"
                 style={{ objectPosition: member.photoPosition === "center" ? "50% 50%" : "50% 20%" }}
                 onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.nom)}&background=064e3b&color=6ee7b7&size=400`; }} />
             : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary/60">

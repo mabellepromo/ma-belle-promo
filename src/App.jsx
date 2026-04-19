@@ -4,7 +4,7 @@ import { WindowFrame } from './components/WindowFrame'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 
 const SITE = "Ma Belle Promo";
 
@@ -50,38 +50,49 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import ScrollToTop from '@/components/ScrollToTop';
+
+// Pages chargées immédiatement (chemin critique)
 import Home from './pages/Home';
 import Layout from './components/Layout';
-import Credo from './pages/Credo';
-import Ambition from './pages/Ambition';
-import Equipe from './pages/Equipe';
-import Sponsors from './pages/Sponsors';
-import Evenements from './pages/Evenements';
-import Projets from './pages/Projets';
-import Programmes from './pages/Programmes';
-import Adhesion from './pages/Adhesion';
-import Cotisation from './pages/Cotisation';
-import NousSoutenir from './pages/NousSoutenir';
-import Actualites from './pages/Actualites';
-import Mediatheque from './pages/Mediatheque';
-import Documents from './pages/Documents';
-import Contacts from './pages/Contacts';
-import Communiques from './pages/Communiques';
-import ArticleDetail from './pages/ArticleDetail';
-import ProjetDetail from './pages/ProjetDetail';
-import Don from './pages/Don';
-import MerciDon from './pages/MerciDon';
-import EspaceMembre from './pages/EspaceMembre';
-import Blog from './pages/Blog';
-import AnnuaireMembres from './pages/AnnuaireMembres';
-import Ressources from './pages/Ressources';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Galeries from './pages/Galeries';
-import GalerieDetail from './pages/GalerieDetail';
 import ResetPassword from './pages/ResetPassword';
-import ScrollToTop from '@/components/ScrollToTop';
+import Actualites from './pages/Actualites';
+import Contacts from './pages/Contacts';
+
+// Pages chargées à la demande (code splitting)
+const Credo          = lazy(() => import('./pages/Credo'));
+const Ambition       = lazy(() => import('./pages/Ambition'));
+const Equipe         = lazy(() => import('./pages/Equipe'));
+const Sponsors       = lazy(() => import('./pages/Sponsors'));
+const Evenements     = lazy(() => import('./pages/Evenements'));
+const Projets        = lazy(() => import('./pages/Projets'));
+const ProjetDetail   = lazy(() => import('./pages/ProjetDetail'));
+const Programmes     = lazy(() => import('./pages/Programmes'));
+const Adhesion       = lazy(() => import('./pages/Adhesion'));
+const Cotisation     = lazy(() => import('./pages/Cotisation'));
+const NousSoutenir   = lazy(() => import('./pages/NousSoutenir'));
+const Mediatheque    = lazy(() => import('./pages/Mediatheque'));
+const Documents      = lazy(() => import('./pages/Documents'));
+const Communiques    = lazy(() => import('./pages/Communiques'));
+const ArticleDetail  = lazy(() => import('./pages/ArticleDetail'));
+const Don            = lazy(() => import('./pages/Don'));
+const MerciDon       = lazy(() => import('./pages/MerciDon'));
+const EspaceMembre   = lazy(() => import('./pages/EspaceMembre'));
+const Blog           = lazy(() => import('./pages/Blog'));
+const AnnuaireMembres = lazy(() => import('./pages/AnnuaireMembres'));
+const Ressources     = lazy(() => import('./pages/Ressources'));
+const Dashboard      = lazy(() => import('./pages/Dashboard'));
+const Galeries       = lazy(() => import('./pages/Galeries'));
+const GalerieDetail  = lazy(() => import('./pages/GalerieDetail'));
+
+function PageLoader() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-background">
+      <div className="w-7 h-7 border-4 border-border border-t-primary rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function PrivateRoute({ children }) {
   const { session } = useLocalAuth();
@@ -117,6 +128,7 @@ const AuthenticatedApp = () => {
     <>
     <PageTitleUpdater />
     <ScrollToTop />
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>
@@ -152,6 +164,7 @@ const AuthenticatedApp = () => {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
     </>
   );
 };

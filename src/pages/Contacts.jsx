@@ -9,9 +9,9 @@ import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
 import { sbGet, sbSet } from "../lib/supabase";
 
-const EMAILJS_SERVICE  = "service_lytdtan";
-const EMAILJS_TEMPLATE = "template_tznyr0b";
-const EMAILJS_KEY      = "8AzpuYIvN_xHmA--I";
+const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function Contacts() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
@@ -38,7 +38,6 @@ export default function Contacts() {
       await sbSet("mbp_contact_messages", [msg, ...existing]);
 
       // Notification email à mabellepromo@gmail.com
-      console.log("[EmailJS] Envoi notification en cours...");
       const ejsResult = await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
@@ -53,8 +52,6 @@ export default function Contacts() {
         },
         { publicKey: EMAILJS_KEY }
       );
-      console.log("[EmailJS] Résultat:", ejsResult);
-
       toast.success("Message envoyé avec succès !");
       setForm({ name: "", email: "", sujet: "", message: "" });
     } catch (err) {

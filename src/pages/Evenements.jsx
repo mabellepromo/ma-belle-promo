@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useContent } from "../lib/localStore";
 import { evenements as evenementsStatic } from "../data/evenements";
-import { articles as articlesStatic } from "../data/articles";
+import { useArticles } from "../hooks/useArticles";
 
 const TYPE_STYLE = {
   "Webinaire":        { badge: "bg-blue-100 text-blue-700",   accent: "bg-blue-500" },
@@ -15,7 +15,7 @@ const TYPE_STYLE = {
 
 export default function Evenements() {
   const evenements = useContent("evenements", evenementsStatic);
-  const articles   = useContent("articles",   articlesStatic);
+  const { articles } = useArticles();
 
   const liste = useMemo(() =>
     evenements
