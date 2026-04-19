@@ -1706,14 +1706,14 @@ export default function Dashboard() {
 
       {/* Header premium */}
       <div className="sticky top-0 z-40 flex-shrink-0" style={{ background: "hsl(150,30%,10%)" }}>
-        <div className="h-16 px-4 sm:px-6 flex items-center justify-between gap-4">
+        <div className="h-20 px-6 sm:px-8 flex items-center justify-between gap-4">
           {/* Logo + titre */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-              alt="MBP" className="w-9 h-9 rounded-full ring-2 ring-white/20" />
+              alt="MBP" className="w-12 h-12 rounded-full ring-2 ring-white/25" />
             <div>
-              <p className="font-heading font-bold text-white text-sm leading-tight">Ma Belle Promo</p>
-              <p className="text-white/50 text-[10px] tracking-widest uppercase leading-tight">Tableau de bord</p>
+              <p className="font-heading font-bold text-white text-base leading-tight">Ma Belle Promo</p>
+              <p className="text-white/50 text-[10px] tracking-widest uppercase leading-tight mt-0.5">Tableau de bord</p>
             </div>
           </div>
           {/* Actions */}
@@ -1738,7 +1738,7 @@ export default function Dashboard() {
       <div className="flex flex-1">
 
         {/* Sidebar */}
-        <aside className="w-56 flex-shrink-0 bg-background border-r border-border sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex flex-col">
+        <aside className="w-56 flex-shrink-0 bg-background border-r border-border border-l-2 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto flex flex-col" style={{ borderLeftColor: "hsl(150,45%,35%)" }}>
           {/* Profil admin */}
           <div className="px-4 py-4 border-b border-border">
             <div className="flex items-center gap-2.5">
@@ -1755,12 +1755,11 @@ export default function Dashboard() {
           <nav className="p-3 space-y-0.5 flex-1">
             {TABS.map(({ key, label, icon: Icon, alert }) => (
               <button key={key} onClick={() => setTab(key)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${
+                className={`w-full flex items-center gap-2.5 pl-4 pr-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${
                   tab === key
                     ? "bg-primary/10 text-primary font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}>
-                {tab === key && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />}
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1 truncate">{label}</span>
                 {alert && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tab === key ? "bg-primary" : "bg-amber-500"}`} />}
@@ -1775,7 +1774,7 @@ export default function Dashboard() {
         </aside>
 
         {/* Contenu principal */}
-        <div className="flex-1 p-6 md:p-8 min-w-0 max-w-6xl">
+        <div className="flex-1 p-6 md:p-8 min-w-0">
 
         {/* ── VUE D'ENSEMBLE ── */}
         {tab === "overview" && (
