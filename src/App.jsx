@@ -80,6 +80,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Galeries from './pages/Galeries';
 import GalerieDetail from './pages/GalerieDetail';
+import ResetPassword from './pages/ResetPassword';
 import ScrollToTop from '@/components/ScrollToTop';
 
 function PrivateRoute({ children }) {
@@ -139,7 +140,7 @@ const AuthenticatedApp = () => {
         <Route path="/actualites/:id" element={<ArticleDetail />} />
         <Route path="/don" element={<Don />} />
         <Route path="/don/merci" element={<MerciDon />} />
-        <Route path="/espace-membre" element={<EspaceMembre />} />
+        <Route path="/espace-membre" element={<PrivateRoute><EspaceMembre /></PrivateRoute>} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/annuaire" element={<PrivateRoute><AnnuaireMembres /></PrivateRoute>} />
         <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
@@ -147,6 +148,7 @@ const AuthenticatedApp = () => {
         <Route path="/galeries/:id" element={<GalerieDetail />} />
       </Route>
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
