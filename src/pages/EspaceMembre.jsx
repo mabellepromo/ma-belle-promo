@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 import { User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X, Download, Shield, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,17 +37,19 @@ export default function EspaceMembre() {
   const [profile, setProfile] = useState({ phone: "", city: "", country: "Togo", profession: "", linkedin: "" });
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState("profil");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setUser(u);
+    supabase.auth.getUser().then(({ data: { user: u } }) => {
       if (u) {
+        const meta = u.user_metadata || {};
+        setUser({ ...u, ...meta });
         setProfile({
-          phone: u.phone || "",
-          city: u.city || "",
-          country: u.country || "Togo",
-          profession: u.profession || "",
-          linkedin: u.linkedin || "",
+          phone: meta.phone || "",
+          city: meta.city || "",
+          country: meta.country || "Togo",
+          profession: meta.profession || "",
+          linkedin: meta.linkedin || "",
         });
       }
     }).finally(() => setLoading(false));
@@ -54,7 +57,7 @@ export default function EspaceMembre() {
 
   const handleSave = async () => {
     setSaving(true);
-    await base44.auth.updateMe(profile);
+    await supabase.auth.updateUser({ data: profile });
     setUser((u) => ({ ...u, ...profile }));
     setEditing(false);
     setSaving(false);
@@ -78,7 +81,7 @@ export default function EspaceMembre() {
           </div>
           <h2 className="font-heading text-3xl font-bold text-foreground mb-3">Accès réservé aux membres</h2>
           <p className="text-muted-foreground mb-6 text-justify">Veuillez vous connecter pour accéder à votre espace membre et consulter votre profil, vos cotisations et les documents exclusifs.</p>
-          <Button onClick={() => base44.auth.redirectToLogin(window.location.href)} className="rounded-full gap-2">
+          <Button onClick={() => navigate('/login')} className="rounded-full gap-2">
             <Shield className="w-4 h-4" /> Se connecter
           </Button>
         </motion.div>

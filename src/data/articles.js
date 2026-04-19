@@ -9,7 +9,7 @@ export const articles = [
     image: "https://i.ytimg.com/vi/enhXRt8erJ0/sddefault.jpg",
     youtube: "https://www.youtube.com/watch?v=enhXRt8erJ0",
     photos: [
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&h=400&fit=crop",
+      "/images/evenements/webinaire-kara.jpg",
       "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&h=400&fit=crop",
       "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
     ],
@@ -102,7 +102,7 @@ Les panélistes ont encouragé les étudiants à planifier leurs objectifs, anti
     extrait: "Le 2 décembre 2022 à l'Agora Senghor de Lomé, Ma Belle Promo a organisé une rencontre intergénérationnelle réunissant près de 200 participants autour des leviers pour réussir tout en impactant sa communauté.",
     date: "7 Mars 2023",
     categorie: "Conférence",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+    image: "/images/evenements/dialogue-generations.jpg",
     photos: [],
     contenu: `Le **02 décembre 2022** à l'Agora Senghor de Lomé, Ma Belle Promo a organisé une rencontre de dialogue intergénérationnel sur le thème :
 

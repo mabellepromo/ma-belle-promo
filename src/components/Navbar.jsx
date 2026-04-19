@@ -71,9 +71,8 @@ function DesktopDropdown({ item }) {
     >
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-1 px-3.5 py-2 text-sm font-medium transition-colors duration-150 ${
-          open ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-        }`}
+        className="flex items-center gap-1 px-3.5 py-2 text-sm font-medium transition-colors duration-150"
+        style={{ color: open ? "#ffffff" : "rgba(255,255,255,0.70)" }}
       >
         {item.label}
         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -88,14 +87,18 @@ function DesktopDropdown({ item }) {
             transition={{ duration: 0.12 }}
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
-            className="absolute top-full left-0 mt-1 w-52 bg-background border border-border rounded-lg shadow-lg py-1 z-50"
+            className="absolute top-full left-0 mt-1 w-52 rounded-lg shadow-xl py-1 z-50 border"
+            style={{ background: "hsl(150,30%,8%)", borderColor: "rgba(255,255,255,0.10)" }}
           >
             {item.children.map((child) => (
               <Link
                 key={child.label}
                 to={child.href}
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="block px-4 py-2 text-sm transition-colors"
+                style={{ color: "rgba(255,255,255,0.65)" }}
+                onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.65)"}
               >
                 {child.label}
               </Link>
@@ -162,13 +165,12 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled
-        ? "bg-background/95 backdrop-blur-xl border-b border-border/60 shadow-sm"
-        : "bg-background/80 backdrop-blur-xl border-b border-border/30"
-    }`}>
+    <nav
+      style={{ background: scrolled ? "hsl(150,30%,7%)" : "hsl(150,30%,10%)" }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-lg"
+    >
       {/* Top accent bar */}
-      <div className="h-0.5 bg-gradient-to-r from-primary via-accent to-primary/60" />
+      <div className="h-0.5 bg-gradient-to-r from-emerald-400 via-yellow-300 to-emerald-500" />
 
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-18">
         {/* Logo */}
@@ -179,8 +181,8 @@ export default function Navbar() {
             className="w-10 h-10 rounded-full object-cover shadow-md group-hover:shadow-primary/30 transition-shadow"
           />
           <div className="hidden sm:block">
-            <div className="font-heading text-base font-bold text-foreground leading-tight tracking-tight">Ma Belle Promo</div>
-            <div className="text-[10px] text-muted-foreground tracking-widest uppercase leading-tight">FDD-MBP · Togo</div>
+            <div className="font-heading text-base font-bold leading-tight tracking-tight" style={{ color: "#e2f5ed" }}>Ma Belle Promo</div>
+            <div className="text-[10px] tracking-widest uppercase leading-tight" style={{ color: "rgba(255,255,255,0.40)" }}>FDD-MBP · Togo</div>
           </div>
         </Link>
 
@@ -195,14 +197,16 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/don")}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-wide uppercase"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-wide uppercase"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
           >
             ♥ Faire un don
           </button>
           {isAdmin && (
             <button
               onClick={() => navigate("/dashboard")}
-              className="hidden sm:flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 text-primary text-xs font-semibold rounded-full hover:bg-primary/20 transition-colors"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
+              style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
             >
               <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
             </button>
@@ -210,7 +214,8 @@ export default function Navbar() {
           {!isAdmin && (
             <button
               onClick={() => navigate("/espace-membre")}
-              className="hidden sm:flex items-center gap-2 px-3 py-2 border border-border text-xs font-semibold rounded-full hover:bg-muted transition-colors"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
+              style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
             >
               <User className="w-3.5 h-3.5" /> Mon espace
             </button>

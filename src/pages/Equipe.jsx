@@ -53,7 +53,7 @@ export default function Equipe() {
                 <div className="mt-4 space-y-1.5 border-t border-border pt-4">
                   {membre.email && (
                     <a href={`mailto:${membre.email}`}
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                      className="flex items-center gap-2 text-xs text-primary hover:underline hover:text-primary/80 transition-colors">
                       <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{membre.email}</span>
                     </a>

@@ -80,6 +80,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Galeries from './pages/Galeries';
 import GalerieDetail from './pages/GalerieDetail';
+import ScrollToTop from '@/components/ScrollToTop';
 
 function PrivateRoute({ children }) {
   const { session } = useLocalAuth();
@@ -114,6 +115,7 @@ const AuthenticatedApp = () => {
   return (
     <>
     <PageTitleUpdater />
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>

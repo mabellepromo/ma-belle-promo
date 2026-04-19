@@ -1,11 +1,18 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, ArrowRight, Play } from "lucide-react";
+import { Calendar, ArrowRight, Clock } from "lucide-react";
 import { articles } from "../data/articles";
+import { useContent } from "../lib/localStore";
+import { evenements as evenementsStatic } from "../data/evenements";
 
 export default function ActualitesSection() {
+  const evenements = useContent("evenements", evenementsStatic);
+  const prochains = evenements
+    .filter(e => e.statut?.toLowerCase() !== "passé")
+    .slice(0, 3);
+
   return (
-    <section id="actualites" className="py-24 md:py-32 bg-muted/50">
+    <section id="actualites" className="py-12 md:py-16 bg-muted/50">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -65,42 +72,45 @@ export default function ActualitesSection() {
           ))}
         </div>
 
-        {/* Video highlight */}
+        {/* Bloc événements */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mt-16 relative rounded-2xl overflow-hidden bg-foreground/5 border border-border"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-12 bg-card border border-border rounded-2xl p-6"
         >
-          <div className="grid md:grid-cols-2 items-center">
-            <div className="p-8 md:p-12">
-              <span className="text-xs font-semibold tracking-widest uppercase text-accent">À la une</span>
-              <h3 className="mt-3 font-heading text-2xl md:text-3xl font-bold text-foreground">
-                Plan d'action 2023-2025
-              </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                Découvrez en vidéo notre feuille de route stratégique et nos ambitions 
-                pour accompagner les étudiants de la Faculté de Droit de Lomé.
-              </p>
-              <Link
-                to="/actualites/numerique-togo"
-                className="mt-6 inline-flex items-center gap-3 px-6 py-3 bg-primary text-primary-foreground rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
-              >
-                <Play className="w-4 h-4" /> Voir l'article complet
-              </Link>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <span className="text-xs font-semibold tracking-widest uppercase text-accent">Agenda</span>
+              <h3 className="mt-1 font-heading text-xl font-bold text-foreground">Prochains événements</h3>
             </div>
-            <div className="relative h-64 md:h-80">
-              <img
-                loading="lazy"
-                src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=450&fit=crop"
-                alt="Campus de l'Université de Lomé"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent md:from-background/40" />
-            </div>
+            <Link to="/activites/evenements" className="flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all">
+              Tout voir <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
+          {prochains.length > 0 ? (
+            <div className="divide-y divide-border">
+              {prochains.map((e, i) => (
+                <div key={e.id || i} className="flex items-center gap-4 py-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{e.titre}</p>
+                    <p className="text-xs text-muted-foreground">{e.date}{e.lieu ? ` · ${e.lieu}` : ""}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 py-2">
+              <Calendar className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">Aucun événement à venir pour le moment. Revenez bientôt.</p>
+            </div>
+          )}
         </motion.div>
+
       </div>
     </section>
   );

@@ -1,37 +1,13 @@
 import { motion } from "framer-motion";
-import { BookOpen, Users, GraduationCap, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const values = [
-  {
-    icon: Users,
-    title: "Amitié",
-    desc: "Un réseau exclusif de diplômés unis par des liens durables, autour des valeurs de partage et de réciprocité.",
-  },
-  {
-    icon: BookOpen,
-    title: "Solidarité",
-    desc: "Échange, partage et réciprocité au service des étudiants actuels et de la communauté.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Entraide",
-    desc: "Accompagner les futurs diplômés avec nos compétences, expertises et expériences.",
-  },
-  {
-    icon: Shield,
-    title: "Engagement",
-    desc: "Des leaders engagés pour changer la vie des personnes destinataires de nos actions.",
-  },
-];
 
 export default function MissionSection() {
   return (
-    <section id="mission" className="py-24 md:py-32 bg-background">
+    <section id="mission" className="py-12 md:py-16 bg-background">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
-        <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center mb-20">
+        <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center mb-0">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -39,10 +15,8 @@ export default function MissionSection() {
             transition={{ duration: 0.7 }}
           >
             <span className="text-xs font-semibold tracking-widest uppercase text-accent">Qui sommes-nous</span>
-            <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
-              Nous sommes <span className="text-primary">MA BELLE PROMO</span>
-              <br />
-              <span className="text-2xl md:text-3xl text-muted-foreground font-medium">et… voici notre histoire !</span>
+            <h2 className="mt-3 font-heading text-2xl md:text-3xl font-bold text-foreground leading-tight">
+              Nous sommes <span className="text-primary">Ma Belle Promo</span>… <span className="text-muted-foreground font-medium">voici notre histoire !</span>
             </h2>
             <p className="mt-6 text-muted-foreground leading-relaxed text-lg">
               Ma Belle Promo est un regroupement d'anciens étudiants de la Faculté de Droit de l'Université de Lomé
@@ -85,7 +59,7 @@ export default function MissionSection() {
             <div className="rounded-2xl overflow-hidden shadow-2xl">
               <img
                 loading="lazy"
-                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop"
+                src="/images/evenements/reunion-mbp.jpg"
                 alt="Soirée de Gala Ma Belle Promo"
                 className="w-full h-80 md:h-96 object-cover object-top"
               />
@@ -106,38 +80,6 @@ export default function MissionSection() {
           </motion.div>
         </div>
 
-        {/* Values */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <span className="text-xs font-semibold tracking-widest uppercase text-accent">Notre raison d'être</span>
-          <h3 className="mt-3 font-heading text-2xl md:text-3xl font-bold text-foreground">
-            Nos valeurs fondamentales
-          </h3>
-        </motion.div>
-
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {values.map((v, i) => (
-            <motion.div
-              key={v.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.12 }}
-              className="group bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all duration-300 text-center"
-            >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-primary/20 transition-colors">
-                <v.icon className="w-6 h-6 text-primary" />
-              </div>
-              <h4 className="font-heading text-lg font-semibold text-foreground mb-2">{v.title}</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </section>
   );

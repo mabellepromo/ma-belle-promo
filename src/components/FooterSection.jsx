@@ -1,6 +1,6 @@
 import { Heart, Mail, Phone, ArrowRight, Instagram, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -13,10 +13,11 @@ const SOCIAL = [
 ];
 
 const NAV = [
-  { label: "Accueil",    href: "/" },
-  { label: "Adhésion",  href: "/implications/adhesion" },
-  { label: "Actualités",href: "/informations/actualites" },
-  { label: "Contact",   href: "/informations/contacts" },
+  { label: "Accueil",       href: "/" },
+  { label: "Adhésion",      href: "/implications/adhesion" },
+  { label: "Actualités",    href: "/informations/actualites" },
+  { label: "Nous soutenir", href: "/implications/soutenir" },
+  { label: "Contact",       href: "/informations/contacts" },
 ];
 
 export default function FooterSection() {
@@ -26,7 +27,10 @@ export default function FooterSection() {
   const handleNewsletter = async (e) => {
     e.preventDefault();
     if (!email.includes("@")) return;
-    await base44.entities.NewsletterSubscriber.create({ email, source: "footer", active: true });
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .insert({ email, source: "footer", active: true });
+    if (error && error.code !== "23505") throw error;
     setDone(true);
     toast.success("Inscription confirmée !");
   };
@@ -59,6 +63,14 @@ export default function FooterSection() {
                 {l.label}
               </Link>
             ))}
+            <a
+              href="https://passerelles-mbp.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity text-background/50"
+            >
+              Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
+            </a>
           </nav>
 
           {/* Contact + newsletter */}
@@ -74,14 +86,15 @@ export default function FooterSection() {
             {done ? (
               <p className="text-background/40 text-xs">✓ Inscrit(e) à la newsletter</p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex gap-1.5">
+              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5">
+                <span className="text-background/60 text-xs font-medium whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>
                 <input
                   type="email"
-                  placeholder="Votre email — newsletter"
+                  placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 w-48"
+                  className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 w-40"
                 />
                 <button type="submit" className="h-7 w-7 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-colors">
                   <ArrowRight className="w-3 h-3 text-primary-foreground" />

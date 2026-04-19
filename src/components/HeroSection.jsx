@@ -200,17 +200,17 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="font-heading leading-none mb-1"
-              style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.03em" }}>
-              Ensemble pour
+            <h1 className="font-heading leading-none mb-1 text-center"
+              style={{ fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.03em" }}>
+              L'excellence juridique partagée,
             </h1>
-            <h1 className="font-heading leading-none mb-6"
+            <h1 className="font-heading leading-none mb-6 text-center"
               style={{
-                fontSize: "clamp(2.4rem, 5vw, 4rem)", fontWeight: 900, letterSpacing: "-0.03em",
+                fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, letterSpacing: "-0.03em",
                 background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>
-              un Togo meilleur
+              au service de l'avenir
             </h1>
 
             {/* Citation présidente */}
@@ -231,7 +231,7 @@ export default function HeroSection() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
                 className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
@@ -244,23 +244,13 @@ export default function HeroSection() {
               >
                 Notre mission <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
-              <Link to="/don"
+              <Link to="/implications/soutenir"
                 className="flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
                 style={{
-                  padding: "13px 26px",
+                  padding: "13px 22px",
                   background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
                   color: "#000",
-                  boxShadow: "0 6px 24px rgba(251,191,36,0.30)",
-                }}>
-                <Heart className="w-4 h-4" /> Faire un don
-              </Link>
-              <Link to="/implications/soutenir"
-                className="flex items-center gap-2 justify-center font-semibold text-sm rounded-full transition-all"
-                style={{
-                  padding: "13px 22px",
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1.5px solid rgba(255,255,255,0.14)",
-                  color: "rgba(255,255,255,0.65)",
+                  boxShadow: "0 4px 16px rgba(251,191,36,0.30)",
                 }}>
                 Nous soutenir
               </Link>
@@ -309,7 +299,7 @@ export default function HeroSection() {
               style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.16)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" }}>
               <span className="text-lg">🏛️</span>
               <div>
-                <p className="text-xs font-bold text-white">FDD · Lomé</p>
+                <p className="text-xs font-bold text-white">Ma Belle Promo</p>
                 <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>Fondée en 2018</p>
               </div>
             </motion.div>
