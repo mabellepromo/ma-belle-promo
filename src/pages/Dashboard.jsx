@@ -276,19 +276,13 @@ export default function Dashboard() {
                   ))}
                 </div>
                 <div className="bg-background border border-border rounded-2xl p-5">
-                  <h3 className="font-heading font-bold text-foreground mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> Comptes d'accès</h3>
-                  {[
-                    { email: "mabellepromo@gmail.com", role: "Admin",  color: "bg-primary/10 text-primary" },
-                    { email: "fasenaya@gmail.com",      role: "Membre", color: "bg-blue-50 text-blue-700" },
-                    { email: "invite@mabellepromo.tg", role: "Invité", color: "bg-muted text-muted-foreground" },
-                  ].map(r => (
-                    <div key={r.email} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                      <span className="font-mono text-xs text-foreground">{r.email}</span>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${r.color}`}>{r.role}</span>
-                    </div>
-                  ))}
+                  <h3 className="font-heading font-bold text-foreground mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> Session active</h3>
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="font-mono text-xs text-foreground">{session?.email}</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">{session?.role || "admin"}</span>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-3">
-                    Pour ajouter un compte : créer un utilisateur dans le dashboard Supabase avec <code className="text-primary font-mono">role</code> dans les métadonnées.
+                    Pour gérer les comptes : ouvrir le dashboard Supabase → Authentication → Users. Le champ <code className="text-primary font-mono">role</code> dans les métadonnées détermine les droits.
                   </p>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { base44 } from "@/api/base44Client";
+import { sbGet, sbSet } from "@/lib/supabase";
 import { toast } from "sonner";
 
 export default function NewsletterSection() {
@@ -16,7 +16,10 @@ export default function NewsletterSection() {
     if (!email || !email.includes("@")) { toast.error("Veuillez entrer une adresse email valide."); return; }
     setLoading(true);
     try {
-      await base44.entities.NewsletterSubscriber.create({ email, name, source: "home", active: true });
+      const existing = await sbGet("mbp_newsletter_subscribers") || [];
+      if (!existing.find(s => s.email === email)) {
+        await sbSet("mbp_newsletter_subscribers", [...existing, { email, name, source: "home", subscribedAt: new Date().toISOString() }]);
+      }
       setDone(true);
       toast.success("Inscription confirmée ! Merci de votre soutien.");
     } catch {
