@@ -150,7 +150,7 @@ export default function AnnuaireMembres() {
                 onClick={() => setSelected(m)} className="flex flex-col items-center gap-0.5 cursor-pointer group" style={{ width: 72 }}>
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-primary/60 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
                   {m.photo
-                    ? <img src={m.photo} alt={m.nom} className="w-full h-full object-cover"
+                    ? <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                         style={{ objectPosition: m.photoPosition === "center" ? "center" : "center 15%" }}
                         onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
                     : <div className="w-full h-full flex items-center justify-center"><span className="text-primary-foreground font-heading font-bold text-sm">{m.nom.charAt(0)}</span></div>
@@ -175,7 +175,7 @@ export default function AnnuaireMembres() {
                   {/* Photo petite à gauche */}
                   <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
                     {m.photo
-                      ? <img src={m.photo} alt={m.nom} className="w-full h-full object-cover"
+                      ? <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                           style={{ objectPosition: m.photoPosition === "center" ? "center" : "center 15%" }}
                           onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
                       : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary/60">
@@ -667,7 +667,7 @@ function ValidationModal({ pending, onValidate, onReject, onClose }) {
           {pending.map((m) => (
             <div key={m.id} className="flex items-center gap-4 p-4 rounded-xl bg-muted/40 border border-border">
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex-shrink-0">
-                <img src={m.photo} alt={m.nom} className="w-full h-full object-cover"
+                <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                   onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=48`; }} />
               </div>
               <div className="flex-1 min-w-0">

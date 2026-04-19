@@ -215,7 +215,7 @@ export default function GalerieDetail() {
                 {photos.map((src, i) => (
                   <button key={i} onClick={() => setLightbox(i)}
                     className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === lightbox ? "border-primary scale-110" : "border-transparent opacity-50 hover:opacity-80"}`}>
-                    <img src={src} alt="" className="w-full h-full object-cover" />
+                    <img loading="lazy" src={src} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

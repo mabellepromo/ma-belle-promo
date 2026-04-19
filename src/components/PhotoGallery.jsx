@@ -73,7 +73,7 @@ function Lightbox({ photos, idx, onClose }) {
                 i === current ? "ring-2 ring-white scale-110" : "opacity-50 hover:opacity-80"
               }`}
             >
-              <img src={p} alt="" className="w-full h-full object-cover" />
+              <img loading="lazy" src={p} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
