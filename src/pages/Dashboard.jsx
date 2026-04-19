@@ -54,7 +54,7 @@ function ImgField({ label, value, onChange }) {
       const url = await uploadImage(file);
       onChange(url);
     } catch (err) {
-      alert("Erreur upload image : " + (err.message || err));
+      toast.error("Erreur upload image : " + (err.message || err));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -91,7 +91,7 @@ function GalerieField({ photos = [], onChange }) {
       const urls = await Promise.all(files.map(f => uploadImage(f)));
       onChange([...photos, ...urls]);
     } catch (err) {
-      alert("Erreur upload photos : " + (err.message || err));
+      toast.error("Erreur upload photos : " + (err.message || err));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -164,7 +164,7 @@ function VideoField({ videos = [], onChange }) {
       const url = await uploadVideo(file);
       onChange([...videos, url]);
     } catch (err) {
-      alert("Erreur upload vidéo : " + (err.message || err));
+      toast.error("Erreur upload vidéo : " + (err.message || err));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -249,18 +249,31 @@ function CrudHeader({ title, count, onAdd }) {
 }
 
 function FormPanel({ title, onClose, onSave, children }) {
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSave();
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
       className="bg-background border border-primary/20 rounded-2xl p-6 mb-6 shadow-lg">
       <div className="flex items-center justify-between mb-5">
         <h3 className="font-heading font-bold text-foreground">{title}</h3>
-        <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"><X className="w-4 h-4" /></button>
+        <button onClick={onClose} disabled={saving} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center disabled:opacity-50"><X className="w-4 h-4" /></button>
       </div>
       <div className="space-y-4">{children}</div>
       <div className="flex gap-3 mt-6 justify-end">
-        <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium rounded-xl border border-border hover:bg-muted transition-colors">Annuler</button>
-        <button type="button" onClick={onSave} className="flex items-center gap-1.5 px-5 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
-          <Save className="w-4 h-4" /> Enregistrer
+        <button type="button" onClick={onClose} disabled={saving} className="px-4 py-2 text-sm font-medium rounded-xl border border-border hover:bg-muted transition-colors disabled:opacity-50">Annuler</button>
+        <button type="button" onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-5 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-70">
+          {saving
+            ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin flex-shrink-0" /> Enregistrement…</>
+            : <><Save className="w-4 h-4" /> Enregistrer</>}
         </button>
       </div>
     </motion.div>
@@ -338,8 +351,8 @@ function useCrud(storeKey, staticData) {
   const KEY = "mbp_store_" + storeKey;
   const [items, setItems] = useState(staticData);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  // Supabase est la seule source — pas de localStorage
   useEffect(() => {
     try { localStorage.removeItem(KEY); } catch {}
     sbGet(KEY)
@@ -351,25 +364,31 @@ function useCrud(storeKey, staticData) {
         setLoading(false);
         toast.error("Impossible de charger les données. Vérifiez votre connexion.");
       });
-  }, [storeKey]); // storeKey (stable) plutôt que KEY (recalculé à chaque render)
+  }, [storeKey]);
 
-  // Mise à jour optimiste : UI immédiate, rollback si Supabase échoue
-  async function save(data) {
+  async function save(data, successMsg = "Enregistré !") {
     const previous = items;
     setItems(data);
+    setSaving(true);
     try {
       await sbSet(KEY, data);
+      toast.success(successMsg);
     } catch {
       setItems(previous);
       toast.error("Échec de la sauvegarde — vos modifications n'ont pas été enregistrées.", { duration: 6000 });
+    } finally {
+      setSaving(false);
     }
   }
 
   function add(item) { return save([...items, { ...item, id: item.id || Date.now() }]); }
   function update(id, data) { return save(items.map(it => String(it.id) === String(id) ? { ...it, ...data } : it)); }
-  function remove(id) { if (confirm("Supprimer cet élément ?")) return save(items.filter(it => String(it.id) !== String(id))); }
+  function remove(id) {
+    if (confirm("Supprimer cet élément ?"))
+      return save(items.filter(it => String(it.id) !== String(id)), "Élément supprimé.");
+  }
 
-  return { items, add, update, remove, save, loading };
+  return { items, add, update, remove, save, loading, saving };
 }
 
 const quillModules = {
@@ -394,11 +413,11 @@ function ArticlesSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Webinaire", "Conférence", "Gala", "Solidarité", "Événement", "Juridique"];
 
-  function doSave() {
-    if (!form.titre || !form.extrait || !form.date) { alert("Titre, extrait et date obligatoires"); return; }
+  async function doSave() {
+    if (!form.titre || !form.extrait || !form.date) { toast.error("Titre, extrait et date obligatoires"); return; }
     const id = form.id || slugify(form.titre) + "-" + Date.now();
-    if (form._editing) update(form._editing, { ...form, id, _editing: undefined });
-    else add({ ...form, id });
+    if (form._editing) await update(form._editing, { ...form, id, _editing: undefined });
+    else await add({ ...form, id });
     setForm(null);
   }
 
@@ -521,10 +540,10 @@ function EvenementsSection() {
   const TYPES = ["Webinaire", "Conférence", "Gala", "Projet éditorial", "Autre"];
   const STATUTS = ["À venir", "En cours", "Passé"];
 
-  function doSave() {
-    if (!form.titre || !form.date || !form.lieu) { alert("Titre, date et lieu obligatoires"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.titre || !form.date || !form.lieu) { toast.error("Titre, date et lieu obligatoires"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -571,11 +590,11 @@ function ProjetsSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Solidarité", "Éducation", "Santé publique", "Autre"];
 
-  function doSave() {
-    if (!form.titre || !form.description) { alert("Titre et description obligatoires"); return; }
+  async function doSave() {
+    if (!form.titre || !form.description) { toast.error("Titre et description obligatoires"); return; }
     const id = form.id || slugify(form.titre) + "-" + Date.now();
-    if (form._editing) update(form._editing, { ...form, id, _editing: undefined });
-    else add({ ...form, id });
+    if (form._editing) await update(form._editing, { ...form, id, _editing: undefined });
+    else await add({ ...form, id });
     setForm(null);
   }
 
@@ -657,10 +676,10 @@ function ProgrammesSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const STATUTS = ["Actif", "En cours", "En gestation", "Terminé"];
 
-  function doSave() {
-    if (!form.titre || !form.description) { alert("Titre et description obligatoires"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.titre || !form.description) { toast.error("Titre et description obligatoires"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -697,10 +716,10 @@ function EquipeSection() {
   const empty = { nom: "", role: "", profession: "", email: "", tel: "", photo: "", linkedin: "" };
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
-  function doSave() {
-    if (!form.nom || !form.role) { alert("Nom et rôle obligatoires"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.nom || !form.role) { toast.error("Nom et rôle obligatoires"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -749,10 +768,10 @@ function SponsorsSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const NIVEAUX = ["Partenaire Platine", "Partenaire Or", "Partenaire Argent", "Partenaire Bronze"];
 
-  function doSave() {
-    if (!form.nom) { alert("Nom obligatoire"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.nom) { toast.error("Nom obligatoire"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -798,10 +817,10 @@ function CommuniquesSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES = ["Communiqué", "Communiqué de presse", "Invitation", "Rapport AG", "Déclaration", "Autre"];
 
-  function doSave() {
-    if (!form.titre || !form.date || !form.resume) { alert("Titre, date et résumé obligatoires"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.titre || !form.date || !form.resume) { toast.error("Titre, date et résumé obligatoires"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -845,16 +864,16 @@ function MediathequeSection() {
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES_V = ["Webinaire", "Présentation", "Conférence", "Événement", "Autre"];
 
-  function doSaveV() {
-    if (!form.titre || !form.videoId) { alert("Titre et ID YouTube obligatoires"); return; }
-    if (form._editing) updateV(form._editing, { ...form, _editing: undefined });
-    else addV({ ...form });
+  async function doSaveV() {
+    if (!form.titre || !form.videoId) { toast.error("Titre et ID YouTube obligatoires"); return; }
+    if (form._editing) await updateV(form._editing, { ...form, _editing: undefined });
+    else await addV({ ...form });
     setForm(null);
   }
-  function doSaveP() {
-    if (!form.src) { alert("URL ou image obligatoire"); return; }
-    if (form._editing) updateP(form._editing, { ...form, _editing: undefined });
-    else addP({ ...form });
+  async function doSaveP() {
+    if (!form.src) { toast.error("URL ou image obligatoire"); return; }
+    if (form._editing) await updateP(form._editing, { ...form, _editing: undefined });
+    else await addP({ ...form });
     setForm(null);
   }
 
@@ -941,10 +960,10 @@ function DocumentsSection() {
   const CATS = ["Gouvernance", "Stratégie", "Rapport", "Finance", "Autre"];
   const TYPES = ["PDF", "Word", "Excel", "PowerPoint", "Autre"];
 
-  function doSave() {
-    if (!form.titre || !form.categorie) { alert("Titre obligatoire"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.titre || !form.categorie) { toast.error("Titre obligatoire"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -998,10 +1017,10 @@ function RessourcesSection() {
   const DOMS = ["Droit des affaires", "Droit public", "Droit pénal", "Droit international", "Droit social", "Fiscalité", "Notariat", "Magistrature", "Général", "Autre"];
   const TYPES = ["PDF", "DOCX", "DOC", "XLSX", "PPTX"];
 
-  function doSave() {
-    if (!form.titre || !form.file_url) { alert("Titre et URL obligatoires"); return; }
-    if (form._editing) update(form._editing, { ...form, _editing: undefined });
-    else add({ ...form });
+  async function doSave() {
+    if (!form.titre || !form.file_url) { toast.error("Titre et URL obligatoires"); return; }
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
   }
 
@@ -1088,7 +1107,7 @@ function MessagesSection() {
   }
 
   async function sendReply() {
-    if (!replyText.trim()) { alert("Le message est vide."); return; }
+    if (!replyText.trim()) { toast.error("Le message est vide."); return; }
     setSendStatus("sending");
     try {
       await emailjs.send(
@@ -1335,7 +1354,7 @@ function ComposeModal({ onClose }) {
 
   async function handleSend() {
     if (!validRecipients.length || !form.sujet || !form.corps) {
-      alert("Au moins un email destinataire, l'objet et le corps sont obligatoires.");
+      toast.error("Au moins un email destinataire, l'objet et le corps sont obligatoires.");
       return;
     }
     setStatus("sending");
@@ -1522,11 +1541,11 @@ function GaleriesSection() {
   const empty = { id: "", titre: "", date: "", lieu: "", description: "", cover: "", photos: [], access: "membres" };
   const f = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
-  function doSave() {
-    if (!form.titre || !form.date) { alert("Titre et date obligatoires"); return; }
+  async function doSave() {
+    if (!form.titre || !form.date) { toast.error("Titre et date obligatoires"); return; }
     const id = form.id || slugify(form.titre) + "-" + Date.now();
-    if (form._editing) update(form._editing, { ...form, id, _editing: undefined });
-    else add({ ...form, id });
+    if (form._editing) await update(form._editing, { ...form, id, _editing: undefined });
+    else await add({ ...form, id });
     setForm(null);
   }
 
@@ -1613,15 +1632,17 @@ export default function Dashboard() {
     });
   }, [allMembers, search]);
 
-  function handleSaveEditMember() {
+  async function handleSaveEditMember() {
     if (!editingMember) return;
-    updateMember(editingMember, editingMember);
+    await updateMember(editingMember, editingMember);
+    toast.success("Membre mis à jour !");
     setEditingMember(null);
   }
 
-  function handleSaveNewMember() {
-    if (!addingMember?.nom?.trim()) return alert("Le nom est obligatoire.");
-    addValidated(addingMember);
+  async function handleSaveNewMember() {
+    if (!addingMember?.nom?.trim()) { toast.error("Le nom est obligatoire."); return; }
+    await addValidated(addingMember);
+    toast.success("Membre ajouté !");
     setAddingMember(null);
   }
 
@@ -1650,7 +1671,7 @@ export default function Dashboard() {
         });
         count++;
       }
-      alert(`${count} membre(s) importé(s) avec succès.`);
+      toast.success(`${count} membre(s) importé(s) avec succès.`);
     };
     reader.readAsText(file, "UTF-8");
     e.target.value = "";
