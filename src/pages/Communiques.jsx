@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { FileText, Calendar, Download } from "lucide-react";
-import { useContent } from "../lib/localStore";
-import { communiques as communiquesStatic } from "../data/communiques";
+import { useCommuniques } from "../hooks/useCommuniques";
 
 const typeColors = {
   "Communiqué de presse": "bg-blue-100 text-blue-700",
@@ -13,7 +12,7 @@ const typeColors = {
 };
 
 export default function Communiques() {
-  const communiques = useContent("communiques", communiquesStatic);
+  const { communiques } = useCommuniques();
   return (
     <div>
       <PageHero title="Communiqués" subtitle="Informations — Communications officielles" />

@@ -2,15 +2,14 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import { Play, ExternalLink, Images } from "lucide-react";
-import { useContent } from "../lib/localStore";
-import { mediaVideos as videosStatic } from "../data/mediatheque";
-import { galeries as galeriesStatic } from "../data/galeries";
+import { useMediaVideos } from "../hooks/useMediaVideos";
+import { useGaleries } from "../hooks/useGaleries";
 import { useLocalAuth } from "../lib/LocalAuth";
 
 export default function Mediatheque() {
   const { session } = useLocalAuth();
-  const videos = useContent("mediaVideos", videosStatic);
-  const galeries = useContent("galeries", galeriesStatic);
+  const { videos } = useMediaVideos();
+  const { galeries } = useGaleries();
   return (
     <div>
       <PageHero title="Médiathèque" subtitle="Informations — Photos & Vidéos" />

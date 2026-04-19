@@ -1,13 +1,12 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Lock, Images, ArrowRight, Calendar, MapPin } from "lucide-react";
-import { galeries as galeriesStatic } from "../data/galeries";
-import { useContent } from "../lib/localStore";
+import { useGaleries } from "../hooks/useGaleries";
 import { useLocalAuth } from "../lib/LocalAuth";
 
 export default function Galeries() {
   const { session } = useLocalAuth();
-  const galeries = useContent("galeries", galeriesStatic);
+  const { galeries } = useGaleries();
   return (
     <div className="min-h-screen bg-background">
 

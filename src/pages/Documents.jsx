@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { FileText, Download, Eye, Lock } from "lucide-react";
-import { useContent } from "../lib/localStore";
-import { documents as documentsStatic } from "../data/documents";
+import { useDocuments } from "../hooks/useDocuments";
 
 const catColors = {
   "Gouvernance": "bg-blue-100 text-blue-700",
@@ -14,7 +13,7 @@ const catColors = {
 const typeIcons = { "PDF": "📄", "Excel": "📊", "Word": "📝" };
 
 export default function Documents() {
-  const documents = useContent("documents", documentsStatic);
+  const { documents } = useDocuments();
   return (
     <div>
       <PageHero title="Documents" subtitle="Informations — Ressources officielles" />

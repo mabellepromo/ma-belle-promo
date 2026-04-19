@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { GraduationCap, Users, Mic, BookOpen, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useContent } from "../lib/localStore";
-import { programmes as programmesStatic } from "../data/programmes";
+import { useProgrammes } from "../hooks/useProgrammes";
 
 /* Icon/color mapping by numero (not serializable to localStorage) */
 const PROG_META = {
@@ -13,7 +12,7 @@ const PROG_META = {
 };
 
 export default function Programmes() {
-  const programmes = useContent("programmes", programmesStatic);
+  const { programmes } = useProgrammes();
   return (
     <div>
       <PageHero title="Nos Programmes" subtitle="Activités — Ce que nous mettons en place" />

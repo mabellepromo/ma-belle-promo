@@ -6,14 +6,15 @@ import { useArticles } from "../../hooks/useArticles";
 import { useEvenements } from "../../hooks/useEvenements";
 import { useProjets } from "../../hooks/useProjets";
 import { useEquipe } from "../../hooks/useEquipe";
+import { useCommuniques } from "../../hooks/useCommuniques";
+import { useDocuments } from "../../hooks/useDocuments";
+import { useRessources } from "../../hooks/useRessources";
+import { useGaleries } from "../../hooks/useGaleries";
+import { useMediaVideos } from "../../hooks/useMediaVideos";
+import { useMediaPhotos } from "../../hooks/useMediaPhotos";
+import { useProgrammes } from "../../hooks/useProgrammes";
 import { articles as articlesStatic } from "../../data/articles.js";
-import { programmes as programmesStatic } from "../../data/programmes.js";
 import { sponsors as sponsorsStatic } from "../../data/sponsors.js";
-import { communiques as communiquesStatic } from "../../data/communiques.js";
-import { mediaVideos as videosStatic, mediaPhotos as photosStatic } from "../../data/mediatheque.js";
-import { documents as documentsStatic } from "../../data/documents.js";
-import { ressources as ressourcesStatic } from "../../data/ressources.js";
-import { galeries as galeriesStatic } from "../../data/galeries.js";
 import { slugify } from "../../lib/localStore";
 import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus } from "lucide-react";
 import {
@@ -226,8 +227,9 @@ export function ProjetsSection() {
 
 /* ─── Programmes ─── */
 export function ProgrammesSection() {
-  const { items, add, update, remove, loading } = useCrud("programmes", programmesStatic);
+  const { programmes: items, add, update, remove, loading, isSeeded, seedFromStatic } = useProgrammes();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { titre: "", description: "", status: "En gestation", lien: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const STATUTS = ["Actif", "En cours", "En gestation", "Terminé"];
@@ -239,11 +241,16 @@ export function ProgrammesSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les programmes statiques dans Supabase ?")) return;
+    setSeeding(true); await seedFromStatic(); setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Programmes" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Programmes" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier le programme" : "Nouveau programme"} onClose={() => setForm(null)} onSave={doSave}>
           <Field label="Titre" required><input className={inp} value={form.titre} onChange={f("titre")} /></Field>
@@ -377,8 +384,9 @@ export function SponsorsSection() {
 
 /* ─── Communiqués ─── */
 export function CommuniquesSection() {
-  const { items, add, update, remove, loading } = useCrud("communiques", communiquesStatic);
+  const { communiques: items, add, update, remove, loading, isSeeded, seedFromStatic } = useCommuniques();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { titre: "", date: "", type: "Communiqué", resume: "", url: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES = ["Communiqué", "Communiqué de presse", "Invitation", "Rapport AG", "Déclaration", "Autre"];
@@ -390,11 +398,16 @@ export function CommuniquesSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les communiqués statiques dans Supabase ?")) return;
+    setSeeding(true); await seedFromStatic(); setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Communiqués" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Communiqués" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier le communiqué" : "Nouveau communiqué"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
@@ -421,8 +434,8 @@ export function CommuniquesSection() {
 
 /* ─── Médiathèque ─── */
 export function MediathequeSection() {
-  const { items: videos, add: addV, update: updateV, remove: removeV, loading: loadingV } = useCrud("media_videos", videosStatic);
-  const { items: photos, add: addP, update: updateP, remove: removeP, loading: loadingP } = useCrud("media_photos", photosStatic);
+  const { videos, add: addV, update: updateV, remove: removeV, loading: loadingV, isSeeded: seededV, seedFromStatic: seedV } = useMediaVideos();
+  const { photos, add: addP, update: updateP, remove: removeP, loading: loadingP, isSeeded: seededP, seedFromStatic: seedP } = useMediaPhotos();
   const [sub, setSub] = useState("videos");
   const [form, setForm] = useState(null);
   const emptyV = { titre: "", videoId: "", duree: "", date: "", type: "Webinaire" };
@@ -456,6 +469,18 @@ export function MediathequeSection() {
               {s === "videos" ? `Vidéos (${videos.length})` : `Photos (${photos.length})`}
             </button>
           ))}
+          {sub === "videos" && !seededV && (
+            <button onClick={async () => { if (confirm("Migrer les vidéos statiques ?")) { await seedV(); } }}
+              className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
+              ☁️ Migrer
+            </button>
+          )}
+          {sub === "photos" && !seededP && (
+            <button onClick={async () => { if (confirm("Migrer les photos statiques ?")) { await seedP(); } }}
+              className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
+              ☁️ Migrer
+            </button>
+          )}
           <button onClick={() => setForm(sub === "videos" ? { ...emptyV } : { ...emptyP })}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90">
             <Plus className="w-3.5 h-3.5" /> Ajouter
@@ -520,8 +545,9 @@ export function MediathequeSection() {
 
 /* ─── Documents ─── */
 export function DocumentsSection() {
-  const { items, add, update, remove, loading } = useCrud("documents", documentsStatic);
+  const { documents: items, add, update, remove, loading, isSeeded, seedFromStatic } = useDocuments();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { titre: "", type: "PDF", taille: "", date: "", categorie: "Gouvernance", acces: "public", desc: "", url: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Gouvernance", "Stratégie", "Rapport", "Finance", "Autre"];
@@ -535,11 +561,16 @@ export function DocumentsSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les documents statiques dans Supabase ?")) return;
+    setSeeding(true); await seedFromStatic(); setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Documents" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Documents" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier le document" : "Nouveau document"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
@@ -576,8 +607,9 @@ export function DocumentsSection() {
 
 /* ─── Ressources Juridiques ─── */
 export function RessourcesSection() {
-  const { items, add, update, remove, loading } = useCrud("ressources", ressourcesStatic);
+  const { ressources: items, add, update, remove, loading, isSeeded, seedFromStatic } = useRessources();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { titre: "", description: "", categorie: "Guide pratique", domaine: "Général", file_url: "", file_type: "PDF", file_size: "", acces: "membres", date: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Modèle de contrat", "Fiche de synthèse", "Guide pratique", "Jurisprudence", "Législation", "Formulaire", "Autre"];
@@ -591,11 +623,16 @@ export function RessourcesSection() {
     setForm(null);
   }
 
+  async function handleSeed() {
+    if (!confirm("Importer les ressources statiques dans Supabase ?")) return;
+    setSeeding(true); await seedFromStatic(); setSeeding(false);
+  }
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Ressources Juridiques" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Ressources Juridiques" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier la ressource" : "Nouvelle ressource"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
@@ -638,25 +675,30 @@ export function RessourcesSection() {
 
 /* ─── Galeries ─── */
 export function GaleriesSection() {
-  const { items, add, update, remove, loading } = useCrud("galeries", galeriesStatic);
+  const { galeries: items, add, update, remove, loading, isSeeded, seedFromStatic } = useGaleries();
   const [form, setForm] = useState(null);
+  const [seeding, setSeeding] = useState(false);
   const empty = { id: "", titre: "", date: "", lieu: "", description: "", cover: "", photos: [], access: "membres" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const ACCESS_COLORS = { membres: "bg-amber-100 text-amber-700", public: "bg-green-100 text-green-700" };
 
   async function doSave() {
     if (!form.titre || !form.date) { toast.error("Titre et date obligatoires"); return; }
-    const id = form.id || slugify(form.titre) + "-" + Date.now();
-    if (form._editing) await update(form._editing, { ...form, id, _editing: undefined });
-    else await add({ ...form, id });
+    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
+    else await add({ ...form });
     setForm(null);
+  }
+
+  async function handleSeed() {
+    if (!confirm("Importer les galeries statiques dans Supabase ?")) return;
+    setSeeding(true); await seedFromStatic(); setSeeding(false);
   }
 
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <CrudHeader title="Galeries photos" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Galeries photos" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier la galerie" : "Nouvelle galerie"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">

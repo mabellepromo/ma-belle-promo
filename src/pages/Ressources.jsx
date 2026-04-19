@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useLocalAuth } from "../lib/LocalAuth";
-import { useContent } from "../lib/localStore";
-import { ressources as ressourcesStatic } from "../data/ressources.js";
+import { useRessources } from "../hooks/useRessources";
 import {
   FileText, Download, Search, Lock, Tag, BookOpen, X, Plus
 } from "lucide-react";
@@ -26,7 +25,7 @@ const FILE_ICONS = { PDF: "📄", DOCX: "📝", DOC: "📝", XLSX: "📊", PPTX:
 
 export default function Ressources() {
   const { session } = useLocalAuth();
-  const ressources = useContent("ressources", ressourcesStatic);
+  const { ressources } = useRessources();
   const [search,    setSearch]    = useState("");
   const [categorie, setCategorie] = useState("Toutes");
   const [domaine,   setDomaine]   = useState("Tous");

@@ -2,15 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X, ChevronLeft, ChevronRight, Download, Play, Pause, ZoomIn, Calendar, MapPin, Images } from "lucide-react";
-import { galeries as galeriesStatic } from "../data/galeries";
-import { useContent } from "../lib/localStore";
+import { useGaleries } from "../hooks/useGaleries";
 import { useLocalAuth } from "../lib/LocalAuth";
 
 export default function GalerieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { session } = useLocalAuth();
-  const galeries = useContent("galeries", galeriesStatic);
+  const { galeries } = useGaleries();
   const galerie = galeries.find(g => g.id === id);
 
   // Redirection si galerie privée et non connecté
