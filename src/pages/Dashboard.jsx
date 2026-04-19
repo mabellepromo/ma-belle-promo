@@ -1050,38 +1050,92 @@ function RessourcesSection() {
 }
 
 /* ─── Messages (formulaire Contact) ─── */
-const STORAGE_MESSAGES = "mbp_contact_messages";
+const EMAILJS_REPLY_TEMPLATE = "template_stj5ekf";
 
 function MessagesSection() {
-  const [messages, setMessages] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_MESSAGES) || "[]"); } catch { return []; }
-  });
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading]   = useState(true);
   const [replyMsg, setReplyMsg] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [senderName,  setSenderName]  = useState("");
+  const [senderPoste, setSenderPoste] = useState("");
+  const [compose, setCompose] = useState(false);
+  const [sendStatus, setSendStatus] = useState("idle"); // idle | sending | sent | error
 
-  function persist(data) { setMessages(data); localStorage.setItem(STORAGE_MESSAGES, JSON.stringify(data)); }
+  const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
+
+  useEffect(() => {
+    sbGet("mbp_contact_messages")
+      .then(data => { if (data) setMessages(data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  async function persist(data) {
+    setMessages(data);
+    try { await sbSet("mbp_contact_messages", data); } catch {}
+  }
+
   function markRead(id) { persist(messages.map(m => m.id === id ? { ...m, read: true } : m)); }
   function deleteMsg(id) { if (confirm("Supprimer ce message ?")) persist(messages.filter(m => m.id !== id)); }
 
-  function getTemplate(msg) {
-    return `Bonjour ${msg.name},\n\nNous avons bien reçu votre message${msg.sujet ? ` concernant "${msg.sujet}"` : ""} et nous vous en remercions.\n\n[Votre réponse ici]\n\nCordialement,\n\nL'équipe Ma Belle Promo\nFDD Lomé · Promotion 1994–2000\nmabellepromo@gmail.com`;
+  function openReply(msg) {
+    markRead(msg.id);
+    setReplyMsg(msg);
+    setReplyText(`Nous avons bien reçu votre message${msg.sujet ? ` concernant "${msg.sujet}"` : ""} et nous vous en remercions.\n\n`);
+    setSenderName("");
+    setSenderPoste("");
+    setSendStatus("idle");
+  }
+
+  async function sendReply() {
+    if (!replyText.trim()) { alert("Le message est vide."); return; }
+    setSendStatus("sending");
+    try {
+      await emailjs.send(
+        "service_lytdtan",
+        EMAILJS_REPLY_TEMPLATE,
+        {
+          to_name:       replyMsg.name,
+          to_email:      replyMsg.email,
+          sujet:         "Réponse — " + (replyMsg.sujet || "Votre message"),
+          reply_message: replyText.replace(/\n/g, "<br>"),
+          date:          new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
+          sender_name:   senderName  || "Le Bureau Exécutif",
+          sender_poste:  senderPoste || "",
+        },
+        { publicKey: "8AzpuYIvN_xHmA--I" }
+      );
+      setSendStatus("sent");
+      setTimeout(() => { setReplyMsg(null); setSendStatus("idle"); }, 2000);
+    } catch (err) {
+      console.error("EmailJS reply error:", err);
+      setSendStatus("error");
+    }
   }
 
   const unread = messages.filter(m => !m.read).length;
 
+  if (loading) return <SectionLoader />;
+
   return (
     <div>
+      {compose && <ComposeModal onClose={() => setCompose(false)} />}
+
       <div className="flex items-center gap-3 mb-6">
         <h2 className="font-heading text-xl font-bold text-foreground">Messages reçus</h2>
         {unread > 0 && <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">{unread} non lu{unread > 1 ? "s" : ""}</span>}
         <span className="text-sm text-muted-foreground ml-auto">{messages.length} message{messages.length !== 1 ? "s" : ""}</span>
+        <button onClick={() => setCompose(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
+          <PenSquare className="w-3.5 h-3.5" /> Nouveau message
+        </button>
       </div>
 
       {/* Modal Répondre */}
       {replyMsg && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setReplyMsg(null)}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-background rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            className="bg-background rounded-2xl shadow-2xl w-full max-w-xl" onClick={e => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <div>
                 <h3 className="font-heading font-bold text-foreground">Répondre à {replyMsg.name}</h3>
@@ -1089,25 +1143,79 @@ function MessagesSection() {
               </div>
               <button onClick={() => setReplyMsg(null)} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"><X className="w-4 h-4" /></button>
             </div>
+
             <div className="p-6 space-y-4">
-              <div className="bg-muted/30 rounded-xl p-4 border border-border">
-                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border/60">
-                  <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png" alt="MBP" className="w-8 h-8 rounded-full" />
+              {/* Aperçu message original */}
+              <div className="bg-muted/30 rounded-xl p-3 border border-border text-xs text-muted-foreground">
+                <p className="font-semibold mb-1 text-foreground">Message original :</p>
+                <p className="line-clamp-3">{replyMsg.message}</p>
+              </div>
+
+              {/* Expéditeur */}
+              <div className="bg-muted/30 rounded-xl p-3 space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Signataire</p>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-xs font-bold text-foreground">Ma Belle Promo</div>
-                    <div className="text-xs text-muted-foreground">mabellepromo@gmail.com</div>
+                    <label className="block text-xs font-medium text-foreground mb-1">Nom</label>
+                    <select
+                      value={senderName}
+                      onChange={e => {
+                        const m = expediteurs.find(x => x.nom === e.target.value);
+                        setSenderName(e.target.value);
+                        setSenderPoste(m ? m.poste : "");
+                      }}
+                      className="w-full px-2 py-1.5 rounded-lg border border-border bg-background text-xs focus:outline-none focus:border-primary/50">
+                      <option value="">— Le Bureau Exécutif —</option>
+                      {expediteurs.map(ex => <option key={ex.nom} value={ex.nom}>{ex.nom}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-foreground mb-1">Fonction</label>
+                    <input
+                      value={senderPoste}
+                      onChange={e => setSenderPoste(e.target.value)}
+                      placeholder="ex: Présidente"
+                      className="w-full px-2 py-1.5 rounded-lg border border-border bg-background text-xs focus:outline-none focus:border-primary/50"
+                    />
                   </div>
                 </div>
-                <pre className="text-xs text-foreground/80 whitespace-pre-wrap font-sans leading-relaxed">{getTemplate(replyMsg)}</pre>
               </div>
-              <div className="flex gap-3">
-                <a href={`mailto:${replyMsg.email}?subject=${encodeURIComponent("Réponse — " + (replyMsg.sujet || "Votre message"))}&body=${encodeURIComponent(getTemplate(replyMsg))}`}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
-                  <Mail className="w-4 h-4" /> Ouvrir dans la messagerie
-                </a>
-                <button onClick={() => { navigator.clipboard.writeText(getTemplate(replyMsg)); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+
+              {/* Zone de réponse */}
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
+                  Corps du message <span className="text-muted-foreground font-normal">(papier en-tête MBP)</span>
+                </label>
+                <textarea
+                  rows={8}
+                  value={replyText}
+                  onChange={e => setReplyText(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-primary/50 resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Statut */}
+              {sendStatus === "error" && (
+                <p className="text-xs text-red-500 font-medium">Échec de l'envoi — vérifiez votre connexion et réessayez.</p>
+              )}
+
+              {/* Boutons */}
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setReplyMsg(null)}
                   className="px-4 py-2.5 border border-border rounded-xl text-sm font-medium hover:bg-muted transition-colors">
-                  {copied ? "✓ Copié" : "Copier"}
+                  Annuler
+                </button>
+                <button onClick={sendReply} disabled={sendStatus === "sending" || sendStatus === "sent"}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    sendStatus === "sent"
+                      ? "bg-green-500 text-white"
+                      : "bg-primary text-primary-foreground hover:opacity-90"
+                  } disabled:opacity-60`}>
+                  {sendStatus === "sending" && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                  {sendStatus === "sent"     && <Check className="w-4 h-4" />}
+                  {sendStatus === "idle"     && <Send className="w-4 h-4" />}
+                  {sendStatus === "error"    && <Send className="w-4 h-4" />}
+                  {sendStatus === "sending" ? "Envoi…" : sendStatus === "sent" ? "Envoyé !" : "Envoyer"}
                 </button>
               </div>
             </div>
@@ -1207,37 +1315,51 @@ const EMAILJS_TEMPLATE = "template_tznyr0b";
 const EMAILJS_KEY      = "8AzpuYIvN_xHmA--I";
 
 function ComposeModal({ onClose }) {
-  const [form, setForm]     = useState({ to: "", sujet: "", nomDest: "", corps: "", expNom: "", expPoste: "" });
+  const [recipients, setRecipients] = useState([{ email: "", nom: "" }]);
+  const [form, setForm]     = useState({ sujet: "", corps: "", expNom: "", expPoste: "" });
   const [files, setFiles]   = useState([]);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [sentCount, setSentCount] = useState(0);
   const [errMsg, setErrMsg] = useState("");
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
   const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
 
-  const notConfigured = !EMAILJS_SERVICE || !EMAILJS_TEMPLATE || !EMAILJS_KEY;
+  function updateRecipient(i, field, value) {
+    setRecipients(prev => prev.map((r, idx) => idx === i ? { ...r, [field]: value } : r));
+  }
+  function addRecipient() { setRecipients(prev => [...prev, { email: "", nom: "" }]); }
+  function removeRecipient(i) { setRecipients(prev => prev.filter((_, idx) => idx !== i)); }
+
+  const validRecipients = recipients.filter(r => r.email.trim());
 
   async function handleSend() {
-    if (!form.to || !form.sujet || !form.corps) { alert("Email destinataire, objet et corps obligatoires"); return; }
-    if (notConfigured) { alert("EmailJS non configuré — voir .env (VITE_EMAILJS_*)"); return; }
+    if (!validRecipients.length || !form.sujet || !form.corps) {
+      alert("Au moins un email destinataire, l'objet et le corps sont obligatoires.");
+      return;
+    }
     setStatus("sending");
+    const date = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE,
-        EMAILJS_TEMPLATE,
-        {
-          to_email:      form.to,
-          to_name:       form.nomDest || form.to,
-          subject:       form.sujet,
-          message:       form.corps,
-          from_name:     form.expNom     || "Ma Belle Promo",
-          from_position: form.expPoste   || "",
-          reply_to:      "mabellepromo@gmail.com",
-        },
-        { publicKey: EMAILJS_KEY }
-      );
+      for (const dest of validRecipients) {
+        await emailjs.send(
+          EMAILJS_SERVICE,
+          EMAILJS_REPLY_TEMPLATE,
+          {
+            to_email:      dest.email,
+            to_name:       dest.nom || dest.email,
+            sujet:         form.sujet,
+            reply_message: form.corps.replace(/\n/g, "<br>"),
+            date,
+            sender_name:   form.expNom   || "Le Bureau Exécutif",
+            sender_poste:  form.expPoste || "",
+          },
+          { publicKey: EMAILJS_KEY }
+        );
+      }
+      setSentCount(validRecipients.length);
       setStatus("sent");
-      setTimeout(() => { onClose(); }, 2000);
+      setTimeout(() => { onClose(); }, 2500);
     } catch (err) {
       console.error("EmailJS error:", err);
       setErrMsg(err?.text || err?.message || JSON.stringify(err) || "Erreur inconnue");
@@ -1262,18 +1384,10 @@ function ComposeModal({ onClose }) {
           <button onClick={onClose} disabled={status === "sending"} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center flex-shrink-0 disabled:opacity-40"><X className="w-4 h-4" /></button>
         </div>
 
-        {/* Bannière non configuré */}
-        {notConfigured && (
-          <div className="mx-6 mt-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <span>EmailJS non configuré. Renseignez <code className="font-mono bg-amber-100 px-1 rounded">VITE_EMAILJS_*</code> dans <code className="font-mono bg-amber-100 px-1 rounded">.env</code> et sur Vercel, puis redéployez.</span>
-          </div>
-        )}
-
         {/* Succès */}
         {status === "sent" && (
           <div className="mx-6 mt-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 flex items-center gap-2">
-            <Check className="w-4 h-4" /> Message envoyé avec succès !
+            <Check className="w-4 h-4" /> {sentCount} message{sentCount > 1 ? "s envoyés" : " envoyé"} avec succès !
           </div>
         )}
 
@@ -1288,14 +1402,34 @@ function ComposeModal({ onClose }) {
         {/* Corps du formulaire */}
         <div className="overflow-y-auto flex-1 p-6 space-y-5">
 
-          {/* Destinataire */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Email du destinataire" required>
-              <input className={inp} type="email" placeholder="destinataire@email.com" value={form.to} onChange={f("to")} disabled={status === "sending"} />
-            </Field>
-            <Field label="Nom complet du destinataire">
-              <input className={inp} placeholder="Prénom Nom" value={form.nomDest} onChange={f("nomDest")} disabled={status === "sending"} />
-            </Field>
+          {/* Destinataires */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Destinataires *</label>
+              <button onClick={addRecipient} disabled={status === "sending"}
+                className="flex items-center gap-1 text-xs font-semibold text-primary hover:opacity-80 transition-opacity disabled:opacity-40">
+                <Plus className="w-3.5 h-3.5" /> Ajouter
+              </button>
+            </div>
+            <div className="space-y-2">
+              {recipients.map((r, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                  <input className={inp} type="email" placeholder="email@exemple.com" value={r.email}
+                    onChange={e => updateRecipient(i, "email", e.target.value)} disabled={status === "sending"} />
+                  <input className={inp} placeholder="Nom (optionnel)" value={r.nom}
+                    onChange={e => updateRecipient(i, "nom", e.target.value)} disabled={status === "sending"} />
+                  {recipients.length > 1 && (
+                    <button onClick={() => removeRecipient(i)} disabled={status === "sending"}
+                      className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 disabled:opacity-40">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {validRecipients.length > 1 && (
+              <p className="text-xs text-muted-foreground mt-1.5">{validRecipients.length} destinataires — un email individuel sera envoyé à chacun.</p>
+            )}
           </div>
 
           <Field label="Objet" required>

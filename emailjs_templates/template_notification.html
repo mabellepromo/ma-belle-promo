@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;">
+    <tr><td align="center" style="padding:20px 10px;">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">
+
+        <!-- En-tête verte -->
+        <tr>
+          <td bgcolor="#1a6b2e" style="background:#1a6b2e;padding:18px 30px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+                    width="50" height="50" style="border-radius:50%;display:block;" alt="MBP" />
+                </td>
+                <td style="padding-left:14px;">
+                  <p style="margin:0;color:#ffffff;font-size:16px;font-weight:bold;">Ma Belle Promo</p>
+                  <p style="margin:3px 0 0 0;color:#ffffff;opacity:0.75;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Nouveau message reçu</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Corps -->
+        <tr>
+          <td style="padding:30px;">
+            <p style="margin:0 0 6px 0;color:#666;font-size:12px;">Reçu le {{sent_at}}</p>
+            <h2 style="margin:0 0 20px 0;color:#1a6b2e;font-size:16px;">{{sujet}}</h2>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f8f8;border-left:4px solid #1a6b2e;border-radius:4px;margin-bottom:20px;">
+              <tr><td style="padding:14px 16px;">
+                <p style="margin:0 0 4px 0;font-size:13px;color:#333;"><strong>Nom :</strong> {{from_name}}</p>
+                <p style="margin:0 0 4px 0;font-size:13px;color:#333;"><strong>Email :</strong> <a href="mailto:{{from_email}}" style="color:#1a6b2e;">{{from_email}}</a></p>
+                <p style="margin:0;font-size:13px;color:#333;"><strong>Sujet :</strong> {{sujet}}</p>
+              </td></tr>
+            </table>
+
+            <p style="margin:0 0 10px 0;font-size:13px;color:#333;font-weight:bold;">Message :</p>
+            <div style="color:#444;font-size:14px;line-height:1.7;white-space:pre-wrap;">{{message}}</div>
+
+            <div style="margin-top:30px;text-align:center;">
+              <a href="https://mabellepromo.vercel.app/dashboard"
+                style="display:inline-block;padding:12px 28px;background:#1a6b2e;color:#ffffff;text-decoration:none;border-radius:50px;font-size:13px;font-weight:bold;">
+                Répondre depuis le Dashboard
+              </a>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Pied de page -->
+        <tr>
+          <td bgcolor="#1a6b2e" style="background:#1a6b2e;padding:14px 30px;text-align:center;">
+            <p style="margin:0;color:#ffffff;font-size:11px;">
+              📞 +228 90 67 33 67 &nbsp;|&nbsp; ✉ mabellepromo@gmail.com &nbsp;|&nbsp; 📍 12 B.P 335 - Baguida, Togo
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

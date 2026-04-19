@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
+import { sbGet, sbSet } from "../lib/supabase";
+
+const EMAILJS_SERVICE  = "service_lytdtan";
+const EMAILJS_TEMPLATE = "template_tznyr0b";
+const EMAILJS_KEY      = "8AzpuYIvN_xHmA--I";
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -17,11 +23,44 @@ export default function ContactSection() {
       return;
     }
     setSending(true);
-    // Simulate sending
-    await new Promise((r) => setTimeout(r, 1200));
-    toast.success("Message envoyé avec succès !");
-    setForm({ name: "", email: "", message: "" });
-    setSending(false);
+
+    const msg = {
+      ...form,
+      sujet: "",
+      id: Date.now(),
+      receivedAt: new Date().toISOString(),
+      read: false,
+    };
+
+    try {
+      const existing = await sbGet("mbp_contact_messages") || [];
+      await sbSet("mbp_contact_messages", [msg, ...existing]);
+
+      console.log("[EmailJS] Envoi notification en cours...");
+      const ejsResult = await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          name:       form.name,
+          email:      form.email,
+          from_name:  form.name,
+          from_email: form.email,
+          sujet:      "(sans sujet)",
+          message:    form.message,
+          sent_at:    new Date().toLocaleString("fr-FR"),
+        },
+        { publicKey: EMAILJS_KEY }
+      );
+      console.log("[EmailJS] Résultat:", ejsResult);
+
+      toast.success("Message envoyé avec succès !");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error("Erreur envoi message:", err);
+      toast.error("Erreur lors de l'envoi. Réessayez ou contactez-nous par email.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -40,7 +79,7 @@ export default function ContactSection() {
               Contactez-nous
             </h2>
             <p className="mt-6 text-muted-foreground text-lg leading-relaxed">
-              Vous avez une question, une suggestion ou souhaitez nous rejoindre ? 
+              Vous avez une question, une suggestion ou souhaitez nous rejoindre ?
               N'hésitez pas à nous écrire. Nous vous répondrons dans les meilleurs délais.
             </p>
 

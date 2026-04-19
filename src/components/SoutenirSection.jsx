@@ -69,7 +69,7 @@ export default function SoutenirSection() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&h=450&fit=crop"
+                src="https://images.unsplash.com/photo-1760784879929-eb7ea4ee6958?w=700&h=450&fit=crop"
                 alt="Bénévoles aidant les étudiants"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -97,7 +97,7 @@ export default function SoutenirSection() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=700&h=450&fit=crop"
+                src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=700&h=450&fit=crop"
                 alt="Dons et générosité"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />

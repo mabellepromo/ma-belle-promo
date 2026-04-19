@@ -6,6 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
+import { sbGet, sbSet } from "../lib/supabase";
+
+const EMAILJS_SERVICE  = "service_lytdtan";
+const EMAILJS_TEMPLATE = "template_tznyr0b";
+const EMAILJS_KEY      = "8AzpuYIvN_xHmA--I";
 
 export default function Contacts() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
@@ -13,17 +19,50 @@ export default function Contacts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) { toast.error("Veuillez remplir tous les champs."); return; }
+    if (!form.name || !form.email || !form.message) {
+      toast.error("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
     setSending(true);
-    await new Promise(r => setTimeout(r, 1200));
-    const msg = { ...form, id: Date.now(), receivedAt: new Date().toISOString(), read: false };
+
+    const msg = {
+      ...form,
+      id: Date.now(),
+      receivedAt: new Date().toISOString(),
+      read: false,
+    };
+
     try {
-      const existing = JSON.parse(localStorage.getItem("mbp_contact_messages") || "[]");
-      localStorage.setItem("mbp_contact_messages", JSON.stringify([msg, ...existing]));
-    } catch {}
-    toast.success("Message envoyé avec succès !");
-    setForm({ name: "", email: "", sujet: "", message: "" });
-    setSending(false);
+      // Sauvegarde dans Supabase (visible dans le Dashboard)
+      const existing = await sbGet("mbp_contact_messages") || [];
+      await sbSet("mbp_contact_messages", [msg, ...existing]);
+
+      // Notification email à mabellepromo@gmail.com
+      console.log("[EmailJS] Envoi notification en cours...");
+      const ejsResult = await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          name:       form.name,
+          email:      form.email,
+          from_name:  form.name,
+          from_email: form.email,
+          sujet:      form.sujet || "(sans sujet)",
+          message:    form.message,
+          sent_at:    new Date().toLocaleString("fr-FR"),
+        },
+        { publicKey: EMAILJS_KEY }
+      );
+      console.log("[EmailJS] Résultat:", ejsResult);
+
+      toast.success("Message envoyé avec succès !");
+      setForm({ name: "", email: "", sujet: "", message: "" });
+    } catch (err) {
+      console.error("Erreur envoi message:", err);
+      toast.error("Erreur lors de l'envoi. Réessayez ou contactez-nous par email.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -79,7 +118,7 @@ export default function Contacts() {
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message *</label><Textarea placeholder="Écrivez votre message ici..." rows={5} value={form.message} onChange={e => setForm({...form, message: e.target.value})} /></div>
               <Button type="submit" disabled={sending} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
                 {sending ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Send className="w-4 h-4" />}
-                {sending ? "Envoi..." : "Envoyer le message"}
+                {sending ? "Envoi en cours..." : "Envoyer le message"}
               </Button>
             </form>
           </motion.div>
