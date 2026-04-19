@@ -11,6 +11,7 @@ import { sbGet, sbSet } from "../lib/supabase";
 const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+const EMAILJS_PRIVATE  = import.meta.env.VITE_EMAILJS_PRIVATE_KEY;
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -53,7 +54,7 @@ export default function ContactSection() {
           message:    form.message,
           sent_at:    new Date().toLocaleString("fr-FR"),
         },
-        { publicKey: EMAILJS_KEY }
+        { publicKey: EMAILJS_KEY, ...(EMAILJS_PRIVATE && { accessToken: EMAILJS_PRIVATE }) }
       );
       toast.success("Message envoyé avec succès !");
       setForm({ name: "", email: "", message: "" });
