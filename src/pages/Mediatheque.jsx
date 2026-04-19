@@ -1,12 +1,16 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
-import { Play, ExternalLink } from "lucide-react";
+import { Play, ExternalLink, Images } from "lucide-react";
 import { useContent } from "../lib/localStore";
-import { mediaVideos as videosStatic, mediaPhotos as photosStatic } from "../data/mediatheque";
+import { mediaVideos as videosStatic } from "../data/mediatheque";
+import { galeries as galeriesStatic } from "../data/galeries";
+import { useLocalAuth } from "../lib/LocalAuth";
 
 export default function Mediatheque() {
+  const { session } = useLocalAuth();
   const videos = useContent("mediaVideos", videosStatic);
-  const photos = useContent("mediaPhotos", photosStatic);
+  const galeries = useContent("galeries", galeriesStatic);
   return (
     <div>
       <PageHero title="Médiathèque" subtitle="Informations — Photos & Vidéos" />
@@ -60,30 +64,41 @@ export default function Mediatheque() {
           </div>
         </motion.div>
 
-        {/* Photos */}
+        {/* Galeries */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h2 className="font-heading text-2xl font-bold text-foreground mb-8">Galerie photos</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground mb-8">Galeries photos</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {photos.map((photo, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + i * 0.08 }}
-                className="relative overflow-hidden rounded-xl aspect-video group cursor-pointer"
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-end">
-                  <span className="p-3 text-xs text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    {photo.alt}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+            {galeries.map((g, i) => {
+              const to = g.access === "membres" && !session
+                ? `/login?redirect=/galeries/${g.id}`
+                : `/galeries/${g.id}`;
+              return (
+                <motion.div
+                  key={g.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.06 }}
+                >
+                  <Link to={to} className="relative block overflow-hidden rounded-xl aspect-video group">
+                    {g.cover ? (
+                      <img
+                        src={g.cover}
+                        alt={g.titre}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <Images className="w-8 h-8 text-muted-foreground/30" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors" />
+                    <span className="absolute inset-x-0 bottom-0 p-3 text-xs text-white font-semibold opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                      {g.titre}
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </section>
