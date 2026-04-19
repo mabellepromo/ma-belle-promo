@@ -172,7 +172,7 @@ export default function Navbar() {
       {/* Top accent bar */}
       <div className="h-0.5 bg-gradient-to-r from-emerald-400 via-yellow-300 to-emerald-500" />
 
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-18">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-20 md:h-24">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
           <img
