@@ -47,6 +47,7 @@ function PageTitleUpdater() {
   }, [pathname]);
   return null;
 }
+import MaintenanceGate, { MAINTENANCE_MODE } from '@/components/MaintenanceGate';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
@@ -173,6 +174,7 @@ const AuthenticatedApp = () => {
 function App() {
   return (
     <HelmetProvider>
+    <MaintenanceGate>
     <AuthProvider>
       <LocalAuthProvider>
         <QueryClientProvider client={queryClientInstance}>
@@ -185,6 +187,7 @@ function App() {
         <WindowFrame />
       </LocalAuthProvider>
     </AuthProvider>
+    </MaintenanceGate>
     </HelmetProvider>
   );
 }
