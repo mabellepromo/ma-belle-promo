@@ -4,7 +4,7 @@ import { Mail, Phone, Linkedin } from "lucide-react";
 import SEO from "../components/SEO";
 import { useEquipe } from "../hooks/useEquipe";
 
-const ARABESQUE = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><g fill='none' stroke='%23000000' stroke-width='0.8' opacity='1'><path d='M50 10 C58 25 58 38 50 50 C42 38 42 25 50 10Z'/><path d='M90 50 C75 58 62 58 50 50 C62 42 75 42 90 50Z'/><path d='M50 90 C42 75 42 62 50 50 C58 62 58 75 50 90Z'/><path d='M10 50 C25 42 38 42 50 50 C38 58 25 58 10 50Z'/><path d='M50 10 C60 18 68 28 70 40'/><path d='M90 50 C82 60 72 68 60 70'/><path d='M50 90 C40 82 32 72 30 60'/><path d='M10 50 C18 40 28 32 40 30'/><path d='M0 0 C12 6 18 18 12 30 C6 18 6 6 0 0Z'/><path d='M100 0 C94 6 94 18 88 30 C82 18 88 6 100 0Z'/><path d='M0 100 C6 94 18 88 30 88 C18 94 6 94 0 100Z'/><path d='M100 100 C88 94 82 88 70 88 C82 82 94 88 100 100Z'/><circle cx='50' cy='50' r='4'/><circle cx='50' cy='10' r='2.5'/><circle cx='90' cy='50' r='2.5'/><circle cx='50' cy='90' r='2.5'/><circle cx='10' cy='50' r='2.5'/><path d='M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30Z'/></g></svg>`;
+const ARABESQUE = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><g fill='none' stroke='%23000000' stroke-width='1.5' opacity='1'><path d='M50 10 C58 25 58 38 50 50 C42 38 42 25 50 10Z'/><path d='M90 50 C75 58 62 58 50 50 C62 42 75 42 90 50Z'/><path d='M50 90 C42 75 42 62 50 50 C58 62 58 75 50 90Z'/><path d='M10 50 C25 42 38 42 50 50 C38 58 25 58 10 50Z'/><path d='M50 10 C60 18 68 28 70 40'/><path d='M90 50 C82 60 72 68 60 70'/><path d='M50 90 C40 82 32 72 30 60'/><path d='M10 50 C18 40 28 32 40 30'/><path d='M0 0 C12 6 18 18 12 30 C6 18 6 6 0 0Z'/><path d='M100 0 C94 6 94 18 88 30 C82 18 88 6 100 0Z'/><path d='M0 100 C6 94 18 88 30 88 C18 94 6 94 0 100Z'/><path d='M100 100 C88 94 82 88 70 88 C82 82 94 88 100 100Z'/><circle cx='50' cy='50' r='4'/><circle cx='50' cy='10' r='2.5'/><circle cx='90' cy='50' r='2.5'/><circle cx='50' cy='90' r='2.5'/><circle cx='10' cy='50' r='2.5'/><path d='M30 30 Q50 20 70 30 Q80 50 70 70 Q50 80 30 70 Q20 50 30 30Z'/></g></svg>`;
 
 const ARABESQUE_BG = `url("data:image/svg+xml,${ARABESQUE}")`;
 
@@ -49,7 +49,7 @@ export default function Equipe() {
             >
               {/* Arabesque filigrane */}
               <div className="absolute inset-0 pointer-events-none"
-                style={{ backgroundImage: ARABESQUE_BG, backgroundSize: "100px 100px", opacity: 0.07 }} />
+                style={{ backgroundImage: ARABESQUE_BG, backgroundSize: "100px 100px", opacity: 0.18 }} />
 
               <div className="relative z-10 flex items-start gap-4">
                 <div className="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-muted border border-border">
