@@ -81,7 +81,7 @@ export default function Ambition() {
             <motion.img
               whileHover={{ scale: 1.04 }}
               transition={{ duration: 0.3 }}
-              src="/collage-membres.jpg"
+              src="/collage-membres.webp"
               alt="Membres Ma Belle Promo"
               className="relative z-10 w-full max-w-md h-96 object-contain drop-shadow-2xl"
               style={{ filter: "drop-shadow(0 8px 32px rgba(6,78,59,0.35)) drop-shadow(0 0 20px rgba(217,119,6,0.2))" }}
