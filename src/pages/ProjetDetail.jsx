@@ -38,7 +38,7 @@ export default function ProjetDetail() {
   }
 
   const accent = catAccent[projet.categorie] || "#16a34a";
-  const autres = allProjets.filter((p) => String(p.id) !== String(id)).slice(0, 3);
+  const autres = projets.filter((p) => String(p.id) !== String(id)).slice(0, 3);
 
   const videoList = Array.isArray(projet.videos) && projet.videos.length > 0
     ? projet.videos
