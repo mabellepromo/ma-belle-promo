@@ -100,7 +100,7 @@ export default function Contacts() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="p-5 bg-primary text-primary-foreground rounded-2xl">
               <h3 className="font-heading font-bold mb-2">Faculté de Droit de Lomé</h3>
               <p className="text-sm text-primary-foreground/80">
-                Ma Belle Promo est l'association des anciens de la Faculté de Droit et des Sciences Économiques de l'Université de Lomé, promotion 1994-2000.
+                Ma Belle Promo est l'association des anciens de la Faculté de Droit de l'Université de Lomé, promotion 1994-2000.
               </p>
             </motion.div>
           </div>
