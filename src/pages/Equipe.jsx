@@ -23,7 +23,21 @@ export default function Equipe() {
       <SEO title="Notre Équipe" description="Le bureau exécutif de Ma Belle Promo : présidente, secrétaires et membres élus de l'association des anciens diplômés FDD de Lomé." path="/association/equipe" />
       <PageHero title="Notre Équipe" subtitle="L'Association — Bureau exécutif" />
 
-      <section className="py-20 max-w-6xl mx-auto px-6">
+      <section className="relative py-20 max-w-6xl mx-auto px-6">
+        {/* Logo tampon en filigrane */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          <img
+            src="/images/Logo/LogoRedesign1.png"
+            alt=""
+            aria-hidden="true"
+            className="w-[520px] h-[520px] object-contain select-none"
+            style={{
+              opacity: 0.06,
+              filter: "grayscale(100%) contrast(1.4)",
+              transform: "rotate(-8deg)",
+            }}
+          />
+        </div>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
