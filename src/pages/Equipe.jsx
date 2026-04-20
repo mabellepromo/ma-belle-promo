@@ -30,11 +30,11 @@ export default function Equipe() {
             src="/Logo Redesign1.png"
             alt=""
             aria-hidden="true"
-            className="w-[520px] h-[520px] object-contain select-none"
+            className="w-[700px] h-[700px] object-contain select-none"
             style={{
-              opacity: 0.07,
+              opacity: 0.05,
               filter: "grayscale(100%) contrast(1.8)",
-              transform: "rotate(-8deg)",
+              transform: "rotate(0deg)",
             }}
           />
         </div>
