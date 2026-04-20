@@ -32,8 +32,8 @@ export default function Equipe() {
             aria-hidden="true"
             className="w-[520px] h-[520px] object-contain select-none"
             style={{
-              opacity: 0.06,
-              filter: "grayscale(100%) contrast(1.4)",
+              opacity: 0.15,
+              filter: "grayscale(100%) contrast(1.8)",
               transform: "rotate(-8deg)",
             }}
           />
