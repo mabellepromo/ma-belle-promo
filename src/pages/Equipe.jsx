@@ -5,15 +5,15 @@ import SEO from "../components/SEO";
 import { useEquipe } from "../hooks/useEquipe";
 
 const CARD_GRADIENTS = [
-  "linear-gradient(135deg, #064e3b 0%, #065f46 60%, #0f766e 100%)",   // vert foncé
-  "linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #2563eb 100%)",   // bleu nuit
-  "linear-gradient(135deg, #78350f 0%, #92400e 60%, #b45309 100%)",   // or brun
-  "linear-gradient(135deg, #3b1a6b 0%, #5b21b6 60%, #7c3aed 100%)",   // violet
-  "linear-gradient(135deg, #1c1917 0%, #292524 60%, #3c3836 100%)",   // ardoise sombre
-  "linear-gradient(135deg, #134e4a 0%, #0f766e 60%, #0d9488 100%)",   // teal
-  "linear-gradient(135deg, #7f1d1d 0%, #991b1b 60%, #b91c1c 100%)",   // bordeaux
-  "linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0284c7 100%)",   // bleu ciel
-  "linear-gradient(135deg, #1a2e05 0%, #365314 60%, #4d7c0f 100%)",   // vert olive
+  "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",   // vert menthe
+  "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",   // bleu lavande
+  "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",   // or doux
+  "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",   // violet poudré
+  "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",   // ardoise perle
+  "linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)",   // teal pastel
+  "linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)",   // rose poudré
+  "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",   // bleu ciel doux
+  "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",   // vert pomme
 ];
 
 export default function Equipe() {
@@ -56,33 +56,31 @@ export default function Equipe() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-heading text-base font-bold text-white leading-tight">{membre.nom}</h3>
-                  <p className="text-xs font-semibold mt-1 uppercase tracking-wide" style={{ color: "#6ee7b7" }}>{membre.role}</p>
+                  <h3 className="font-heading text-base font-bold text-foreground leading-tight">{membre.nom}</h3>
+                  <p className="text-xs font-semibold mt-1 uppercase tracking-wide text-primary">{membre.role}</p>
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                 {membre.profession}
               </p>
               {(membre.email || membre.tel || membre.linkedin) && (
-                <div className="mt-4 space-y-1.5 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
+                <div className="mt-4 space-y-1.5 pt-4 border-t border-black/10">
                   {membre.email && (
                     <a href={`mailto:${membre.email}`}
-                      className="flex items-center gap-2 text-xs hover:underline transition-colors"
-                      style={{ color: "#6ee7b7" }}>
+                      className="flex items-center gap-2 text-xs text-primary hover:underline transition-colors">
                       <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{membre.email}</span>
                     </a>
                   )}
                   {membre.tel && (
-                    <div className="flex items-center gap-2 text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Phone className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>{membre.tel}</span>
                     </div>
                   )}
                   {membre.linkedin && (
                     <a href={membre.linkedin} target="_blank" rel="noreferrer"
-                      className="flex items-center gap-2 text-xs transition-colors"
-                      style={{ color: "rgba(255,255,255,0.65)" }}>
+                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
                       <Linkedin className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">LinkedIn</span>
                     </a>
