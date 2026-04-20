@@ -95,6 +95,7 @@ export default function ArticleDetail() {
                 src={article.image}
                 alt={article.titre}
                 className="w-full h-full object-cover"
+                style={{ objectPosition: article.photo_position || "center" }}
               />
             </div>
           </div>

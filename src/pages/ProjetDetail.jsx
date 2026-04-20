@@ -122,6 +122,7 @@ export default function ProjetDetail() {
                   src={projet.image}
                   alt={projet.titre}
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: projet.photo_position || "center" }}
                 />
               </div>
             </div>

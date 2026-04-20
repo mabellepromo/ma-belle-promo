@@ -29,7 +29,7 @@ export function ArticlesSection() {
   const { articles: items, add, update, remove, loading, isSeeded, seedFromStatic } = useArticles();
   const [form, setForm] = useState(null);
   const [seeding, setSeeding] = useState(false);
-  const empty = { id: "", titre: "", extrait: "", date: "", categorie: "Événement", image: "", videos: [], contenu: "", photos: [] };
+  const empty = { id: "", titre: "", extrait: "", date: "", categorie: "Événement", image: "", photo_position: "center", videos: [], contenu: "", photos: [] };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Webinaire", "Conférence", "Gala", "Solidarité", "Événement", "Juridique"];
 
@@ -79,6 +79,14 @@ export function ArticlesSection() {
             <Field label="Catégorie"><select className={sel} value={form.categorie} onChange={f("categorie")}>{CATS.map(c => <option key={c}>{c}</option>)}</select></Field>
             <div className="md:col-span-2"><Field label="Extrait" required><textarea className={ta} rows={2} value={form.extrait} onChange={f("extrait")} /></Field></div>
             <div className="md:col-span-2"><ImgField label="Image de couverture" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
+            <div className="md:col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" className="w-4 h-4 rounded accent-primary"
+                  checked={form.photo_position === "top"}
+                  onChange={e => setForm(p => ({ ...p, photo_position: e.target.checked ? "top" : "center" }))} />
+                <span className="text-sm text-foreground">Photo portrait — cadrer depuis le haut (pour ne pas couper les têtes)</span>
+              </label>
+            </div>
             <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
             <div className="md:col-span-2"><VideoField videos={Array.isArray(form.videos) ? form.videos : (form.youtube ? [form.youtube] : [])} onChange={v => setForm(p => ({ ...p, videos: v, youtube: "" }))} /></div>
             <div className="md:col-span-2">
@@ -169,7 +177,7 @@ export function ProjetsSection() {
   const { projets: items, add, update, remove, loading, isSeeded, seedFromStatic } = useProjets();
   const [form, setForm] = useState(null);
   const [seeding, setSeeding] = useState(false);
-  const empty = { id: "", titre: "", extrait: "", description: "", contenu: "", date: "", categorie: "Solidarité", image: "", photos: [], videos: [] };
+  const empty = { id: "", titre: "", extrait: "", description: "", contenu: "", date: "", categorie: "Solidarité", image: "", photo_position: "center", photos: [], videos: [] };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Solidarité", "Éducation", "Santé publique", "Autre"];
 
@@ -208,6 +216,14 @@ export function ProjetsSection() {
               </Field>
             </div>
             <div className="md:col-span-2"><ImgField label="Image d'accroche" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
+            <div className="md:col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" className="w-4 h-4 rounded accent-primary"
+                  checked={form.photo_position === "top"}
+                  onChange={e => setForm(p => ({ ...p, photo_position: e.target.checked ? "top" : "center" }))} />
+                <span className="text-sm text-foreground">Photo portrait — cadrer depuis le haut (pour ne pas couper les têtes)</span>
+              </label>
+            </div>
             <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
             <div className="md:col-span-2"><VideoField videos={form.videos || []} onChange={v => setForm(p => ({ ...p, videos: v }))} /></div>
           </div>
