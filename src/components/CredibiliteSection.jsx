@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function CredibiliteSection() {
   return (
-    <section className="py-10" style={{ background: "hsl(150,30%,10%)" }}>
+    <section className="py-10" style={{ background: "var(--brand-dark-mid)" }}>
       <div className="max-w-3xl mx-auto px-6">
         <div className="grid sm:grid-cols-2 gap-4">
           <motion.div

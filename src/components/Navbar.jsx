@@ -88,7 +88,7 @@ function DesktopDropdown({ item }) {
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
             className="absolute top-full left-0 mt-1 w-52 rounded-lg shadow-xl py-1 z-50 border"
-            style={{ background: "hsl(150,30%,8%)", borderColor: "rgba(255,255,255,0.10)" }}
+            style={{ background: "var(--brand-dark-mid)", borderColor: "rgba(255,255,255,0.10)" }}
           >
             {item.children.map((child) => (
               <Link
@@ -166,7 +166,7 @@ export default function Navbar() {
 
   return (
     <nav
-      style={{ background: scrolled ? "hsl(150,30%,7%)" : "hsl(150,30%,10%)" }}
+      style={{ background: scrolled ? "var(--brand-dark)" : "var(--brand-dark-mid)" }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-lg"
     >
       {/* Top accent bar */}

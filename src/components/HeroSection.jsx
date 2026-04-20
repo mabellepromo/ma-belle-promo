@@ -76,7 +76,7 @@ export default function HeroSection() {
       ref={ref}
       id="hero"
       className="relative min-h-screen flex flex-col overflow-hidden"
-      style={{ background: "linear-gradient(150deg, hsl(150,30%,7%) 0%, hsl(150,32%,12%) 40%, hsl(150,30%,10%) 70%, hsl(150,28%,6%) 100%)" }}
+      style={{ background: "linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-dark-light) 40%, var(--brand-dark-mid) 70%, hsl(150,28%,6%) 100%)" }}
     >
       {/* Image fond subtile */}
       <motion.div style={{ y: bgY }} className="absolute inset-0">

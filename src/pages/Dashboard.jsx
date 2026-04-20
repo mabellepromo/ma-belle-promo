@@ -148,7 +148,7 @@ export default function Dashboard() {
       {compose && <ComposeModal onClose={() => setCompose(false)} />}
 
       {/* Header */}
-      <div className="sticky top-0 z-40 flex-shrink-0" style={{ background: "hsl(150,30%,10%)" }}>
+      <div className="sticky top-0 z-40 flex-shrink-0" style={{ background: "var(--brand-dark-mid)" }}>
         <div className="h-20 px-6 sm:px-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
@@ -180,7 +180,7 @@ export default function Dashboard() {
 
         {/* Sidebar */}
         <aside className="w-56 flex-shrink-0 bg-background border-r border-border border-l-2 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto flex flex-col"
-          style={{ borderLeftColor: "hsl(150,45%,35%)" }}>
+          style={{ borderLeftColor: "hsl(var(--primary))" }}>
           <div className="px-4 py-4 border-b border-border">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
@@ -218,7 +218,7 @@ export default function Dashboard() {
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
             <div className="space-y-8">
-              <div className="relative overflow-hidden rounded-2xl p-6 md:p-8" style={{ background: "hsl(150,30%,10%)" }}>
+              <div className="relative overflow-hidden rounded-2xl p-6 md:p-8" style={{ background: "var(--brand-dark-mid)" }}>
                 <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 0%, transparent 60%)" }} />
                 <div className="relative flex items-center gap-5">
                   <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"

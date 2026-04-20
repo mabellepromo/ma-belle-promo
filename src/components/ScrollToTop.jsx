@@ -21,7 +21,7 @@ export default function ScrollToTop() {
           transition={{ duration: 0.2 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-opacity hover:opacity-80"
-          style={{ background: "hsl(150,30%,10%)", border: "1px solid rgba(52,211,153,0.30)" }}
+          style={{ background: "var(--brand-dark-mid)", border: "1px solid rgba(52,211,153,0.30)" }}
           aria-label="Retour en haut"
         >
           <ArrowUp className="w-4 h-4 text-emerald-400" />
