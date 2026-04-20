@@ -121,7 +121,7 @@ export default function ProjetDetail() {
                 <img
                   src={projet.image}
                   alt={projet.titre}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-top"
                 />
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function ProjetDetail() {
                 >
                   <div className="h-32 overflow-hidden flex-shrink-0">
                     <img loading="lazy" src={p.image} alt={p.titre}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-4 flex flex-col flex-1">
                     <span className={`self-start px-2 py-0.5 text-xs font-semibold rounded-full mb-2 ${catColors[p.categorie] || "bg-gray-100 text-gray-700"}`}>

@@ -64,7 +64,7 @@ function HeroCard({ article }) {
         <img
           src={article.image}
           alt={article.titre}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
         />
         {/* Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
@@ -115,7 +115,7 @@ function MediumCard({ article, index }) {
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600"
+            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-600"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           <span className={`absolute bottom-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
@@ -159,7 +159,7 @@ function ListCard({ article, index }) {
       >
         <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
           <img loading="lazy" src={article.image} alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

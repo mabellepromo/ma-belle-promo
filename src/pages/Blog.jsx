@@ -138,7 +138,7 @@ export default function Blog() {
                         <img
                           src={featured.image}
                           alt={featured.titre}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 md:to-transparent" />
                         <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
@@ -187,7 +187,7 @@ export default function Blog() {
                         <img
                           src={article.image}
                           alt={article.titre}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-3 left-3">
                           <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${CAT_COLORS[article.categorie] || "bg-gray-100 text-gray-700"}`}>
