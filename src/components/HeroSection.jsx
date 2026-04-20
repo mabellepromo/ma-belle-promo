@@ -196,6 +196,20 @@ export default function HeroSection() {
                 </div>
               ))}
             </motion.div>
+
+            {/* ── Présidente compacte — sous les stats, cachée sur lg ── */}
+            <div className="lg:hidden w-full flex items-center gap-3 rounded-2xl px-4 py-3"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
+                style={{ border: "2px solid rgba(52,211,153,0.50)", boxShadow: "0 0 12px rgba(52,211,153,0.20)" }}>
+                <img src="/images/membres/fabienne.png" alt="Fabienne SENAYA-ATAYI"
+                  className="w-full h-full object-cover object-top" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-heading text-sm font-bold leading-tight truncate">Fabienne SENAYA-ATAYI</p>
+                <p className="text-xs mt-0.5" style={{ color: "#6ee7b7" }}>Présidente · Ma Belle Promo</p>
+              </div>
+            </div>
           </motion.div>
 
           {/* ── COL 2 : Titre + message + CTAs ── */}
@@ -259,23 +273,6 @@ export default function HeroSection() {
               </Link>
             </div>
 
-            {/* ── Version compacte présidente — mobile/tablette uniquement ── */}
-            <div className="lg:hidden mt-6 flex items-center gap-4 rounded-2xl px-4 py-3"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
-              <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0"
-                style={{ border: "2px solid rgba(52,211,153,0.50)", boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}>
-                <img
-                  src="/images/membres/fabienne.png"
-                  alt="Fabienne SENAYA-ATAYI"
-                  className="w-full h-full object-cover object-top"
-                />
-              </div>
-              <div>
-                <p className="text-white font-heading text-sm font-bold leading-tight">Fabienne SENAYA-ATAYI</p>
-                <p className="text-xs mt-0.5" style={{ color: "#6ee7b7" }}>Présidente · Ma Belle Promo</p>
-              </div>
-              <span className="ml-auto text-2xl">🏛️</span>
-            </div>
           </motion.div>
 
           {/* ── COL 3 : Photo présidente ── */}

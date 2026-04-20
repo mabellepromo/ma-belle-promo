@@ -161,7 +161,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setOpen(false);
-  }, [location.pathname]);
+  }, [location]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
