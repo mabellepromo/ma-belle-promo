@@ -24,8 +24,8 @@ export default function Equipe() {
       <PageHero title="Notre Équipe" subtitle="L'Association — Bureau exécutif" />
 
       <section className="relative py-20 max-w-6xl mx-auto px-6">
-        {/* Logo tampon en filigrane */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        {/* Logo tampon en filigrane — fixe pendant le scroll */}
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
           <img
             src="/Logo Redesign1.png"
             alt=""
@@ -41,13 +41,13 @@ export default function Equipe() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-16"
+          className="relative z-10 text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-16"
         >
           Le bureau exécutif de Ma Belle Promo est composé de membres élus lors de l'Assemblée Générale.
           Ils œuvrent bénévolement pour faire avancer la mission de l'association.
         </motion.p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {equipe.map((membre, i) => (
             <motion.div
               key={membre.nom}
