@@ -29,7 +29,6 @@ const PAGE_TITLES = {
   "/don":                        "Faire un Don",
   "/don/merci":                  "Merci !",
   "/espace-membre":              "Mon Espace",
-  "/blog":                       "Blog & Ressources",
   "/annuaire":                   "Annuaire des Membres",
   "/ressources":                 "Ressources Juridiques",
   "/login":                      "Connexion",
@@ -81,7 +80,6 @@ const ArticleDetail  = lazy(() => import('./pages/ArticleDetail'));
 const Don            = lazy(() => import('./pages/Don'));
 const MerciDon       = lazy(() => import('./pages/MerciDon'));
 const EspaceMembre   = lazy(() => import('./pages/EspaceMembre'));
-const Blog           = lazy(() => import('./pages/Blog'));
 const AnnuaireMembres = lazy(() => import('./pages/AnnuaireMembres'));
 const Ressources     = lazy(() => import('./pages/Ressources'));
 const Dashboard      = lazy(() => import('./pages/Dashboard'));
@@ -155,7 +153,7 @@ const AuthenticatedApp = () => {
         <Route path="/don" element={<Don />} />
         <Route path="/don/merci" element={<MerciDon />} />
         <Route path="/espace-membre" element={<PrivateRoute><EspaceMembre /></PrivateRoute>} />
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog" element={<Navigate to="/informations/actualites" replace />} />
         <Route path="/annuaire" element={<PrivateRoute><AnnuaireMembres /></PrivateRoute>} />
         <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
         <Route path="/galeries" element={<Galeries />} />

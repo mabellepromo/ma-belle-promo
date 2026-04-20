@@ -35,7 +35,6 @@ const navItems = [
     label: "Informations",
     children: [
       { label: "Actualités", href: "/informations/actualites" },
-      { label: "Blog & Ressources", href: "/blog" },
       { label: "Galeries membres", href: "/galeries", membersOnly: true },
       { label: "Médiathèque", href: "/informations/mediatheque" },
       { label: "Documents", href: "/informations/documents" },
