@@ -27,7 +27,7 @@ export default function Equipe() {
         {/* Logo tampon en filigrane */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
           <img
-            src="/images/Logo/LogoRedesign1.png"
+            src="/Logo Redesign1.png"
             alt=""
             aria-hidden="true"
             className="w-[520px] h-[520px] object-contain select-none"
