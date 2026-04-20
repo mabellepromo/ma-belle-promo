@@ -65,7 +65,7 @@ export default function Credo() {
         {/* Logo en filigrane */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <img
-            src="/Logo Redesign1.png"
+            src="/Logo Redesign1.webp"
             alt=""
             className="w-[420px] max-w-[70%] opacity-[0.06] object-contain"
           />

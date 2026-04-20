@@ -8,7 +8,7 @@ export default function Layout() {
       {/* Logo tampon fixe en filigrane sur toutes les pages */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
         <img
-          src="/Logo Redesign1.png"
+          src="/Logo Redesign1.webp"
           alt=""
           aria-hidden="true"
           className="w-[900px] h-[900px] object-contain select-none"

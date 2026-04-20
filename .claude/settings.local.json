@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sed 's/<[^>]*>//g')"
+      "Bash(sed 's/<[^>]*>//g')",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

@@ -202,7 +202,7 @@ export default function HeroSection() {
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
               <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
                 style={{ border: "2px solid rgba(52,211,153,0.50)", boxShadow: "0 0 12px rgba(52,211,153,0.20)" }}>
-                <img src="/images/membres/fabienne.png" alt="Fabienne SENAYA-ATAYI"
+                <img src="/images/membres/fabienne.webp" alt="Fabienne SENAYA-ATAYI"
                   className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex-1 min-w-0">
@@ -297,7 +297,7 @@ export default function HeroSection() {
             <div className="relative z-10 w-full rounded-3xl overflow-hidden"
               style={{ aspectRatio: "3/4", boxShadow: "0 24px 60px rgba(0,0,0,0.40), 0 0 0 1.5px rgba(255,255,255,0.10)" }}>
               <img
-                src="/images/membres/fabienne.png"
+                src="/images/membres/fabienne.webp"
                 alt="Fabienne SENAYA-ATAYI — Présidente"
                 className="w-full h-full object-cover object-top"
               />

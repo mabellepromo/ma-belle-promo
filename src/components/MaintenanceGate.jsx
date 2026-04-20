@@ -33,7 +33,7 @@ export default function MaintenanceGate({ children }) {
       <div className="mb-8 text-center">
         <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden border-2"
           style={{ borderColor: "rgba(52,211,153,0.4)" }}>
-          <img src="/images/Logo/LogoRedesign1.png" alt="Ma Belle Promo"
+          <img src="/Logo Redesign1.webp" alt="Ma Belle Promo"
             className="w-full h-full object-cover" />
         </div>
         <h1 className="font-heading text-2xl font-bold text-white tracking-wide">Ma Belle Promo</h1>
