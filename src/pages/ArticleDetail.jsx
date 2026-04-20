@@ -147,7 +147,8 @@ export default function ArticleDetail() {
           prose-li:text-muted-foreground
           prose-strong:text-foreground
           prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-          prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:font-medium">
+          prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:font-medium
+          [&_p]:text-justify [&_li]:text-justify">
           {article.contenu?.trim().startsWith("<")
             ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.contenu) }} />
             : <ReactMarkdown>{article.contenu}</ReactMarkdown>

@@ -176,7 +176,8 @@ export default function ProjetDetail() {
             prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
             prose-li:text-muted-foreground
             prose-strong:text-foreground
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            [&_p]:text-justify [&_li]:text-justify">
             {projet.contenu.trim().startsWith("<")
               ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(projet.contenu) }} />
               : <ReactMarkdown>{projet.contenu}</ReactMarkdown>
