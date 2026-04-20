@@ -63,7 +63,7 @@ export default function ActualitesSection() {
                   {article.titre}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {article.contenu.replace(/[*#_>]/g, "").slice(0, 130)}...
+                  {(article.extrait || article.contenu || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 130)}...
                 </p>
                 <Link to={`/actualites/${article.id}`} className="mt-4 flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all">
                   Lire la suite <ArrowRight className="w-4 h-4" />
