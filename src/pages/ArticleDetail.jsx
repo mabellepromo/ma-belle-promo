@@ -94,7 +94,7 @@ export default function ArticleDetail() {
               <img
                 src={article.image}
                 alt={article.titre}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function ArticleDetail() {
                     <img
                       src={a.image}
                       alt={a.titre}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-4 flex flex-col flex-1">
