@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown, Home, User, LayoutDashboard } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalAuth } from "@/lib/LocalAuth";
 
@@ -155,8 +155,13 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useLocalAuth();
   const isAdmin = session?.role === "admin";
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
