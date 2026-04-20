@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import SEO from "../components/SEO";
 
 const valeurs = [
   {
@@ -56,6 +57,7 @@ const valeurs = [
 export default function Credo() {
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Notre Credo" description="Les valeurs fondatrices de Ma Belle Promo : amitié, solidarité et entraide au service des anciens diplômés de la FDD de l'Université de Lomé." path="/association/credo" />
 
       {/* ── Hero 80vh ── */}
       <div className="relative flex flex-col items-center justify-center h-[58vh] bg-foreground overflow-hidden px-6">

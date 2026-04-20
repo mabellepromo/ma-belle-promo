@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Building2, Globe } from "lucide-react";
+import SEO from "../components/SEO";
 
 const niveaux = [
   { label: "Partenaire Platine", color: "bg-slate-100 border-slate-300", badge: "💎", desc: "Soutien annuel ≥ 500 000 FCFA" },
@@ -18,6 +19,7 @@ const avantages = [
 export default function Sponsors() {
   return (
     <div>
+      <SEO title="Nos Sponsors" description="Les partenaires et mécènes de Ma Belle Promo. Rejoignez-nous pour soutenir nos actions solidaires au Togo." path="/association/sponsors" />
       <PageHero title="Nos Sponsors" subtitle="L'Association — Partenaires & Mécènes" />
 
       <section className="py-20 max-w-5xl mx-auto px-6">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import SEO from "../components/SEO";
 import PageHero from "../components/PageHero";
 import { Heart, Phone, Mail, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,7 @@ export default function Don() {
 
   return (
     <div>
+      <SEO title="Faire un Don" description="Faites un don à Ma Belle Promo et soutenez nos actions de solidarité, d'éducation et de santé au Togo." path="/don" />
       <PageHero title="Faire un Don" subtitle="Soutenir — Ma Belle Promo" />
 
       <section className="py-16 max-w-4xl mx-auto px-6">

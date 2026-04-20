@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { GraduationCap, Users, Mic, BookOpen, ArrowRight } from "lucide-react";
+import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
 import { useProgrammes } from "../hooks/useProgrammes";
 
@@ -15,6 +16,7 @@ export default function Programmes() {
   const { programmes } = useProgrammes();
   return (
     <div>
+      <SEO title="Nos Programmes" description="Les programmes d'actions de Ma Belle Promo : éducation, solidarité, santé publique et développement communautaire au Togo." path="/activites/programmes" />
       <PageHero title="Nos Programmes" subtitle="Activités — Ce que nous mettons en place" />
 
       <section className="py-20 max-w-5xl mx-auto px-6">

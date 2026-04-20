@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
 import { Search, Tag, Calendar, ArrowRight, BookOpen, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useArticles } from "../hooks/useArticles";
@@ -63,6 +64,7 @@ export default function Blog() {
 
   return (
     <div>
+      <SEO title="Blog & Ressources" description="Articles, analyses juridiques et ressources partagées par les membres de Ma Belle Promo, anciens diplômés de la FDD de Lomé." path="/blog" />
       <PageHero
         title="Blog & Ressources"
         subtitle="Informations — Analyses juridiques & sociales"

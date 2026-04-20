@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { Mail, Phone, Linkedin } from "lucide-react";
+import SEO from "../components/SEO";
 import { useEquipe } from "../hooks/useEquipe";
 
 export default function Equipe() {
   const { equipe } = useEquipe();
   return (
     <div>
+      <SEO title="Notre Équipe" description="Le bureau exécutif de Ma Belle Promo : présidente, secrétaires et membres élus de l'association des anciens diplômés FDD de Lomé." path="/association/equipe" />
       <PageHero title="Notre Équipe" subtitle="L'Association — Bureau exécutif" />
 
       <section className="py-20 max-w-6xl mx-auto px-6">

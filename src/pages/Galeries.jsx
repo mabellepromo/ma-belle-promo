@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Lock, Images, ArrowRight, Calendar, MapPin } from "lucide-react";
+import SEO from "../components/SEO";
 import { useGaleries } from "../hooks/useGaleries";
 import { useLocalAuth } from "../lib/LocalAuth";
 
@@ -9,6 +10,7 @@ export default function Galeries() {
   const { galeries } = useGaleries();
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Galeries photos" description="Les galeries photos des événements et activités de Ma Belle Promo, association des anciens diplômés de la FDD de Lomé." path="/galeries" />
 
       {/* En-tête */}
       <div className="bg-foreground border-b border-border">

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Search, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
+import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
 import { useArticles } from "../hooks/useArticles";
 
@@ -200,6 +201,7 @@ export default function Actualites() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Actualités" description="Toutes les actualités de Ma Belle Promo : événements, projets, actions solidaires et nouvelles de l'association au Togo." path="/informations/actualites" />
 
       {/* ── En-tête éditorial ── */}
       <div className="bg-foreground border-b border-border">

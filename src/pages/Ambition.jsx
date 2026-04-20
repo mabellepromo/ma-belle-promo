@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { Target, CheckCircle2 } from "lucide-react";
+import SEO from "../components/SEO";
 
 const objectifs = [
   "Promouvoir le partage d'expérience et le réseautage entre les membres",
@@ -13,6 +14,7 @@ const objectifs = [
 export default function Ambition() {
   return (
     <div>
+      <SEO title="Notre Ambition" description="Les buts et objectifs de Ma Belle Promo, association des anciens diplômés de la FDD de l'Université de Lomé (1994-2000)." path="/association/ambition" />
       <PageHero title="Notre Ambition" subtitle="L'Association — But et objectifs" />
 
       <section className="py-20 max-w-6xl mx-auto px-6">

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Disallow: /dashboard
+Disallow: /espace-membre
+Disallow: /informations/mediatheque
+Disallow: /informations/documents
+Disallow: /annuaire
+Disallow: /ressources
+Disallow: /login
+Disallow: /reset-password
+
+Sitemap: https://www.mabellepromo.org/sitemap.xml

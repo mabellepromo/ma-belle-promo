@@ -3,6 +3,7 @@ import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import { WindowFrame } from './components/WindowFrame'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 
@@ -171,6 +172,7 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
+    <HelmetProvider>
     <AuthProvider>
       <LocalAuthProvider>
         <QueryClientProvider client={queryClientInstance}>
@@ -183,6 +185,7 @@ function App() {
         <WindowFrame />
       </LocalAuthProvider>
     </AuthProvider>
+    </HelmetProvider>
   );
 }
 

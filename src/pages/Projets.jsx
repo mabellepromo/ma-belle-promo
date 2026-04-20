@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Search, Tag, ArrowUpRight } from "lucide-react";
 import { useState, useMemo } from "react";
+import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
 import { useProjets } from "../hooks/useProjets";
 
@@ -143,6 +144,7 @@ export default function Projets() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Nos Réalisations" description="Les projets et réalisations de Ma Belle Promo au Togo : solidarité, éducation, santé et développement communautaire." path="/activites/projets" />
 
       {/* ── En-tête ── */}
       <div className="bg-foreground border-b border-border">

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Banknote, Phone, Mail, MapPin, Globe } from "lucide-react";
+import SEO from "../components/SEO";
 
 const supportMethods = [
   {
@@ -33,6 +34,7 @@ const supportMethods = [
 export default function NousSoutenir() {
   return (
     <div>
+      <SEO title="Nous Soutenir" description="Soutenez les actions solidaires de Ma Belle Promo au Togo. Faites un don et contribuez au développement de notre communauté." path="/implications/soutenir" />
       <PageHero title="Nous Soutenir" subtitle="Implications — Votre engagement" />
 
       <section className="py-20 max-w-5xl mx-auto px-6">

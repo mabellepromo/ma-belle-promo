@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
+import SEO from "../components/SEO";
 import { Send, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -64,6 +65,7 @@ export default function Contacts() {
 
   return (
     <div>
+      <SEO title="Contacts" description="Contactez Ma Belle Promo : adresse, téléphone, email et formulaire de contact de l'association des anciens diplômés FDD de Lomé." path="/informations/contacts" />
       <PageHero title="Contacts" subtitle="Informations — Nous joindre" />
 
       <section className="py-20 max-w-6xl mx-auto px-6">

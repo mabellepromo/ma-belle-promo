@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
@@ -28,6 +29,7 @@ export default function Evenements() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Événements" description="Tous les événements de Ma Belle Promo : galas, conférences, webinaires et rencontres des membres de la promotion FDD Lomé 1994-2000." path="/activites/evenements" />
 
       {/* En-tête éditorial */}
       <div className="bg-foreground border-b border-border">

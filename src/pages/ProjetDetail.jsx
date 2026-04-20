@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import SEO from "../components/SEO";
 import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import PhotoGallery from "../components/PhotoGallery";
@@ -78,6 +79,12 @@ export default function ProjetDetail() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={projet.titre}
+        description={projet.extrait || projet.description || `${projet.titre} — Ma Belle Promo`}
+        image={projet.image}
+        path={`/activites/projets/${id}`}
+      />
 
       {/* ── Header split élégant ── */}
       <div className="border-b border-border" style={{ background: "linear-gradient(135deg, #f8faf8 0%, #ffffff 60%, #fefdf5 100%)" }}>

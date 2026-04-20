@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { FileText, Calendar, Download } from "lucide-react";
+import SEO from "../components/SEO";
 import { useCommuniques } from "../hooks/useCommuniques";
 
 const typeColors = {
@@ -15,6 +16,7 @@ export default function Communiques() {
   const { communiques } = useCommuniques();
   return (
     <div>
+      <SEO title="Communiqués" description="Les communiqués officiels de Ma Belle Promo, association des anciens diplômés de la Faculté de Droit du Développement de Lomé." path="/informations/communiques" />
       <PageHero title="Communiqués" subtitle="Informations — Communications officielles" />
 
       <section className="py-20 max-w-4xl mx-auto px-6">

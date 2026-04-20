@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import SEO from "../components/SEO";
 import { Calendar, ArrowLeft, Clock, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import PhotoGallery from "../components/PhotoGallery";
@@ -61,6 +62,13 @@ export default function ArticleDetail() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={article.titre}
+        description={article.extrait || `${article.titre} — Ma Belle Promo`}
+        image={article.image}
+        path={`/actualites/${id}`}
+        article
+      />
 
       {/* ── Hero : texte gauche (effet feuilleté) + image droite ── */}
       <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 border-b border-border">

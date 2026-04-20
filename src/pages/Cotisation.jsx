@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { CreditCard, Phone, Building, CheckCircle2 } from "lucide-react";
+import SEO from "../components/SEO";
 
 const tarifs = [
   { type: "Membre actif résidant au Togo", montant: "30 000 FCFA", periode: "par an", detail: "Cotisation annuelle pour les membres résidant au Togo." },
@@ -26,6 +27,7 @@ const inclus = [
 export default function Cotisation() {
   return (
     <div>
+      <SEO title="Cotisation" description="Grille tarifaire et modalités de paiement de la cotisation annuelle à Ma Belle Promo. Mobile Money, virement bancaire ou en personne." path="/implications/cotisation" />
       <PageHero title="Cotisation" subtitle="Implications — Contribuer à la mission" />
 
       <section className="py-20 max-w-5xl mx-auto px-6">
