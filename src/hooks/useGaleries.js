@@ -31,7 +31,7 @@ export function useGaleries() {
 
   async function add(item) {
     setSaving(true);
-    const id = item.id || slugify(item.titre) + "-" + Date.now();
+    const id = item.id || slugify(item.titre);
     const { error } = await supabase
       .from("galeries")
       .insert({ ...item, id, photos: item.photos ?? [] });
