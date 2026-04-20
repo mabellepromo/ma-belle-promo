@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowDown, Heart, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
@@ -14,13 +14,14 @@ const stats = [
 /** @param {{ children: import("react").ReactNode }} props */
 function WaterBubble({ children }) {
   const D = 280;
+  const shouldReduce = useReducedMotion();
   return (
     <div style={{ position: "relative", width: D, height: D }}>
-      {[0, 1, 2, 3].map((i) => (
+      {[0, 1].map((i) => (
         <motion.div
           key={i}
-          animate={{ scale: [0.85, 2.2], opacity: [0.45, 0] }}
-          transition={{ duration: 5, repeat: Infinity, delay: i * 0.9, ease: "easeOut" }}
+          animate={shouldReduce ? {} : { scale: [0.85, 2.2], opacity: [0.45, 0] }}
+          transition={{ duration: 5, repeat: Infinity, delay: i * 1.8, ease: "easeOut" }}
           style={{
             position: "absolute", inset: 0, borderRadius: "50%",
             border: "1.5px solid rgba(144,255,180,0.30)",
@@ -28,7 +29,7 @@ function WaterBubble({ children }) {
         />
       ))}
       <motion.div
-        animate={{ scale: [1, 1.015, 1] }}
+        animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "absolute", inset: 0, borderRadius: "50%",
@@ -65,6 +66,7 @@ function WaterBubble({ children }) {
 
 export default function HeroSection() {
   const ref = useRef(null);
+  const shouldReduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
@@ -81,6 +83,7 @@ export default function HeroSection() {
         <img
           src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop"
           alt=""
+          loading="lazy"
           className="w-full h-full object-cover scale-110"
           style={{ opacity: 0.07, mixBlendMode: "luminosity" }}
         />
@@ -92,7 +95,7 @@ export default function HeroSection() {
       {/* Lumières ambiantes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1, 1.25, 1] }}
+          animate={shouldReduce ? {} : { x: [0, 50, 0], y: [0, -30, 0], scale: [1, 1.25, 1] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           style={{
             position: "absolute", top: "10%", left: "5%",
@@ -101,7 +104,7 @@ export default function HeroSection() {
           }}
         />
         <motion.div
-          animate={{ x: [0, -30, 0], y: [0, 50, 0] }}
+          animate={shouldReduce ? {} : { x: [0, -30, 0], y: [0, 50, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 4 }}
           style={{
             position: "absolute", bottom: "10%", right: "10%",
