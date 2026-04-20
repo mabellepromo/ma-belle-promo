@@ -252,16 +252,9 @@ export default function Navbar() {
         />
       )}
 
-      {/* Mobile menu — animation translateY, plus fiable que height sur iOS */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18 }}
-            className="md:hidden bg-background border-t border-border relative z-50"
-          >
+      {/* Mobile menu — sans AnimatePresence pour éviter les blocages iOS */}
+      {open && (
+        <div className="md:hidden bg-background border-t border-border relative z-50">
             <div className="px-4 py-4 space-y-2 max-h-[75vh] overflow-y-auto">
               {/* Home */}
               <button
@@ -294,9 +287,8 @@ export default function Navbar() {
                 ♥ Faire un don
               </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </nav>
   );
 }
