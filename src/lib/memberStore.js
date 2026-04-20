@@ -27,7 +27,7 @@ function memberToRow(m) {
   };
 }
 
-export function useMemberStore() {
+export function useMemberStore({ realtime = false } = {}) {
   const [members,  setMembers]  = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
@@ -53,12 +53,13 @@ export function useMemberStore() {
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
+    if (!realtime) return;
     const channel = supabase
       .channel("members-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "members" }, () => load())
       .subscribe();
     return () => supabase.removeChannel(channel);
-  }, [load]);
+  }, [load, realtime]);
 
   const allMembers     = useMemo(() => members.filter(m => m.status === "validated"), [members]);
   const pendingMembers = useMemo(() => members.filter(m => m.status === "pending"),   [members]);

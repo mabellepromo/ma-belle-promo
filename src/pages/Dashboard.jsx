@@ -33,7 +33,7 @@ export default function Dashboard() {
     allMembers, pendingMembers,
     updateMember, validateMember, rejectMember, deleteMember, addValidated,
     isSeeded, seedFromStatic, migrateFromOldStore, saving: memberSaving,
-  } = useMemberStore();
+  } = useMemberStore({ realtime: true });
 
   const [tab,           setTab]          = useState("overview");
   const [search,        setSearch]       = useState("");
