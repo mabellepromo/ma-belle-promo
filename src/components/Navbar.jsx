@@ -222,7 +222,7 @@ export default function Navbar() {
           )}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-muted transition-colors"
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/80"
           >
             <AnimatePresence mode="wait">
               {open ? (

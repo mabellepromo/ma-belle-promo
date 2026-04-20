@@ -129,7 +129,7 @@ export default function Adhesion() {
       <section className="py-20 max-w-5xl mx-auto px-6">
 
         {/* Processus */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid sm:grid-cols-4 gap-4 mb-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
           {etapes.map((e) => (
             <div key={e.num} className="relative text-center p-5 bg-card border border-border rounded-xl">
               <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center mx-auto mb-3">

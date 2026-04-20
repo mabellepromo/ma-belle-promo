@@ -205,7 +205,7 @@ export default function ArticleDetail() {
               <div className="flex-1 h-px bg-border" />
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {autres.map((a) => (
                 <Link
                   key={a.id}

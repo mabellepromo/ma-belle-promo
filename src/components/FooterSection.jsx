@@ -86,19 +86,21 @@ export default function FooterSection() {
             {done ? (
               <p className="text-background/40 text-xs">✓ Inscrit(e) à la newsletter</p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5">
-                <span className="text-background/60 text-xs font-medium whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>
-                <input
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 w-40"
-                />
-                <button type="submit" className="h-7 w-7 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-colors">
-                  <ArrowRight className="w-3 h-3 text-primary-foreground" />
-                </button>
+              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full lg:w-auto">
+                <span className="text-background/60 text-xs font-medium text-center lg:text-right lg:whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0 sm:w-44"
+                  />
+                  <button type="submit" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-colors">
+                    <ArrowRight className="w-3 h-3 text-primary-foreground" />
+                  </button>
+                </div>
               </form>
             )}
           </div>

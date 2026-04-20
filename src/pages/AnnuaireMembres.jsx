@@ -68,7 +68,7 @@ export default function AnnuaireMembres() {
       <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 mb-10">
           {[
             { label: "Membres", value: allMembers.length, icon: Users },
             { label: "Pays", value: Array.from(new Set(allMembers.map(m => m.pays))).length, icon: MapPin },

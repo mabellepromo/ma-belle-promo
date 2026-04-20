@@ -31,7 +31,7 @@ export default function ActualitesSection() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {articles.slice(0, 3).map((article, i) => (
             <motion.article
               key={article.id}

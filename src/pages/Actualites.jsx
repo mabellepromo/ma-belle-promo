@@ -227,7 +227,7 @@ export default function Actualites() {
               placeholder="Rechercher un article…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="h-10 pl-9 pr-4 rounded-xl border border-border bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors w-60 shadow-sm"
+              className="h-10 pl-9 pr-4 rounded-xl border border-border bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors w-full sm:w-60 shadow-sm"
             />
           </div>
           <div className="flex flex-wrap gap-1.5">

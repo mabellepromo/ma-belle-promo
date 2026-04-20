@@ -18,7 +18,7 @@ export default function Mediatheque() {
         {/* Vidéos */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16">
           <h2 className="font-heading text-2xl font-bold text-foreground mb-8">Vidéos</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {videos.map((v, i) => (
               <motion.div
                 key={v.titre}

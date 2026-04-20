@@ -32,7 +32,7 @@ export default function Cotisation() {
         {/* Tarifs */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16">
           <h2 className="font-heading text-2xl font-bold text-foreground text-center mb-10">Grille tarifaire</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {tarifs.map((t, i) => (
               <motion.div
                 key={t.type}

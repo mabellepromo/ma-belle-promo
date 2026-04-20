@@ -137,8 +137,8 @@ export default function HeroSection() {
           </span>
         </motion.div>
 
-        {/* ── Grille 3 colonnes : bulle | message présidente | photo ── */}
-        <div className="grid lg:grid-cols-[auto_1fr_340px] gap-10 lg:gap-14 items-center">
+        {/* ── Grille responsive : 1 col mobile / 2 col md / 3 col lg ── */}
+        <div className="grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_340px] gap-8 md:gap-10 lg:gap-14 items-center">
 
           {/* ── COL 1 : Bulle + titre ── */}
           <motion.div
@@ -257,6 +257,24 @@ export default function HeroSection() {
                 }}>
                 Nous soutenir
               </Link>
+            </div>
+
+            {/* ── Version compacte présidente — mobile/tablette uniquement ── */}
+            <div className="lg:hidden mt-6 flex items-center gap-4 rounded-2xl px-4 py-3"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0"
+                style={{ border: "2px solid rgba(52,211,153,0.50)", boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}>
+                <img
+                  src="/images/membres/fabienne.png"
+                  alt="Fabienne SENAYA-ATAYI"
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <div>
+                <p className="text-white font-heading text-sm font-bold leading-tight">Fabienne SENAYA-ATAYI</p>
+                <p className="text-xs mt-0.5" style={{ color: "#6ee7b7" }}>Présidente · Ma Belle Promo</p>
+              </div>
+              <span className="ml-auto text-2xl">🏛️</span>
             </div>
           </motion.div>
 
