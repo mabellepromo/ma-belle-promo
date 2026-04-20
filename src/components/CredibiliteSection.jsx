@@ -39,7 +39,7 @@ export default function CredibiliteSection() {
         whileInView={{ opacity: 1, x: 0, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
+        className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
         style={{ marginLeft: "-1rem" }}
       >
         <Spiral color="#34d399" flip={false} />
@@ -51,7 +51,7 @@ export default function CredibiliteSection() {
         whileInView={{ opacity: 1, x: 0, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
+        className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
         style={{ marginRight: "-1rem" }}
       >
         <Spiral color="#fbbf24" flip={true} />
