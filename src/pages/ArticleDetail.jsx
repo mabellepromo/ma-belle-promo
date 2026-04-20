@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { useArticles } from "../hooks/useArticles";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 import { Calendar, ArrowLeft, Clock, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useState } from "react";
 import PhotoGallery from "../components/PhotoGallery";
 import DOMPurify from "dompurify";
 
@@ -22,10 +22,29 @@ function readingTime(content) {
 
 export default function ArticleDetail() {
   const { id } = useParams();
-  const { articles: allArticles } = useArticles();
-  const article = allArticles.find((a) => String(a.id) === String(id));
+  const [article, setArticle] = useState(null);
+  const [autres, setAutres] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      const [{ data: art }, { data: aut }] = await Promise.all([
+        supabase.from("articles").select("*").eq("id", id).single(),
+        supabase.from("articles").select("id,titre,date,categorie,image").neq("id", id).limit(3),
+      ]);
+      setArticle(art ?? null);
+      setAutres(aut ?? []);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
   const galleryPhotos = article?.photos?.length > 0 ? article.photos : [];
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  }
 
   if (!article) {
     return (
@@ -38,7 +57,6 @@ export default function ArticleDetail() {
     );
   }
 
-  const autres = allArticles.filter((a) => String(a.id) !== String(id)).slice(0, 3);
   const mins = readingTime(article.contenu);
 
   return (

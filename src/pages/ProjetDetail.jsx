@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { useProjets } from "../hooks/useProjets";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useState } from "react";
 import PhotoGallery from "../components/PhotoGallery";
 import DOMPurify from "dompurify";
 
@@ -20,11 +20,29 @@ const catAccent = {
 
 export default function ProjetDetail() {
   const { id } = useParams();
-  const { projets } = useProjets();
-  const projet = projets.find((p) => String(p.id) === String(id));
+  const [projet, setProjet] = useState(null);
+  const [autres, setAutres] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      const [{ data: proj }, { data: aut }] = await Promise.all([
+        supabase.from("projets").select("*").eq("id", id).single(),
+        supabase.from("projets").select("id,titre,date,categorie,image").neq("id", id).limit(3),
+      ]);
+      setProjet(proj ?? null);
+      setAutres(aut ?? []);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
 
   const galleryPhotos = projet?.photos?.length > 0 ? projet.photos : [];
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  }
 
   if (!projet) {
     return (
@@ -38,7 +56,6 @@ export default function ProjetDetail() {
   }
 
   const accent = catAccent[projet.categorie] || "#16a34a";
-  const autres = projets.filter((p) => String(p.id) !== String(id)).slice(0, 3);
 
   const videoList = Array.isArray(projet.videos) && projet.videos.length > 0
     ? projet.videos
