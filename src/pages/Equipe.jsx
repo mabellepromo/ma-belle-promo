@@ -24,20 +24,6 @@ export default function Equipe() {
       <PageHero title="Notre Équipe" subtitle="L'Association — Bureau exécutif" />
 
       <section className="relative py-20 max-w-6xl mx-auto px-6">
-        {/* Logo tampon en filigrane — fixe pendant le scroll */}
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
-          <img
-            src="/Logo Redesign1.png"
-            alt=""
-            aria-hidden="true"
-            className="w-[900px] h-[900px] object-contain select-none"
-            style={{
-              opacity: 0.035,
-              filter: "grayscale(100%) contrast(1.8)",
-              transform: "rotate(0deg)",
-            }}
-          />
-        </div>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
