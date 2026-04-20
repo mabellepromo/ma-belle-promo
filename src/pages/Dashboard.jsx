@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { useArticles } from "../hooks/useArticles";
+import { useEvenements } from "../hooks/useEvenements";
 import {
   Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock,
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const { articles } = useArticles();
+  const { evenements } = useEvenements();
 
   const {
     allMembers, pendingMembers,
@@ -131,7 +133,7 @@ export default function Dashboard() {
     { label: "Membres",    value: allMembers.length,     icon: Users,        color: "bg-blue-50 text-blue-600",   sub: `${allMembers.filter(m => m.bureau).length} au bureau`, onClick: () => setTab("membres") },
     { label: "En attente", value: pendingMembers.length, icon: Clock,        color: "bg-amber-50 text-amber-600", sub: "à valider", alert: pendingMembers.length > 0, onClick: () => setTab("pending") },
     { label: "Articles",   value: articles.length, icon: FileText, color: "bg-green-50 text-green-600", sub: "publications", onClick: () => setTab("articles") },
-    { label: "Événements", value: 0, icon: Calendar, color: "bg-indigo-50 text-indigo-600", sub: "planifiés", onClick: () => setTab("evenements") },
+    { label: "Événements", value: evenements.length, icon: Calendar, color: "bg-indigo-50 text-indigo-600", sub: "planifiés", onClick: () => setTab("evenements") },
   ];
 
   const PROTECTED_PAGES = [
