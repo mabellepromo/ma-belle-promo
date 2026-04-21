@@ -285,7 +285,7 @@ export default function Dashboard() {
       </aside>
 
       {/* ── CONTENU PRINCIPAL ── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Topbar contenu */}
         <div className="sticky top-0 z-30 h-14 flex-shrink-0 flex items-center justify-between px-8 border-b"
           style={{ background: "rgba(240,242,245,0.85)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
