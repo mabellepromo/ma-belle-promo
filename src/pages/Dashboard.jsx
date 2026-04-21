@@ -570,6 +570,13 @@ export default function Dashboard() {
           {tab === "ressources"  && <RessourcesSection />}
 
         </div>
+
+        {/* Footer contenu */}
+        <div className="flex-shrink-0 h-10 flex items-center justify-between px-8 border-t"
+          style={{ background: "rgba(240,242,245,0.85)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
+          <p className="text-[11px] text-muted-foreground">FDD Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
+          <p className="text-[11px] text-muted-foreground">{new Date().getFullYear()} · Tableau de bord v2</p>
+        </div>
       </div>
     </div>
   );
