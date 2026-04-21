@@ -184,7 +184,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#f0f2f5" }}>
+    <div className="h-screen flex overflow-hidden" style={{ background: "#f0f2f5" }}>
 
       {compose && <ComposeModal onClose={() => setCompose(false)} />}
 
