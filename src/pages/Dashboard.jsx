@@ -192,14 +192,10 @@ export default function Dashboard() {
       <aside className="w-64 flex-shrink-0 sticky top-0 h-screen flex flex-col overflow-hidden"
         style={{ background: "var(--brand-dark)" }}>
 
-        {/* Logo */}
-        <div className="px-5 pt-6 pb-5 flex items-center gap-3 flex-shrink-0">
-          <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-            alt="MBP" className="w-10 h-10 rounded-full ring-2 flex-shrink-0" style={{ ringColor: "rgba(255,255,255,0.15)" }} />
-          <div>
-            <p className="font-heading font-bold text-white text-sm leading-tight">Ma Belle Promo</p>
-            <p className="text-[10px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Tableau de bord</p>
-          </div>
+        {/* En-tête sidebar */}
+        <div className="px-5 pt-6 pb-5 flex-shrink-0">
+          <p className="font-heading font-bold text-white text-sm leading-tight">Ma Belle Promo</p>
+          <p className="text-[10px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Tableau de bord</p>
         </div>
 
         {/* Bouton Composer */}
@@ -287,8 +283,8 @@ export default function Dashboard() {
       {/* ── CONTENU PRINCIPAL ── */}
       <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr 2.5rem" }}>
         {/* Topbar contenu */}
-        <div className="z-30 flex items-center justify-between px-8 border-b"
-          style={{ background: "rgba(240,242,245,0.85)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
+        <div className="z-30 flex items-center justify-between px-8 border-b border-l-4"
+          style={{ background: "rgba(240,242,245,0.95)", borderColor: "#e2e8f0", borderLeftColor: "hsl(var(--primary))" }}>
           <h2 className="font-heading font-bold text-foreground text-base">
             {TABS.find(t => t.key === tab)?.label?.replace(/\s*\(\d+\)/, "") || "Vue d'ensemble"}
           </h2>
@@ -574,32 +570,20 @@ export default function Dashboard() {
         {/* Footer contenu */}
         <div className="fixed bottom-0 right-0 z-20"
           style={{ left: "16rem", background: "var(--brand-dark)" }}>
-          <div className="flex items-center justify-between px-8 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-            <div className="flex items-center gap-3">
-              <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-                alt="MBP" className="w-7 h-7 rounded-full opacity-80" />
-              <div>
-                <p className="text-xs font-bold text-white/80">Ma Belle Promo</p>
-                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>FDD · Lomé, Togo · 1994–2000</p>
-              </div>
+          <div className="flex items-center justify-between px-8 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <div>
+              <p className="text-xs font-bold text-white/70">Ma Belle Promo</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.30)" }}>FDD · Université de Lomé · Promotion 1994–2000</p>
             </div>
-            <div className="flex items-center gap-6">
-              <Link to="/" target="_blank" className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Site public
-              </Link>
-              <button onClick={() => setTab("messages")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Messages
-              </button>
-              <button onClick={() => setTab("membres")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Membres
-              </button>
-              <button onClick={() => setTab("articles")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Articles
-              </button>
+            <div className="flex items-center gap-8">
+              <Link to="/" target="_blank" className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Site public</Link>
+              <button onClick={() => setTab("messages")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Messages</button>
+              <button onClick={() => setTab("membres")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Membres</button>
+              <button onClick={() => setTab("articles")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Articles</button>
+              <button onClick={() => setTab("evenements")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Événements</button>
+              <button onClick={() => setTab("galeries")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Galeries</button>
             </div>
-            <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.30)" }}>
-              © {new Date().getFullYear()} · Tableau de bord v2
-            </p>
+            <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()}</p>
           </div>
         </div>
       </div>
