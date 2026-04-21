@@ -54,7 +54,7 @@ const MEMBRES_PUBLICATIONS = [
   "Edwige KUAGBENU",
   "Claude AMEGAN",
   "Laurent ASSIOBO",
-  "Barthélemy",           // non trouvé dans l'annuaire actuel
+  "Barthélemy ABBEY",
   "Tata HOUNKANLI",
   "Essi DJEHA-AKUETE",
   "Jean-Yves AKUETE",
@@ -66,7 +66,7 @@ const MEMBRES_PUBLICATIONS = [
   "Sylvestre GOSSOU",
   "Romuald AFATCHAO",
   "Koffi Junior AOUGA",
-  "Bibi Bellow",          // non trouvé dans l'annuaire actuel
+  "Rabiatou Iyabo BELLO",
 ];
 
 const COMMUNAUTES = [
