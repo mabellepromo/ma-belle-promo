@@ -25,19 +25,19 @@ export default defineConfig({
         lang: 'fr',
         icons: [
           {
-            src: '/Logo Redesign1.webp',
+            src: '/Logo Redesign1.png',
             sizes: '192x192',
-            type: 'image/webp',
+            type: 'image/png',
           },
           {
-            src: '/Logo Redesign1.webp',
+            src: '/Logo Redesign1.png',
             sizes: '512x512',
-            type: 'image/webp',
+            type: 'image/png',
           },
           {
-            src: '/Logo Redesign1.webp',
+            src: '/Logo Redesign1.png',
             sizes: '512x512',
-            type: 'image/webp',
+            type: 'image/png',
             purpose: 'any maskable',
           },
         ],
