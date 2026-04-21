@@ -295,7 +295,7 @@ export default function Dashboard() {
           <p className="text-xs text-muted-foreground">FDD · Université de Lomé · Promotion 1994–2000</p>
         </div>
 
-        <div className="p-6 md:p-8 overflow-y-auto pb-12">
+        <div className="p-6 md:p-8 overflow-y-auto pb-20">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
@@ -572,10 +572,35 @@ export default function Dashboard() {
         </div>
 
         {/* Footer contenu */}
-        <div className="fixed bottom-0 right-0 z-20 flex items-center justify-between px-8 border-t"
-          style={{ left: "16rem", height: "2.5rem", background: "rgba(240,242,245,0.95)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
-          <p className="text-[11px] text-muted-foreground">FDD Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
-          <p className="text-[11px] text-muted-foreground">{new Date().getFullYear()} · Tableau de bord v2</p>
+        <div className="fixed bottom-0 right-0 z-20"
+          style={{ left: "16rem", background: "var(--brand-dark)" }}>
+          <div className="flex items-center justify-between px-8 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-3">
+              <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+                alt="MBP" className="w-7 h-7 rounded-full opacity-80" />
+              <div>
+                <p className="text-xs font-bold text-white/80">Ma Belle Promo</p>
+                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>FDD · Lomé, Togo · 1994–2000</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link to="/" target="_blank" className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
+                Site public
+              </Link>
+              <button onClick={() => setTab("messages")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
+                Messages
+              </button>
+              <button onClick={() => setTab("membres")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
+                Membres
+              </button>
+              <button onClick={() => setTab("articles")} className="text-[11px] font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>
+                Articles
+              </button>
+            </div>
+            <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.30)" }}>
+              © {new Date().getFullYear()} · Tableau de bord v2
+            </p>
+          </div>
         </div>
       </div>
     </div>
