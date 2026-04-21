@@ -62,6 +62,31 @@ export default function Dashboard() {
     setAddingMember(null);
   }
 
+  function exportMembresExcel() {
+    const headers = ["Nom", "Profession", "Ville", "Pays", "Email", "Téléphone", "LinkedIn", "Année diplôme", "Statut"];
+    const rows = allMembers.map(m => [
+      m.nom || "",
+      m.profession || "",
+      m.ville || "",
+      m.pays || "",
+      m.email || "",
+      m.telephone || m.tel || "",
+      m.linkedin || "",
+      m.anneeObtention || "",
+      m.bureau ? "Bureau" : "Membre",
+    ]);
+    const csv = [headers, ...rows]
+      .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";"))
+      .join("\r\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `membres-mbp-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function handleCsvUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -418,6 +443,10 @@ export default function Dashboard() {
                 <button onClick={() => csvInputRef.current?.click()}
                   className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground">
                   <Upload className="w-4 h-4" /> Importer CSV
+                </button>
+                <button onClick={exportMembresExcel}
+                  className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium hover:bg-emerald-100 transition-colors text-emerald-700">
+                  <Download className="w-4 h-4" /> Exporter Excel
                 </button>
                 <input ref={csvInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={handleCsvUpload} />
                 {!isSeeded && (
