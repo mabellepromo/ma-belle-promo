@@ -183,64 +183,75 @@ export default function Dashboard() {
     },
   ];
 
+  const allNavItems = NAV_GROUPS.flatMap(g => g.items);
+  const currentNavItem = allNavItems.find(i => i.key === tab);
+  const CurrentIcon = currentNavItem?.icon || LayoutDashboard;
+
+  const STAT_COLORS = [
+    { border: "#3b82f6", bg: "#eff6ff", text: "#2563eb" },
+    { border: "#f59e0b", bg: "#fffbeb", text: "#d97706" },
+    { border: "#10b981", bg: "#ecfdf5", text: "#059669" },
+    { border: "#6366f1", bg: "#eef2ff", text: "#4f46e5" },
+  ];
+
   return (
-    <div className="h-screen flex overflow-hidden" style={{ background: "#f0f2f5" }}>
+    <div className="h-screen flex overflow-hidden" style={{ background: "#f1f5f9" }}>
 
       {compose && <ComposeModal onClose={() => setCompose(false)} />}
 
       {/* ── SIDEBAR ── */}
-      <aside className="w-64 flex-shrink-0 sticky top-0 h-screen flex flex-col overflow-hidden"
-        style={{ background: "var(--brand-dark)" }}>
+      <aside className="w-64 flex-shrink-0 h-screen flex flex-col"
+        style={{ background: "var(--brand-dark)", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
 
-        {/* En-tête sidebar */}
-        <div className="px-5 pt-6 pb-5 flex-shrink-0">
-          <p className="font-heading font-bold text-white text-sm leading-tight">Ma Belle Promo</p>
-          <p className="text-[10px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Tableau de bord</p>
+        {/* En-tête */}
+        <div className="px-6 py-5 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <p className="font-heading font-bold text-white text-base leading-tight tracking-tight">Ma Belle Promo</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--primary))" }} />
+            <p className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.30)" }}>Tableau de bord</p>
+          </div>
         </div>
 
-        {/* Bouton Composer */}
-        <div className="px-4 pb-4 flex-shrink-0">
+        {/* Composer */}
+        <div className="px-4 py-4 flex-shrink-0">
           <button onClick={() => setCompose(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 active:scale-95"
             style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}>
-            <PenSquare className="w-4 h-4" /> Composer un message
+            <PenSquare className="w-4 h-4" /> Composer
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-5">
+        <nav className="flex-1 overflow-y-auto px-3 space-y-4 pb-4">
           {NAV_GROUPS.map((group, gi) => (
             <div key={gi}>
               {group.label && (
-                <p className="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-widest"
-                  style={{ color: "rgba(255,255,255,0.25)" }}>
-                  {group.label}
-                </p>
+                <div className="flex items-center gap-2 px-3 mb-1">
+                  <span className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: "rgba(255,255,255,0.20)" }}>{group.label}</span>
+                  <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
+                </div>
               )}
               <div className="space-y-0.5">
                 {group.items.map(({ key, label, icon: Icon, badge, badgeAlert }) => {
                   const active = tab === key;
                   return (
                     <button key={key} onClick={() => setTab(key)}
-                      className="relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-left"
                       style={{
-                        background: active ? "rgba(255,255,255,0.12)" : "transparent",
-                        color: active ? "#ffffff" : "rgba(255,255,255,0.55)",
+                        background: active ? "hsl(var(--primary))" : "transparent",
+                        color: active ? "#fff" : "rgba(255,255,255,0.50)",
+                        fontWeight: active ? 600 : 400,
                       }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}
-                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = active ? "#ffffff" : "rgba(255,255,255,0.55)"; }}
+                      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}}
+                      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.50)"; }}}
                     >
-                      {active && (
-                        <span className="absolute left-0 w-0.5 h-5 rounded-r-full" style={{ background: "hsl(var(--primary))" }} />
-                      )}
-                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <Icon className="w-4 h-4 flex-shrink-0" style={{ opacity: active ? 1 : 0.7 }} />
                       <span className="flex-1 truncate">{label}</span>
                       {badge != null && badge > 0 && (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                          badgeAlert
-                            ? "bg-amber-500 text-white animate-pulse"
-                            : "text-white/50"
-                        }`} style={!badgeAlert ? { background: "rgba(255,255,255,0.12)" } : {}}>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                          style={badgeAlert
+                            ? { background: "#f59e0b", color: "#fff" }
+                            : { background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
                           {badge}
                         </span>
                       )}
@@ -252,74 +263,90 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        {/* Footer sidebar */}
-        <div className="flex-shrink-0 border-t px-4 py-4 space-y-1" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl mb-2" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(var(--primary)/0.3)" }}>
-              <Shield className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
+        {/* Profil + actions */}
+        <div className="flex-shrink-0 px-4 pb-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-2" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(var(--primary))" }}>
+              <Shield className="w-3.5 h-3.5 text-white" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-white/80 truncate">{session?.email?.split("@")[0]}</p>
-              <p className="text-[10px] text-white/35 truncate capitalize">{session?.role || "admin"}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold leading-tight truncate" style={{ color: "rgba(255,255,255,0.80)" }}>{session?.email?.split("@")[0]}</p>
+              <p className="text-[9px] uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.30)" }}>{session?.role || "admin"}</p>
             </div>
           </div>
-          <Link to="/" target="_blank"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-            style={{ color: "rgba(255,255,255,0.45)" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.85)"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.45)"; e.currentTarget.style.background = "transparent"; }}>
-            <Globe className="w-3.5 h-3.5" /> Voir le site public
-          </Link>
-          <button onClick={() => { logout(); navigate("/login"); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-            style={{ color: "rgba(255,255,255,0.45)" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#fca5a5"; e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.45)"; e.currentTarget.style.background = "transparent"; }}>
-            <LogOut className="w-3.5 h-3.5" /> Déconnexion
-          </button>
+          <div className="flex gap-1">
+            <Link to="/" target="_blank"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-medium transition-all"
+              style={{ color: "rgba(255,255,255,0.40)", background: "rgba(255,255,255,0.04)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.80)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.40)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+              <Globe className="w-3 h-3" /> Site
+            </Link>
+            <button onClick={() => { logout(); navigate("/login"); }}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-medium transition-all"
+              style={{ color: "rgba(255,255,255,0.40)", background: "rgba(255,255,255,0.04)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#fca5a5"; e.currentTarget.style.background = "rgba(239,68,68,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.40)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+              <LogOut className="w-3 h-3" /> Quitter
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* ── CONTENU PRINCIPAL ── */}
-      <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr 2.5rem" }}>
-        {/* Topbar contenu */}
-        <div className="z-30 flex items-center justify-between px-8 border-b"
-          style={{ background: "var(--brand-dark)", borderColor: "rgba(255,255,255,0.08)" }}>
-          <h2 className="font-heading font-bold text-white text-base">
-            {TABS.find(t => t.key === tab)?.label?.replace(/\s*\(\d+\)/, "") || "Vue d'ensemble"}
-          </h2>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.40)" }}>FDD · Université de Lomé · Promotion 1994–2000</p>
+      {/* ── CONTENU ── */}
+      <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr auto" }}>
+
+        {/* Topbar */}
+        <div className="flex items-center justify-between px-8"
+          style={{ background: "var(--brand-dark)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
+              <CurrentIcon className="w-3.5 h-3.5 text-white/70" />
+            </div>
+            <h2 className="font-heading font-bold text-white text-sm tracking-wide">
+              {currentNavItem?.label || "Vue d'ensemble"}
+            </h2>
+          </div>
+          <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.30)" }}>
+            {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </p>
         </div>
 
-        <div className="p-6 md:p-8 overflow-y-auto pb-20">
+        <div className="p-6 md:p-8 overflow-y-auto pb-6">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
-            <div className="space-y-8">
-              <div className="relative overflow-hidden rounded-2xl p-6 md:p-8" style={{ background: "var(--brand-dark-mid)" }}>
-                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 0%, transparent 60%)" }} />
-                <div className="relative flex items-center gap-5">
-                  <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-                    alt="MBP" className="w-14 h-14 rounded-full ring-2 ring-white/20 flex-shrink-0 hidden sm:block" />
-                  <div>
-                    <p className="text-white/60 text-xs tracking-widest uppercase mb-1">Bienvenue</p>
-                    <h1 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight">Tableau de bord</h1>
-                    <p className="text-white/60 text-sm mt-1">FDD — Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
-                  </div>
+            <div className="space-y-6">
+
+              {/* Bannière */}
+              <div className="relative overflow-hidden rounded-2xl px-8 py-7"
+                style={{ background: "linear-gradient(135deg, var(--brand-dark) 0%, #1a3d2b 60%, #0f2a1e 100%)" }}>
+                <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(52,211,153,0.08) 0%, transparent 60%)" }} />
+                <div className="absolute right-0 top-0 bottom-0 w-64 opacity-5"
+                  style={{ backgroundImage: "repeating-linear-gradient(45deg, white 0px, white 1px, transparent 1px, transparent 12px)" }} />
+                <div className="relative">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "hsl(var(--primary))" }}>Bienvenue</p>
+                  <h1 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight">Tableau de bord</h1>
+                  <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>FDD — Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
                 </div>
               </div>
 
+              {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {stats.map(({ label, value, icon: Icon, color, sub, alert, onClick }, i) => (
-                  <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+                {stats.map(({ label, value, icon: Icon, sub, alert, onClick }, i) => (
+                  <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                     onClick={onClick}
-                    className={`relative overflow-hidden bg-background border rounded-2xl p-5 group ${alert ? "border-amber-200" : "border-border"} ${onClick ? "cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200" : ""}`}>
-                    <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-5 bg-primary group-hover:opacity-10 transition-opacity" />
-                    {alert && <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />}
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${color}`}><Icon className="w-5 h-5" /></div>
-                    <div className="font-heading text-4xl font-black text-foreground tracking-tight">{value}</div>
-                    <div className="text-sm font-bold text-foreground mt-1">{label}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
+                    className={`bg-white rounded-2xl overflow-hidden shadow-sm group ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
+                    <div className="h-1 w-full" style={{ background: STAT_COLORS[i].border }} />
+                    <div className="p-5">
+                      {alert && <span className="float-right w-2 h-2 rounded-full bg-amber-500 animate-pulse mt-1" />}
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: STAT_COLORS[i].bg }}>
+                        <Icon className="w-4 h-4" style={{ color: STAT_COLORS[i].text }} />
+                      </div>
+                      <div className="font-heading text-3xl font-black tracking-tight" style={{ color: "#0f172a" }}>{value}</div>
+                      <div className="text-sm font-semibold mt-0.5" style={{ color: "#1e293b" }}>{label}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>{sub}</div>
+                    </div>
                   </motion.div>
                 ))}
               </div>
