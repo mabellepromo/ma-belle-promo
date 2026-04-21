@@ -285,9 +285,9 @@ export default function Dashboard() {
       </aside>
 
       {/* ── CONTENU PRINCIPAL ── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr 2.5rem" }}>
         {/* Topbar contenu */}
-        <div className="sticky top-0 z-30 h-14 flex-shrink-0 flex items-center justify-between px-8 border-b"
+        <div className="z-30 flex items-center justify-between px-8 border-b"
           style={{ background: "rgba(240,242,245,0.85)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
           <h2 className="font-heading font-bold text-foreground text-base">
             {TABS.find(t => t.key === tab)?.label?.replace(/\s*\(\d+\)/, "") || "Vue d'ensemble"}
@@ -295,7 +295,7 @@ export default function Dashboard() {
           <p className="text-xs text-muted-foreground">FDD · Université de Lomé · Promotion 1994–2000</p>
         </div>
 
-        <div className="flex-1 p-6 md:p-8 min-w-0 overflow-y-auto">
+        <div className="p-6 md:p-8 overflow-y-auto">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
@@ -572,7 +572,7 @@ export default function Dashboard() {
         </div>
 
         {/* Footer contenu */}
-        <div className="flex-shrink-0 h-10 flex items-center justify-between px-8 border-t"
+        <div className="flex items-center justify-between px-8 border-t"
           style={{ background: "rgba(240,242,245,0.85)", backdropFilter: "blur(8px)", borderColor: "#e2e8f0" }}>
           <p className="text-[11px] text-muted-foreground">FDD Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
           <p className="text-[11px] text-muted-foreground">{new Date().getFullYear()} · Tableau de bord v2</p>
