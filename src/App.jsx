@@ -18,6 +18,7 @@ const PAGE_TITLES = {
   "/activites/evenements":       "Événements",
   "/activites/projets":          "Nos Réalisations",
   "/activites/programmes":       "Nos Programmes",
+  "/activites/plan-action-2026": "Plan d'Action 2026",
   "/implications/adhesion":      "Adhésion",
   "/implications/cotisation":    "Cotisation",
   "/implications/soutenir":      "Nous Soutenir",
@@ -85,6 +86,7 @@ const Ressources     = lazy(() => import('./pages/Ressources'));
 const Dashboard      = lazy(() => import('./pages/Dashboard'));
 const Galeries       = lazy(() => import('./pages/Galeries'));
 const GalerieDetail  = lazy(() => import('./pages/GalerieDetail'));
+const PlanAction2026 = lazy(() => import('./pages/PlanAction2026'));
 
 function PageLoader() {
   return (
@@ -140,6 +142,7 @@ const AuthenticatedApp = () => {
         <Route path="/activites/projets" element={<Projets />} />
         <Route path="/activites/projets/:id" element={<ProjetDetail />} />
         <Route path="/activites/programmes" element={<Programmes />} />
+        <Route path="/activites/plan-action-2026" element={<PlanAction2026 />} />
         <Route path="/implications/adherents" element={<Navigate to="/annuaire" replace />} />
         <Route path="/implications/adhesion" element={<Adhesion />} />
         <Route path="/implications/cotisation" element={<Cotisation />} />
