@@ -283,12 +283,12 @@ export default function Dashboard() {
       {/* ── CONTENU PRINCIPAL ── */}
       <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr 2.5rem" }}>
         {/* Topbar contenu */}
-        <div className="z-30 flex items-center justify-between px-8 border-b border-l-4"
-          style={{ background: "rgba(240,242,245,0.95)", borderColor: "#e2e8f0", borderLeftColor: "hsl(var(--primary))" }}>
-          <h2 className="font-heading font-bold text-foreground text-base">
+        <div className="z-30 flex items-center justify-between px-8 border-b"
+          style={{ background: "var(--brand-dark)", borderColor: "rgba(255,255,255,0.08)" }}>
+          <h2 className="font-heading font-bold text-white text-base">
             {TABS.find(t => t.key === tab)?.label?.replace(/\s*\(\d+\)/, "") || "Vue d'ensemble"}
           </h2>
-          <p className="text-xs text-muted-foreground">FDD · Université de Lomé · Promotion 1994–2000</p>
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.40)" }}>FDD · Université de Lomé · Promotion 1994–2000</p>
         </div>
 
         <div className="p-6 md:p-8 overflow-y-auto pb-20">
