@@ -42,31 +42,51 @@ const OBJECTIFS = [
   },
 ];
 
+// Noms complets issus de l'annuaire des membres (src/data/members.js)
 const MEMBRES_PUBLICATIONS = [
-  "Josée", "Fally", "Georges", "Joël", "Abide", "Francisco",
-  "Erick", "Edwige", "Claude", "Laurent", "Barthélemy", "Tata",
-  "Essi", "Jean-Yves", "André", "Jovite", "Edwige A.", "Olive",
-  "Sylvestre Bidé", "Sylvestre Gossou", "Romuald", "Junior", "Bibi Bellow",
+  "Josée Aféfa SALOKOFFI",
+  "Falilatou TCHANILE épse DOGO",
+  "Georges KOUTOH",
+  "Joël AGBEMELO",
+  "Abidé BATABA",
+  "Francisco KPODAR",
+  "Erick FIOKLOU-TOULAN",
+  "Edwige KUAGBENU",
+  "Claude AMEGAN",
+  "Laurent ASSIOBO",
+  "Barthélemy",           // non trouvé dans l'annuaire actuel
+  "Tata HOUNKANLI",
+  "Essi DJEHA-AKUETE",
+  "Jean-Yves AKUETE",
+  "André Kangni AFANOU",
+  "Jovite AGOUZOU épse SODJEDO",
+  "Edwige AHONON",
+  "Olive B.K. AYENA",
+  "Sylvestre BIDE",
+  "Sylvestre GOSSOU",
+  "Romuald AFATCHAO",
+  "Koffi Junior AOUGA",
+  "Bibi Bellow",          // non trouvé dans l'annuaire actuel
 ];
 
 const COMMUNAUTES = [
   {
     nom: "Sanguera",
-    responsable: "André",
+    responsable: "André Kangni AFANOU",
     desc: "Diagnostic participatif des besoins et mise en œuvre d'au moins une action concrète sur l'année.",
     color: "border-t-primary bg-primary/5",
     dotColor: "bg-primary",
   },
   {
     nom: "Zalivé",
-    responsable: "Erick · Joël · Francisco",
+    responsable: "Erick FIOKLOU-TOULAN · Joël AGBEMELO · Francisco KPODAR",
     desc: "Sensibilisation aux droits et projets communautaires en partenariat direct avec les populations.",
     color: "border-t-rose-400 bg-rose-500/5",
     dotColor: "bg-rose-400",
   },
   {
     nom: "Agbodrafo",
-    responsable: "Francisco",
+    responsable: "Francisco KPODAR",
     desc: "Contact avec les leaders locaux, identification des besoins prioritaires et actions de sensibilisation.",
     color: "border-t-amber-400 bg-amber-500/5",
     dotColor: "bg-amber-400",
@@ -250,7 +270,7 @@ export default function PlanAction2026() {
                 <div className="w-1 h-6 bg-primary rounded-full" />
                 <h3 className="font-heading text-2xl font-bold text-foreground">Activité 1.1 — Réseautage & Mentorat</h3>
               </div>
-              <Coordinator name="Olive (coord.)" />
+              <Coordinator name="Olive B.K. AYENA (coord.)" />
             </div>
             <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
               Cœur de la mission MBP. Créer et entretenir des liens solides entre membres
@@ -292,8 +312,8 @@ export default function PlanAction2026() {
                 Icon={Globe2} iconColor="bg-blue-500/10 text-blue-600" delay={0.16}
               >
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <Coordinator name="Olive — modération" />
-                  <Coordinator name="Joël — offres d'emploi & stages (2×/mois)" />
+                  <Coordinator name="Olive B.K. AYENA — modération" />
+                  <Coordinator name="Joël AGBEMELO — offres d'emploi & stages (2×/mois)" />
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">
                   Espace numérique centralisé pour les échanges entre membres.
@@ -310,7 +330,7 @@ export default function PlanAction2026() {
                 Icon={Mic2} iconColor="bg-violet-500/10 text-violet-600" delay={0.24}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <Coordinator name="Georges (coord.)" />
+                  <Coordinator name="Georges KOUTOH (coord.)" />
                   <span className="inline-flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold">
                     <CalendarDays className="w-3.5 h-3.5" /> Début : avril 2026
                   </span>
