@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { sbGet, sbSet } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
 export default function NewsletterSection() {
@@ -16,10 +16,19 @@ export default function NewsletterSection() {
     if (!email || !email.includes("@")) { toast.error("Veuillez entrer une adresse email valide."); return; }
     setLoading(true);
     try {
-      const existing = await sbGet("mbp_newsletter_subscribers") || [];
-      if (!existing.find(s => s.email === email)) {
-        await sbSet("mbp_newsletter_subscribers", [...existing, { email, name, source: "home", subscribedAt: new Date().toISOString() }]);
+      const { error } = await supabase.from("newsletter_subscribers").insert({
+        email,
+        name: name || null,
+        source: "home",
+        subscribed_at: new Date().toISOString(),
+      });
+      if (error && error.code === "23505") {
+        // email déjà inscrit — pas une erreur bloquante
+        setDone(true);
+        toast.success("Vous êtes déjà inscrit(e) à notre newsletter !");
+        return;
       }
+      if (error) throw error;
       setDone(true);
       toast.success("Inscription confirmée ! Merci de votre soutien.");
     } catch {

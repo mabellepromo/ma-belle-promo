@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "./supabase";
-import { sbGet } from "./supabase";
 import { members as staticMembers } from "../data/members.js";
 
 function rowToMember(row) {
@@ -28,7 +27,7 @@ function memberToRow(m) {
 }
 
 export function useMemberStore({ realtime = false } = {}) {
-  const [members,  setMembers]  = useState([]);
+  const [members,  setMembers]  = useState(/** @type {any[]} */([]));
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
   const [isSeeded, setIsSeeded] = useState(false);
@@ -163,27 +162,6 @@ export function useMemberStore({ realtime = false } = {}) {
     setSaving(false);
   }
 
-  async function migrateFromOldStore() {
-    setSaving(true);
-    const oldValidated = await sbGet("mbp_validated_members") || [];
-    const oldPending   = await sbGet("mbp_pending_members")   || [];
-    const all = [
-      ...oldValidated.map(m => memberToRow({ ...m, status: "validated" })),
-      ...oldPending.map(m => memberToRow({ ...m, status: "pending" })),
-    ];
-    if (!all.length) {
-      toast.info("Aucun membre trouvé dans l'ancien système.");
-      setSaving(false);
-      return;
-    }
-    const { error } = await supabase
-      .from("members")
-      .upsert(all, { onConflict: "id" });
-    if (error) toast.error("Erreur récupération anciens membres : " + error.message);
-    else { toast.success(`${all.length} anciens membres récupérés !`); await load(); }
-    setSaving(false);
-  }
-
   return {
     allMembers,
     pendingMembers,
@@ -199,7 +177,6 @@ export function useMemberStore({ realtime = false } = {}) {
     saving,
     isSeeded,
     seedFromStatic,
-    migrateFromOldStore,
     reload: load,
   };
 }

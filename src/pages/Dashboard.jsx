@@ -32,7 +32,7 @@ export default function Dashboard() {
   const {
     allMembers, pendingMembers,
     updateMember, validateMember, rejectMember, deleteMember, addValidated,
-    isSeeded, seedFromStatic, migrateFromOldStore, saving: memberSaving,
+    isSeeded, seedFromStatic, saving: memberSaving,
   } = useMemberStore({ realtime: true });
 
   const [tab,           setTab]          = useState("overview");
@@ -457,12 +457,6 @@ export default function Dashboard() {
                       : <>☁️ Migrer les données initiales</>}
                   </button>
                 )}
-                <button onClick={migrateFromOldStore} disabled={memberSaving}
-                  className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold hover:bg-blue-100 transition-colors disabled:opacity-60">
-                  {memberSaving
-                    ? <><div className="w-3.5 h-3.5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> Récupération…</>
-                    : <>🔄 Récupérer anciens membres</>}
-                </button>
               </div>
 
               {addingMember && (
