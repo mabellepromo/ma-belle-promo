@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { sbGet, sbSet } from "../../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { equipe as equipeStatic } from "../../data/equipe.js";
@@ -218,7 +218,7 @@ export function ComposeModal({ onClose }) {
 }
 
 export function MessagesSection() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(/** @type {any[]} */([]));
   const [loading, setLoading]   = useState(true);
   const [replyMsg, setReplyMsg] = useState(null);
   const [replyText, setReplyText]     = useState("");
@@ -230,18 +230,23 @@ export function MessagesSection() {
   const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
 
   useEffect(() => {
-    sbGet("mbp_contact_messages")
-      .then(data => { if (data) setMessages(data); setLoading(false); })
+    supabase.from("messages")
+      .select("*")
+      .order("received_at", { ascending: false })
+      .then(({ data }) => { if (data) setMessages(data.map(m => ({ ...m, receivedAt: m.received_at }))); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  async function persist(data) {
-    setMessages(data);
-    try { await sbSet("mbp_contact_messages", data); } catch {}
+  async function markRead(id) {
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, read: true } : m));
+    await supabase.from("messages").update({ read: true }).eq("id", id);
   }
 
-  function markRead(id) { persist(messages.map(m => m.id === id ? { ...m, read: true } : m)); }
-  function deleteMsg(id) { if (confirm("Supprimer ce message ?")) persist(messages.filter(m => m.id !== id)); }
+  async function deleteMsg(id) {
+    if (!confirm("Supprimer ce message ?")) return;
+    setMessages(prev => prev.filter(m => m.id !== id));
+    await supabase.from("messages").delete().eq("id", id);
+  }
 
   function openReply(msg) {
     markRead(msg.id);

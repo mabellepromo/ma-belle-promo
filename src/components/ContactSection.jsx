@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
-import { sbGet, sbSet } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -34,13 +34,12 @@ export default function ContactSection() {
     };
 
     try {
-      // Sauvegarde Supabase non bloquante
-      try {
-        const existing = await sbGet("mbp_contact_messages") || [];
-        await sbSet("mbp_contact_messages", [msg, ...existing]);
-      } catch (saveErr) {
-        console.warn("Sauvegarde mbp_store échouée (non bloquant):", saveErr);
-      }
+      // Sauvegarde dans la table messages (non bloquante)
+      supabase.from("messages").insert({
+        id: msg.id, name: msg.name, email: msg.email,
+        sujet: msg.sujet, message: msg.message,
+        received_at: msg.receivedAt, read: false,
+      }).then(({ error }) => { if (error) console.warn("Sauvegarde messages échouée:", error.message); });
 
       await emailjs.send(
         EMAILJS_SERVICE,

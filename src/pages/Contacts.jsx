@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
-import { sbGet, sbSet } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -34,12 +34,14 @@ export default function Contacts() {
     };
 
     try {
-      // Sauvegarde dans Supabase (visible dans le Dashboard)
-      const existing = await sbGet("mbp_contact_messages") || [];
-      await sbSet("mbp_contact_messages", [msg, ...existing]);
+      // Sauvegarde dans la table messages (visible dans le Dashboard)
+      supabase.from("messages").insert({
+        id: msg.id, name: msg.name, email: msg.email,
+        sujet: msg.sujet || "", message: msg.message,
+        received_at: msg.receivedAt, read: false,
+      }).then(({ error }) => { if (error) console.warn("Sauvegarde messages:", error.message); });
 
-      // Notification email à contact@mabellepromo.org
-      const ejsResult = await emailjs.send(
+      await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
         {
