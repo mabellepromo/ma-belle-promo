@@ -12,10 +12,11 @@ import {
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
-  Link2, Download, MessageSquare, PenSquare, BookOpen
+  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
+import AccesSection from "./dashboard/AccesSection.jsx";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -178,6 +179,7 @@ export default function Dashboard() {
         { key: "membres",  label: `Membres`, badge: allMembers.length, icon: Users },
         { key: "pending",  label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
         { key: "messages", label: "Messages", icon: MessageSquare },
+        { key: "acces",    label: "Accès membres", icon: KeyRound },
       ],
     },
     {
@@ -614,6 +616,7 @@ export default function Dashboard() {
           {tab === "documents"   && <DocumentsSection />}
           {tab === "galeries"    && <GaleriesSection />}
           {tab === "ressources"  && <RessourcesSection />}
+          {tab === "acces"       && <AccesSection />}
 
         </div>
 
