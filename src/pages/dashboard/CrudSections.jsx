@@ -13,15 +13,15 @@ import { useGaleries } from "../../hooks/useGaleries";
 import { useMediaVideos } from "../../hooks/useMediaVideos";
 import { useMediaPhotos } from "../../hooks/useMediaPhotos";
 import { useProgrammes } from "../../hooks/useProgrammes";
+import { useSponsors } from "../../hooks/useSponsors";
 import { articles as articlesStatic } from "../../data/articles.js";
-import { sponsors as sponsorsStatic } from "../../data/sponsors.js";
 import { slugify } from "../../lib/localStore";
 import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus } from "lucide-react";
 import {
   inp, ta, sel,
   Field, ImgField, GalerieField, VideoField,
   SectionLoader, CrudHeader, FormPanel, ItemRow,
-  useCrud, quillModules,
+  quillModules,
 } from "./shared.jsx";
 
 /* ─── Articles ─── */
@@ -351,7 +351,7 @@ export function EquipeSection() {
 
 /* ─── Sponsors ─── */
 export function SponsorsSection() {
-  const { items, add, update, remove, loading } = useCrud("sponsors", sponsorsStatic);
+  const { items, add, update, remove, loading } = useSponsors();
   const [form, setForm] = useState(null);
   const empty = { nom: "", logo: "", url: "", niveau: "Partenaire Bronze", description: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
