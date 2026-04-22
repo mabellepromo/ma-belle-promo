@@ -141,6 +141,7 @@ export default function ArticleDetail() {
         {/* Contenu */}
         <article className="prose prose-slate max-w-none
           prose-headings:font-heading prose-headings:text-foreground
+          prose-h1:text-xl prose-h1:mt-8 prose-h1:mb-3
           prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3
           prose-h3:text-lg prose-h3:mt-6
           prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
