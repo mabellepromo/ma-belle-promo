@@ -14,7 +14,7 @@ export function useEquipe() {
     const { data, error } = await supabase
       .from("equipe")
       .select("*")
-      .order("created_at", { ascending: true });
+      .order("id", { ascending: true });
 
     if (error || !data?.length) {
       setEquipe(equipeStatic);
