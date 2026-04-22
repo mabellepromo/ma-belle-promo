@@ -56,7 +56,7 @@ export default function MerciDon() {
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>📱 <strong className="text-foreground">TMoney :</strong> Envoyez votre don au +228 90 05 36 06</p>
               <p>📱 <strong className="text-foreground">Flooz :</strong> Envoyez votre don au +228 96 02 00 00</p>
-              <p>✉️ <strong className="text-foreground">Confirmation :</strong> Envoyez une copie à mabellepromo@gmail.com avec votre nom et le programme choisi.</p>
+              <p>✉️ <strong className="text-foreground">Confirmation :</strong> Envoyez une copie à contact@mabellepromo.org avec votre nom et le programme choisi.</p>
               <p className="text-xs border-t border-border pt-3 mt-3">Notre équipe vous enverra un reçu de don dans les 48 heures suivant la réception de votre virement.</p>
             </div>
           </div>

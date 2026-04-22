@@ -80,7 +80,7 @@ export function ComposeModal({ onClose }) {
             alt="MBP" className="w-9 h-9 rounded-full ring-2 ring-primary/20" />
           <div className="flex-1 min-w-0">
             <h3 className="font-heading font-bold text-foreground">Nouveau message</h3>
-            <p className="text-xs text-muted-foreground">De : <span className="font-medium text-primary">mabellepromo@gmail.com</span></p>
+            <p className="text-xs text-muted-foreground">De : <span className="font-medium text-primary">contact@mabellepromo.org</span></p>
           </div>
           <button onClick={onClose} disabled={status === "sending"}
             className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center flex-shrink-0 disabled:opacity-40">
@@ -142,7 +142,7 @@ export function ComposeModal({ onClose }) {
               <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
                 alt="" className="w-5 h-5 rounded-full" />
               <span className="text-xs font-bold text-foreground">Ma Belle Promo</span>
-              <span className="text-xs text-muted-foreground">· mabellepromo@gmail.com</span>
+              <span className="text-xs text-muted-foreground">· contact@mabellepromo.org</span>
             </div>
             <p className="text-xs text-muted-foreground italic">
               Bonjour <span className="text-foreground font-medium">{form.nomDest || "[Destinataire]"}</span>,
@@ -176,7 +176,7 @@ export function ComposeModal({ onClose }) {
               <p className="font-semibold text-foreground">{form.expNom || "Votre nom"}</p>
               {form.expPoste && <p>{form.expPoste}</p>}
               <p className="font-medium text-primary/80">Ma Belle Promo — FDD Lomé · 1994–2000</p>
-              <p>mabellepromo@gmail.com</p>
+              <p>contact@mabellepromo.org</p>
             </div>
           </div>
 

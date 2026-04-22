@@ -11,7 +11,7 @@ const tarifs = [
 
 const modalites = [
   { icon: Phone, titre: "Mobile Money", detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92", color: "bg-orange-50 border-orange-200" },
-  { icon: Building, titre: "Virement bancaire", detail: "Nous contacter pour les coordonnées bancaires via mabellepromo@gmail.com", color: "bg-blue-50 border-blue-200" },
+  { icon: Building, titre: "Virement bancaire", detail: "Nous contacter pour les coordonnées bancaires via contact@mabellepromo.org", color: "bg-blue-50 border-blue-200" },
   { icon: CreditCard, titre: "En personne", detail: "Règlement possible directement au siège : 12 BP 335 Baguida, Togo", color: "bg-green-50 border-green-200" },
 ];
 
@@ -87,8 +87,8 @@ export default function Cotisation() {
           <div className="mt-6 pt-6 border-t border-primary/10">
             <p className="text-sm text-muted-foreground">
               Pour toute question relative à la cotisation, contactez notre trésorier à l'adresse :
-              <a href="mailto:mabellepromo@gmail.com" className="text-primary font-medium hover:underline ml-1">
-                mabellepromo@gmail.com
+              <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline ml-1">
+                contact@mabellepromo.org
               </a>
             </p>
           </div>

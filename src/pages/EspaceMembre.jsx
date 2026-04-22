@@ -262,7 +262,7 @@ export default function EspaceMembre() {
             </div>
 
             <p className="text-xs text-muted-foreground text-center mt-4">
-              Pour toute question sur vos cotisations, contactez le trésorier à mabellepromo@gmail.com
+              Pour toute question sur vos cotisations, contactez le trésorier à contact@mabellepromo.org
             </p>
           </motion.div>
         )}

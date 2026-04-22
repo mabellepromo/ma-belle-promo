@@ -23,7 +23,7 @@ export default function Documents() {
           <Lock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
           <p className="text-sm text-muted-foreground">
             Certains documents sont réservés aux membres de l'association. Pour y accéder, 
-            contactez-nous à <a href="mailto:mabellepromo@gmail.com" className="text-primary font-medium hover:underline">mabellepromo@gmail.com</a>.
+            contactez-nous à <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline">contact@mabellepromo.org</a>.
           </p>
         </motion.div>
 

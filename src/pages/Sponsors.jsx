@@ -104,7 +104,7 @@ export default function Sponsors() {
             Vous souhaitez soutenir les actions de Ma Belle Promo ? Contactez-nous pour discuter d'un partenariat.
           </p>
           <a
-            href="mailto:mabellepromo@gmail.com?subject=Partenariat"
+            href="mailto:contact@mabellepromo.org?subject=Partenariat"
             className="inline-block px-7 py-3 bg-white text-foreground rounded-full text-sm font-semibold hover:bg-white/90 transition-colors"
           >
             Proposer un partenariat

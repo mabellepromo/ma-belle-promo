@@ -111,8 +111,8 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground text-sm">Email</h4>
-                  <a href="mailto:mabellepromo@gmail.com" className="text-primary text-sm mt-0.5 hover:underline">
-                    mabellepromo@gmail.com
+                  <a href="mailto:contact@mabellepromo.org" className="text-primary text-sm mt-0.5 hover:underline">
+                    contact@mabellepromo.org
                   </a>
                 </div>
               </div>

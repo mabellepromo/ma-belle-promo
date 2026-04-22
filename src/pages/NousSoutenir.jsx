@@ -27,7 +27,7 @@ const supportMethods = [
     icon: Mail,
     titre: "Par mail",
     desc: "Contactez-nous pour voir ensemble comment vous pouvez aider.",
-    detail: "mabellepromo@gmail.com",
+    detail: "contact@mabellepromo.org",
   },
 ];
 
@@ -107,7 +107,7 @@ export default function NousSoutenir() {
               <p className="text-xs text-muted-foreground mb-2">{m.desc}</p>
               <p className="text-xs text-foreground/70 font-medium whitespace-pre-line">{m.detail}</p>
               {m.action && (
-                <a href="mailto:mabellepromo@gmail.com?subject=Don" className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
+                <a href="mailto:contact@mabellepromo.org?subject=Don" className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
                   Donner maintenant
                 </a>
               )}

@@ -25,7 +25,7 @@ const supportMethods = [
     icon: Mail,
     title: "Par mail",
     desc: "Contactez-nous par email pour voir ensemble comment vous pouvez aider.",
-    detail: "mabellepromo@gmail.com",
+    detail: "contact@mabellepromo.org",
   },
 ];
 
@@ -148,7 +148,7 @@ export default function SoutenirSection() {
               <p className="text-xs text-foreground/70 font-medium">{method.detail}</p>
               {method.action && (
                 <a
-                  href="mailto:mabellepromo@gmail.com?subject=Don%20en%20ligne"
+                  href="mailto:contact@mabellepromo.org?subject=Don%20en%20ligne"
                   className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity"
                 >
                   Donner maintenant
