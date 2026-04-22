@@ -172,11 +172,14 @@ export default function ProjetDetail() {
         {projet.contenu && projet.contenu.trim() && projet.contenu.trim() !== "<p><br></p>" && (
           <article className="prose prose-slate max-w-none
             prose-headings:font-heading prose-headings:text-foreground
+            prose-h1:text-xl prose-h1:mt-8 prose-h1:mb-3
             prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3
+            prose-h3:text-lg prose-h3:mt-6
             prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
             prose-li:text-muted-foreground
             prose-strong:text-foreground
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:font-medium
             [&_p]:text-justify [&_li]:text-justify">
             {projet.contenu.trim().startsWith("<")
               ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(projet.contenu) }} />
