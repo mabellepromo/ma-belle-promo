@@ -1,23 +1,178 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
-import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowRight, ChevronRight } from "lucide-react";
 import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
 
 const TYPE_STYLE = {
-  "Webinaire":        { badge: "bg-blue-100 text-blue-700",   accent: "bg-blue-500" },
-  "Conférence":       { badge: "bg-purple-100 text-purple-700", accent: "bg-purple-500" },
-  "Gala":             { badge: "bg-amber-100 text-amber-700",  accent: "bg-amber-500" },
-  "Projet éditorial": { badge: "bg-green-100 text-green-700",  accent: "bg-green-500" },
+  "Webinaire":        { badge: "bg-blue-100 text-blue-700",     dot: "bg-blue-500",    border: "border-blue-200" },
+  "Conférence":       { badge: "bg-purple-100 text-purple-700", dot: "bg-purple-500",  border: "border-purple-200" },
+  "Gala":             { badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-500",   border: "border-amber-200" },
+  "Projet éditorial": { badge: "bg-green-100 text-green-700",   dot: "bg-green-500",   border: "border-green-200" },
+  "Événement":        { badge: "bg-gray-100 text-gray-700",     dot: "bg-gray-400",    border: "border-gray-200" },
 };
+
+const TYPES = ["Tous", "Webinaire", "Conférence", "Gala", "Projet éditorial"];
+
+const SESSION_ID = "session-de-partage-sur-le-nouvequ-code-du-travail-1776658409803";
+
+function TypeBadge({ type }) {
+  const s = TYPE_STYLE[type] || TYPE_STYLE["Événement"];
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full ${s.badge}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+      {type}
+    </span>
+  );
+}
+
+/* ── Carte hero (1er événement passé) ── */
+function HeroCard({ evt }) {
+  const content = (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="group relative rounded-3xl overflow-hidden border border-border hover:border-primary/30 hover:shadow-2xl transition-all duration-500 cursor-pointer"
+      style={{ minHeight: 420 }}
+    >
+      <img
+        src={evt.image}
+        alt={evt.titre}
+        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        onError={e => { e.target.style.display = "none"; }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
+
+      <div className="relative z-10 h-full flex flex-col justify-between p-8" style={{ minHeight: 420 }}>
+        <div className="flex items-start justify-between">
+          <TypeBadge type={evt.type} />
+          <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-white/15 text-white backdrop-blur-sm">
+            Passé
+          </span>
+        </div>
+
+        <div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/60 mb-3">
+            {evt.date && <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" />{evt.date}</span>}
+            {evt.heures && <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" />{evt.heures}</span>}
+            {evt.lieu && <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3" />{evt.lieu}</span>}
+          </div>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white leading-snug mb-3 group-hover:text-primary transition-colors">
+            {evt.titre}
+          </h2>
+          <p className="text-white/65 text-sm leading-relaxed line-clamp-2 mb-5">{evt.description}</p>
+          {evt.article && (
+            <Link
+              to={`/actualites/${evt.article.id}`}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all"
+            >
+              Lire le compte-rendu <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return evt.article
+    ? <Link to={`/actualites/${evt.article.id}`}>{content}</Link>
+    : content;
+}
+
+/* ── Carte compacte (grille) ── */
+function GridCard({ evt, i }) {
+  const s = TYPE_STYLE[evt.type] || TYPE_STYLE["Événement"];
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ duration: 0.5, delay: i * 0.07 }}
+      className={`group bg-card border ${s.border} rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300`}
+    >
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={evt.image}
+          alt={evt.titre}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          onError={e => { e.target.style.display = "none"; }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute top-3 left-3 flex gap-2">
+          <TypeBadge type={evt.type} />
+        </div>
+        <span className="absolute bottom-3 right-3 font-heading text-4xl font-black text-white/15 leading-none select-none">
+          {String(evt.num).padStart(2, "0")}
+        </span>
+      </div>
+
+      <div className="p-5">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-2.5">
+          {evt.date && <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" />{evt.date}</span>}
+          {evt.lieu && <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-primary" />{evt.lieu}</span>}
+        </div>
+        <h3 className="font-heading text-base font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+          {evt.titre}
+        </h3>
+        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">{evt.description}</p>
+        {evt.article && (
+          <Link
+            to={`/actualites/${evt.article.id}`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:gap-2.5 transition-all"
+          >
+            Compte-rendu <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+        )}
+      </div>
+    </motion.article>
+  );
+}
+
+/* ── Carte "À venir" ── */
+function UpcomingCard({ evt }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="relative bg-primary/5 border-2 border-primary/20 rounded-3xl p-8 overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/5 -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+      <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              À venir
+            </span>
+            <TypeBadge type={evt.type} />
+          </div>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-3 leading-snug">{evt.titre}</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed mb-5">{evt.description}</p>
+          <div className="flex flex-wrap gap-4 text-sm text-foreground font-medium">
+            {evt.date && <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" />{evt.date}</span>}
+            {evt.heures && <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />{evt.heures}</span>}
+            {evt.lieu && <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" />{evt.lieu}</span>}
+          </div>
+        </div>
+        {evt.image && (
+          <div className="w-full md:w-64 h-44 rounded-2xl overflow-hidden flex-shrink-0">
+            <img src={evt.image} alt={evt.titre} className="w-full h-full object-cover" />
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Evenements() {
   const { evenements } = useEvenements();
   const { articles } = useArticles();
-
-  const SESSION_ID = "session-de-partage-sur-le-nouvequ-code-du-travail-1776658409803";
+  const [filtre, setFiltre] = useState("Tous");
 
   const liste = useMemo(() => {
     const fromEvenements = evenements
@@ -41,120 +196,106 @@ export default function Evenements() {
       article: artSession,
     }] : [];
 
-    return [...sessionCard, ...fromEvenements].map((evt, idx) => ({ ...evt, num: idx + 1 }));
+    return [...sessionCard, ...fromEvenements];
   }, [evenements, articles]);
+
+  const aVenir  = liste.filter(e => e.statut?.toLowerCase() !== "passé");
+  const passes  = liste.filter(e => e.statut?.toLowerCase() === "passé");
+  const filtres = filtre === "Tous" ? passes : passes.filter(e => e.type === filtre);
+  const numbered = filtres.map((e, i) => ({ ...e, num: i + 1 }));
+
+  const [hero, ...rest] = numbered;
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Événements" description="Tous les événements de Ma Belle Promo : galas, conférences, webinaires et rencontres des membres de la promotion FDD Lomé 1994-2000." path="/activites/evenements" />
+      <SEO title="Événements" description="Tous les événements de Ma Belle Promo : galas, conférences, webinaires et rencontres des membres de la promotion FDD Lomé 1994–2000." path="/activites/evenements" />
 
-      {/* En-tête éditorial */}
-      <div className="bg-foreground border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Ma Belle Promo</p>
-            <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
+      {/* ── En-tête ── */}
+      <div className="bg-foreground">
+        <div className="max-w-6xl mx-auto px-6 py-14 md:py-20">
+          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary/70 mb-3">Ma Belle Promo · FDD Lomé</p>
+            <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-none mb-4">
               Événements
             </h1>
-            <p className="text-white/50 text-sm max-w-xl">
-              Conférences, webinaires, galas — les rendez-vous qui ont marqué l'histoire de l'association.
+            <div className="w-12 h-0.5 bg-primary mb-6" />
+            <p className="text-white/50 text-base max-w-lg leading-relaxed">
+              Conférences, webinaires, galas — les rendez-vous qui rythment la vie de l'association depuis 2021.
             </p>
+          </motion.div>
+
+          {/* Compteurs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-wrap gap-6 mt-10"
+          >
+            {[
+              { val: liste.length, label: "événements" },
+              { val: aVenir.length, label: "à venir" },
+              { val: passes.length, label: "éditions passées" },
+            ].map(({ val, label }) => (
+              <div key={label} className="text-center">
+                <div className="font-heading text-3xl font-black text-white">{val}</div>
+                <div className="text-xs text-white/35 uppercase tracking-widest mt-0.5">{label}</div>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>
 
-      <section className="max-w-5xl mx-auto px-6 py-12 space-y-6">
-        {liste.map((evt, i) => {
-          const style = TYPE_STYLE[evt.type] || { badge: "bg-gray-100 text-gray-700", accent: "bg-gray-400" };
+      <div className="max-w-6xl mx-auto px-6 py-12 space-y-16">
 
-          return (
-            <motion.article
-              key={evt.id}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-400"
-            >
-              {/* Barre accent gauche */}
-              <div className={`absolute left-0 top-0 bottom-0 w-1 ${style.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+        {/* ── À venir ── */}
+        {aVenir.length > 0 && (
+          <section>
+            <h2 className="font-heading text-xs font-bold uppercase tracking-widest text-primary mb-6">Prochain événement</h2>
+            <div className="space-y-4">
+              {aVenir.map(evt => <UpcomingCard key={evt.id} evt={evt} />)}
+            </div>
+          </section>
+        )}
 
-              <div className="flex flex-col md:flex-row">
+        {/* ── Passés ── */}
+        <section>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <h2 className="font-heading text-xs font-bold uppercase tracking-widest text-primary">
+              {aVenir.length > 0 ? "Éditions passées" : "Tous les événements"}
+            </h2>
 
-                {/* Image */}
-                <div className="relative md:w-72 lg:w-80 h-52 md:h-auto flex-shrink-0 overflow-hidden">
-                  <img
-                    src={evt.image}
-                    alt={evt.titre}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 md:block hidden" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent md:hidden" />
+            {/* Filtres */}
+            <div className="flex flex-wrap gap-2">
+              {TYPES.map(t => (
+                <button
+                  key={t}
+                  onClick={() => setFiltre(t)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
+                    filtre === t
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
 
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full ${style.badge}`}>
-                      {evt.type}
-                    </span>
-                    {evt.statut === "Passé" && (
-                      <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-black/60 text-white backdrop-blur-sm">
-                        Passé
-                      </span>
-                    )}
-                  </div>
+          {numbered.length === 0 && (
+            <p className="text-center text-muted-foreground text-sm py-16">Aucun événement dans cette catégorie.</p>
+          )}
 
-                  {/* Numéro décoratif */}
-                  <div className="absolute bottom-3 right-3 font-heading text-5xl font-black text-white/20 leading-none select-none">
-                    {String(evt.num).padStart(2, "0")}
-                  </div>
-                </div>
+          {/* Hero card */}
+          {hero && <div className="mb-6"><HeroCard evt={hero} /></div>}
 
-                {/* Contenu */}
-                <div className="flex flex-col justify-between flex-1 p-6 md:p-8">
-                  <div>
-                    <h2 className="font-heading text-xl md:text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors leading-snug">
-                      {evt.titre}
-                    </h2>
-                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground mb-4">
-                      {evt.date && (
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.date}
-                        </span>
-                      )}
-                      {evt.heures && (
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.heures}
-                        </span>
-                      )}
-                      {evt.lieu && (
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.lieu}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
-                      {evt.description}
-                    </p>
-                  </div>
+          {/* Grille 2 colonnes */}
+          {rest.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {rest.map((evt, i) => <GridCard key={evt.id} evt={evt} i={i} />)}
+            </div>
+          )}
+        </section>
 
-                  {evt.article && (
-                    <div className="mt-5 pt-4 border-t border-border/50">
-                      <Link
-                        to={`/actualites/${evt.article.id}`}
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all group/link"
-                      >
-                        Lire le compte-rendu
-                        <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            </motion.article>
-          );
-        })}
-      </section>
+      </div>
     </div>
   );
 }
