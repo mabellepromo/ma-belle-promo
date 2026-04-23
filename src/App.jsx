@@ -48,6 +48,7 @@ function PageTitleUpdater() {
   return null;
 }
 import MaintenanceGate, { MAINTENANCE_MODE } from '@/components/MaintenanceGate';
+import CookieBanner from '@/components/CookieBanner';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
@@ -186,6 +187,7 @@ function App() {
           <Router>
             <AuthenticatedApp />
           </Router>
+          <CookieBanner />
           <Toaster />
           <SonnerToaster richColors position="top-right" />
         </QueryClientProvider>
