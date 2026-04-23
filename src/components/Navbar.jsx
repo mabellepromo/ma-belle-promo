@@ -287,6 +287,38 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-background border-t border-border relative z-50">
             <div className="px-4 py-4 space-y-2 max-h-[75vh] overflow-y-auto">
+              {/* Bloc utilisateur — toujours en premier */}
+              {session ? (
+                <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#fecaca", background: "#fef2f2" }}>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{session.nom}</p>
+                      <p className="text-xs text-muted-foreground">{isAdmin ? "Administrateur" : "Membre"}</p>
+                    </div>
+                    <button
+                      onClick={() => { setOpen(false); logout(); navigate("/"); }}
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                      style={{ color: "#dc2626", background: "#fee2e2" }}
+                    >
+                      <LogOut className="w-3.5 h-3.5" /> Quitter
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setOpen(false); navigate("/login"); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  Se connecter / Mon espace
+                </button>
+              )}
+
               {/* Home */}
               <button
                 onClick={() => { setOpen(false); navigate("/"); }}
@@ -309,18 +341,6 @@ export default function Navbar() {
                     <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
                   </div>
                   Tableau de bord
-                </button>
-              )}
-              {session && (
-                <button
-                  onClick={() => { setOpen(false); logout(); navigate("/"); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium rounded-xl border transition-colors"
-                  style={{ color: "#dc2626", background: "#fef2f2", borderColor: "#fecaca" }}
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#fee2e2" }}>
-                    <LogOut className="w-3.5 h-3.5" style={{ color: "#dc2626" }} />
-                  </div>
-                  Se déconnecter · {session.nom}
                 </button>
               )}
               <button
