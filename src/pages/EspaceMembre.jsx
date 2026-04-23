@@ -19,7 +19,7 @@ const documentsExclusifs = [
 
 const ANNEE_DEBUT = 2026;
 const historiqueExemple = [
-  { annee: String(ANNEE_DEBUT), montant: "15 000", statut: "en attente", date: "—", recu: false },
+  { annee: String(ANNEE_DEBUT), montant: "30 000", statut: "en attente", date: "—", recu: false },
 ];
 
 const tabs = [
