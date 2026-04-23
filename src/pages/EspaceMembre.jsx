@@ -17,11 +17,9 @@ const documentsExclusifs = [
   { titre: "Annuaire des membres", type: "PDF", taille: "—", date: "2024", restreint: true },
 ];
 
+const ANNEE_DEBUT = 2026;
 const historiqueExemple = [
-  { annee: "2024", montant: "15 000", statut: "payée", date: "15 Jan. 2024", recu: true },
-  { annee: "2023", montant: "15 000", statut: "payée", date: "10 Fév. 2023", recu: true },
-  { annee: "2022", montant: "10 000", statut: "payée", date: "5 Mars 2022", recu: true },
-  { annee: "2025", montant: "15 000", statut: "en attente", date: "—", recu: false },
+  { annee: String(ANNEE_DEBUT), montant: "15 000", statut: "en attente", date: "—", recu: false },
 ];
 
 const tabs = [
@@ -229,15 +227,15 @@ export default function EspaceMembre() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <div className="grid sm:grid-cols-3 gap-4 mb-8">
               <div className="bg-card border border-border rounded-xl p-5 text-center">
-                <div className="text-2xl font-bold text-primary font-heading">3</div>
+                <div className="text-2xl font-bold text-primary font-heading">0</div>
                 <div className="text-xs text-muted-foreground mt-1">Années de cotisation</div>
               </div>
               <div className="bg-card border border-border rounded-xl p-5 text-center">
-                <div className="text-2xl font-bold text-foreground font-heading">40 000 F</div>
+                <div className="text-2xl font-bold text-foreground font-heading">0 F</div>
                 <div className="text-xs text-muted-foreground mt-1">Total versé</div>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
-                <div className="text-2xl font-bold text-amber-600 font-heading">2025</div>
+                <div className="text-2xl font-bold text-amber-600 font-heading">{ANNEE_DEBUT}</div>
                 <div className="text-xs text-amber-600 mt-1">Cotisation en attente</div>
               </div>
             </div>
