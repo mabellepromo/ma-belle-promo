@@ -17,15 +17,32 @@ export default function Evenements() {
   const { evenements } = useEvenements();
   const { articles } = useArticles();
 
-  const liste = useMemo(() =>
-    evenements
+  const SESSION_ID = "session-de-partage-sur-le-nouvequ-code-du-travail-1776658409803";
+
+  const liste = useMemo(() => {
+    const fromEvenements = evenements
       .filter(e => String(e.id) !== "1")
-      .map((evt, idx) => {
+      .map((evt) => {
         const article = evt.articleId ? articles.find(a => a.id === evt.articleId) : null;
-        return { ...evt, article, image: article?.image || evt.image, num: idx + 1 };
-      }),
-    [evenements, articles]
-  );
+        return { ...evt, article, image: article?.image || evt.image };
+      });
+
+    const artSession = articles.find(a => a.id === SESSION_ID);
+    const sessionCard = artSession ? [{
+      id: artSession.id,
+      titre: artSession.titre,
+      date: artSession.date,
+      heures: "",
+      lieu: "",
+      type: artSession.categorie || "Événement",
+      statut: "Passé",
+      description: artSession.extrait,
+      image: artSession.image,
+      article: artSession,
+    }] : [];
+
+    return [...sessionCard, ...fromEvenements].map((evt, idx) => ({ ...evt, num: idx + 1 }));
+  }, [evenements, articles]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,15 +116,21 @@ export default function Evenements() {
                       {evt.titre}
                     </h2>
                     <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground mb-4">
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.date}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.heures}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.lieu}
-                      </span>
+                      {evt.date && (
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.date}
+                        </span>
+                      )}
+                      {evt.heures && (
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.heures}
+                        </span>
+                      )}
+                      {evt.lieu && (
+                        <span className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />{evt.lieu}
+                        </span>
+                      )}
                     </div>
                     <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
                       {evt.description}
