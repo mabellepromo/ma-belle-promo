@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, MapPin, Phone, Mail } from "lucide-react";
+import { Send, MapPin, Phone, Mail, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -15,12 +16,17 @@ const EMAILJS_PRIVATE  = import.meta.env.VITE_EMAILJS_PRIVATE_KEY;
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.sujet || !form.message) {
       toast.error("Veuillez remplir tous les champs.");
+      return;
+    }
+    if (!consent) {
+      toast.error("Veuillez accepter la politique de confidentialité pour envoyer votre message.");
       return;
     }
     setSending(true);
@@ -163,7 +169,23 @@ export default function ContactSection() {
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                 />
               </div>
-              <Button type="submit" disabled={sending} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
+              {/* Consentement RGPD */}
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border accent-primary flex-shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
+                  J'accepte que mes données (nom, email, message) soient traitées par Ma Belle Promo afin de répondre à ma demande, conformément à la{" "}
+                  <Link to="/confidentialite" className="text-primary hover:underline font-medium">
+                    politique de confidentialité
+                  </Link>.
+                </span>
+              </label>
+
+              <Button type="submit" disabled={sending || !consent} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
                 {sending ? (
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 ) : (

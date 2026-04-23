@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import emailjs from "@emailjs/browser";
 import { supabase } from "../lib/supabase";
+import { Link } from "react-router-dom";
 
 const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -16,12 +17,17 @@ const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function Contacts() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+    if (!consent) {
+      toast.error("Veuillez accepter la politique de confidentialité pour envoyer votre message.");
       return;
     }
     setSending(true);
@@ -117,7 +123,23 @@ export default function Contacts() {
               </div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Sujet</label><Input placeholder="Objet de votre message" value={form.sujet} onChange={e => setForm({...form, sujet: e.target.value})} className="h-12" /></div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Message *</label><Textarea placeholder="Écrivez votre message ici..." rows={5} value={form.message} onChange={e => setForm({...form, message: e.target.value})} /></div>
-              <Button type="submit" disabled={sending} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
+
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border accent-primary flex-shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
+                  J'accepte que mes données (nom, email, message) soient traitées par Ma Belle Promo afin de répondre à ma demande, conformément à la{" "}
+                  <Link to="/confidentialite" className="text-primary hover:underline font-medium">
+                    politique de confidentialité
+                  </Link>.
+                </span>
+              </label>
+
+              <Button type="submit" disabled={sending || !consent} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
                 {sending ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Send className="w-4 h-4" />}
                 {sending ? "Envoi en cours..." : "Envoyer le message"}
               </Button>
