@@ -4,6 +4,7 @@ import HeroSection from "../components/HeroSection";
 import MissionSection from "../components/MissionSection";
 import CredibiliteSection from "../components/CredibiliteSection";
 import ActualitesSection from "../components/ActualitesSection";
+import EvenementsSection from "../components/EvenementsSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import ContactSection from "../components/ContactSection";
 import FooterSection from "../components/FooterSection";
@@ -39,6 +40,7 @@ export default function Home() {
       <MissionSection />
       <CredibiliteSection />
       <ActualitesSection />
+      <EvenementsSection />
       <TestimonialsSection />
       <ContactSection />
       <FooterSection />
