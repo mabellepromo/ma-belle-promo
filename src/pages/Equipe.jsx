@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { Mail, Phone, Linkedin } from "lucide-react";
+import { Linkedin } from "lucide-react";
 import SEO from "../components/SEO";
 import { useEquipe } from "../hooks/useEquipe";
 
@@ -60,28 +60,13 @@ export default function Equipe() {
                   <p className="text-xs font-semibold mt-1 uppercase tracking-wide text-primary">{membre.role}</p>
                 </div>
               </div>
-              {(membre.email || membre.tel || membre.linkedin) && (
-                <div className="mt-4 space-y-1.5 pt-4 border-t border-black/10">
-                  {membre.email && (
-                    <a href={`mailto:${membre.email}`}
-                      className="flex items-center gap-2 text-xs text-primary hover:underline transition-colors">
-                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span className="truncate">{membre.email}</span>
-                    </a>
-                  )}
-                  {membre.tel && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Phone className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>{membre.tel}</span>
-                    </div>
-                  )}
-                  {membre.linkedin && (
-                    <a href={membre.linkedin} target="_blank" rel="noreferrer"
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                      <Linkedin className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span className="truncate">LinkedIn</span>
-                    </a>
-                  )}
+              {membre.linkedin && (
+                <div className="mt-4 pt-4 border-t border-black/10">
+                  <a href={membre.linkedin} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                    <Linkedin className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className="truncate">LinkedIn</span>
+                  </a>
                 </div>
               )}
             </motion.div>
