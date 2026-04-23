@@ -114,10 +114,16 @@ export default function EspaceMembre() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card border border-border rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-5"
         >
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0 shadow-md">
-            <span className="text-primary-foreground font-heading font-bold text-3xl">
-              {user.full_name?.charAt(0) || "M"}
-            </span>
+          <div className="w-20 h-20 rounded-2xl flex-shrink-0 shadow-md overflow-hidden">
+            {user.photo ? (
+              <img src={user.photo} alt={user.full_name} className="w-full h-full object-cover object-top" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                <span className="text-primary-foreground font-heading font-bold text-3xl">
+                  {user.full_name?.charAt(0) || "M"}
+                </span>
+              </div>
+            )}
           </div>
           <div className="text-center sm:text-left flex-1">
             <h2 className="font-heading text-2xl font-bold text-foreground">{user.full_name}</h2>
