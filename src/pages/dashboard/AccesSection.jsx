@@ -6,16 +6,29 @@ import { Mail, Send, RefreshCw, UserCheck, UserX, KeyRound } from "lucide-react"
 const EDGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-member`;
 
 async function sendInvitation(member, accessToken) {
-  const res = await fetch(EDGE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({ email: member.email, nom: member.nom, member_id: member.id }),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || "Erreur inconnue");
+  if (!accessToken) throw new Error("Session expirée — rechargez la page");
+
+  let res;
+  try {
+    res = await fetch(EDGE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ email: member.email, nom: member.nom, member_id: member.id }),
+    });
+  } catch (networkErr) {
+    throw new Error(`Réseau : ${networkErr instanceof Error ? networkErr.message : String(networkErr)}`);
+  }
+
+  /** @type {any} */
+  let json = {};
+  try { json = await res.json(); } catch {}
+
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} — ${json.error || json.message || "Erreur inconnue"}`);
+  }
   return json;
 }
 
@@ -77,7 +90,8 @@ export default function AccesSection() {
         await sendInvitation(member, token);
         ok++;
       } catch (err) {
-        errors.push({ nom: member.nom, err: err.message });
+        const msg = err instanceof Error ? err.message : String(err);
+        errors.push({ nom: member.nom, err: msg });
       }
       setProgress(p => ({ ...p, done: p.done + 1 }));
       // Pause anti rate-limiting Supabase
@@ -91,8 +105,8 @@ export default function AccesSection() {
     if (errors.length === 0) {
       toast.success(`${ok} invitation(s) envoyée(s) avec succès !`);
     } else {
-      toast.error(`${ok} OK · ${errors.length} erreur(s) — voir la console`);
-      errors.forEach(e => console.warn(`[AccesSection] ${e.nom}:`, e.err));
+      const detail = errors.map(e => `${e.nom} : ${e.err}`).join(" | ");
+      toast.error(`Erreur : ${detail}`, { duration: 15000 });
     }
   }
 
