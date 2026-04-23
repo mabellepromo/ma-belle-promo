@@ -241,6 +241,21 @@ export default function Navbar() {
               <User className="w-3.5 h-3.5" /> Mon espace
             </button>
           )}
+          {/* Indicateur mobile : prénom + déconnexion (visible uniquement < 640px) */}
+          {session && (
+            <div className="sm:hidden flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs"
+              style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.75)" }}>
+              <User className="w-3 h-3 flex-shrink-0" />
+              <span className="max-w-[64px] truncate">{session.nom.split(" ")[0]}</span>
+              <button
+                onClick={() => { logout(); navigate("/"); }}
+                title="Se déconnecter"
+                className="ml-0.5 hover:text-white transition-colors"
+              >
+                <LogOut className="w-3 h-3" />
+              </button>
+            </div>
+          )}
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/80"
