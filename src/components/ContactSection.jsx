@@ -14,12 +14,12 @@ const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const EMAILJS_PRIVATE  = import.meta.env.VITE_EMAILJS_PRIVATE_KEY;
 
 export default function ContactSection() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) {
+    if (!form.name || !form.email || !form.sujet || !form.message) {
       toast.error("Veuillez remplir tous les champs.");
       return;
     }
@@ -49,14 +49,14 @@ export default function ContactSection() {
           email:      form.email,
           from_name:  form.name,
           from_email: form.email,
-          sujet:      "(sans sujet)",
+          sujet:      form.sujet,
           message:    form.message,
           sent_at:    new Date().toLocaleString("fr-FR"),
         },
         { publicKey: EMAILJS_KEY, ...(EMAILJS_PRIVATE && { accessToken: EMAILJS_PRIVATE }) }
       );
       toast.success("Message envoyé avec succès !");
-      setForm({ name: "", email: "", message: "" });
+      setForm({ name: "", email: "", sujet: "", message: "" });
     } catch (err) {
       console.error("Erreur envoi message:", err);
       toast.error("Erreur lors de l'envoi. Réessayez ou contactez-nous par email.");
@@ -142,6 +142,15 @@ export default function ContactSection() {
                   placeholder="votre@email.com"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="h-12"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Objet</label>
+                <Input
+                  placeholder="Objet de votre message"
+                  value={form.sujet}
+                  onChange={(e) => setForm({ ...form, sujet: e.target.value })}
                   className="h-12"
                 />
               </div>
