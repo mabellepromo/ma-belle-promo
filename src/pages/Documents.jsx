@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { FileText, Download, Eye, Lock } from "lucide-react";
+import { Download, Eye, Lock } from "lucide-react";
 import { useDocuments } from "../hooks/useDocuments";
+import { useLocalAuth } from "../lib/LocalAuth";
 
 const catColors = {
   "Gouvernance": "bg-blue-100 text-blue-700",
@@ -14,18 +15,25 @@ const typeIcons = { "PDF": "📄", "Excel": "📊", "Word": "📝" };
 
 export default function Documents() {
   const { documents } = useDocuments();
+  const { session } = useLocalAuth();
+  const isMember = !!session;
+
   return (
     <div>
       <PageHero title="Documents" subtitle="Informations — Ressources officielles" />
 
       <section className="py-20 max-w-4xl mx-auto px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 bg-primary/5 border border-primary/10 rounded-xl flex items-start gap-3">
-          <Lock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            Certains documents sont réservés aux membres de l'association. Pour y accéder, 
-            contactez-nous à <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline">contact@mabellepromo.org</a>.
-          </p>
-        </motion.div>
+        {!isMember && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 bg-primary/5 border border-primary/10 rounded-xl flex items-start gap-3">
+            <Lock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-muted-foreground">
+              Certains documents sont réservés aux membres de l'association. Pour y accéder,{" "}
+              <a href="/login" className="text-primary font-medium hover:underline">connectez-vous</a>{" "}
+              ou contactez-nous à{" "}
+              <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline">contact@mabellepromo.org</a>.
+            </p>
+          </motion.div>
+        )}
 
         <div className="space-y-4">
           {documents.map((doc, i) => (
@@ -56,7 +64,7 @@ export default function Documents() {
                   <p className="text-xs text-muted-foreground">{doc.desc}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  {doc.acces === "public" && doc.url ? (
+                  {doc.url && (doc.acces === "public" || (doc.acces === "members" && isMember)) ? (
                     <>
                       <a href={doc.url} target="_blank" rel="noreferrer"
                         className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors" title="Aperçu">
@@ -69,7 +77,7 @@ export default function Documents() {
                     </>
                   ) : (
                     <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground cursor-not-allowed"
-                      title={doc.acces !== "public" ? "Membres uniquement" : "Aucun fichier joint"}>
+                      title={!doc.url ? "Aucun fichier joint" : "Membres uniquement"}>
                       <Lock className="w-4 h-4" />
                     </button>
                   )}
