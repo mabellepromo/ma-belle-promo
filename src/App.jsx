@@ -86,7 +86,9 @@ const Ressources     = lazy(() => import('./pages/Ressources'));
 const Dashboard      = lazy(() => import('./pages/Dashboard'));
 const Galeries       = lazy(() => import('./pages/Galeries'));
 const GalerieDetail  = lazy(() => import('./pages/GalerieDetail'));
-const PlanAction2026 = lazy(() => import('./pages/PlanAction2026'));
+const PlanAction2026   = lazy(() => import('./pages/PlanAction2026'));
+const MentionsLegales  = lazy(() => import('./pages/MentionsLegales'));
+const Confidentialite  = lazy(() => import('./pages/Confidentialite'));
 
 function PageLoader() {
   return (
@@ -161,6 +163,8 @@ const AuthenticatedApp = () => {
         <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
         <Route path="/galeries" element={<Galeries />} />
         <Route path="/galeries/:id" element={<GalerieDetail />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />

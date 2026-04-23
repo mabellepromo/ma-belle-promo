@@ -108,7 +108,14 @@ export default function FooterSection() {
 
         {/* ── Barre du bas ── */}
         <div className="mt-6 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo · Amitié · Solidarité · Entraide</p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo · Amitié · Solidarité · Entraide</p>
+            <div className="flex items-center gap-3">
+              <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">Mentions légales</Link>
+              <span className="text-background/20">·</span>
+              <Link to="/confidentialite" className="text-xs text-background/30 hover:text-background/60 transition-colors">Confidentialité</Link>
+            </div>
+          </div>
 
           <div className="flex items-center gap-4">
             {SOCIAL.map(({ href, Icon, label }) => (
