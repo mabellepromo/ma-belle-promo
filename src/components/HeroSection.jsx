@@ -130,9 +130,9 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="flex justify-center lg:justify-start items-center gap-2 mb-10"
         >
-          <span className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase text-center"
             style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.28)" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" style={{ boxShadow: "0 0 6px #34d399" }} />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 align-middle" style={{ boxShadow: "0 0 6px #34d399" }} />
             Association des Diplômés FDD · Lomé, Togo
           </span>
         </motion.div>
