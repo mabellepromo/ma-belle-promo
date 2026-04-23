@@ -56,17 +56,20 @@ export default function Documents() {
                   <p className="text-xs text-muted-foreground">{doc.desc}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  {doc.acces === "public" ? (
+                  {doc.acces === "public" && doc.url ? (
                     <>
-                      <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors" title="Aperçu">
+                      <a href={doc.url} target="_blank" rel="noreferrer"
+                        className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors" title="Aperçu">
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors text-primary" title="Télécharger">
+                      </a>
+                      <a href={doc.url} download target="_blank" rel="noreferrer"
+                        className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors text-primary" title="Télécharger">
                         <Download className="w-4 h-4" />
-                      </button>
+                      </a>
                     </>
                   ) : (
-                    <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground cursor-not-allowed" title="Membres uniquement">
+                    <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground cursor-not-allowed"
+                      title={doc.acces !== "public" ? "Membres uniquement" : "Aucun fichier joint"}>
                       <Lock className="w-4 h-4" />
                     </button>
                   )}
