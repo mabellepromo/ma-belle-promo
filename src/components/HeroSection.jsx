@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 
 const stats = [
   { value: "2018", label: "Fondée en" },
-  { value: "40+", label: "Membres actifs" },
-  { value: "15+", label: "Projets réalisés" },
-  { value: "6 ans", label: "D'engagement" },
+  { value: "45+", label: "Membres actifs" },
+  { value: "10+", label: "Projets réalisés" },
+  { value: "8 ans", label: "D'engagement" },
 ];
 
 /* ══ BULLE D'EAU ══ */
