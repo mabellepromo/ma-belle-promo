@@ -60,9 +60,6 @@ export default function Equipe() {
                   <p className="text-xs font-semibold mt-1 uppercase tracking-wide text-primary">{membre.role}</p>
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                {membre.profession}
-              </p>
               {(membre.email || membre.tel || membre.linkedin) && (
                 <div className="mt-4 space-y-1.5 pt-4 border-t border-black/10">
                   {membre.email && (
