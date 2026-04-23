@@ -31,7 +31,7 @@ const tabs = [
 ];
 
 export default function EspaceMembre() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(/** @type {any} */(null));
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState({ phone: "", city: "", country: "Togo", profession: "", linkedin: "" });
@@ -40,15 +40,24 @@ export default function EspaceMembre() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user: u } }) => {
+    supabase.auth.getUser().then(async (/** @type {any} */ { data: { user: u } }) => {
       if (u) {
         const meta = u.user_metadata || {};
-        setUser({ ...u, ...meta });
+
+        // Charger les données réelles depuis la table members
+        const { data: m } = await supabase
+          .from("members")
+          .select("nom, telephone, ville, pays, profession, photo")
+          .eq("email", u.email)
+          .maybeSingle();
+
+        const fullName = meta.nom || meta.full_name || m?.nom || u.email;
+        setUser({ ...u, ...meta, full_name: fullName, photo: m?.photo || null });
         setProfile({
-          phone: meta.phone || "",
-          city: meta.city || "",
-          country: meta.country || "Togo",
-          profession: meta.profession || "",
+          phone: meta.phone || m?.telephone || "",
+          city: meta.city || m?.ville || "",
+          country: meta.country || m?.pays || "Togo",
+          profession: meta.profession || m?.profession || "",
           linkedin: meta.linkedin || "",
         });
       }
@@ -58,7 +67,14 @@ export default function EspaceMembre() {
   const handleSave = async () => {
     setSaving(true);
     await supabase.auth.updateUser({ data: profile });
-    setUser((u) => ({ ...u, ...profile }));
+    // Répercuter dans la table members pour que l'annuaire reste synchronisé
+    await supabase.from("members").update({
+      telephone: profile.phone,
+      ville:     profile.city,
+      pays:      profile.country,
+      profession: profile.profession,
+    }).eq("email", user.email);
+    setUser((/** @type {any} */ u) => ({ ...u, ...profile }));
     setEditing(false);
     setSaving(false);
     toast.success("Profil mis à jour !");
