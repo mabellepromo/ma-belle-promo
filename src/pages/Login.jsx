@@ -41,8 +41,14 @@ export default function Login() {
       setLoading(false);
       return;
     }
-    const redirect = searchParams.get("redirect") || "/";
-    navigate(redirect, { replace: true });
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      navigate(redirect, { replace: true });
+    } else {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      const role = s?.user?.user_metadata?.role;
+      navigate(role === "admin" ? "/dashboard" : "/espace-membre", { replace: true });
+    }
   }
 
   async function handleReset(e) {
