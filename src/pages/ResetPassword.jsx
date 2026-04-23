@@ -24,7 +24,13 @@ export default function ResetPassword() {
       return;
     }
 
-    // PASSWORD_RECOVERY = mot de passe oublié ; SIGNED_IN = première connexion via invitation
+    // Supabase traite le token du hash dès l'init, avant que useEffect s'exécute.
+    // On vérifie donc la session existante en plus d'écouter les événements futurs.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+
+    // PASSWORD_RECOVERY = mot de passe oublié ; SIGNED_IN = invitation première connexion
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
     });
