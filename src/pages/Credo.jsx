@@ -139,7 +139,7 @@ export default function Credo() {
               <h3 className="font-heading text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {v.titre}
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed relative z-10">
+              <p className="text-muted-foreground text-sm leading-relaxed relative z-10 text-justify">
                 {v.texte}
               </p>
             </motion.div>
