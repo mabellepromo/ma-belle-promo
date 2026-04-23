@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { sbGet, sbSet, uploadImage, uploadVideo } from "../../lib/supabase";
+import { sbGet, sbSet, uploadImage, uploadVideo, uploadFile } from "../../lib/supabase";
 import { motion } from "framer-motion";
-import { X, Plus, Save, Upload, Edit2, Trash2, Eye } from "lucide-react";
+import { X, Plus, Save, Upload, Edit2, Trash2, Eye, FileText } from "lucide-react";
 
 /* ─── Constantes de style ─── */
 export const inp = "w-full h-9 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:border-primary/50";
@@ -126,6 +126,61 @@ export function GalerieField({ photos = [], onChange }) {
       </div>
       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
       <p className="text-xs text-muted-foreground">Glissez les photos pour les réordonner. Survolez pour supprimer.</p>
+    </div>
+  );
+}
+
+export function FileField({ label, url, onUpload, onRemove }) {
+  const fileRef = useRef();
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const publicUrl = await uploadFile(file);
+      const ext = file.name.split(".").pop().toUpperCase();
+      const sizeKo = Math.round(file.size / 1024);
+      const taille = sizeKo >= 1024 ? `${(sizeKo / 1024).toFixed(1)} Mo` : `${sizeKo} Ko`;
+      onUpload({ url: publicUrl, type: ext, taille, nom: file.name });
+    } catch (err) {
+      toast.error("Erreur upload : " + (err.message || err));
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-foreground mb-1">{label}</label>
+      {url ? (
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-muted/50 border border-border rounded-lg">
+          <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+          <a href={url} target="_blank" rel="noreferrer"
+            className="text-xs text-primary hover:underline truncate flex-1">
+            {url.split("/").pop().replace(/^\d+-[a-z0-9]+\./, "fichier.")}
+          </a>
+          <button type="button" onClick={onRemove}
+            className="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center flex-shrink-0 hover:bg-red-600 transition-colors">
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={() => fileRef.current.click()} disabled={uploading}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-50">
+            {uploading
+              ? <><Upload className="w-3.5 h-3.5 animate-pulse" /> Upload en cours…</>
+              : <><Upload className="w-3.5 h-3.5" /> Uploader un fichier</>}
+          </button>
+          <span className="text-xs text-muted-foreground">PDF, Word, Excel, PowerPoint…</span>
+        </div>
+      )}
+      <input ref={fileRef} type="file"
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods"
+        className="hidden" onChange={handleFile} />
     </div>
   );
 }

@@ -53,6 +53,11 @@ export async function uploadVideo(file) {
   return uploadToStorage(file, "videos");
 }
 
+/** Uploader un document (PDF, Word, Excel…) dans Supabase Storage */
+export async function uploadFile(file) {
+  return uploadToStorage(file, "documents");
+}
+
 /** S'abonner aux changements d'une clé en temps réel */
 export function sbSubscribe(key, callback) {
   const channel = supabase

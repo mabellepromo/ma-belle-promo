@@ -19,7 +19,7 @@ import { slugify } from "../../lib/localStore";
 import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus } from "lucide-react";
 import {
   inp, ta, sel,
-  Field, ImgField, GalerieField, VideoField,
+  Field, ImgField, GalerieField, VideoField, FileField,
   SectionLoader, CrudHeader, FormPanel, ItemRow,
   quillModules,
 } from "./shared.jsx";
@@ -601,7 +601,23 @@ export function DocumentsSection() {
                 <option value="members">Membres uniquement</option>
               </select>
             </Field>
-            <div className="md:col-span-2"><Field label="URL de téléchargement"><input className={inp} type="url" placeholder="Lien Google Drive, Dropbox..." value={form.url} onChange={f("url")} /></Field></div>
+            <div className="md:col-span-2">
+              <FileField
+                label="Fichier (upload direct ou URL externe)"
+                url={form.url}
+                onUpload={({ url, type, taille }) =>
+                  setForm(p => ({ ...p, url, type, taille }))
+                }
+                onRemove={() => setForm(p => ({ ...p, url: "" }))}
+              />
+              {!form.url && (
+                <div className="mt-2">
+                  <Field label="Ou coller une URL (Google Drive, Dropbox…)">
+                    <input className={inp} type="url" placeholder="https://..." value={form.url} onChange={f("url")} />
+                  </Field>
+                </div>
+              )}
+            </div>
             <div className="md:col-span-2"><Field label="Description"><textarea className={ta} rows={2} value={form.desc} onChange={f("desc")} /></Field></div>
           </div>
         </FormPanel>
