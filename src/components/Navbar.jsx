@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown, Home, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalAuth } from "@/lib/LocalAuth";
@@ -155,7 +155,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = useLocalAuth();
+  const { session, logout } = useLocalAuth();
   const isAdmin = session?.role === "admin";
 
   useEffect(() => {
@@ -206,16 +206,33 @@ export default function Navbar() {
           >
             ♥ Faire un don
           </button>
-          {isAdmin && (
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
-              style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-            </button>
-          )}
-          {!isAdmin && (
+          {session ? (
+            <>
+              {isAdmin && (
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
+                  style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                </button>
+              )}
+              <div
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs rounded-full"
+                style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.70)" }}
+              >
+                <User className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="max-w-[100px] truncate">{session.nom}</span>
+                <button
+                  onClick={() => { logout(); navigate("/"); }}
+                  title="Se déconnecter"
+                  className="ml-1 hover:text-white transition-colors flex-shrink-0"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </>
+          ) : (
             <button
               onClick={() => navigate("/espace-membre")}
               className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
@@ -277,6 +294,18 @@ export default function Navbar() {
                     <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
                   </div>
                   Tableau de bord
+                </button>
+              )}
+              {session && (
+                <button
+                  onClick={() => { setOpen(false); logout(); navigate("/"); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium rounded-xl border transition-colors"
+                  style={{ color: "#dc2626", background: "#fef2f2", borderColor: "#fecaca" }}
+                >
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#fee2e2" }}>
+                    <LogOut className="w-3.5 h-3.5" style={{ color: "#dc2626" }} />
+                  </div>
+                  Se déconnecter · {session.nom}
                 </button>
               )}
               <button
