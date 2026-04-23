@@ -125,18 +125,6 @@ export default function HeroSection() {
         style={{ opacity }}
         className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-16 pt-28 pb-16 max-w-7xl mx-auto w-full"
       >
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="flex justify-center lg:justify-start items-center gap-2 mb-10"
-        >
-          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase text-center"
-            style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.28)" }}>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 align-middle" style={{ boxShadow: "0 0 6px #34d399" }} />
-            Association des Diplômés FDD · Lomé, Togo
-          </span>
-        </motion.div>
-
         {/* ── Grille responsive : 1 col mobile / 2 col md / 3 col lg ── */}
         <div className="grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_340px] gap-8 md:gap-10 lg:gap-14 items-center">
 
@@ -146,6 +134,17 @@ export default function HeroSection() {
             transition={{ duration: 1.1, ease: [0.34, 1.56, 0.64, 1] }}
             className="flex flex-col items-center gap-6"
           >
+            {/* Badge centré sur la bulle */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+            >
+              <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase text-center"
+                style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.28)" }}>
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 align-middle" style={{ boxShadow: "0 0 6px #34d399" }} />
+                Association des Diplômés FDD · Lomé, Togo
+              </span>
+            </motion.div>
+
             <WaterBubble>
               <motion.img
                 src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
