@@ -128,7 +128,7 @@ export default function HeroSection() {
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 mb-10 self-center lg:self-start"
+          className="inline-flex items-center gap-2 mb-10 mx-auto lg:mx-0"
         >
           <span className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
             style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.28)" }}>
