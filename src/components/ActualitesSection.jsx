@@ -134,7 +134,7 @@ export default function ActualitesSection() {
                 src={PLAN_IMAGE}
                 alt="Plan d'action MBP 2026"
                 loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700"
               />
 
               {/* Dégradé overlay */}
