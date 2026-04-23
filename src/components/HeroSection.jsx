@@ -217,11 +217,11 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="font-heading leading-none mb-1 text-center"
+            <h1 className="font-heading leading-none mb-1 text-center md:text-left"
               style={{ fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.03em" }}>
               L'excellence juridique partagée,
             </h1>
-            <h1 className="font-heading leading-none mb-6 text-center"
+            <h1 className="font-heading leading-none mb-6 text-center md:text-left"
               style={{
                 fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, letterSpacing: "-0.03em",
                 background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
@@ -248,7 +248,7 @@ export default function HeroSection() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
               <button
                 onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
                 className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
