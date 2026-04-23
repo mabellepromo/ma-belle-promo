@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
 import { CheckCircle2, ArrowRight, User, Mail, Phone, Briefcase, MapPin, GraduationCap, FileText, Heart, Upload, CreditCard } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -46,6 +47,7 @@ export default function Adhesion() {
     disponibilites: "",
     accepteStatuts: false,
     accepteCotisation: false,
+    accepteRGPD: false,
   });
   const [photoFile, setPhotoFile]       = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -73,6 +75,10 @@ export default function Adhesion() {
     }
     if (!form.accepteStatuts || !form.accepteCotisation) {
       toast.error("Veuillez accepter les conditions d'adhésion.");
+      return;
+    }
+    if (!form.accepteRGPD) {
+      toast.error("Veuillez accepter la politique de confidentialité.");
       return;
     }
     await new Promise(r => setTimeout(r, 1000));
@@ -313,6 +319,14 @@ export default function Adhesion() {
                   <input type="checkbox" checked={form.accepteCotisation} onChange={update("accepteCotisation")} className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary" />
                   <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                     Je m'engage à régler la <strong>cotisation annuelle</strong> selon les modalités en vigueur et à participer activement à la vie de l'association. <span className="text-red-500">*</span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input type="checkbox" checked={form.accepteRGPD} onChange={update("accepteRGPD")} className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    J'autorise Ma Belle Promo à collecter et traiter mes données personnelles dans le cadre de ma demande d'adhésion, conformément à la{" "}
+                    <Link to="/confidentialite" className="text-primary hover:underline font-medium">politique de confidentialité</Link>.
+                    Je sais que je peux demander la suppression de mes données à tout moment. <span className="text-red-500">*</span>
                   </span>
                 </label>
               </div>

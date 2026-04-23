@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X, Download, Shield, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X, Download, Shield, Clock, CheckCircle, AlertCircle, Trash2, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ const tabs = [
   { id: "profil", label: "Mon Profil", icon: User },
   { id: "cotisations", label: "Cotisations", icon: Clock },
   { id: "documents", label: "Documents", icon: FileText },
+  { id: "donnees", label: "Mes données", icon: ShieldCheck },
 ];
 
 export default function EspaceMembre() {
@@ -35,6 +36,7 @@ export default function EspaceMembre() {
   const [profile, setProfile] = useState({ phone: "", city: "", country: "Togo", profession: "", linkedin: "" });
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState("profil");
+  const [deletionRequested, setDeletionRequested] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +63,39 @@ export default function EspaceMembre() {
       }
     }).finally(() => setLoading(false));
   }, []);
+
+  const handleExport = async () => {
+    const { data: m } = await supabase.from("members").select("*").eq("email", user.email).maybeSingle();
+    const payload = {
+      export_date: new Date().toISOString(),
+      profil: {
+        nom: user.full_name,
+        email: user.email,
+        telephone: profile.phone,
+        ville: profile.city,
+        pays: profile.country,
+        profession: profile.profession,
+        linkedin: profile.linkedin,
+      },
+      membre: m || null,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mes-donnees-mbp-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Export téléchargé !");
+  };
+
+  const handleDeleteRequest = async () => {
+    await supabase.auth.updateUser({ data: { deletion_requested: true, deletion_requested_at: new Date().toISOString() } });
+    await supabase.auth.signOut();
+    setDeletionRequested(true);
+    toast.success("Demande de suppression envoyée. Vous avez été déconnecté(e).");
+    setTimeout(() => navigate("/"), 3000);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -314,6 +349,86 @@ export default function EspaceMembre() {
             </div>
           </motion.div>
         )}
+        {/* Mes données */}
+        {tab === "donnees" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+
+            {/* Export */}
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Download className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading font-bold text-foreground mb-1">Télécharger mes données</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Exportez toutes vos données personnelles conservées par Ma Belle Promo au format JSON (droit à la portabilité — Art. 20 RGPD).
+                  </p>
+                  <button
+                    onClick={handleExport}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <Download className="w-4 h-4" /> Exporter mes données
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Infos RGPD */}
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-foreground mb-1">Vos droits sur vos données</h3>
+                  <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                    <li>• <strong className="text-foreground">Accès</strong> — consultez votre profil dans l'onglet "Mon Profil"</li>
+                    <li>• <strong className="text-foreground">Rectification</strong> — modifiez vos informations via le bouton "Modifier"</li>
+                    <li>• <strong className="text-foreground">Portabilité</strong> — exportez vos données ci-dessus</li>
+                    <li>• <strong className="text-foreground">Suppression</strong> — demandez l'effacement de votre compte ci-dessous</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Pour toute autre demande RGPD :{" "}
+                    <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Suppression */}
+            <div className="bg-card border border-red-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <Trash2 className="w-5 h-5 text-red-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading font-bold text-foreground mb-1">Supprimer mon compte</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Envoyez une demande de suppression de votre compte et de vos données personnelles (droit à l'oubli — Art. 17 RGPD).
+                    Le bureau traitera votre demande dans un délai de 30 jours. Vous serez déconnecté(e) immédiatement.
+                  </p>
+                  {!deletionRequested ? (
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Êtes-vous sûr(e) de vouloir demander la suppression de votre compte ? Cette action est irréversible.")) {
+                          handleDeleteRequest();
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" /> Demander la suppression
+                    </button>
+                  ) : (
+                    <p className="text-sm font-medium text-green-600">✓ Demande envoyée. Redirection en cours...</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+
       </section>
     </div>
   );
