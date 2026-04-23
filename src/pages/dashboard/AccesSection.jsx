@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
-import { Mail, Send, RefreshCw, UserCheck, UserX, KeyRound } from "lucide-react";
+import { Mail, Send, RefreshCw, UserCheck, UserX, KeyRound, RotateCcw } from "lucide-react";
 
 const EDGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-member`;
 
@@ -71,6 +71,11 @@ export default function AccesSection() {
         ? new Set()
         : new Set(uninvited.map(m => m.id))
     );
+  }
+
+  async function resetInvitation(id) {
+    await supabase.from("members").update({ invited_at: null }).eq("id", id);
+    await load();
   }
 
   async function handleSend() {
@@ -255,6 +260,12 @@ export default function AccesSection() {
                 <span className="text-xs text-muted-foreground flex-shrink-0">
                   {new Date(m.invited_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
                 </span>
+                <button
+                  onClick={() => resetInvitation(m.id)}
+                  title="Réinviter ce membre"
+                  className="p-1.5 rounded-lg hover:bg-amber-100 text-muted-foreground hover:text-amber-700 transition-colors flex-shrink-0">
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
               </div>
             ))}
           </div>
