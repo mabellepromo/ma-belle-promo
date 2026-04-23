@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { Lock, Eye, EyeOff, Check } from "lucide-react";
+import { Lock, Eye, EyeOff, Check, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ResetPassword() {
@@ -11,17 +11,27 @@ export default function ResetPassword() {
   const [showPwd,  setShowPwd]    = useState(false);
   const [loading,  setLoading]    = useState(false);
   const [ready,    setReady]      = useState(false);
+  const [linkError, setLinkError] = useState(/** @type {string|null} */(null));
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Supabase déclenche PASSWORD_RECOVERY quand le lien de réinitialisation est utilisé
+    // Détecter une erreur dans le hash (lien expiré, invalide…)
+    const hash = window.location.hash;
+    if (hash.includes("error=")) {
+      const params = new URLSearchParams(hash.slice(1));
+      const desc = params.get("error_description") || "Lien invalide ou expiré.";
+      setLinkError(desc.replace(/\+/g, " "));
+      return;
+    }
+
+    // PASSWORD_RECOVERY = mot de passe oublié ; SIGNED_IN = première connexion via invitation
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  async function handleSubmit(e) {
+  async function handleSubmit(/** @type {React.FormEvent} */ e) {
     e.preventDefault();
     if (password !== confirm) { toast.error("Les mots de passe ne correspondent pas."); return; }
     if (password.length < 8)  { toast.error("Le mot de passe doit contenir au moins 8 caractères."); return; }
@@ -30,13 +40,33 @@ export default function ResetPassword() {
     if (error) {
       toast.error("Erreur : " + error.message);
     } else {
-      toast.success("Mot de passe mis à jour ! Redirection en cours…");
+      toast.success("Mot de passe créé ! Redirection en cours…");
       setTimeout(() => navigate("/login"), 2500);
     }
     setLoading(false);
   }
 
   const bg = "linear-gradient(160deg, #042b14 0%, #063d1e 40%, #052918 70%, #031a0e 100%)";
+
+  if (linkError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: bg }}>
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-full bg-red-900/40 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
+            <AlertTriangle className="w-7 h-7 text-red-400" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Lien expiré</h2>
+          <p className="text-gray-400 text-sm mb-6">
+            Ce lien d'activation n'est plus valide. Contactez l'administrateur pour recevoir un nouveau lien d'invitation.
+          </p>
+          <button onClick={() => navigate("/")}
+            className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors">
+            Retour à l'accueil
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!ready) {
     return (
