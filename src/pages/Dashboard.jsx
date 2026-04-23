@@ -339,7 +339,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="p-6 md:p-8 overflow-y-auto pb-24">
+        <div className="p-6 md:p-8 overflow-y-auto pb-24 md:pb-24">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
