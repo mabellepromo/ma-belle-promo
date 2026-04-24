@@ -107,7 +107,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground text-sm">Téléphone</h4>
-                  <p className="text-muted-foreground text-sm mt-0.5">+228 90 05 36 06 / 90 03 63 43</p>
+                  <p className="text-muted-foreground text-sm mt-0.5">+228 96 09 07 07</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
