@@ -44,7 +44,7 @@ export default function Don() {
   const modesPaiement = [
     { id: "tmoney", label: "TMoney", detail: "+228 90 05 36 06" },
     { id: "flooz", label: "Flooz", detail: "+228 96 02 00 00" },
-    { id: "virement", label: "Virement bancaire", detail: "SGBS Togo — RIB disponible sur demande" },
+    { id: "virement", label: "Virement bancaire", detail: "Ecobank Togo — RIB disponible sur demande" },
     { id: "especes", label: "Espèces / en personne", detail: "12 BP 335 Baguida, Lomé" },
   ];
 
