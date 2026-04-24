@@ -118,6 +118,64 @@ function buildReplyPayload({ to_email, to_name, sujet, reply_message, date, send
   };
 }
 
+function buildNewsletterConfirmPayload({ email, token, confirm_url }) {
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:17px;color:#111827;">Confirmez votre inscription</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.7;">
+      Merci de votre intérêt pour les actualités de <strong>l'Association Ma Belle Promo (MBP)</strong>.<br>
+      Cliquez sur le bouton ci-dessous pour confirmer votre inscription à la newsletter.
+    </p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${confirm_url}"
+        style="display:inline-block;padding:13px 32px;background:#14532d;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;letter-spacing:0.3px;">
+        Confirmer mon inscription
+      </a>
+    </div>
+    <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
+      Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.<br>
+      Ce lien est valable 48 heures.
+    </p>`;
+  return {
+    sender: SENDER,
+    to: [{ email }],
+    subject: "Confirmez votre inscription à la newsletter — Ma Belle Promo",
+    htmlContent: wrapHtml(content),
+  };
+}
+
+function buildAdminAlertPayload({ nom, email, alertType, detail }) {
+  const labels = {
+    deletion_request: { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
+  };
+  const cfg = labels[alertType] || { titre: alertType, couleur: "#6b7280", badge: "Alerte" };
+  const content = `
+    <div style="display:inline-block;padding:4px 12px;background:${cfg.couleur};color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">
+      ${cfg.badge}
+    </div>
+    <h2 style="margin:0 0 16px;font-size:17px;color:#111827;">${cfg.titre}</h2>
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:100px;">Membre :</td>
+          <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:600;">${nom || "—"}</td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Email :</td>
+          <td style="padding:4px 0;font-size:13px;"><a href="mailto:${email}" style="color:#14532d;">${email}</a></td></tr>
+      <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Date :</td>
+          <td style="padding:4px 0;font-size:13px;color:#6b7280;">${new Date().toLocaleString("fr-FR")}</td></tr>
+    </table>
+    ${detail ? `<div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;">
+      <p style="margin:0;font-size:13px;color:#374151;">${detail}</p>
+    </div>` : ""}
+    <p style="margin:0;font-size:12px;color:#9ca3af;">
+      Traitez cette demande depuis le Dashboard ou en répondant à l'email du membre sous 30 jours (Art. 17 RGPD).
+    </p>`;
+  return {
+    sender: SENDER,
+    to: CONTACT_TO,
+    replyTo: { email, name: nom || email },
+    subject: `[${cfg.badge}] ${cfg.titre} — ${nom || email}`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -133,14 +191,17 @@ export default async function handler(req, res) {
 
   const { type, ...data } = req.body;
 
-  if (type !== "contact" && type !== "reply") {
-    return res.status(400).json({ error: "Invalid type. Use 'contact' or 'reply'." });
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert"];
+  if (!VALID_TYPES.includes(type)) {
+    return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
   }
 
   try {
-    const payload = type === "contact"
-      ? buildContactPayload(data)
-      : buildReplyPayload(data);
+    let payload;
+    if (type === "contact")            payload = buildContactPayload(data);
+    else if (type === "reply")         payload = buildReplyPayload(data);
+    else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
+    else                               payload = buildAdminAlertPayload(data);
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",

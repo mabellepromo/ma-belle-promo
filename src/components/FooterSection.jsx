@@ -27,12 +27,20 @@ export default function FooterSection() {
   const handleNewsletter = async (e) => {
     e.preventDefault();
     if (!email.includes("@")) return;
+    const token = crypto.randomUUID();
     const { error } = await supabase
       .from("newsletter_subscribers")
-      .insert({ email, source: "footer", active: true });
-    if (error && error.code !== "23505") throw error;
+      .insert({ email, source: "footer", active: false, token });
+    // 23505 = email déjà inscrit → on re-envoie quand même le lien de confirmation
+    if (error && error.code !== "23505") { toast.error("Une erreur est survenue."); return; }
+    const confirm_url = `${window.location.origin}/newsletter/confirmer?token=${token}`;
+    await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "newsletter_confirm", email, token, confirm_url }),
+    });
     setDone(true);
-    toast.success("Inscription confirmée !");
+    toast.success("Vérifiez votre boîte email pour confirmer !");
   };
 
   return (
@@ -84,7 +92,7 @@ export default function FooterSection() {
               </a>
             </div>
             {done ? (
-              <p className="text-background/40 text-xs">✓ Inscrit(e) à la newsletter</p>
+              <p className="text-background/40 text-xs">✓ Vérifiez votre email pour confirmer l'inscription</p>
             ) : (
               <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full lg:w-auto">
                 <span className="text-background/60 text-xs font-medium text-center lg:text-right lg:whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>

@@ -91,6 +91,18 @@ export default function EspaceMembre() {
 
   const handleDeleteRequest = async () => {
     await supabase.auth.updateUser({ data: { deletion_requested: true, deletion_requested_at: new Date().toISOString() } });
+    // Notifier l'admin par email
+    fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type:      "admin_alert",
+        alertType: "deletion_request",
+        nom:       user.full_name || user.email,
+        email:     user.email,
+        detail:    `L'utilisateur a demandé la suppression de son compte le ${new Date().toLocaleString("fr-FR")}. Traitez cette demande sous 30 jours conformément à l'Art. 17 RGPD.`,
+      }),
+    }).catch(console.error);
     await supabase.auth.signOut();
     setDeletionRequested(true);
     toast.success("Demande de suppression envoyée. Vous avez été déconnecté(e).");
