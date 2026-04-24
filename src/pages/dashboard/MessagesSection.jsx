@@ -58,8 +58,8 @@ export function ComposeModal({ onClose }) {
       setStatus("sent");
       setTimeout(() => { onClose(); }, 2500);
     } catch (err) {
-      console.error("EmailJS error:", err);
-      setErrMsg(err?.text || err?.message || JSON.stringify(err) || "Erreur inconnue");
+      console.error("Brevo send error:", err);
+      setErrMsg(err?.message || JSON.stringify(err) || "Erreur inconnue");
       setStatus("error");
     }
   }

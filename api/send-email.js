@@ -140,16 +140,16 @@ export default async function handler(req, res) {
   }
 
   const { type, ...data } = req.body;
-  let payload;
-  if (type === "contact") {
-    payload = buildContactPayload(data);
-  } else if (type === "reply") {
-    payload = buildReplyPayload(data);
-  } else {
+
+  if (type !== "contact" && type !== "reply") {
     return res.status(400).json({ error: "Invalid type. Use 'contact' or 'reply'." });
   }
 
   try {
+    const payload = type === "contact"
+      ? buildContactPayload(data)
+      : buildReplyPayload(data);
+
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -162,13 +162,13 @@ export default async function handler(req, res) {
 
     const result = await response.json();
     if (!response.ok) {
-      console.error("Brevo error:", JSON.stringify(result));
+      console.error(`Brevo error [${type}]:`, JSON.stringify(result));
       return res.status(502).json({ error: result });
     }
 
     return res.status(200).json({ success: true, messageId: result.messageId });
   } catch (err) {
-    console.error("send-email error:", err);
+    console.error(`send-email error [${type}]:`, err.message, err.stack);
     return res.status(500).json({ error: err.message });
   }
 }
