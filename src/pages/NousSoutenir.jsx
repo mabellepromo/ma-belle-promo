@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Banknote, Phone, Mail, MapPin, Globe } from "lucide-react";
 import SEO from "../components/SEO";
+import { Link } from "react-router-dom";
 
 const supportMethods = [
   {
@@ -27,7 +28,7 @@ const supportMethods = [
     icon: Mail,
     titre: "Par mail",
     desc: "Contactez-nous pour voir ensemble comment vous pouvez aider.",
-    detail: "contact@mabellepromo.org",
+    detail: <Link to="/informations/contacts" className="text-primary font-semibold hover:underline">Formulaire de contact</Link>,
   },
 ];
 
