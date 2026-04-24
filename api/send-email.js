@@ -1,7 +1,7 @@
 // Vercel serverless function — proxy Brevo API
 // La clé API reste côté serveur (jamais exposée au navigateur)
 
-const SENDER = { name: "Ma Belle Promo", email: "a8fa09001@smtp-brevo.com" };
+const SENDER = { name: "Ma Belle Promo", email: "contact@mabellepromo.org" };
 const CONTACT_TO = [{ email: "contact@mabellepromo.org", name: "Ma Belle Promo" }];
 
 function wrapHtml(content) {
