@@ -7,6 +7,7 @@ import { Heart, Phone, Mail, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const montants = [5000, 10000, 25000, 50000, 100000];
 
@@ -24,6 +25,7 @@ export default function Don() {
   const [programme, setProgramme] = useState("general");
   const [form, setForm] = useState({ nom: "", prenom: "", email: "", tel: "", message: "" });
   const [mode, setMode] = useState("tmoney"); // tmoney | flooz | virement | especes
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const montantFinal = montantLibre ? parseInt(montantLibre) : montantSelectionne;
@@ -34,6 +36,10 @@ export default function Don() {
     e.preventDefault();
     if (!form.nom || !form.email || !montantFinal) {
       toast.error("Veuillez indiquer votre nom, email et le montant du don.");
+      return;
+    }
+    if (!consent) {
+      toast.error("Veuillez accepter la politique de confidentialité pour continuer.");
       return;
     }
     setLoading(true);
@@ -184,7 +190,22 @@ export default function Don() {
             </div>
           </motion.div>
 
-          <Button type="submit" disabled={loading || !montantFinal} className="w-full h-13 rounded-full text-base font-bold gap-2 py-4">
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-border accent-primary flex-shrink-0 cursor-pointer"
+            />
+            <span className="text-xs text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
+              J'accepte que mes données (nom, email, montant) soient traitées par Ma Belle Promo afin de traiter mon don, conformément à la{" "}
+              <Link to="/confidentialite" className="text-primary hover:underline font-medium">
+                politique de confidentialité
+              </Link>.
+            </span>
+          </label>
+
+          <Button type="submit" disabled={loading || !montantFinal || !consent} className="w-full h-13 rounded-full text-base font-bold gap-2 py-4">
             {loading ? (
               <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
             ) : (

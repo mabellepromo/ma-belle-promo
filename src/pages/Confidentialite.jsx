@@ -83,12 +83,12 @@ export default function Confidentialite() {
             <Table rows={[
               ["Service", "Rôle", "Localisation"],
               ["Supabase", "Hébergement base de données et authentification", "Union Européenne"],
-              ["Vercel", "Hébergement du site web", "États-Unis"],
-              ["EmailJS", "Transmission des formulaires de contact par email", "États-Unis"],
+              ["Vercel", "Hébergement du site web", "États-Unis (SCC)"],
+              ["Brevo (Sendinblue)", "Envoi des emails transactionnels", "Union Européenne"],
             ]} />
             <p>
-              Pour les transferts vers les États-Unis (Vercel, EmailJS), nous nous assurons que ces prestataires
-              respectent des garanties appropriées de protection des données.
+              Pour les transferts vers les États-Unis (Vercel), nous nous assurons que ce prestataire
+              respecte des garanties appropriées via les clauses contractuelles types (SCC) de la Commission européenne.
             </p>
           </Section>
 
