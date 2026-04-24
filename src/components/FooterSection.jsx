@@ -76,8 +76,8 @@ export default function FooterSection() {
           {/* Contact + newsletter */}
           <div className="flex flex-col gap-2.5 items-center lg:items-end text-xs text-background/50 shrink-0">
             <div className="flex items-center gap-4">
-              <a href="tel:+22896020000" className="flex items-center gap-1.5 hover:text-background transition-colors">
-                <Phone className="w-3 h-3" /> +228 96 02 00 00
+              <a href="tel:+22896090707" className="flex items-center gap-1.5 hover:text-background transition-colors">
+                <Phone className="w-3 h-3" /> +228 96 09 07 07
               </a>
               <a href="mailto:contact@mabellepromo.org" className="flex items-center gap-1.5 hover:text-background transition-colors">
                 <Mail className="w-3 h-3" /> contact@mabellepromo.org
