@@ -50,9 +50,7 @@ function PageTitleUpdater() {
 import MaintenanceGate, { MAINTENANCE_MODE } from '@/components/MaintenanceGate';
 import CookieBanner from '@/components/CookieBanner';
 import PageNotFound from './lib/PageNotFound';
-import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from '@/components/ScrollToTop';
 
 // Pages chargées immédiatement (chemin critique)
@@ -110,26 +108,6 @@ function PrivateRoute({ children }) {
 }
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
-
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
-    }
-    // mode local_dev : authError inconnu → on affiche le site quand même
-  }
-
   return (
     <>
     <PageTitleUpdater />
@@ -183,8 +161,7 @@ function App() {
   return (
     <HelmetProvider>
     <MaintenanceGate>
-    <AuthProvider>
-      <LocalAuthProvider>
+    <LocalAuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
             <AuthenticatedApp />
@@ -195,7 +172,6 @@ function App() {
         </QueryClientProvider>
         <WindowFrame />
       </LocalAuthProvider>
-    </AuthProvider>
     </MaintenanceGate>
     </HelmetProvider>
   );
