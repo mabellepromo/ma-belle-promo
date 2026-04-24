@@ -31,17 +31,17 @@ export default function Ambition() {
             </div>
             <span className="text-xs font-semibold tracking-widest uppercase text-accent">Notre raison d'être</span>
             <h2 className="mt-3 font-heading text-3xl md:text-4xl font-bold text-foreground mb-5">Notre But</h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
+            <p className="text-muted-foreground leading-relaxed mb-4 text-justify">
               Le but de MBP est en partie décrit dans ses statuts. Il s'agit de contribuer à
               <strong className="text-foreground"> l'épanouissement de ses membres</strong> mais aussi et surtout
               d'<strong className="text-foreground">éclairer, d'accompagner les étudiants</strong> tout en impactant
               la société à travers les activités que nous mettons en place.
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-4">
+            <p className="text-muted-foreground leading-relaxed mb-4 text-justify">
               Notre autre ambition est de <strong className="text-foreground">montrer l'étendue et l'importance
               du droit dans notre société</strong>. Pour cela, des objectifs sont assignés à l'association.
             </p>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-justify">
               Elle se veut aussi un réseau exclusif permettant à ses membres de développer leurs contacts
               personnels et professionnels, et d'avoir pour ambition de maintenir notre savoir vivant
               et de conserver un lien avec la Faculté.
