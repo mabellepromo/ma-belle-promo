@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { CreditCard, Phone, Building, CheckCircle2 } from "lucide-react";
 import SEO from "../components/SEO";
+import { Link } from "react-router-dom";
 
 const tarifs = [
   { type: "Membre actif résidant au Togo", montant: "30 000 FCFA", periode: "par an", detail: "Cotisation annuelle pour les membres résidant au Togo." },
@@ -11,7 +12,7 @@ const tarifs = [
 
 const modalites = [
   { icon: Phone, titre: "Mobile Money", detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92", color: "bg-orange-50 border-orange-200" },
-  { icon: Building, titre: "Virement bancaire", detail: <>Nous contacter pour les coordonnées bancaires via <a href="mailto:contact@mabellepromo.org" className="text-blue-600 font-medium hover:underline">contact@mabellepromo.org</a></>, color: "bg-blue-50 border-blue-200" },
+  { icon: Building, titre: "Virement bancaire", detail: <>Nous contacter pour les coordonnées bancaires via notre <Link to="/informations/contacts" className="text-blue-600 font-medium hover:underline">formulaire de contact</Link></>, color: "bg-blue-50 border-blue-200" },
   { icon: CreditCard, titre: "En personne", detail: "Règlement possible directement au siège : 12 BP 335 Baguida, Togo", color: "bg-green-50 border-green-200" },
 ];
 
