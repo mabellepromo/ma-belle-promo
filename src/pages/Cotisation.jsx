@@ -11,7 +11,7 @@ const tarifs = [
 
 const modalites = [
   { icon: Phone, titre: "Mobile Money", detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92", color: "bg-orange-50 border-orange-200" },
-  { icon: Building, titre: "Virement bancaire", detail: "Nous contacter pour les coordonnées bancaires via contact@mabellepromo.org", color: "bg-blue-50 border-blue-200" },
+  { icon: Building, titre: "Virement bancaire", detail: <>Nous contacter pour les coordonnées bancaires via <a href="mailto:contact@mabellepromo.org" className="text-blue-600 font-medium hover:underline">contact@mabellepromo.org</a></>, color: "bg-blue-50 border-blue-200" },
   { icon: CreditCard, titre: "En personne", detail: "Règlement possible directement au siège : 12 BP 335 Baguida, Togo", color: "bg-green-50 border-green-200" },
 ];
 
@@ -56,7 +56,7 @@ export default function Cotisation() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-16">
           <h2 className="font-heading text-2xl font-bold text-foreground text-center mb-10">Modalités de paiement</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {modalites.map((m, i) => (
+            {modalites.map((m) => (
               <div key={m.titre} className={`border-2 rounded-2xl p-6 ${m.color}`}>
                 <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4 shadow-sm">
                   <m.icon className="w-6 h-6 text-foreground" />
