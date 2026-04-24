@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../lib/supabase";
+import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { equipe as equipeStatic } from "../../data/equipe.js";
 import {
@@ -9,6 +10,10 @@ import {
 } from "lucide-react";
 import { SectionLoader, inp, ta, sel, Field } from "./shared.jsx";
 
+const EMAILJS_SERVICE       = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_REPLY_TEMPLATE = "template_stj5ekf";
+const EMAILJS_TEMPLATE      = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_KEY            = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export function ComposeModal({ onClose }) {
   const [recipients, setRecipients] = useState([{ email: "", nom: "" }]);
@@ -38,21 +43,20 @@ export function ComposeModal({ onClose }) {
     const date = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
     try {
       for (const dest of validRecipients) {
-        const resp = await fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type:          "reply",
+        await emailjs.send(
+          EMAILJS_SERVICE,
+          EMAILJS_REPLY_TEMPLATE,
+          {
             to_email:      dest.email,
             to_name:       dest.nom || dest.email,
             sujet:         form.sujet,
-            reply_message: form.corps,
+            reply_message: form.corps.replace(/\n/g, "<br>"),
             date,
             sender_name:   form.expNom   || "Le Bureau Exécutif",
             sender_poste:  form.expPoste || "",
-          }),
-        });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          },
+          { publicKey: EMAILJS_KEY }
+        );
       }
       setSentCount(validRecipients.length);
       setStatus("sent");
@@ -186,9 +190,9 @@ export function ComposeModal({ onClose }) {
               <input type="file" multiple className="hidden" onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])} />
             </label>
             {files.length > 0 && (
-              <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+              <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
                 <Paperclip className="w-3 h-3" />
-                {files.length} fichier{files.length > 1 ? "s" : ""} sélectionné{files.length > 1 ? "s" : ""} — les pièces jointes ne sont pas encore prises en charge
+                {files.length} fichier{files.length > 1 ? "s" : ""} sélectionné{files.length > 1 ? "s" : ""} — les pièces jointes nécessitent le plan EmailJS payant
               </p>
             )}
           </div>
@@ -257,21 +261,20 @@ export function MessagesSection() {
     if (!replyText.trim()) { toast.error("Le message est vide."); return; }
     setSendStatus("sending");
     try {
-      const resp = await fetch("/api/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type:          "reply",
-          to_email:      replyMsg.email,
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_REPLY_TEMPLATE,
+        {
           to_name:       replyMsg.name,
+          to_email:      replyMsg.email,
           sujet:         "Réponse — " + (replyMsg.sujet || "Votre message"),
-          reply_message: replyText,
+          reply_message: replyText.replace(/\n/g, "<br>"),
           date:          new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
           sender_name:   senderName  || "Le Bureau Exécutif",
           sender_poste:  senderPoste || "",
-        }),
-      });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        },
+        { publicKey: EMAILJS_KEY }
+      );
       setSendStatus("sent");
       setTimeout(() => { setReplyMsg(null); setSendStatus("idle"); }, 2000);
     } catch (err) {

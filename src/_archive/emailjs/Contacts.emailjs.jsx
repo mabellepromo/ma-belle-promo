@@ -7,8 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
 import { supabase } from "../lib/supabase";
 import { Link } from "react-router-dom";
+
+const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function Contacts() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
@@ -42,19 +47,20 @@ export default function Contacts() {
         received_at: msg.receivedAt, read: false,
       }).then(({ error }) => { if (error) console.warn("Sauvegarde messages:", error.message); });
 
-      const resp = await fetch("/api/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type:    "contact",
-          name:    form.name,
-          email:   form.email,
-          sujet:   form.sujet || "(sans sujet)",
-          message: form.message,
-          sent_at: new Date().toLocaleString("fr-FR"),
-        }),
-      });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          name:       form.name,
+          email:      form.email,
+          from_name:  form.name,
+          from_email: form.email,
+          sujet:      form.sujet || "(sans sujet)",
+          message:    form.message,
+          sent_at:    new Date().toLocaleString("fr-FR"),
+        },
+        { publicKey: EMAILJS_KEY }
+      );
       toast.success("Message envoyé avec succès !");
       setForm({ name: "", email: "", sujet: "", message: "" });
     } catch (err) {
