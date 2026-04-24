@@ -220,7 +220,8 @@ export function MessagesSection() {
   const [replyText, setReplyText]     = useState("");
   const [senderName, setSenderName]   = useState("");
   const [senderPoste, setSenderPoste] = useState("");
-  const [compose, setCompose]   = useState(false);
+  const [compose, setCompose]     = useState(false);
+  const [viewMsg, setViewMsg]     = useState(null);
   const [sendStatus, setSendStatus] = useState("idle");
 
   const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
@@ -275,7 +276,7 @@ export function MessagesSection() {
       setSendStatus("sent");
       setTimeout(() => { setReplyMsg(null); setSendStatus("idle"); }, 2000);
     } catch (err) {
-      console.error("EmailJS reply error:", err);
+      console.error("Brevo reply error:", err);
       setSendStatus("error");
     }
   }
@@ -379,6 +380,58 @@ export function MessagesSection() {
         </div>
       )}
 
+      {viewMsg && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => setViewMsg(null)}>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+            className="bg-background rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]"
+            onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-border flex items-start justify-between flex-shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0">
+                  <span className="text-primary-foreground text-sm font-bold">{viewMsg.name?.charAt(0)?.toUpperCase()}</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground truncate">{viewMsg.name}</p>
+                  <a href={`mailto:${viewMsg.email}`} className="text-xs text-primary hover:underline truncate block">{viewMsg.email}</a>
+                </div>
+              </div>
+              <button onClick={() => setViewMsg(null)}
+                className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center flex-shrink-0 ml-3">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-6 space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-0.5">Sujet</p>
+                  <p className="text-sm font-semibold text-foreground">{viewMsg.sujet || "—"}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xs font-medium text-foreground">{new Date(viewMsg.receivedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(viewMsg.receivedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</p>
+                </div>
+              </div>
+              <div className="bg-muted/30 border border-border rounded-xl p-4">
+                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{viewMsg.message}</p>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3 flex-shrink-0 bg-muted/20 rounded-b-2xl">
+              <button onClick={() => setViewMsg(null)}
+                className="px-4 py-2 text-sm font-medium rounded-xl border border-border hover:bg-muted transition-colors">
+                Fermer
+              </button>
+              <button onClick={() => { setViewMsg(null); openReply(viewMsg); }}
+                className="flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
+                <Reply className="w-4 h-4" /> Répondre
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {messages.length === 0 ? (
         <div className="text-center py-24 text-muted-foreground bg-background border border-dashed border-border rounded-2xl">
           <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -399,7 +452,8 @@ export function MessagesSection() {
           <div className="divide-y divide-border/60">
             {messages.map((m, i) => (
               <motion.div key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                className={`group grid grid-cols-[2fr_3fr_1fr_auto_auto] gap-4 items-center px-5 py-4 transition-all relative ${!m.read ? "bg-primary/[0.03]" : "hover:bg-muted/30"}`}>
+                onClick={() => { setViewMsg({ ...m }); markRead(m.id); }}
+                className={`group grid grid-cols-[2fr_3fr_1fr_auto_auto] gap-4 items-center px-5 py-4 transition-all relative cursor-pointer ${!m.read ? "bg-primary/[0.03]" : "hover:bg-muted/30"}`}>
                 {!m.read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />}
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -426,7 +480,7 @@ export function MessagesSection() {
                   <span className={`w-1.5 h-1.5 rounded-full ${m.read ? "bg-muted-foreground/40" : "bg-blue-500"}`} />
                   {m.read ? "Lu" : "Non lu"}
                 </span>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                   {!m.read && (
                     <button onClick={() => markRead(m.id)} title="Marquer comme lu"
                       className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
