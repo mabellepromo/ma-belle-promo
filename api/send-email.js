@@ -19,20 +19,12 @@ function wrapHtml(content) {
 
         <!-- En-tête verte -->
         <tr>
-          <td style="background:linear-gradient(135deg,#15803d 0%,#16a34a 60%,#22c55e 100%);padding:28px 32px;">
-            <table cellpadding="0" cellspacing="0" width="100%">
-              <tr>
-                <td style="vertical-align:middle;">
-                  <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-                    width="52" height="52" alt="Ma Belle Promo"
-                    style="border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:block;float:left;margin-right:16px;" />
-                  <div style="overflow:hidden;">
-                    <div style="color:#fff;font-size:18px;font-weight:bold;letter-spacing:0.3px;">Ma Belle Promo</div>
-                    <div style="color:rgba(255,255,255,0.75);font-size:12px;margin-top:3px;">FDD · Université de Lomé · Promotion 1994–2000</div>
-                  </div>
-                </td>
-              </tr>
-            </table>
+          <td style="background:#14532d;padding:28px 32px;text-align:center;">
+            <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+              width="56" height="56" alt="Association Ma Belle Promo (MBP)"
+              style="border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:block;margin:0 auto 12px;" />
+            <div style="color:#fff;font-size:18px;font-weight:bold;letter-spacing:0.3px;">Association Ma Belle Promo (MBP)</div>
+            <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:4px;">FDD · Université de Lomé · Promotion 1994–2000</div>
           </td>
         </tr>
 
