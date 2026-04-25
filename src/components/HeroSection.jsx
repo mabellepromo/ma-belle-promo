@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { ArrowDown, Heart, ChevronRight } from "lucide-react";
+import { ArrowDown, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 
@@ -217,12 +217,12 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h1 className="font-heading leading-none mb-1 text-center md:text-left"
-              style={{ fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.03em" }}>
+              style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}>
               L'excellence juridique partagée,
             </h1>
             <h1 className="font-heading leading-none mb-6 text-center md:text-left"
               style={{
-                fontSize: "clamp(1.7rem, 3.5vw, 2.8rem)", fontWeight: 900, letterSpacing: "-0.03em",
+                fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, letterSpacing: "-0.04em",
                 background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>
@@ -252,10 +252,11 @@ export default function HeroSection() {
                 onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
                 className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
                 style={{
-                  padding: "13px 26px",
-                  background: "rgba(52,211,153,0.14)",
-                  border: "1.5px solid rgba(52,211,153,0.38)",
+                  padding: "14px 28px",
+                  background: "linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.18))",
+                  border: "1.5px solid rgba(52,211,153,0.55)",
                   color: "#6ee7b7",
+                  boxShadow: "0 4px 20px rgba(52,211,153,0.15)",
                 }}
               >
                 Notre mission <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -263,10 +264,10 @@ export default function HeroSection() {
               <Link to="/implications/soutenir"
                 className="flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
                 style={{
-                  padding: "13px 22px",
+                  padding: "14px 28px",
                   background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
                   color: "#000",
-                  boxShadow: "0 4px 16px rgba(251,191,36,0.30)",
+                  boxShadow: "0 4px 20px rgba(251,191,36,0.40)",
                 }}>
                 Nous soutenir
               </Link>
