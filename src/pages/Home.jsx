@@ -27,6 +27,15 @@ const jsonLd = {
   ]
 };
 
+/* Dégradé de transition entre sections claire et sombre */
+const light = "hsl(40,20%,98%)";
+const dark  = "hsl(150,30%,10%)";
+const muted = "hsl(40,20%,96%)";
+
+function Fade({ from, to }) {
+  return <div style={{ height: 80, background: `linear-gradient(to bottom, ${from}, ${to})` }} />;
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen">
@@ -36,11 +45,17 @@ export default function Home() {
       </Helmet>
       <Navbar />
       <HeroSection />
+      {/* Hero finit déjà avec un fondu vers bg-background — pas de Fade ici */}
       <MissionSection />
+      <Fade from={light} to={dark} />
       <CredibiliteSection />
+      <Fade from={dark} to={muted} />
       <ActualitesSection />
+      <Fade from={muted} to={dark} />
       <TestimonialsSection />
+      <Fade from={dark} to={muted} />
       <ContactSection />
+      <Fade from={muted} to={dark} />
       <FooterSection />
     </div>
   );
