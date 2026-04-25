@@ -1,7 +1,8 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { compressImage } from "../lib/imageUtils";
 import { useMemberStore } from "../lib/memberStore";
+import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
@@ -42,8 +43,27 @@ export default function Dashboard() {
   const [compose,       setCompose]      = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember,  setAddingMember]  = useState(null);
-  const [confirmDialog, setConfirmDialog] = useState(null);
+  const [confirmDialog,  setConfirmDialog]  = useState(null);
+  const [unreadCount,    setUnreadCount]    = useState(0);
   const csvInputRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchUnread() {
+      const { count } = await supabase
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("read", false);
+      setUnreadCount(count || 0);
+    }
+    fetchUnread();
+
+    const channel = supabase
+      .channel("dashboard-messages-unread")
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, fetchUnread)
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, []);
 
   const filteredMembers = useMemo(() => {
     const q = search.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -148,7 +168,7 @@ export default function Dashboard() {
     { key: "overview",    label: "Vue d'ensemble",  icon: LayoutDashboard },
     { key: "membres",     label: `Membres (${allMembers.length})`, icon: Users },
     { key: "pending",     label: `En attente${pendingMembers.length > 0 ? ` (${pendingMembers.length})` : ""}`, icon: Clock, alert: pendingMembers.length > 0 },
-    { key: "messages",    label: "Messages", icon: MessageSquare },
+    { key: "messages",    label: unreadCount > 0 ? `Messages (${unreadCount})` : "Messages", icon: MessageSquare, alert: unreadCount > 0 },
     { key: "articles",    label: "Articles",    icon: FileText },
     { key: "evenements",  label: "Événements",  icon: Calendar },
     { key: "projets",     label: "Projets",     icon: Star },
@@ -185,7 +205,7 @@ export default function Dashboard() {
       items: [
         { key: "membres",  label: `Membres`, badge: allMembers.length, icon: Users },
         { key: "pending",  label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
-        { key: "messages", label: "Messages", icon: MessageSquare },
+        { key: "messages", label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
         { key: "acces",    label: "Accès membres", icon: KeyRound },
       ],
     },
