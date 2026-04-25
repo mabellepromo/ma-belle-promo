@@ -28,7 +28,7 @@ export default function DonnezSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-xs font-semibold tracking-widest uppercase text-amber-300 mb-3"
+              className="eyebrow text-amber-300 mb-3"
             >
               Notre détermination à votre service
             </motion.p>

@@ -113,7 +113,7 @@ export default function Credo() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-xs font-bold uppercase tracking-widest text-primary text-center mb-12"
+          className="eyebrow text-primary text-center mb-12"
         >
           Six valeurs fondamentales
         </motion.p>

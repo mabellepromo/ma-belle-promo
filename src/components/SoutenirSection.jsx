@@ -42,7 +42,7 @@ export default function SoutenirSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <span className="text-xs font-semibold tracking-widest uppercase text-accent">Votre implication</span>
+            <span className="eyebrow text-accent">Votre implication</span>
             <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
               Votre soutien est un <span className="text-primary">accélérateur</span> de projets
             </h2>

@@ -140,7 +140,7 @@ export default function Projets() {
       <div className="bg-foreground border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Ma Belle Promo</p>
+            <p className="eyebrow text-primary/70 mb-2">Ma Belle Promo</p>
             <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
               Nos Réalisations
             </h1>
@@ -215,7 +215,7 @@ export default function Projets() {
               <div className="mt-4">
                 <div className="flex items-center gap-6 mb-4">
                   <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+                  <span className="eyebrow text-muted-foreground/60">
                     {rest.length} autre{rest.length > 1 ? "s" : ""} réalisation{rest.length > 1 ? "s" : ""}
                   </span>
                   <div className="flex-1 h-px bg-border" />

@@ -29,7 +29,7 @@ export default function Ambition() {
             <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
               <Target className="w-7 h-7 text-primary" />
             </div>
-            <span className="text-xs font-semibold tracking-widest uppercase text-accent">Notre raison d'être</span>
+            <span className="eyebrow text-accent">Notre raison d'être</span>
             <h2 className="mt-3 font-heading text-3xl md:text-4xl font-bold text-foreground mb-5">Notre But</h2>
             <p className="text-muted-foreground leading-relaxed mb-4 text-justify">
               Le but de MBP est en partie décrit dans ses statuts. Il s'agit de contribuer à

@@ -33,7 +33,7 @@ export default function EvenementsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <span className="text-xs font-semibold tracking-widest uppercase text-accent">Agenda</span>
+          <span className="eyebrow text-accent">Agenda</span>
           <h2 className="mt-3 font-heading text-3xl md:text-4xl font-bold text-foreground">
             Nos Évènements
           </h2>

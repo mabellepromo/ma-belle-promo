@@ -17,7 +17,7 @@ export default function Galeries() {
         <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary/70">Ma Belle Promo</p>
+              <p className="eyebrow text-primary/70">Ma Belle Promo</p>
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 text-white/70 text-[10px] font-bold">
                 <Lock className="w-3 h-3" /> Membres uniquement
               </span>

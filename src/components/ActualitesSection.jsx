@@ -25,7 +25,7 @@ export default function ActualitesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-xs font-semibold tracking-widest uppercase text-accent">Restez informés</span>
+          <span className="eyebrow text-accent">Restez informés</span>
           <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground">
             Actualités & Événements
           </h2>
@@ -89,7 +89,7 @@ export default function ActualitesSection() {
           >
             <div className="flex items-center justify-between mb-5">
               <div>
-                <span className="text-xs font-semibold tracking-widest uppercase text-accent">Agenda</span>
+                <span className="eyebrow text-accent">Agenda</span>
                 <h3 className="mt-1 font-heading text-xl font-bold text-foreground">Prochains événements</h3>
               </div>
               <Link to="/activites/evenements" className="flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all">

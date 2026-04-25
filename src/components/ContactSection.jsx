@@ -75,7 +75,7 @@ export default function ContactSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <span className="text-xs font-semibold tracking-widest uppercase text-accent">Restons en contact</span>
+            <span className="eyebrow text-accent">Restons en contact</span>
             <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
               Contactez-nous
             </h2>

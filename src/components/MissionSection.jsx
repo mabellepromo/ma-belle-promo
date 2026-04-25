@@ -14,7 +14,7 @@ export default function MissionSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <span className="text-xs font-semibold tracking-widest uppercase text-accent">Qui sommes-nous</span>
+            <span className="eyebrow text-accent">Qui sommes-nous</span>
             <h2 className="mt-3 font-heading text-2xl md:text-3xl font-bold text-foreground leading-tight">
               Nous sommes <span className="text-primary">Ma Belle Promo</span>… <span className="text-muted-foreground font-medium">voici notre histoire !</span>
             </h2>

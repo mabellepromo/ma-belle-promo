@@ -214,7 +214,7 @@ export default function Evenements() {
       <div className="bg-foreground">
         <div className="max-w-6xl mx-auto px-6 py-14 md:py-20">
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary/70 mb-3">Ma Belle Promo · FDD Lomé</p>
+            <p className="eyebrow text-primary/70 mb-3">Ma Belle Promo · FDD Lomé</p>
             <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-none mb-4">
               Événements
             </h1>
@@ -248,7 +248,7 @@ export default function Evenements() {
         {/* ── À venir ── */}
         {aVenir.length > 0 && (
           <section>
-            <h2 className="font-heading text-xs font-bold uppercase tracking-widest text-primary mb-6">Prochain événement</h2>
+            <h2 className="font-heading eyebrow text-primary mb-6">Prochain événement</h2>
             <div className="space-y-4">
               {aVenir.map(evt => <UpcomingCard key={evt.id} evt={evt} />)}
             </div>
@@ -258,7 +258,7 @@ export default function Evenements() {
         {/* ── Passés ── */}
         <section>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <h2 className="font-heading text-xs font-bold uppercase tracking-widest text-primary">
+            <h2 className="font-heading eyebrow text-primary">
               {aVenir.length > 0 ? "Éditions passées" : "Tous les événements"}
             </h2>
 

@@ -70,7 +70,7 @@ export default function GalerieDetail() {
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Galerie privée · Membres</p>
+              <p className="eyebrow text-primary/70 mb-2">Galerie privée · Membres</p>
               <h1 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight mb-3">
                 {galerie.titre}
               </h1>

@@ -26,7 +26,7 @@ export default function PageHero({ title, subtitle }) {
         {subtitle && (
           <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span className="text-xs font-semibold tracking-widest uppercase text-white/80">{subtitle}</span>
+            <span className="eyebrow text-white/80">{subtitle}</span>
           </div>
         )}
 
