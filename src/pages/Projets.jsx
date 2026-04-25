@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Search, Tag, ArrowUpRight } from "lucide-react";
+import { ArrowRight, Search, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
 import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
@@ -16,14 +16,13 @@ const catAccent = {
   "Santé publique":"#22c55e",
 };
 
-/* ── Carte image pleine (overlay texte) ── */
+/* ── Carte projet (image en haut, texte sur fond carte en bas) ── */
 function OverlayCard({ projet, size = "normal", index = 0 }) {
-  const accent = catAccent[projet.categorie] ?? "#16a34a";
-  const light  = catLight[projet.categorie]  ?? "bg-gray-100 text-gray-700";
-
-  const heightClass = size === "large"  ? "h-[420px] md:h-[520px]"
-                    : size === "tall"   ? "h-[260px] md:h-[253px]"
-                    : "h-[220px] md:h-[240px]";
+  const accent   = catAccent[projet.categorie] ?? "#16a34a";
+  const light    = catLight[projet.categorie]  ?? "bg-gray-100 text-gray-700";
+  const imgClass = size === "large" ? "h-64 md:h-80"
+                 : size === "tall"  ? "h-44 md:h-48"
+                 :                    "h-44";
 
   return (
     <motion.div
@@ -35,43 +34,34 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
     >
       <Link
         to={`/activites/projets/${projet.id}`}
-        className={`group relative flex flex-col justify-end overflow-hidden rounded-2xl ${heightClass} w-full`}
+        className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
         {/* Image */}
-        <img
-          src={projet.image}
-          alt={projet.titre}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
+        <div className={`relative ${imgClass} overflow-hidden flex-shrink-0`}>
+          <img
+            src={projet.image}
+            alt={projet.titre}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+          {/* Trait couleur catégorie */}
+          <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: accent }} />
+        </div>
 
-        {/* Trait couleur catégorie en haut */}
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: accent }} />
-
-        {/* Gradient texte */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Badge catégorie */}
-        <span className={`absolute top-4 left-4 px-2.5 py-1 text-[10px] font-bold rounded-full ${light}`}>
-          {projet.categorie}
-        </span>
-
-        {/* Bouton voir */}
-        <span className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all group-hover:bg-white/20">
-          <ArrowUpRight className="w-4 h-4 text-white" />
-        </span>
-
-        {/* Texte bas */}
-        <div className="relative z-10 p-5">
-          <p className="text-white/50 text-[10px] uppercase tracking-widest mb-2">{projet.date}</p>
-          <h3 className={`font-heading font-bold text-white leading-tight group-hover:text-primary/90 transition-colors ${size === "large" ? "text-2xl md:text-3xl" : "text-base md:text-lg"}`}>
+        {/* Texte sur fond propre */}
+        <div className="p-4 md:p-5 flex flex-col flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full ${light}`}>{projet.categorie}</span>
+            <span className="text-[10px] text-muted-foreground">{projet.date}</span>
+          </div>
+          <h3 className={`font-heading font-bold text-foreground group-hover:text-primary transition-colors leading-tight flex-1 ${size === "large" ? "text-xl md:text-2xl" : "text-sm md:text-base"}`}>
             {projet.titre}
           </h3>
           {size === "large" && projet.extrait && (
-            <p className="text-white/60 text-sm mt-2 line-clamp-2 max-w-md">
+            <p className="text-muted-foreground text-sm mt-2 line-clamp-2">
               {projet.extrait || projet.description}
             </p>
           )}
-          <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-white/70 group-hover:text-white transition-colors">
+          <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-primary group-hover:gap-2 transition-all">
             Voir le projet <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
