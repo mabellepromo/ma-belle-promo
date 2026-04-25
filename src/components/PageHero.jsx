@@ -1,6 +1,6 @@
 export default function PageHero({ title, subtitle }) {
   return (
-    <div className="relative pt-32 pb-20 text-center overflow-hidden bg-foreground">
+    <div className="relative pt-28 pb-10 text-center overflow-hidden bg-foreground">
       {/* Grille de points décorative */}
       <div className="absolute inset-0 opacity-10">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -26,7 +26,7 @@ export default function PageHero({ title, subtitle }) {
           </div>
         )}
 
-        <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
+        <h1 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight tracking-tight">
           {title}
         </h1>
 
