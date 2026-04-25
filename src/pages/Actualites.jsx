@@ -61,20 +61,20 @@ function HeroCard({ article }) {
         to={`/actualites/${article.id}`}
         className="group block w-full rounded-3xl overflow-hidden shadow-2xl bg-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        {/* Image */}
-        <div className="relative h-72 md:h-96 overflow-hidden">
+        {/* Image à taille naturelle, sans recadrage */}
+        <div className="overflow-hidden bg-muted">
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-auto group-hover:scale-105 transition-transform duration-700"
           />
-          <span className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold rounded-full ${pill}`}>
-            {article.categorie}
-          </span>
         </div>
 
         {/* Texte sur fond propre */}
         <div className="p-8 md:p-10">
+          <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 ${pill}`}>
+            {article.categorie}
+          </span>
           <h2 className="font-heading text-foreground text-2xl md:text-3xl font-bold leading-tight mb-3 group-hover:text-primary transition-colors">
             {article.titre}
           </h2>
@@ -111,24 +111,25 @@ function MediumCard({ article, index }) {
         to={`/actualites/${article.id}`}
         className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        {/* Image */}
-        <div className="relative h-52 overflow-hidden bg-muted flex-shrink-0">
+        {/* Image à taille naturelle, sans recadrage */}
+        <div className="overflow-hidden bg-muted flex-shrink-0">
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600"
+            className="w-full h-auto group-hover:scale-105 transition-transform duration-600"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <span className={`absolute bottom-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
-            {article.categorie}
-          </span>
         </div>
 
         {/* Texte */}
         <div className="p-5 flex flex-col flex-1">
-          <span className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
-            <Calendar className="w-3 h-3" /> {article.date}
-          </span>
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
+              {article.categorie}
+            </span>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Calendar className="w-3 h-3" /> {article.date}
+            </span>
+          </div>
           <h3 className="font-heading text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-2 flex-1">
             {article.titre}
           </h3>
