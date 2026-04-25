@@ -16,7 +16,11 @@ export default function MissionSection() {
           >
             <span className="eyebrow text-accent">Qui sommes-nous</span>
             <h2 className="mt-3 font-heading text-3xl md:text-5xl font-bold text-foreground leading-tight">
-              Nous sommes <span className="text-primary">Ma Belle Promo</span>… <span className="text-muted-foreground font-medium">voici notre histoire !</span>
+              Nous sommes{" "}
+              <span className="text-primary">Ma Belle Promo</span>
+              <span className="font-medium italic text-accent">
+                {" "}… voici notre histoire !
+              </span>
             </h2>
             <p className="mt-6 text-muted-foreground leading-relaxed text-lg">
               Ma Belle Promo est un regroupement d'anciens étudiants de la Faculté de Droit de l'Université de Lomé

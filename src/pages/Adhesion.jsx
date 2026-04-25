@@ -156,6 +156,49 @@ export default function Adhesion() {
           </div>
         </motion.div>
 
+        {/* Éligibilité */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-12 relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 px-8 py-8"
+        >
+          {/* Guillemet décoratif */}
+          <span className="absolute -top-4 -left-2 font-heading text-[10rem] leading-none text-primary/8 select-none pointer-events-none">"</span>
+
+          <div className="relative">
+            <span className="eyebrow text-accent mb-2 block">Article des statuts</span>
+            <h3 className="font-heading text-xl font-bold text-foreground mb-6">Qui peut rejoindre Ma Belle Promo ?</h3>
+
+            <div className="space-y-5">
+              {/* Condition d'éligibilité */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <GraduationCap className="w-5 h-5 text-primary" />
+                </div>
+                <p className="text-foreground leading-relaxed">
+                  Peut être membre de MBP, tout ancien étudiant inscrit à la{" "}
+                  <strong>Faculté de Droit de l'Université de Lomé entre 1994 et 2000</strong>,
+                  sans condition ni distinction d'origine, de nationalité, de religion ou de race,
+                  et qui fait siens les idéaux de l'Association.
+                </p>
+              </div>
+
+              {/* Engagement de cotisation */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <CreditCard className="w-5 h-5 text-accent" />
+                </div>
+                <p className="text-foreground leading-relaxed">
+                  Les membres doivent en outre prendre l'engagement de verser mensuellement une somme de{" "}
+                  <strong className="text-primary">2 500 FCFA</strong> à titre de cotisation,
+                  soit <strong className="text-primary">30 000 FCFA</strong> par an.
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Formulaire */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
