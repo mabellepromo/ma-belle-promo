@@ -15,6 +15,7 @@ import {
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
 import AccesSection from "./dashboard/AccesSection.jsx";
 import {
@@ -41,6 +42,7 @@ export default function Dashboard() {
   const [compose,       setCompose]      = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember,  setAddingMember]  = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(null);
   const csvInputRef = useRef(null);
 
   const filteredMembers = useMemo(() => {
@@ -91,6 +93,11 @@ export default function Dashboard() {
   function handleCsvUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Fichier trop volumineux (max 5 Mo).");
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const lines = ev.target.result.split("\n").filter(l => l.trim());
@@ -546,7 +553,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => setEditingMember({ ...m })} className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => { if (confirm(`Supprimer ${m.nom} ?`)) deleteMember(m.id); }} className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setConfirmDialog({ title: `Supprimer ${m.nom} ?`, message: "Cette action est irréversible.", onConfirm: () => { deleteMember(m.id); setConfirmDialog(null); } })} className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </motion.div>
                   ))}
@@ -640,6 +647,14 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!confirmDialog}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        onConfirm={confirmDialog?.onConfirm}
+        onCancel={() => setConfirmDialog(null)}
+      />
     </div>
   );
 }

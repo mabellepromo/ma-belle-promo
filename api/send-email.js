@@ -4,6 +4,69 @@
 const SENDER = { name: "Association Ma Belle Promo (MBP)", email: "contact@mabellepromo.org" };
 const CONTACT_TO = [{ email: "contact@mabellepromo.org", name: "Ma Belle Promo" }];
 
+/* ── Origines autorisées ── */
+const ALLOWED_ORIGINS = [
+  "https://mabellepromo.org",
+  "https://www.mabellepromo.org",
+  "https://mabellepromo.vercel.app",
+];
+
+/* ── Validation email basique ── */
+const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
+function isValidEmail(email) {
+  return typeof email === "string" && EMAIL_RE.test(email);
+}
+
+/* ── Validation URL de confirmation (domaines MBP uniquement) ── */
+function isValidConfirmUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  try {
+    new URL(url);
+    return ALLOWED_ORIGINS.some(o => url.startsWith(o));
+  } catch {
+    return false;
+  }
+}
+
+function getAllowedOrigin(req) {
+  const origin = req.headers.origin || "";
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  // localhost autorisé uniquement en dev local
+  if (process.env.NODE_ENV !== "production" && origin.startsWith("http://localhost")) return origin;
+  return ALLOWED_ORIGINS[0];
+}
+
+/* ── Rate limiting en mémoire (max 5 requêtes / IP / 5 min) ── */
+const rateLimitMap = new Map();
+const RATE_LIMIT   = 5;
+const RATE_WINDOW  = 5 * 60 * 1000;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const timestamps = (rateLimitMap.get(ip) || []).filter(t => now - t < RATE_WINDOW);
+  if (timestamps.length >= RATE_LIMIT) return false;
+  timestamps.push(now);
+  rateLimitMap.set(ip, timestamps);
+  // Nettoyage périodique pour éviter les fuites mémoire
+  if (rateLimitMap.size > 1000) {
+    for (const [key, val] of rateLimitMap) {
+      if (val.every(t => now - t >= RATE_WINDOW)) rateLimitMap.delete(key);
+    }
+  }
+  return true;
+}
+
+/* ── Échappement HTML pour les données utilisateur ── */
+function escHtml(str) {
+  if (typeof str !== "string") return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 function wrapHtml(content) {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -55,6 +118,13 @@ function wrapHtml(content) {
 }
 
 function buildContactPayload({ name, email, sujet, message, sent_at }) {
+  // Toutes les données utilisateur sont échappées avant injection dans le HTML
+  const safeName    = escHtml(name);
+  const safeEmail   = escHtml(email);
+  const safeSujet   = escHtml(sujet);
+  const safeMessage = escHtml(message);
+  const safeSentAt  = escHtml(sent_at || new Date().toLocaleString("fr-FR"));
+
   const content = `
     <h2 style="margin:0 0 20px;font-size:17px;color:#111827;border-bottom:2px solid #16a34a;padding-bottom:10px;">
       Nouveau message de contact
@@ -62,51 +132,51 @@ function buildContactPayload({ name, email, sujet, message, sent_at }) {
     <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
       <tr>
         <td style="padding:4px 0;font-size:13px;color:#6b7280;width:100px;">De&nbsp;:</td>
-        <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:600;">${name}</td>
+        <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:600;">${safeName}</td>
       </tr>
       <tr>
         <td style="padding:4px 0;font-size:13px;color:#6b7280;">Email&nbsp;:</td>
         <td style="padding:4px 0;font-size:13px;">
-          <a href="mailto:${email}" style="color:#16a34a;text-decoration:none;">${email}</a>
+          <a href="mailto:${safeEmail}" style="color:#16a34a;text-decoration:none;">${safeEmail}</a>
         </td>
       </tr>
-      ${sujet ? `<tr>
+      ${safeSujet ? `<tr>
         <td style="padding:4px 0;font-size:13px;color:#6b7280;">Sujet&nbsp;:</td>
-        <td style="padding:4px 0;font-size:13px;color:#111827;">${sujet}</td>
+        <td style="padding:4px 0;font-size:13px;color:#111827;">${safeSujet}</td>
       </tr>` : ""}
       <tr>
         <td style="padding:4px 0;font-size:13px;color:#6b7280;">Reçu le&nbsp;:</td>
-        <td style="padding:4px 0;font-size:13px;color:#6b7280;">${sent_at || new Date().toLocaleString("fr-FR")}</td>
+        <td style="padding:4px 0;font-size:13px;color:#6b7280;">${safeSentAt}</td>
       </tr>
     </table>
     <div style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:0 8px 8px 0;padding:16px 20px;">
-      <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${message}</p>
+      <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${safeMessage}</p>
     </div>
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
-      Répondez directement à cet email pour contacter <strong>${name}</strong>.
+      Répondez directement à cet email pour contacter <strong>${safeName}</strong>.
     </p>`;
 
   return {
     sender: SENDER,
     to: CONTACT_TO,
     replyTo: { email, name },
-    subject: `[Contact] ${sujet || "Nouveau message"} — ${name}`,
+    subject: `[Contact] ${safeSujet || "Nouveau message"} — ${safeName}`,
     htmlContent: wrapHtml(content),
   };
 }
 
 function buildReplyPayload({ to_email, to_name, sujet, reply_message, date, sender_name, sender_poste }) {
-  const greeting = to_name ? `Bonjour ${to_name},` : "Bonjour,";
-  const body = reply_message?.replace(/\n/g, "<br>") || "";
+  const greeting = to_name ? `Bonjour ${escHtml(to_name)},` : "Bonjour,";
+  const body = escHtml(reply_message || "").replace(/\n/g, "<br>");
   const content = `
     <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
     <div style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:28px;">${body}</div>
     <div style="border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;">
-      <p style="margin:0;font-size:13px;font-weight:700;color:#111827;">${sender_name || "Le Bureau Exécutif"}</p>
-      ${sender_poste ? `<p style="margin:3px 0 0;font-size:12px;color:#6b7280;">${sender_poste}</p>` : ""}
+      <p style="margin:0;font-size:13px;font-weight:700;color:#111827;">${escHtml(sender_name || "Le Bureau Exécutif")}</p>
+      ${sender_poste ? `<p style="margin:3px 0 0;font-size:12px;color:#6b7280;">${escHtml(sender_poste)}</p>` : ""}
       <p style="margin:4px 0 0;font-size:12px;color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</p>
       <p style="margin:2px 0 0;font-size:12px;color:#9ca3af;">contact@mabellepromo.org</p>
-      ${date ? `<p style="margin:6px 0 0;font-size:11px;color:#d1d5db;">Le ${date}</p>` : ""}
+      ${date ? `<p style="margin:6px 0 0;font-size:11px;color:#d1d5db;">Le ${escHtml(date)}</p>` : ""}
     </div>`;
 
   return {
@@ -147,7 +217,7 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
     deletion_request: { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
   };
-  const cfg = labels[alertType] || { titre: alertType, couleur: "#6b7280", badge: "Alerte" };
+  const cfg = labels[alertType] || { titre: escHtml(alertType), couleur: "#6b7280", badge: "Alerte" };
   const content = `
     <div style="display:inline-block;padding:4px 12px;background:${cfg.couleur};color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">
       ${cfg.badge}
@@ -155,14 +225,14 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
     <h2 style="margin:0 0 16px;font-size:17px;color:#111827;">${cfg.titre}</h2>
     <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
       <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:100px;">Membre :</td>
-          <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:600;">${nom || "—"}</td></tr>
+          <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:600;">${escHtml(nom || "—")}</td></tr>
       <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Email :</td>
-          <td style="padding:4px 0;font-size:13px;"><a href="mailto:${email}" style="color:#14532d;">${email}</a></td></tr>
+          <td style="padding:4px 0;font-size:13px;"><a href="mailto:${escHtml(email)}" style="color:#14532d;">${escHtml(email)}</a></td></tr>
       <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Date :</td>
           <td style="padding:4px 0;font-size:13px;color:#6b7280;">${new Date().toLocaleString("fr-FR")}</td></tr>
     </table>
     ${detail ? `<div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;">
-      <p style="margin:0;font-size:13px;color:#374151;">${detail}</p>
+      <p style="margin:0;font-size:13px;color:#374151;">${escHtml(detail)}</p>
     </div>` : ""}
     <p style="margin:0;font-size:12px;color:#9ca3af;">
       Traitez cette demande depuis le Dashboard ou en répondant à l'email du membre sous 30 jours (Art. 17 RGPD).
@@ -171,18 +241,26 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
     sender: SENDER,
     to: CONTACT_TO,
     replyTo: { email, name: nom || email },
-    subject: `[${cfg.badge}] ${cfg.titre} — ${nom || email}`,
+    subject: `[${cfg.badge}] ${cfg.titre} — ${escHtml(nom || email)}`,
     htmlContent: wrapHtml(content),
   };
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigin = getAllowedOrigin(req);
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Vary", "Origin");
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Rate limiting — max 5 requêtes / IP / 5 minutes
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ error: "Trop de requêtes. Réessayez dans quelques minutes." });
+  }
 
   const BREVO_API_KEY = process.env.BREVO_API_KEY;
   if (!BREVO_API_KEY) {
@@ -196,12 +274,24 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
   }
 
+  // Validation des champs selon le type
+  if (type === "contact") {
+    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+  } else if (type === "reply") {
+    if (!isValidEmail(data.to_email)) return res.status(400).json({ error: "Adresse email du destinataire invalide." });
+  } else if (type === "newsletter_confirm") {
+    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+    if (!isValidConfirmUrl(data.confirm_url)) return res.status(400).json({ error: "URL de confirmation non autorisée." });
+  } else if (type === "admin_alert") {
+    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+  }
+
   try {
     let payload;
-    if (type === "contact")            payload = buildContactPayload(data);
-    else if (type === "reply")         payload = buildReplyPayload(data);
+    if (type === "contact")              payload = buildContactPayload(data);
+    else if (type === "reply")           payload = buildReplyPayload(data);
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
-    else                               payload = buildAdminAlertPayload(data);
+    else                                 payload = buildAdminAlertPayload(data);
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",

@@ -31,62 +31,58 @@ export function useProjets() {
 
   async function add(item) {
     setSaving(true);
-    const id = item.id || slugify(item.titre) + "-" + Date.now();
-    const { error } = await supabase
-      .from("projets")
-      .insert({ ...item, id, photos: item.photos ?? [], videos: item.videos ?? [] });
-    if (error) {
-      toast.error("Erreur ajout : " + error.message);
-    } else {
-      toast.success("Projet ajouté !");
-      await load();
+    try {
+      const id = item.id || slugify(item.titre) + "-" + Date.now();
+      const { error } = await supabase
+        .from("projets")
+        .insert({ ...item, id, photos: item.photos ?? [], videos: item.videos ?? [] });
+      if (error) toast.error("Erreur ajout : " + error.message);
+      else { toast.success("Projet ajouté !"); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function update(id, item) {
     setSaving(true);
-    const { error } = await supabase
-      .from("projets")
-      .update({ ...item, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      toast.error("Erreur mise à jour : " + error.message);
-    } else {
-      toast.success("Projet mis à jour !");
-      await load();
+    try {
+      const { error } = await supabase
+        .from("projets")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) toast.error("Erreur mise à jour : " + error.message);
+      else { toast.success("Projet mis à jour !"); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function remove(id) {
     if (!confirm("Supprimer ce projet définitivement ?")) return;
     setSaving(true);
-    const { error } = await supabase.from("projets").delete().eq("id", id);
-    if (error) {
-      toast.error("Erreur suppression : " + error.message);
-    } else {
-      toast.success("Projet supprimé.");
-      await load();
+    try {
+      const { error } = await supabase.from("projets").delete().eq("id", id);
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Projet supprimé."); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function seedFromStatic() {
     setSaving(true);
-    const { error } = await supabase
-      .from("projets")
-      .upsert(
-        projetsStatic.map(p => ({ ...p, photos: p.photos ?? [], videos: p.videos ?? [] })),
-        { onConflict: "id" }
-      );
-    if (error) {
-      toast.error("Erreur migration : " + error.message);
-    } else {
-      toast.success(`${projetsStatic.length} projets migrés !`);
-      await load();
+    try {
+      const { error } = await supabase
+        .from("projets")
+        .upsert(
+          projetsStatic.map(p => ({ ...p, photos: p.photos ?? [], videos: p.videos ?? [] })),
+          { onConflict: "id" }
+        );
+      if (error) toast.error("Erreur migration : " + error.message);
+      else { toast.success(`${projetsStatic.length} projets migrés !`); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   return { projets, loading, saving, isSeeded, add, update, remove, seedFromStatic, reload: load };

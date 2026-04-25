@@ -49,6 +49,12 @@ export function LocalAuthProvider({ children }) {
   }
 
   async function logout() {
+    // Vider le cache de données local (préférences cookies conservées)
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith("mbp_store_"))
+        .forEach(k => localStorage.removeItem(k));
+    } catch {}
     await supabase.auth.signOut();
   }
 

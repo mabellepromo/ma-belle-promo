@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { sbGet, sbSet, uploadImage, uploadVideo, uploadFile } from "../../lib/supabase";
+import { uploadImage, uploadVideo, uploadFile } from "../../lib/supabase";
 import { motion } from "framer-motion";
 import { X, Plus, Save, Upload, Edit2, Trash2, Eye, FileText } from "lucide-react";
 
@@ -375,74 +375,5 @@ export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDel
   );
 }
 
-export function mergeWithStatic(stored, staticData) {
-  const result = staticData.map(staticItem => {
-    const storedItem = stored.find(s => String(s.id) === String(staticItem.id));
-    if (!storedItem) return staticItem;
-    const merged = { ...storedItem };
-    for (const [k, v] of Object.entries(staticItem)) {
-      const cur = merged[k];
-      const isEmpty = cur === "" || cur === null || cur === undefined ||
-        (Array.isArray(cur) && cur.length === 0 && Array.isArray(v) && v.length > 0);
-      if (isEmpty) merged[k] = v;
-    }
-    return merged;
-  });
-  const staticIds = new Set(staticData.map(s => String(s.id)));
-  stored.filter(s => !staticIds.has(String(s.id))).forEach(s => result.push(s));
-  return result;
-}
 
-export function useCrud(storeKey, staticData) {
-  const KEY = "mbp_store_" + storeKey;
-  const [items, setItems] = useState(staticData);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    try { localStorage.removeItem(KEY); } catch {}
-    sbGet(KEY)
-      .then(remote => {
-        if (remote !== null) setItems(mergeWithStatic(remote, staticData));
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        toast.error("Impossible de charger les données. Vérifiez votre connexion.");
-      });
-  }, [storeKey]);
-
-  async function save(data, successMsg = "Enregistré !") {
-    const previous = items;
-    setItems(data);
-    setSaving(true);
-    try {
-      await sbSet(KEY, data);
-      toast.success(successMsg);
-    } catch {
-      setItems(previous);
-      toast.error("Échec de la sauvegarde — vos modifications n'ont pas été enregistrées.", { duration: 6000 });
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function add(item) { return save([...items, { ...item, id: item.id || Date.now() }]); }
-  function update(id, data) { return save(items.map(it => String(it.id) === String(id) ? { ...it, ...data } : it)); }
-  function remove(id) {
-    if (confirm("Supprimer cet élément ?"))
-      return save(items.filter(it => String(it.id) !== String(id)), "Élément supprimé.");
-  }
-
-  return { items, add, update, remove, save, loading, saving };
-}
-
-export const quillModules = {
-  toolbar: [
-    [{ header: [2, 3, false] }],
-    ["bold", "italic", "underline"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
-};

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { supabase } from "../lib/supabase";
-import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, Shield, ArrowLeft, Send } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowLeft, Send } from "lucide-react";
 
 export default function Login() {
   const { login } = useLocalAuth();
@@ -42,8 +42,10 @@ export default function Login() {
       return;
     }
     const redirect = searchParams.get("redirect");
-    if (redirect) {
-      navigate(redirect, { replace: true });
+    // Accepter uniquement les chemins internes (commence par / mais pas //)
+    const safePath = redirect && /^\/(?!\/)/.test(redirect) ? redirect : null;
+    if (safePath) {
+      navigate(safePath, { replace: true });
     } else {
       const { data: { session: s } } = await supabase.auth.getSession();
       const role = s?.user?.user_metadata?.role;

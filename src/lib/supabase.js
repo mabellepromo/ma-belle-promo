@@ -31,6 +31,16 @@ export async function sbSet(key, value) {
   if (error) throw error;
 }
 
+const ALLOWED_IMAGE_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+const ALLOWED_VIDEO_MIME = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
+const ALLOWED_DOC_MIME   = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+];
+
 /** Uploader un fichier dans Supabase Storage (bucket mbp-media) */
 async function uploadToStorage(file, folder) {
   const ext = file.name.split(".").pop().toLowerCase();
@@ -45,16 +55,22 @@ async function uploadToStorage(file, folder) {
 
 /** Uploader une image dans Supabase Storage */
 export async function uploadImage(file) {
+  if (!ALLOWED_IMAGE_MIME.includes(file.type))
+    throw new Error("Format non autorisé. Utilisez JPEG, PNG, WebP, GIF ou AVIF.");
   return uploadToStorage(file, "images");
 }
 
 /** Uploader un fichier vidéo dans Supabase Storage */
 export async function uploadVideo(file) {
+  if (!ALLOWED_VIDEO_MIME.includes(file.type))
+    throw new Error("Format non autorisé. Utilisez MP4, WebM, OGG ou MOV.");
   return uploadToStorage(file, "videos");
 }
 
 /** Uploader un document (PDF, Word, Excel…) dans Supabase Storage */
 export async function uploadFile(file) {
+  if (!ALLOWED_DOC_MIME.includes(file.type))
+    throw new Error("Format non autorisé. Utilisez PDF, Word ou Excel.");
   return uploadToStorage(file, "documents");
 }
 

@@ -18,7 +18,6 @@ export function useArticles() {
       .order("created_at", { ascending: false });
 
     if (error || !data?.length) {
-      // Table vide ou inaccessible → fallback données statiques
       setArticles(articlesStatic);
       setIsSeeded(false);
     } else {
@@ -32,63 +31,74 @@ export function useArticles() {
 
   async function add(item) {
     setSaving(true);
-    const id = item.id || slugify(item.titre);
-    const { error } = await supabase
-      .from("articles")
-      .insert({ ...item, id, photos: item.photos ?? [] });
-    if (error) {
-      toast.error("Erreur ajout : " + error.message);
-    } else {
-      toast.success("Article ajouté !");
-      await load();
+    try {
+      const id = item.id || slugify(item.titre);
+      const { error } = await supabase
+        .from("articles")
+        .insert({ ...item, id, photos: item.photos ?? [] });
+      if (error) {
+        toast.error("Erreur ajout : " + error.message);
+      } else {
+        toast.success("Article ajouté !");
+        await load();
+      }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function update(id, item) {
     setSaving(true);
-    const { error } = await supabase
-      .from("articles")
-      .update({ ...item, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      toast.error("Erreur mise à jour : " + error.message);
-    } else {
-      toast.success("Article mis à jour !");
-      await load();
+    try {
+      const { error } = await supabase
+        .from("articles")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) {
+        toast.error("Erreur mise à jour : " + error.message);
+      } else {
+        toast.success("Article mis à jour !");
+        await load();
+      }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function remove(id) {
     if (!confirm("Supprimer cet article définitivement ?")) return;
     setSaving(true);
-    const { error } = await supabase.from("articles").delete().eq("id", id);
-    if (error) {
-      toast.error("Erreur suppression : " + error.message);
-    } else {
-      toast.success("Article supprimé.");
-      await load();
+    try {
+      const { error } = await supabase.from("articles").delete().eq("id", id);
+      if (error) {
+        toast.error("Erreur suppression : " + error.message);
+      } else {
+        toast.success("Article supprimé.");
+        await load();
+      }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
-  /** Importe les données statiques dans Supabase (migration initiale, une seule fois) */
   async function seedFromStatic() {
     setSaving(true);
-    const { error } = await supabase
-      .from("articles")
-      .upsert(
-        articlesStatic.map(a => ({ ...a, photos: a.photos ?? [] })),
-        { onConflict: "id" }
-      );
-    if (error) {
-      toast.error("Erreur migration : " + error.message);
-    } else {
-      toast.success(`${articlesStatic.length} articles migrés avec succès !`);
-      await load();
+    try {
+      const { error } = await supabase
+        .from("articles")
+        .upsert(
+          articlesStatic.map(a => ({ ...a, photos: a.photos ?? [] })),
+          { onConflict: "id" }
+        );
+      if (error) {
+        toast.error("Erreur migration : " + error.message);
+      } else {
+        toast.success(`${articlesStatic.length} articles migrés avec succès !`);
+        await load();
+      }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   return { articles, loading, saving, isSeeded, add, update, remove, seedFromStatic, reload: load };

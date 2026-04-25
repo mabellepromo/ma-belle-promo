@@ -8,6 +8,7 @@ import {
   MessageSquare, Plus, Paperclip
 } from "lucide-react";
 import { SectionLoader, inp, ta, sel, Field } from "./shared.jsx";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 
 export function ComposeModal({ onClose }) {
@@ -220,8 +221,9 @@ export function MessagesSection() {
   const [replyText, setReplyText]     = useState("");
   const [senderName, setSenderName]   = useState("");
   const [senderPoste, setSenderPoste] = useState("");
-  const [compose, setCompose]     = useState(false);
-  const [viewMsg, setViewMsg]     = useState(null);
+  const [compose, setCompose]         = useState(false);
+  const [viewMsg, setViewMsg]         = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(null);
   const [sendStatus, setSendStatus] = useState("idle");
 
   const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
@@ -239,10 +241,16 @@ export function MessagesSection() {
     await supabase.from("messages").update({ read: true }).eq("id", id);
   }
 
-  async function deleteMsg(id) {
-    if (!confirm("Supprimer ce message ?")) return;
-    setMessages(prev => prev.filter(m => m.id !== id));
-    await supabase.from("messages").delete().eq("id", id);
+  function askDeleteMsg(id) {
+    setConfirmDialog({
+      title: "Supprimer ce message ?",
+      message: "Cette action est irréversible.",
+      onConfirm: async () => {
+        setConfirmDialog(null);
+        setMessages(prev => prev.filter(m => m.id !== id));
+        await supabase.from("messages").delete().eq("id", id);
+      },
+    });
   }
 
   function openReply(msg) {
@@ -491,7 +499,7 @@ export function MessagesSection() {
                     className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
                     <Reply className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => deleteMsg(m.id)} title="Supprimer"
+                  <button onClick={() => askDeleteMsg(m.id)} title="Supprimer"
                     className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -501,6 +509,14 @@ export function MessagesSection() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmDialog}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        onConfirm={confirmDialog?.onConfirm}
+        onCancel={() => setConfirmDialog(null)}
+      />
     </div>
   );
 }

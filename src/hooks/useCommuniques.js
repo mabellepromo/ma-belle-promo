@@ -30,41 +30,53 @@ export function useCommuniques() {
 
   async function add(item) {
     setSaving(true);
-    const id = String(item.id || Date.now());
-    const { error } = await supabase.from("communiques").insert({ ...item, id });
-    if (error) toast.error("Erreur ajout : " + error.message);
-    else { toast.success("Communiqué ajouté !"); await load(); }
-    setSaving(false);
+    try {
+      const id = String(item.id || Date.now());
+      const { error } = await supabase.from("communiques").insert({ ...item, id });
+      if (error) toast.error("Erreur ajout : " + error.message);
+      else { toast.success("Communiqué ajouté !"); await load(); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function update(id, item) {
     setSaving(true);
-    const { error } = await supabase
-      .from("communiques")
-      .update({ ...item, updated_at: new Date().toISOString() })
-      .eq("id", String(id));
-    if (error) toast.error("Erreur mise à jour : " + error.message);
-    else { toast.success("Communiqué mis à jour !"); await load(); }
-    setSaving(false);
+    try {
+      const { error } = await supabase
+        .from("communiques")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", String(id));
+      if (error) toast.error("Erreur mise à jour : " + error.message);
+      else { toast.success("Communiqué mis à jour !"); await load(); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function remove(id) {
     if (!confirm("Supprimer ce communiqué définitivement ?")) return;
     setSaving(true);
-    const { error } = await supabase.from("communiques").delete().eq("id", String(id));
-    if (error) toast.error("Erreur suppression : " + error.message);
-    else { toast.success("Communiqué supprimé."); await load(); }
-    setSaving(false);
+    try {
+      const { error } = await supabase.from("communiques").delete().eq("id", String(id));
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Communiqué supprimé."); await load(); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function seedFromStatic() {
     setSaving(true);
-    const { error } = await supabase
-      .from("communiques")
-      .upsert(communiquesStatic.map(c => ({ ...c, id: String(c.id) })), { onConflict: "id" });
-    if (error) toast.error("Erreur migration : " + error.message);
-    else { toast.success(`${communiquesStatic.length} communiqués migrés !`); await load(); }
-    setSaving(false);
+    try {
+      const { error } = await supabase
+        .from("communiques")
+        .upsert(communiquesStatic.map(c => ({ ...c, id: String(c.id) })), { onConflict: "id" });
+      if (error) toast.error("Erreur migration : " + error.message);
+      else { toast.success(`${communiquesStatic.length} communiqués migrés !`); await load(); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   return { communiques, loading, saving, isSeeded, add, update, remove, seedFromStatic, reload: load };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, MapPin, Phone, Mail, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -12,6 +12,13 @@ export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", sujet: "", message: "" });
   const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +63,7 @@ export default function ContactSection() {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       toast.success("Message envoyé avec succès !");
       setForm({ name: "", email: "", sujet: "", message: "" });
+      setCooldown(60);
     } catch (err) {
       console.error("Erreur envoi message:", err);
       toast.error("Erreur lors de l'envoi. Réessayez ou contactez-nous par email.");
@@ -174,13 +182,13 @@ export default function ContactSection() {
                 </span>
               </label>
 
-              <Button type="submit" disabled={sending || !consent} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
+              <Button type="submit" disabled={sending || !consent || cooldown > 0} className="w-full h-12 rounded-full text-sm font-semibold gap-2">
                 {sending ? (
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                {sending ? "Envoi en cours..." : "Envoyer le message"}
+                {sending ? "Envoi en cours..." : cooldown > 0 ? `Réessayer dans ${cooldown}s` : "Envoyer le message"}
               </Button>
             </form>
           </motion.div>

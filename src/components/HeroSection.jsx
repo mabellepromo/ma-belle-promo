@@ -83,7 +83,7 @@ export default function HeroSection() {
         <img
           src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop"
           alt=""
-          loading="lazy"
+          fetchPriority="high"
           className="w-full h-full object-cover scale-110"
           style={{ opacity: 0.07, mixBlendMode: "luminosity" }}
         />

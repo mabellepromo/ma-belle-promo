@@ -42,7 +42,33 @@ export default function ProjetDetail() {
   const galleryPhotos = projet?.photos?.length > 0 ? projet.photos : [];
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+    return (
+      <div className="min-h-screen bg-background animate-pulse">
+        <div className="bg-foreground border-b border-white/10">
+          <div className="h-1 w-full bg-white/10" />
+          <div className="max-w-5xl mx-auto px-6 pt-32 pb-12 md:pb-16">
+            <div className="grid md:grid-cols-[1fr_380px] gap-10 md:gap-14 items-center">
+              <div className="space-y-5">
+                <div className="h-3 w-20 bg-white/20 rounded" />
+                <div className="h-5 w-24 bg-white/20 rounded-full" />
+                <div className="h-8 w-full bg-white/20 rounded" />
+                <div className="h-8 w-4/5 bg-white/20 rounded" />
+                <div className="h-3 w-full bg-white/15 rounded" />
+                <div className="h-3 w-5/6 bg-white/15 rounded" />
+              </div>
+              <div className="rounded-2xl bg-white/10 aspect-[4/3]" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-3">
+          <div className="h-4 bg-muted rounded w-full" />
+          <div className="h-4 bg-muted rounded w-5/6" />
+          <div className="h-4 bg-muted rounded w-4/5" />
+          <div className="h-4 bg-muted rounded w-full" />
+          <div className="h-4 bg-muted rounded w-3/4" />
+        </div>
+      </div>
+    );
   }
 
   if (!projet) {

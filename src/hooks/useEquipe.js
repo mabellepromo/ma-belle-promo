@@ -30,60 +30,56 @@ export function useEquipe() {
 
   async function add(item) {
     setSaving(true);
-    const id = String(item.id || Date.now());
-    const { error } = await supabase.from("equipe").insert({ ...item, id });
-    if (error) {
-      toast.error("Erreur ajout : " + error.message);
-    } else {
-      toast.success("Membre ajouté !");
-      await load();
+    try {
+      const id = String(item.id || Date.now());
+      const { error } = await supabase.from("equipe").insert({ ...item, id });
+      if (error) toast.error("Erreur ajout : " + error.message);
+      else { toast.success("Membre ajouté !"); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function update(id, item) {
     setSaving(true);
-    const { error } = await supabase
-      .from("equipe")
-      .update({ ...item, updated_at: new Date().toISOString() })
-      .eq("id", String(id));
-    if (error) {
-      toast.error("Erreur mise à jour : " + error.message);
-    } else {
-      toast.success("Membre mis à jour !");
-      await load();
+    try {
+      const { error } = await supabase
+        .from("equipe")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", String(id));
+      if (error) toast.error("Erreur mise à jour : " + error.message);
+      else { toast.success("Membre mis à jour !"); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function remove(id) {
     if (!confirm("Supprimer ce membre définitivement ?")) return;
     setSaving(true);
-    const { error } = await supabase.from("equipe").delete().eq("id", String(id));
-    if (error) {
-      toast.error("Erreur suppression : " + error.message);
-    } else {
-      toast.success("Membre supprimé.");
-      await load();
+    try {
+      const { error } = await supabase.from("equipe").delete().eq("id", String(id));
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Membre supprimé."); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   async function seedFromStatic() {
     setSaving(true);
-    const { error } = await supabase
-      .from("equipe")
-      .upsert(
-        equipeStatic.map(m => ({ ...m, id: String(m.id) })),
-        { onConflict: "id" }
-      );
-    if (error) {
-      toast.error("Erreur migration : " + error.message);
-    } else {
-      toast.success(`${equipeStatic.length} membres migrés !`);
-      await load();
+    try {
+      const { error } = await supabase
+        .from("equipe")
+        .upsert(
+          equipeStatic.map(m => ({ ...m, id: String(m.id) })),
+          { onConflict: "id" }
+        );
+      if (error) toast.error("Erreur migration : " + error.message);
+      else { toast.success(`${equipeStatic.length} membres migrés !`); await load(); }
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   return { equipe, loading, saving, isSeeded, add, update, remove, seedFromStatic, reload: load };

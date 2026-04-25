@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
 
-const ReactQuill = lazy(() => import("../../components/RichEditor.jsx"));
+const RichEditor = lazy(() => import("../../components/RichEditor.jsx"));
 import { useArticles } from "../../hooks/useArticles";
 import { useEvenements } from "../../hooks/useEvenements";
 import { useProjets } from "../../hooks/useProjets";
@@ -21,7 +21,6 @@ import {
   inp, ta, sel,
   Field, ImgField, GalerieField, VideoField, FileField,
   SectionLoader, CrudHeader, FormPanel, ItemRow,
-  quillModules,
 } from "./shared.jsx";
 
 /* ─── Articles ─── */
@@ -91,11 +90,9 @@ export function ArticlesSection() {
             <div className="md:col-span-2"><VideoField videos={Array.isArray(form.videos) ? form.videos : (form.youtube ? [form.youtube] : [])} onChange={v => setForm(p => ({ ...p, videos: v, youtube: "" }))} /></div>
             <div className="md:col-span-2">
               <Field label="Contenu" required>
-                <div className="rounded-lg border border-border overflow-hidden [&_.ql-toolbar]:bg-muted [&_.ql-container]:bg-background [&_.ql-container]:min-h-[180px] [&_.ql-editor]:text-sm [&_.ql-editor]:text-foreground">
-                  <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
-                    <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} modules={quillModules} />
-                  </Suspense>
-                </div>
+                <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
+                  <RichEditor value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} />
+                </Suspense>
               </Field>
             </div>
           </div>
@@ -211,7 +208,7 @@ export function ProjetsSection() {
             <div className="md:col-span-2">
               <Field label="Contenu détaillé (page projet)">
                 <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
-                  <ReactQuill theme="snow" value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} className="bg-background rounded-lg" style={{ minHeight: 180 }} />
+                  <RichEditor value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} />
                 </Suspense>
               </Field>
             </div>
