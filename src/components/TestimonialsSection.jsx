@@ -59,7 +59,7 @@ export default function TestimonialsSection() {
   const t = testimonials[current];
 
   return (
-    <section className="py-10 bg-foreground relative overflow-hidden">
+    <section className="py-16 md:py-20 bg-foreground relative overflow-hidden">
 
       {/* Filigrane MBP */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
@@ -71,56 +71,64 @@ export default function TestimonialsSection() {
 
       <div className="relative max-w-4xl mx-auto px-6">
 
+        {/* En-tête */}
+        <div className="text-center mb-10">
+          <p className="eyebrow text-primary/70 mb-3">Ils témoignent</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white">La parole à nos membres</h2>
+        </div>
+
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={current}
             custom={direction}
-            initial={{ opacity: 0, x: direction * 30 }}
+            initial={{ opacity: 0, x: direction * 40 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -30 }}
-            transition={{ duration: 0.4 }}
-            className="flex items-center gap-6 py-2"
+            exit={{ opacity: 0, x: direction * -40 }}
+            transition={{ duration: 0.45 }}
+            className="bg-white/[0.04] border border-white/10 rounded-2xl p-7 md:p-10"
           >
-            {/* Photo */}
-            <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden border border-accent/30"
-              style={{ background: "rgba(52,211,153,0.10)" }}>
-              {t.photo
-                ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
-                : <span className="w-full h-full flex items-center justify-center font-heading text-xl font-bold text-accent">{t.name.charAt(0)}</span>
-              }
-            </div>
+            {/* Guillemet décoratif */}
+            <div className="font-heading text-5xl text-accent/40 leading-none mb-4 select-none">"</div>
 
-            {/* Citation + identité */}
-            <div className="flex-1 min-w-0">
-              <p className="text-background/80 text-sm md:text-base leading-relaxed italic line-clamp-2">
-                « {t.quote} »
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="font-heading text-sm font-bold text-background">{t.name}</span>
-                <span className="text-background/30">·</span>
-                <span className="text-xs text-accent truncate">{t.role}</span>
-                <span className="text-background/30 hidden sm:inline">·</span>
-                <span className="text-xs text-background/40 truncate hidden sm:inline">{t.titre}</span>
+            {/* Citation */}
+            <p className="text-background/80 text-base md:text-lg leading-relaxed italic mb-8">
+              {t.quote}
+            </p>
+
+            {/* Identité + contrôles */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full flex-shrink-0 overflow-hidden border-2 border-accent/30"
+                  style={{ background: "rgba(52,211,153,0.10)" }}>
+                  {t.photo
+                    ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
+                    : <span className="w-full h-full flex items-center justify-center font-heading text-lg font-bold text-accent">{t.name.charAt(0)}</span>
+                  }
+                </div>
+                <div>
+                  <p className="font-heading text-sm font-bold text-background">{t.name}</p>
+                  <p className="text-xs text-accent mt-0.5">{t.role}</p>
+                  <p className="text-xs text-background/40 mt-0.5 hidden sm:block">{t.titre}</p>
+                </div>
               </div>
-            </div>
 
-            {/* Contrôles */}
-            <div className="flex-shrink-0 flex items-center gap-1.5">
-              <button onClick={prev} className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
-                <ChevronLeft className="w-3 h-3" />
-              </button>
-              <button onClick={next} className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
-                <ChevronRight className="w-3 h-3" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={prev} className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={next} className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
 
         {/* Points */}
-        <div className="flex gap-1.5 mt-4 justify-center">
+        <div className="flex gap-2 mt-6 justify-center">
           {testimonials.map((_, i) => (
             <button key={i} onClick={() => go(i)}
-              className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-1 bg-accent" : "w-1 h-1 bg-background/20"}`}
+              className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-1.5 bg-accent" : "w-1.5 h-1.5 bg-background/20 hover:bg-background/40"}`}
             />
           ))}
         </div>

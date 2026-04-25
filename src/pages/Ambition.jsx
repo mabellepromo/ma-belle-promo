@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { Target, CheckCircle2 } from "lucide-react";
+import { Target } from "lucide-react";
 import SEO from "../components/SEO";
 
 const objectifs = [
@@ -102,7 +102,7 @@ export default function Ambition() {
           <p className="text-muted-foreground mb-8">
             Nos statuts y font une large part dans l'article 5 :
           </p>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {objectifs.map((obj, i) => (
               <motion.div
                 key={i}
@@ -110,9 +110,11 @@ export default function Ambition() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
+                className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted border border-transparent hover:border-primary/20 transition-all"
               >
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <span className="w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
                 <p className="text-muted-foreground leading-relaxed">{obj}</p>
               </motion.div>
             ))}

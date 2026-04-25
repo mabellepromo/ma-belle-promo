@@ -31,7 +31,7 @@ const Spiral = ({ color = "#34d399", flip = false }) => (
 
 export default function CredibiliteSection() {
   return (
-    <section className="relative py-10 overflow-hidden" style={{ background: "var(--brand-dark-mid)" }}>
+    <section className="relative py-16 overflow-hidden" style={{ background: "var(--brand-dark-mid)" }}>
 
       {/* Spirale gauche */}
       <motion.div
@@ -39,8 +39,8 @@ export default function CredibiliteSection() {
         whileInView={{ opacity: 1, x: 0, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
-        style={{ marginLeft: "-1rem" }}
+        className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-40 h-40 pointer-events-none"
+        style={{ marginLeft: "-1.5rem" }}
       >
         <Spiral color="#34d399" flip={false} />
       </motion.div>
@@ -51,61 +51,82 @@ export default function CredibiliteSection() {
         whileInView={{ opacity: 1, x: 0, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
-        style={{ marginRight: "-1rem" }}
+        className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-40 h-40 pointer-events-none"
+        style={{ marginRight: "-1.5rem" }}
       >
         <Spiral color="#fbbf24" flip={true} />
       </motion.div>
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6">
-        <div className="grid sm:grid-cols-2 gap-4">
+      <div className="relative z-10 max-w-4xl mx-auto px-6">
+
+        {/* En-tête */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55 }}
+          className="text-center mb-10"
+        >
+          <p className="eyebrow text-primary/70 mb-3">Rejoignez-nous</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white">Faites partie de l'aventure</h2>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 gap-5">
+
+          {/* Carte Devenir membre */}
           <motion.div
-            initial={{ opacity: 0, x: -16 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="rounded-xl p-5 border flex items-center gap-4"
+            className="rounded-2xl p-7 border flex flex-col gap-5"
             style={{ background: "rgba(52,211,153,0.10)", borderColor: "rgba(52,211,153,0.30)" }}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(52,211,153,0.20)" }}>
-              <UserPlus className="w-5 h-5 text-emerald-400" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(52,211,153,0.20)" }}>
+              <UserPlus className="w-6 h-6 text-emerald-400" />
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-heading font-bold text-white text-base">Devenir membre</h3>
-              <p className="text-white/50 text-xs mt-0.5">Anciens de la FDD de Lomé</p>
+            <div>
+              <h3 className="font-heading font-bold text-white text-lg mb-2">Devenir membre</h3>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Ancien diplômé de la FDD de Lomé ? Rejoignez le réseau des anciens et participez à nos activités communes.
+              </p>
             </div>
             <Link
               to="/implications/adhesion"
-              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
+              className="self-start px-5 py-2.5 rounded-full text-sm font-bold transition-all hover:opacity-90"
               style={{ background: "rgba(52,211,153,0.25)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.40)" }}
             >
-              Adhérer
+              Adhérer →
             </Link>
           </motion.div>
 
+          {/* Carte Nous soutenir */}
           <motion.div
-            initial={{ opacity: 0, x: 16 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-xl p-5 border flex items-center gap-4"
+            className="rounded-2xl p-7 border flex flex-col gap-5"
             style={{ background: "rgba(251,191,36,0.09)", borderColor: "rgba(251,191,36,0.30)" }}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.18)" }}>
-              <HeartHandshake className="w-5 h-5 text-yellow-400" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.18)" }}>
+              <HeartHandshake className="w-6 h-6 text-yellow-400" />
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-heading font-bold text-white text-base">Nous soutenir</h3>
-              <p className="text-white/50 text-xs mt-0.5">Actions sociales au Togo</p>
+            <div>
+              <h3 className="font-heading font-bold text-white text-lg mb-2">Nous soutenir</h3>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Contribuez aux actions solidaires de Ma Belle Promo au Togo : éducation, aide aux personnes vulnérables, mentorat.
+              </p>
             </div>
             <Link
               to="/implications/soutenir"
-              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
+              className="self-start px-5 py-2.5 rounded-full text-sm font-bold transition-all hover:opacity-90"
               style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
             >
-              Donner
+              Faire un don →
             </Link>
           </motion.div>
+
         </div>
       </div>
     </section>

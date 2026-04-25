@@ -170,10 +170,10 @@ export default function AnnuaireMembres() {
               return (
                 <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
                   onClick={() => setSelected(m)}
-                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group flex items-center gap-3 p-3">
+                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 transition-all cursor-pointer group flex items-center gap-3 p-3">
 
                   {/* Photo petite à gauche */}
-                  <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                  <div className="relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden bg-muted ring-2 ring-border group-hover:ring-primary/30 transition-all">
                     {m.photo
                       ? <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                           style={{ objectPosition: m.photoPosition === "center" ? "center" : "center 15%" }}

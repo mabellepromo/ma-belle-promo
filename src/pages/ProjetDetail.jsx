@@ -86,12 +86,12 @@ export default function ProjetDetail() {
         path={`/activites/projets/${id}`}
       />
 
-      {/* ── Header split élégant ── */}
-      <div className="border-b border-border" style={{ background: "linear-gradient(135deg, #f8faf8 0%, #ffffff 60%, #fefdf5 100%)" }}>
+      {/* ── Header ── */}
+      <div className="bg-foreground border-b border-white/10">
         {/* Barre accent couleur catégorie tout en haut */}
         <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${accent}, ${accent}88)` }} />
 
-        <div className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+        <div className="max-w-5xl mx-auto px-6 pt-32 pb-12 md:pb-16">
           <div className="grid md:grid-cols-[1fr_380px] gap-10 md:gap-14 items-center">
 
             {/* ── Colonne gauche : meta + titre ── */}
@@ -99,7 +99,7 @@ export default function ProjetDetail() {
               {/* Fil d'Ariane */}
               <Link
                 to="/activites/projets"
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors mb-7"
+                className="inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors mb-7"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Nos Réalisations
               </Link>
@@ -107,12 +107,12 @@ export default function ProjetDetail() {
               {/* Catégorie + date */}
               <div className="flex flex-wrap items-center gap-2.5 mb-5">
                 <span
-                  className="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full ring-1"
-                  style={{ background: accent + "18", color: accent, ringColor: accent + "40" }}
+                  className="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full"
+                  style={{ background: accent + "30", color: accent, border: `1px solid ${accent}50` }}
                 >
                   {projet.categorie}
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 text-xs text-white/50">
                   <Calendar className="w-3.5 h-3.5" /> {projet.date}
                 </span>
               </div>
@@ -120,14 +120,14 @@ export default function ProjetDetail() {
               {/* Trait décoratif + titre */}
               <div className="flex gap-4 items-start mb-5">
                 <div className="w-1 flex-shrink-0 mt-2 rounded-full self-stretch" style={{ background: `linear-gradient(to bottom, ${accent}, transparent)`, minHeight: 60 }} />
-                <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
                   {projet.titre}
                 </h1>
               </div>
 
               {/* Extrait sous le titre */}
               {(projet.extrait || projet.description) && (
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-lg">
+                <p className="text-sm md:text-base text-white/60 leading-relaxed max-w-lg">
                   {projet.extrait || projet.description}
                 </p>
               )}
@@ -138,10 +138,10 @@ export default function ProjetDetail() {
               {/* Rectangle décalé décoratif */}
               <div
                 className="absolute -bottom-3 -right-3 w-full h-full rounded-2xl"
-                style={{ background: accent + "18", border: `1px solid ${accent}28` }}
+                style={{ background: accent + "25", border: `1px solid ${accent}30` }}
               />
               {/* Image principale */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3]">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]" style={{ boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}>
                 <img
                   src={projet.image}
                   alt={projet.titre}
