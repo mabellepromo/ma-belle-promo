@@ -48,7 +48,7 @@ function groupByYear(list) {
   return Object.entries(map).sort((a, b) => Number(b[0]) - Number(a[0]));
 }
 
-/* ── Carte hero (image en haut, texte en bas sur fond carte) ── */
+/* ── Carte hero (pleine largeur, image en fond) ── */
 function HeroCard({ article }) {
   const pill = catPills[article.categorie] ?? "bg-primary/90 text-white";
   return (
@@ -59,33 +59,33 @@ function HeroCard({ article }) {
     >
       <Link
         to={`/actualites/${article.id}`}
-        className="group block w-full rounded-3xl overflow-hidden shadow-2xl bg-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
+        className="group relative block w-full h-[480px] rounded-3xl overflow-hidden shadow-2xl"
       >
-        {/* Image à taille naturelle, sans recadrage */}
-        <div className="overflow-hidden bg-muted">
-          <img
-            src={article.image}
-            alt={article.titre}
-            className="w-full h-auto group-hover:scale-105 transition-transform duration-700"
-          />
-        </div>
+        {/* Image fond */}
+        <img
+          src={article.image}
+          alt={article.titre}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+        {/* Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-        {/* Texte sur fond propre */}
-        <div className="p-8 md:p-10">
+        {/* Contenu */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
           <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 ${pill}`}>
             {article.categorie}
           </span>
-          <h2 className="font-heading text-foreground text-2xl md:text-3xl font-bold leading-tight mb-3 group-hover:text-primary transition-colors">
+          <h2 className="font-heading text-white text-2xl md:text-4xl font-bold leading-tight mb-3 group-hover:text-primary/90 transition-colors">
             {article.titre}
           </h2>
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-6 max-w-2xl">
+          <p className="text-white/70 text-sm leading-relaxed line-clamp-2 mb-5 max-w-2xl">
             {article.extrait}
           </p>
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-muted-foreground text-xs">
+            <span className="flex items-center gap-2 text-white/60 text-xs">
               <Calendar className="w-3.5 h-3.5" /> {article.date}
             </span>
-            <span className="flex items-center gap-2 text-sm font-bold text-primary group-hover:gap-3 transition-all">
+            <span className="flex items-center gap-2 text-sm font-bold text-white group-hover:text-primary/90 transition-colors">
               Lire l'article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </div>
@@ -111,25 +111,24 @@ function MediumCard({ article, index }) {
         to={`/actualites/${article.id}`}
         className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        {/* Image à taille naturelle, sans recadrage */}
-        <div className="overflow-hidden bg-muted flex-shrink-0">
+        {/* Image */}
+        <div className="relative h-52 overflow-hidden bg-muted flex-shrink-0">
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-auto group-hover:scale-105 transition-transform duration-600"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <span className={`absolute bottom-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
+            {article.categorie}
+          </span>
         </div>
 
         {/* Texte */}
         <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
-              {article.categorie}
-            </span>
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Calendar className="w-3 h-3" /> {article.date}
-            </span>
-          </div>
+          <span className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
+            <Calendar className="w-3 h-3" /> {article.date}
+          </span>
           <h3 className="font-heading text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-2 flex-1">
             {article.titre}
           </h3>

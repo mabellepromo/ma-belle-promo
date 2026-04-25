@@ -47,8 +47,8 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
         {/* Trait couleur catégorie en haut */}
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: accent }} />
 
-        {/* Gradient — assez dense pour couvrir le texte des images chargées */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/15" />
+        {/* Gradient texte */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
         {/* Badge catégorie */}
         <span className={`absolute top-4 left-4 px-2.5 py-1 text-[10px] font-bold rounded-full ${light}`}>
@@ -62,8 +62,8 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
 
         {/* Texte bas */}
         <div className="relative z-10 p-5">
-          <p className="text-white/60 text-[10px] uppercase tracking-widest mb-2 drop-shadow-sm">{projet.date}</p>
-          <h3 className={`font-heading font-bold text-white leading-tight group-hover:text-primary/90 transition-colors drop-shadow-lg line-clamp-3 ${size === "large" ? "text-2xl md:text-3xl" : "text-base md:text-lg"}`}>
+          <p className="text-white/50 text-[10px] uppercase tracking-widest mb-2">{projet.date}</p>
+          <h3 className={`font-heading font-bold text-white leading-tight group-hover:text-primary/90 transition-colors ${size === "large" ? "text-2xl md:text-3xl" : "text-base md:text-lg"}`}>
             {projet.titre}
           </h3>
           {size === "large" && projet.extrait && (
