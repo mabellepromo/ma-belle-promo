@@ -288,9 +288,14 @@ export default function Navbar() {
         />
       )}
 
-      {/* Mobile menu — sans AnimatePresence pour éviter les blocages iOS */}
+      {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-background border-t border-border relative z-50">
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="md:hidden bg-background border-t border-border relative z-50"
+        >
             <div className="px-4 py-4 space-y-2 max-h-[75vh] overflow-y-auto">
               {/* Bloc utilisateur — toujours en premier */}
               {session ? (
@@ -355,7 +360,7 @@ export default function Navbar() {
                 ♥ Faire un don
               </button>
             </div>
-        </div>
+        </motion.div>
       )}
     </nav>
   );

@@ -6,6 +6,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const SITE = "Ma Belle Promo";
 
@@ -108,12 +109,21 @@ function PrivateRoute({ children }) {
 }
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   return (
     <>
     <PageTitleUpdater />
     <ScrollToTop />
     <Suspense fallback={<PageLoader />}>
-    <Routes>
+    <AnimatePresence mode="wait" initial={false}>
+    <motion.div
+      key={location.key}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15, ease: "easeInOut" }}
+    >
+    <Routes location={location}>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>
         <Route path="/association/credo" element={<Credo />} />
@@ -152,6 +162,8 @@ const AuthenticatedApp = () => {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </motion.div>
+    </AnimatePresence>
     </Suspense>
     </>
   );

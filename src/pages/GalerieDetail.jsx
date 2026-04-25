@@ -63,17 +63,20 @@ export default function GalerieDetail() {
     <div className="min-h-screen bg-background">
 
       {/* En-tête galerie */}
-      <div className="bg-foreground text-background">
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          <Link to="/galeries" className="inline-flex items-center gap-2 text-white/50 hover:text-white text-sm mb-6 transition-colors">
+      <div className="bg-foreground border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-14 md:py-18">
+          <Link to="/galeries" className="inline-flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Toutes les galeries
           </Link>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow text-primary/70 mb-2">Galerie privée · Membres</p>
-              <h1 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight mb-3">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <p className="eyebrow text-primary/70 mb-3">Galerie privée · Membres</p>
+              <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
                 {galerie.titre}
               </h1>
+              {galerie.description && (
+                <p className="text-white/50 text-sm leading-relaxed mb-5 max-w-xl">{galerie.description}</p>
+              )}
               <div className="flex flex-wrap gap-4 text-sm text-white/50">
                 <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-primary/70" />{galerie.date}</span>
                 <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-primary/70" />{galerie.lieu}</span>
@@ -83,9 +86,9 @@ export default function GalerieDetail() {
             {photos.length > 1 && (
               <button
                 onClick={() => { openLightbox(0); setSlideshow(true); }}
-                className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-full hover:opacity-90 transition-opacity"
+                className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground text-sm font-bold rounded-full hover:opacity-90 transition-opacity shadow-lg"
               >
-                <Play className="w-4 h-4" /> Diaporama
+                <Play className="w-4 h-4" /> Lancer le diaporama
               </button>
             )}
           </div>
