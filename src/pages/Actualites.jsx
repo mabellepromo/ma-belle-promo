@@ -67,18 +67,18 @@ function HeroCard({ article }) {
           alt={article.titre}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+        {/* Gradient — assez dense pour couvrir le texte des images chargées */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/65 to-black/20" />
 
         {/* Contenu */}
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
           <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 ${pill}`}>
             {article.categorie}
           </span>
-          <h2 className="font-heading text-white text-2xl md:text-4xl font-bold leading-tight mb-3 group-hover:text-primary/90 transition-colors">
+          <h2 className="font-heading text-white text-2xl md:text-4xl font-bold leading-tight mb-3 group-hover:text-primary/90 transition-colors drop-shadow-lg line-clamp-3">
             {article.titre}
           </h2>
-          <p className="text-white/70 text-sm leading-relaxed line-clamp-2 mb-5 max-w-2xl">
+          <p className="text-white/80 text-sm leading-relaxed line-clamp-2 mb-5 max-w-2xl drop-shadow-md">
             {article.extrait}
           </p>
           <div className="flex items-center justify-between">
