@@ -45,22 +45,27 @@ export default function FooterSection() {
 
   return (
     <footer className="bg-foreground text-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Ligne d'accent en haut */}
+      <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
         {/* ── Ligne principale ── */}
-        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
 
           {/* Brand */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
             <img
               loading="lazy"
               src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
               alt="Logo Ma Belle Promo"
-              className="w-10 h-10 rounded-full opacity-90"
+              className="w-14 h-14 rounded-full opacity-90 shadow-lg"
+              style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
             />
             <div>
-              <div className="font-heading font-bold text-background leading-tight">Ma Belle Promo</div>
-              <div className="text-xs text-background/40 leading-tight">FDD Lomé · 1994–2000</div>
+              <div className="font-heading text-lg font-bold text-background leading-tight">Ma Belle Promo</div>
+              <div className="text-xs text-background/40 leading-tight mt-0.5">FDD Lomé · 1994–2000</div>
+              <div className="text-[10px] text-background/30 leading-tight mt-0.5 tracking-wide">Amitié · Solidarité · Entraide</div>
             </div>
           </div>
 
@@ -133,9 +138,9 @@ export default function FooterSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="text-background/35 hover:text-background transition-colors"
+                className="text-background/40 hover:text-background transition-colors hover:scale-110 transition-transform"
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />
               </a>
             ))}
           </div>

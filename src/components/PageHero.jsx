@@ -1,7 +1,7 @@
 export default function PageHero({ title, subtitle }) {
   return (
-    <div className="relative py-10 md:py-14 text-center overflow-hidden bg-foreground">
-      {/* Decorative background pattern */}
+    <div className="relative pt-32 pb-20 text-center overflow-hidden bg-foreground">
+      {/* Grille de points décorative */}
       <div className="absolute inset-0 opacity-10">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -13,35 +13,32 @@ export default function PageHero({ title, subtitle }) {
         </svg>
       </div>
 
-      {/* Glowing orbs */}
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-accent/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-white/10 rounded-full blur-2xl" />
+      {/* Halos lumineux */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-accent/15 rounded-full blur-3xl" />
 
-      {/* Content */}
+      {/* Contenu */}
       <div className="relative z-10 max-w-3xl mx-auto px-6">
-        {/* Logo */}
-
-
-        {/* Subtitle pill */}
         {subtitle && (
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
             <span className="eyebrow text-white/80">{subtitle}</span>
           </div>
         )}
 
-        {/* Title */}
-        <h1 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight tracking-tight">
+        <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
           {title}
         </h1>
 
-        {/* Decorative line */}
-        <div className="flex items-center justify-center gap-3 mt-4">
-          <div className="h-px w-10 bg-accent/60" />
+        <div className="flex items-center justify-center gap-3 mt-5">
+          <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent/60" />
           <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-          <div className="h-px w-10 bg-accent/60" />
+          <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent/60" />
         </div>
       </div>
+
+      {/* Fondu vers la section suivante */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-background pointer-events-none" />
     </div>
   );
 }

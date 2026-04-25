@@ -170,13 +170,18 @@ export default function Navbar() {
 
   return (
     <nav
-      style={{ background: scrolled ? "var(--brand-dark)" : "var(--brand-dark-mid)" }}
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-lg"
+      style={{
+        background: scrolled ? "rgba(5,18,11,0.88)" : "var(--brand-dark-mid)",
+        backdropFilter: scrolled ? "blur(14px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
+        boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.35)" : "none",
+      }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
       {/* Top accent bar */}
       <div className="h-0.5 bg-gradient-to-r from-emerald-400 via-yellow-300 to-emerald-500" />
 
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-20 md:h-24">
+      <div className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-16" : "h-20 md:h-24"}`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
           <img
