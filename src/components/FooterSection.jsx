@@ -87,9 +87,9 @@ export default function FooterSection() {
               <a href="tel:+22896090707" className="flex items-center gap-1.5 hover:text-background transition-colors">
                 <Phone className="w-3 h-3" /> +228 96 09 07 07
               </a>
-              <a href="mailto:contact@mabellepromo.org" className="flex items-center gap-1.5 hover:text-background transition-colors">
-                <Mail className="w-3 h-3" /> contact@mabellepromo.org
-              </a>
+              <Link to="/informations/contacts" className="flex items-center gap-1.5 hover:text-background transition-colors">
+                <Mail className="w-3 h-3" /> Nous contacter
+              </Link>
             </div>
             {done ? (
               <p className="text-background/40 text-xs">✓ Vérifiez votre email pour confirmer l'inscription</p>

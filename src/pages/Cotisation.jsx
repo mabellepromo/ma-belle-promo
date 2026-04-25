@@ -88,9 +88,9 @@ export default function Cotisation() {
           <div className="mt-6 pt-6 border-t border-primary/10">
             <p className="text-sm text-muted-foreground">
               Pour toute question relative à la cotisation, contactez notre trésorier à l'adresse :
-              <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline ml-1">
-                contact@mabellepromo.org
-              </a>
+              <Link to="/informations/contacts" className="text-primary font-medium hover:underline ml-1">
+                notre formulaire de contact
+              </Link>
             </p>
           </div>
         </motion.div>

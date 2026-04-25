@@ -50,7 +50,7 @@ export default function Confidentialite() {
           <Section title="1. Responsable du traitement">
             <p><strong className="text-foreground">Association Ma Belle Promo (MBP)</strong></p>
             <p>12 BP 335 Baguida, Lomé, Togo</p>
-            <p>Email : <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a></p>
+            <p>Email : <Link to="/informations/contacts" className="text-primary hover:underline">Formulaire de contact</Link></p>
             <p>Tél. : +228 90 05 36 06</p>
           </Section>
 
@@ -107,13 +107,13 @@ export default function Confidentialite() {
             <ul className="list-disc pl-5 space-y-1">
               <li><strong className="text-foreground">Droit d'accès</strong> — consulter vos données depuis votre <Link to="/espace-membre" className="text-primary hover:underline">espace membre</Link></li>
               <li><strong className="text-foreground">Droit de rectification</strong> — modifier votre profil depuis votre espace membre</li>
-              <li><strong className="text-foreground">Droit à l'effacement</strong> — demander la suppression de votre compte à <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a></li>
+              <li><strong className="text-foreground">Droit à l'effacement</strong> — demander la suppression de votre compte via notre <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link></li>
               <li><strong className="text-foreground">Droit d'opposition</strong> — s'opposer à un traitement en nous contactant par email</li>
               <li><strong className="text-foreground">Droit à la portabilité</strong> — demander un export de vos données par email</li>
             </ul>
             <p className="mt-3">
-              Pour exercer ces droits, contactez-nous à{" "}
-              <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>.
+              Pour exercer ces droits, utilisez notre{" "}
+              <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link>.
               Nous répondrons dans un délai de 30 jours.
             </p>
           </Section>

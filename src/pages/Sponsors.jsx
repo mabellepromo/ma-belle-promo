@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Building2, Globe } from "lucide-react";
 import SEO from "../components/SEO";
+import { Link } from "react-router-dom";
 
 const niveaux = [
   { label: "Partenaire Platine", color: "bg-slate-100 border-slate-300", badge: "💎", desc: "Soutien annuel ≥ 500 000 FCFA" },
@@ -103,12 +104,12 @@ export default function Sponsors() {
           <p className="text-primary-foreground/80 mb-5">
             Vous souhaitez soutenir les actions de Ma Belle Promo ? Contactez-nous pour discuter d'un partenariat.
           </p>
-          <a
-            href="mailto:contact@mabellepromo.org?subject=Partenariat"
+          <Link
+            to="/informations/contacts"
             className="inline-block px-7 py-3 bg-white text-foreground rounded-full text-sm font-semibold hover:bg-white/90 transition-colors"
           >
             Proposer un partenariat
-          </a>
+          </Link>
         </motion.div>
       </section>
     </div>

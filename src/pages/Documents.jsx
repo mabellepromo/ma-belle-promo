@@ -3,6 +3,7 @@ import PageHero from "../components/PageHero";
 import { Download, Eye, Lock } from "lucide-react";
 import { useDocuments } from "../hooks/useDocuments";
 import { useLocalAuth } from "../lib/LocalAuth";
+import { Link } from "react-router-dom";
 
 const catColors = {
   "Gouvernance": "bg-blue-100 text-blue-700",
@@ -30,7 +31,7 @@ export default function Documents() {
               Certains documents sont réservés aux membres de l'association. Pour y accéder,{" "}
               <a href="/login" className="text-primary font-medium hover:underline">connectez-vous</a>{" "}
               ou contactez-nous à{" "}
-              <a href="mailto:contact@mabellepromo.org" className="text-primary font-medium hover:underline">contact@mabellepromo.org</a>.
+              <Link to="/informations/contacts" className="text-primary font-medium hover:underline">notre formulaire de contact</Link>.
             </p>
           </motion.div>
         )}

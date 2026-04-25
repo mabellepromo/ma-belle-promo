@@ -81,7 +81,7 @@ export default function Contacts() {
                 { icon: MapPin, label: "Adresse", value: "12 BP 335 Baguida, Togo" },
                 { icon: Phone, label: "TMoney", value: "90 05 36 06 / 90 03 63 43" },
                 { icon: Phone, label: "Flooz", value: "96 02 00 00 / 99 41 91 92" },
-                { icon: Mail, label: "Email", value: "contact@mabellepromo.org", href: "mailto:contact@mabellepromo.org" },
+                { icon: Mail, label: "Email", value: "contact@mabellepromo.org" },
                 { icon: Clock, label: "Disponibilité", value: "Lun – Ven : 8h – 18h" },
               ].map((item, i) => (
                 <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.08 }} className="flex items-start gap-4">

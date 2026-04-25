@@ -108,9 +108,9 @@ export default function NousSoutenir() {
               <p className="text-xs text-muted-foreground mb-2">{m.desc}</p>
               <p className="text-xs text-foreground/70 font-medium whitespace-pre-line">{m.detail}</p>
               {m.action && (
-                <a href="mailto:contact@mabellepromo.org?subject=Don" className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
+                <Link to="/don" className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
                   Donner maintenant
-                </a>
+                </Link>
               )}
             </motion.div>
           ))}

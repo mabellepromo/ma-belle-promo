@@ -23,9 +23,7 @@ export default function MentionsLegales() {
             <p><strong className="text-foreground">Nom de l'association :</strong> Ma Belle Promo (MBP)</p>
             <p><strong className="text-foreground">Statut :</strong> Association des anciens diplômés de la Faculté de Droit du Développement (FDD) de l'Université de Lomé, promotion 1994–2000</p>
             <p><strong className="text-foreground">Siège social :</strong> 12 BP 335 Baguida, Lomé, Togo</p>
-            <p><strong className="text-foreground">Email :</strong>{" "}
-              <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>
-            </p>
+            <p><strong className="text-foreground">Email :</strong>{" "}contact@mabellepromo.org</p>
             <p><strong className="text-foreground">Téléphone :</strong> +228 90 05 36 06 / +228 90 03 63 43</p>
             <p><strong className="text-foreground">Directrice de la publication :</strong> Fabienne SENAYA-ATAYI, Présidente de Ma Belle Promo</p>
           </Section>
@@ -75,8 +73,8 @@ export default function MentionsLegales() {
             <p>
               Conformément aux principes du Règlement Général sur la Protection des Données (RGPD) et à la
               loi togolaise sur la protection des données personnelles, vous disposez de droits sur vos données.
-              Pour exercer ces droits, contactez-nous à{" "}
-              <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>.
+              Pour exercer ces droits, utilisez notre{" "}
+              <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link>.
             </p>
           </Section>
 

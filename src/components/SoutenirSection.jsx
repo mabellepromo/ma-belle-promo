@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { HandHeart, Banknote, Phone, Mail, MapPin, Globe } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const supportMethods = [
   {
@@ -147,12 +148,12 @@ export default function SoutenirSection() {
               <p className="text-sm text-muted-foreground mb-3">{method.desc}</p>
               <p className="text-xs text-foreground/70 font-medium">{method.detail}</p>
               {method.action && (
-                <a
-                  href="mailto:contact@mabellepromo.org?subject=Don%20en%20ligne"
+                <Link
+                  to="/don"
                   className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity"
                 >
                   Donner maintenant
-                </a>
+                </Link>
               )}
             </motion.div>
           ))}

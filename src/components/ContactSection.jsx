@@ -109,9 +109,9 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground text-sm">Email</h4>
-                  <a href="mailto:contact@mabellepromo.org" className="text-primary text-sm mt-0.5 hover:underline">
-                    contact@mabellepromo.org
-                  </a>
+                  <Link to="/informations/contacts" className="text-primary text-sm mt-0.5 hover:underline">
+                    Formulaire de contact
+                  </Link>
                 </div>
               </div>
             </div>

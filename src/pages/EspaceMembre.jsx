@@ -402,7 +402,7 @@ export default function EspaceMembre() {
                   </ul>
                   <p className="text-xs text-muted-foreground mt-3">
                     Pour toute autre demande RGPD :{" "}
-                    <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>
+                    <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link>
                   </p>
                 </div>
               </div>
