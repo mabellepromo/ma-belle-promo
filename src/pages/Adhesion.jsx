@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
-import { CheckCircle2, ArrowRight, User, Mail, Phone, Briefcase, MapPin, GraduationCap, FileText, Heart, Upload, CreditCard } from "lucide-react";
+import { CheckCircle2, ArrowRight, ChevronRight, User, Mail, Phone, Briefcase, MapPin, GraduationCap, FileText, Heart, Upload, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -137,16 +137,23 @@ export default function Adhesion() {
       <section className="py-20 max-w-5xl mx-auto px-6">
 
         {/* Processus */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
-          {etapes.map((e) => (
-            <div key={e.num} className="relative text-center p-5 bg-card border border-border rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center mx-auto mb-3">
-                <span className="text-primary-foreground text-xs font-bold">{e.num}</span>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative mb-16">
+          {/* Ligne de connexion desktop */}
+          <div className="hidden sm:block absolute top-9 left-[12.5%] right-[12.5%] h-px bg-border z-0" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {etapes.map((e, i) => (
+              <div key={e.num} className="relative z-10 text-center p-5 bg-card border border-border rounded-xl">
+                <div className="w-10 h-10 rounded-full bg-primary ring-4 ring-background flex items-center justify-center mx-auto mb-3">
+                  <span className="text-primary-foreground text-xs font-bold">{e.num}</span>
+                </div>
+                <h4 className="font-semibold text-foreground text-sm mb-1">{e.titre}</h4>
+                <p className="text-muted-foreground text-xs leading-relaxed">{e.desc}</p>
+                {i < etapes.length - 1 && (
+                  <ChevronRight className="hidden sm:block absolute -right-3 top-9 -translate-y-1/2 w-5 h-5 text-primary/40 z-20" />
+                )}
               </div>
-              <h4 className="font-semibold text-foreground text-sm mb-1">{e.titre}</h4>
-              <p className="text-muted-foreground text-xs leading-relaxed">{e.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </motion.div>
 
         {/* Formulaire */}

@@ -91,27 +91,32 @@ export default function NousSoutenir() {
         </div>
 
         {/* Comment nous soutenir */}
-        <h2 className="font-heading text-2xl font-bold text-foreground text-center mb-8">Comment nous soutenir</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="text-center mb-8">
+          <p className="eyebrow text-accent mb-2">Toutes les façons d'aider</p>
+          <h2 className="font-heading text-2xl font-bold text-foreground">Comment nous soutenir</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
           {supportMethods.map((m, i) => (
             <motion.div
               key={m.titre}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 + i * 0.1 }}
-              className="bg-card border border-border rounded-2xl p-6 text-center hover:shadow-md hover:border-primary/20 transition-all"
+              className="bg-card border border-border rounded-xl p-5 flex items-start gap-4 hover:shadow-md hover:border-primary/20 transition-all"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <m.icon className="w-6 h-6 text-primary" />
+              <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                <m.icon className="w-5 h-5 text-primary" />
               </div>
-              <h4 className="font-heading font-semibold text-foreground mb-2">{m.titre}</h4>
-              <p className="text-xs text-muted-foreground mb-2">{m.desc}</p>
-              <p className="text-xs text-foreground/70 font-medium whitespace-pre-line">{m.detail}</p>
-              {m.action && (
-                <Link to="/don" className="mt-4 inline-block px-5 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
-                  Donner maintenant
-                </Link>
-              )}
+              <div className="min-w-0 flex-1">
+                <h4 className="font-heading font-bold text-foreground mb-1">{m.titre}</h4>
+                <p className="text-xs text-muted-foreground mb-1.5 leading-relaxed">{m.desc}</p>
+                <p className="text-xs text-foreground/70 font-medium whitespace-pre-line">{m.detail}</p>
+                {m.action && (
+                  <Link to="/don" className="mt-3 inline-block px-4 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
+                    Donner maintenant
+                  </Link>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>

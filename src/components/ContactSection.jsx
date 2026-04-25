@@ -65,7 +65,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-12 md:py-16 bg-muted/50">
+    <section id="contact" className="py-14 md:py-20 bg-muted/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 md:gap-20">
           {/* Info */}
@@ -76,41 +76,37 @@ export default function ContactSection() {
             transition={{ duration: 0.7 }}
           >
             <span className="eyebrow text-accent">Restons en contact</span>
-            <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
+            <h2 className="mt-3 font-heading text-3xl md:text-4xl font-bold text-foreground leading-tight">
               Contactez-nous
             </h2>
-            <p className="mt-6 text-muted-foreground text-lg leading-relaxed">
+            <p className="mt-5 text-muted-foreground leading-relaxed">
               Vous avez une question, une suggestion ou souhaitez nous rejoindre ?
               N'hésitez pas à nous écrire. Nous vous répondrons dans les meilleurs délais.
             </p>
 
-            <div className="mt-10 space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-primary" />
+            <div className="mt-10 space-y-4">
+              {[
+                { icon: MapPin, label: "Adresse", value: "12 BP 335 Baguida, Togo" },
+                { icon: Phone, label: "Téléphone", value: "+228 96 09 07 07" },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-4 p-4 rounded-xl bg-background border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4.5 h-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{label}</p>
+                    <p className="text-sm font-medium text-foreground mt-0.5">{value}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground text-sm">Adresse</h4>
-                  <p className="text-muted-foreground text-sm mt-0.5">12 BP 335 Baguida, Togo</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground text-sm">Téléphone</h4>
-                  <p className="text-muted-foreground text-sm mt-0.5">+228 96 09 07 07</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground text-sm">Email</h4>
-                  <Link to="/informations/contacts" className="text-primary text-sm mt-0.5 hover:underline">
-                    Formulaire de contact
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Message</p>
+                  <Link to="/informations/contacts" className="text-sm font-semibold text-primary hover:underline mt-0.5 block">
+                    Formulaire de contact →
                   </Link>
                 </div>
               </div>
@@ -124,7 +120,7 @@ export default function ContactSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.15 }}
           >
-            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-sm">
+            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-md">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Nom complet</label>
                 <Input
