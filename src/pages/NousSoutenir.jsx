@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Banknote, Phone, Mail, MapPin, Globe } from "lucide-react";
 import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
+import PaymentModal from "../components/PaymentModal";
 
 const supportMethods = [
   {
@@ -33,6 +35,8 @@ const supportMethods = [
 ];
 
 export default function NousSoutenir() {
+  const [donModal, setDonModal] = useState(false);
+
   return (
     <div>
       <SEO title="Nous Soutenir" description="Soutenez les actions solidaires de Ma Belle Promo au Togo. Faites un don et contribuez au développement de notre communauté." path="/implications/soutenir" />
@@ -83,9 +87,9 @@ export default function NousSoutenir() {
                 Vos dons, additionnés à ceux des adhérents, nous aident à toucher nos objectifs du doigt 
                 et à changer des vies concrètement.
               </p>
-              <a href="/don" className="mt-4 inline-block text-sm text-primary font-medium hover:underline">
+              <button onClick={() => setDonModal(true)} className="mt-4 inline-block text-sm text-primary font-medium hover:underline">
                 Faire un don maintenant →
-              </a>
+              </button>
             </div>
           </motion.div>
         </div>
@@ -112,15 +116,21 @@ export default function NousSoutenir() {
                 <p className="text-xs text-muted-foreground mb-1.5 leading-relaxed">{m.desc}</p>
                 <p className="text-xs text-foreground/70 font-medium whitespace-pre-line">{m.detail}</p>
                 {m.action && (
-                  <Link to="/don" className="mt-3 inline-block px-4 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
+                  <button onClick={() => setDonModal(true)} className="mt-3 inline-block px-4 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition-opacity">
                     Donner maintenant
-                  </Link>
+                  </button>
                 )}
               </div>
             </motion.div>
           ))}
         </div>
       </section>
+
+      <PaymentModal
+        open={donModal}
+        onClose={() => setDonModal(false)}
+        type="don"
+      />
     </div>
   );
 }

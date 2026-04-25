@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X, Download, Shield, Clock, CheckCircle, AlertCircle, Trash2, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import PageHero from "../components/PageHero";
+import PaymentModal from "../components/PaymentModal";
 
 const documentsExclusifs = [
   { titre: "Statuts de l'association (2018)", type: "PDF", taille: "245 Ko", date: "Janv. 2018" },
@@ -37,6 +38,7 @@ export default function EspaceMembre() {
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState("profil");
   const [deletionRequested, setDeletionRequested] = useState(false);
+  const [paymentModal, setPaymentModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -318,9 +320,9 @@ export default function EspaceMembre() {
                         </button>
                       )}
                       {!c.recu && (
-                        <a href="/implications/cotisation" className="text-xs font-semibold text-amber-600 hover:underline">
+                        <button onClick={() => setPaymentModal(true)} className="text-xs font-semibold text-amber-600 hover:underline">
                           Payer →
-                        </a>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -442,6 +444,13 @@ export default function EspaceMembre() {
         )}
 
       </section>
+
+      <PaymentModal
+        open={paymentModal}
+        onClose={() => setPaymentModal(false)}
+        type="cotisation"
+        user={user}
+      />
     </div>
   );
 }

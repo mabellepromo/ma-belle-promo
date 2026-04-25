@@ -30,6 +30,7 @@ const PAGE_TITLES = {
   "/informations/communiques":   "Communiqués",
   "/don":                        "Faire un Don",
   "/don/merci":                  "Merci !",
+  "/paiement/retour":            "Retour de paiement",
   "/espace-membre":              "Mon Espace",
   "/annuaire":                   "Annuaire des Membres",
   "/ressources":                 "Ressources Juridiques",
@@ -90,6 +91,7 @@ const PlanAction2026   = lazy(() => import('./pages/PlanAction2026'));
 const MentionsLegales    = lazy(() => import('./pages/MentionsLegales'));
 const Confidentialite    = lazy(() => import('./pages/Confidentialite'));
 const NewsletterConfirm  = lazy(() => import('./pages/NewsletterConfirm'));
+const PaiementRetour     = lazy(() => import('./pages/PaiementRetour'));
 
 function PageLoader() {
   return (
@@ -156,6 +158,7 @@ const AuthenticatedApp = () => {
         <Route path="/mentions-legales" element={<MentionsLegales />} />
         <Route path="/confidentialite" element={<Confidentialite />} />
         <Route path="/newsletter/confirmer" element={<NewsletterConfirm />} />
+        <Route path="/paiement/retour" element={<PaiementRetour />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
