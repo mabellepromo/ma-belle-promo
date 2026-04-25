@@ -48,7 +48,7 @@ function groupByYear(list) {
   return Object.entries(map).sort((a, b) => Number(b[0]) - Number(a[0]));
 }
 
-/* ── Carte hero (pleine largeur, image en fond) ── */
+/* ── Carte hero (image en haut, texte en bas sur fond carte) ── */
 function HeroCard({ article }) {
   const pill = catPills[article.categorie] ?? "bg-primary/90 text-white";
   return (
@@ -59,33 +59,33 @@ function HeroCard({ article }) {
     >
       <Link
         to={`/actualites/${article.id}`}
-        className="group relative block w-full h-[480px] rounded-3xl overflow-hidden shadow-2xl"
+        className="group block w-full rounded-3xl overflow-hidden shadow-2xl bg-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        {/* Image fond */}
-        <img
-          src={article.image}
-          alt={article.titre}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
-        {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-
-        {/* Contenu */}
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
-          <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 ${pill}`}>
+        {/* Image */}
+        <div className="relative h-72 md:h-96 overflow-hidden">
+          <img
+            src={article.image}
+            alt={article.titre}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+          <span className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold rounded-full ${pill}`}>
             {article.categorie}
           </span>
-          <h2 className="font-heading text-white text-2xl md:text-4xl font-bold leading-tight mb-3 group-hover:text-primary/90 transition-colors">
+        </div>
+
+        {/* Texte sur fond propre */}
+        <div className="p-8 md:p-10">
+          <h2 className="font-heading text-foreground text-2xl md:text-3xl font-bold leading-tight mb-3 group-hover:text-primary transition-colors">
             {article.titre}
           </h2>
-          <p className="text-white/70 text-sm leading-relaxed line-clamp-2 mb-5 max-w-2xl">
+          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-6 max-w-2xl">
             {article.extrait}
           </p>
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-white/60 text-xs">
+            <span className="flex items-center gap-2 text-muted-foreground text-xs">
               <Calendar className="w-3.5 h-3.5" /> {article.date}
             </span>
-            <span className="flex items-center gap-2 text-sm font-bold text-white group-hover:text-primary/90 transition-colors">
+            <span className="flex items-center gap-2 text-sm font-bold text-primary group-hover:gap-3 transition-all">
               Lire l'article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </div>
