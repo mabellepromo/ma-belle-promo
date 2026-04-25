@@ -54,8 +54,8 @@ export default function Galeries() {
                   className="group block rounded-2xl overflow-hidden border border-border hover:border-primary/30 hover:shadow-xl transition-all duration-300 bg-card"
                 >
 
-                  {/* Image de couverture */}
-                  <div className="relative h-52 overflow-hidden bg-muted">
+                  {/* Image de couverture — ratio 4/3 cohérent */}
+                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                     {g.cover ? (
                       <img loading="lazy" src={g.cover} alt={g.titre}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />

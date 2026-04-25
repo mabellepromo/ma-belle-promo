@@ -28,59 +28,55 @@ function TypeBadge({ type }) {
   );
 }
 
-/* ── Carte hero (1er événement passé) ── */
+/* ── Carte hero (1er événement passé) — image en haut, texte en bas ── */
 function HeroCard({ evt }) {
-  const content = (
+  const inner = (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="group relative rounded-3xl overflow-hidden border border-border hover:border-primary/30 hover:shadow-2xl transition-all duration-500 cursor-pointer"
-      style={{ minHeight: 420 }}
+      className="group rounded-3xl overflow-hidden border border-border bg-card hover:border-primary/30 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer"
     >
-      <img
-        src={evt.image}
-        alt={evt.titre}
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        onError={e => { e.target.style.display = "none"; }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
-
-      <div className="relative z-10 h-full flex flex-col justify-between p-8" style={{ minHeight: 420 }}>
-        <div className="flex items-start justify-between">
+      {/* Image */}
+      <div className="relative h-72 md:h-96 overflow-hidden">
+        <img
+          src={evt.image}
+          alt={evt.titre}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          onError={e => { e.target.style.display = "none"; }}
+        />
+        <div className="absolute top-4 left-4 flex items-center gap-2">
           <TypeBadge type={evt.type} />
-          <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-white/15 text-white backdrop-blur-sm">
+          <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-black/50 text-white backdrop-blur-sm">
             Passé
           </span>
         </div>
+      </div>
 
-        <div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/60 mb-3">
-            {evt.date && <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" />{evt.date}</span>}
-            {evt.heures && <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" />{evt.heures}</span>}
-            {evt.lieu && <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3" />{evt.lieu}</span>}
-          </div>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white leading-snug mb-3 group-hover:text-primary transition-colors">
-            {evt.titre}
-          </h2>
-          <p className="text-white/65 text-sm leading-relaxed line-clamp-2 mb-5">{evt.description}</p>
-          {evt.article && (
-            <Link
-              to={`/actualites/${evt.article.id}`}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all"
-            >
-              Lire le compte-rendu <ArrowRight className="w-4 h-4" />
-            </Link>
-          )}
+      {/* Texte */}
+      <div className="p-8">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-4">
+          {evt.date && <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" />{evt.date}</span>}
+          {evt.heures && <span className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary" />{evt.heures}</span>}
+          {evt.lieu && <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-primary" />{evt.lieu}</span>}
         </div>
+        <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground leading-snug mb-3 group-hover:text-primary transition-colors">
+          {evt.titre}
+        </h2>
+        <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-5">{evt.description}</p>
+        {evt.article && (
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3 transition-all">
+            Lire le compte-rendu <ArrowRight className="w-4 h-4" />
+          </span>
+        )}
       </div>
     </motion.div>
   );
 
   return evt.article
-    ? <Link to={`/actualites/${evt.article.id}`}>{content}</Link>
-    : content;
+    ? <Link to={`/actualites/${evt.article.id}`}>{inner}</Link>
+    : inner;
 }
 
 /* ── Carte compacte (grille) ── */

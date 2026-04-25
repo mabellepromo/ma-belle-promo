@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function MissionSection() {
   return (
-    <section id="mission" className="py-12 md:py-16 bg-background">
+    <section id="mission" className="py-16 md:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
@@ -15,7 +15,7 @@ export default function MissionSection() {
             transition={{ duration: 0.7 }}
           >
             <span className="eyebrow text-accent">Qui sommes-nous</span>
-            <h2 className="mt-3 font-heading text-2xl md:text-3xl font-bold text-foreground leading-tight">
+            <h2 className="mt-3 font-heading text-3xl md:text-5xl font-bold text-foreground leading-tight">
               Nous sommes <span className="text-primary">Ma Belle Promo</span>… <span className="text-muted-foreground font-medium">voici notre histoire !</span>
             </h2>
             <p className="mt-6 text-muted-foreground leading-relaxed text-lg">

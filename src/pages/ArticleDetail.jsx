@@ -70,19 +70,16 @@ export default function ArticleDetail() {
         article
       />
 
-      {/* ── Hero : texte gauche (effet feuilleté) + image droite ── */}
-      <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+      {/* ── Hero : cohérent avec les autres en-têtes de pages ── */}
+      <div className="bg-foreground border-b border-white/10">
+        <div className="max-w-5xl mx-auto px-6 pt-32 pb-12 md:pb-16">
           <div className="grid md:grid-cols-[1fr_380px] gap-8 md:gap-10 items-center">
 
             {/* ── Bloc titre avec effet pages feuilletées ── */}
             <div className="relative">
-              {/* Page 3 — la plus en arrière */}
-              <div className="absolute inset-0 rounded-2xl bg-emerald-200 translate-x-3 translate-y-3 opacity-50" />
-              {/* Page 2 — intermédiaire */}
-              <div className="absolute inset-0 rounded-2xl bg-emerald-100 translate-x-1.5 translate-y-1.5 opacity-80" />
-              {/* Page principale */}
-              <div className="relative bg-emerald-50 rounded-2xl border border-emerald-200/60 px-7 py-8 shadow-2xl">
+              <div className="absolute inset-0 rounded-2xl bg-emerald-700/40 translate-x-3 translate-y-3" />
+              <div className="absolute inset-0 rounded-2xl bg-emerald-600/30 translate-x-1.5 translate-y-1.5" />
+              <div className="relative bg-white/95 rounded-2xl border border-white/20 px-7 py-8 shadow-2xl">
                 <Link
                   to="/informations/actualites"
                   className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors mb-5"
@@ -99,7 +96,7 @@ export default function ArticleDetail() {
                   </span>
                 </div>
 
-                <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground leading-tight mb-4">
+                <h1 className="font-heading text-2xl md:text-4xl font-bold text-foreground leading-tight mb-4">
                   {article.titre}
                 </h1>
 
@@ -115,8 +112,8 @@ export default function ArticleDetail() {
               </div>
             </div>
 
-            {/* ── Image droite — propre et contenue ── */}
-            <div className="rounded-2xl overflow-hidden shadow-xl aspect-video w-full bg-muted">
+            {/* ── Image droite ── */}
+            <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video w-full bg-muted" style={{ boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}>
               <img
                 src={article.image}
                 alt={article.titre}
