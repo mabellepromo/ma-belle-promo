@@ -81,11 +81,10 @@ export default function Adhesion() {
       toast.error("Veuillez accepter la politique de confidentialité.");
       return;
     }
-    await new Promise(r => setTimeout(r, 1000));
+    const nomComplet = `${form.prenom} ${form.nom}`.trim();
 
     // Sauvegarde dans la file d'attente de l'Annuaire
-    const nomComplet = `${form.prenom} ${form.nom}`.trim();
-    addPending({
+    await addPending({
       nom: nomComplet,
       profession: [form.profession, form.fonctionActuelle].filter(Boolean).join(" — ") || "Non renseigné",
       ville: form.ville || "Non renseignée",
@@ -101,6 +100,19 @@ export default function Adhesion() {
       cycleCotisation: form.cycleCotisation,
       motivations: form.motivations,
     });
+
+    // Notifier l'admin (non bloquant)
+    fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type:      "admin_alert",
+        alertType: "new_member_request",
+        nom:       nomComplet,
+        email:     form.email,
+        detail:    `Nouvelle demande d'adhésion reçue.\nPromotion : ${form.anneeObtention} · ${form.specialite || "—"}\nProfession : ${form.profession || "—"}\nVille : ${form.ville || "—"}, ${form.pays || "—"}\nCycle de cotisation : ${form.cycleCotisation}`,
+      }),
+    }).catch(console.error);
 
     setSent(true);
     toast.success("Demande d'adhésion envoyée avec succès !");

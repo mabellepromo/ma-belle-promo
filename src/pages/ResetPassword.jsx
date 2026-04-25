@@ -47,7 +47,7 @@ export default function ResetPassword() {
       toast.error("Erreur : " + error.message);
     } else {
       toast.success("Mot de passe créé ! Redirection en cours…");
-      setTimeout(() => navigate("/login"), 2500);
+      setTimeout(() => navigate("/espace-membre"), 2500);
     }
     setLoading(false);
   }
@@ -90,7 +90,7 @@ export default function ResetPassword() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
           <img
-            src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+            src="/Logo Redesign1.webp"
             alt="Ma Belle Promo"
             className="w-16 h-16 mx-auto mb-4 drop-shadow-lg"
           />
@@ -156,7 +156,7 @@ export default function ResetPassword() {
           </form>
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-6">© 2018–2024 Ma Belle Promo · FDD Université de Lomé</p>
+        <p className="text-center text-gray-600 text-xs mt-6">© 2018–2026 Ma Belle Promo · FDD Université de Lomé</p>
       </motion.div>
     </div>
   );

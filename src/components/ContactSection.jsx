@@ -32,20 +32,14 @@ export default function ContactSection() {
     }
     setSending(true);
 
-    const msg = {
-      ...form,
-      sujet: "",
-      id: Date.now(),
-      receivedAt: new Date().toISOString(),
-      read: false,
-    };
+    const receivedAt = new Date().toISOString();
 
     try {
-      // Sauvegarde dans la table messages (non bloquante)
+      // Sauvegarde dans la table messages (non bloquante) — pas d'id fourni : UUID généré par Supabase
       supabase.from("messages").insert({
-        id: msg.id, name: msg.name, email: msg.email,
-        sujet: msg.sujet, message: msg.message,
-        received_at: msg.receivedAt, read: false,
+        name: form.name, email: form.email,
+        sujet: form.sujet, message: form.message,
+        received_at: receivedAt, read: false,
       }).then(({ error }) => { if (error) console.warn("Sauvegarde messages échouée:", error.message); });
 
       const resp = await fetch("/api/send-email", {

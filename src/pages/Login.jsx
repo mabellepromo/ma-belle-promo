@@ -104,7 +104,7 @@ export default function Login() {
           className="text-center mb-8"
         >
           <img
-            src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+            src="/Logo Redesign1.webp"
             alt="Ma Belle Promo"
             className="w-20 h-20 mx-auto mb-4 drop-shadow-lg"
           />
@@ -270,7 +270,7 @@ export default function Login() {
         </motion.div>
 
         <p className="text-center text-gray-600 text-xs mt-6">
-          © 2018–2024 Ma Belle Promo · FDD Université de Lomé
+          © 2018–2026 Ma Belle Promo · FDD Université de Lomé
         </p>
       </div>
     </div>

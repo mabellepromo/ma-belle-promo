@@ -215,7 +215,8 @@ function buildNewsletterConfirmPayload({ email, token, confirm_url }) {
 
 function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
-    deletion_request: { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
+    deletion_request:    { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
+    new_member_request:  { titre: "Nouvelle demande d'adhésion",      couleur: "#16a34a", badge: "À valider" },
   };
   const cfg = labels[alertType] || { titre: escHtml(alertType), couleur: "#6b7280", badge: "Alerte" };
   const content = `
@@ -231,8 +232,8 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
       <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Date :</td>
           <td style="padding:4px 0;font-size:13px;color:#6b7280;">${new Date().toLocaleString("fr-FR")}</td></tr>
     </table>
-    ${detail ? `<div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;">
-      <p style="margin:0;font-size:13px;color:#374151;">${escHtml(detail)}</p>
+    ${detail ? `<div style="background:#f0fdf4;border-left:4px solid ${cfg.couleur};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;">
+      <p style="margin:0;font-size:13px;color:#374151;white-space:pre-line;">${escHtml(detail).replace(/\n/g, "<br>")}</p>
     </div>` : ""}
     <p style="margin:0;font-size:12px;color:#9ca3af;">
       Traitez cette demande depuis le Dashboard ou en répondant à l'email du membre sous 30 jours (Art. 17 RGPD).

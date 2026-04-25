@@ -113,9 +113,10 @@ export function useMemberStore({ realtime = false } = {}) {
   }
 
   async function addPending(member) {
+    // Exclure id — Supabase génère l'UUID automatiquement
+    const { id: _discarded, ...baseRow } = memberToRow(member);
     const row = {
-      ...memberToRow(member),
-      id: String(member.id || Date.now()),
+      ...baseRow,
       bureau: false,
       status: "pending",
       photo: member.photo ||
