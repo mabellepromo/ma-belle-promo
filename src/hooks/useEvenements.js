@@ -16,7 +16,7 @@ export function useEvenements() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setEvenements(evenementsStatic);
       setIsSeeded(false);
     } else {

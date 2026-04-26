@@ -16,7 +16,7 @@ export function useDocuments() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setDocuments(documentsStatic);
       setIsSeeded(false);
     } else {

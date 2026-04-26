@@ -17,7 +17,7 @@ export function useProjets() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setProjets(projetsStatic);
       setIsSeeded(false);
     } else {

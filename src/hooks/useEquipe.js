@@ -16,7 +16,7 @@ export function useEquipe() {
       .select("*")
       .order("id", { ascending: true });
 
-    if (error || !data?.length) {
+    if (error) {
       setEquipe(equipeStatic);
       setIsSeeded(false);
     } else {

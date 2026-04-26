@@ -16,7 +16,7 @@ export function useRessources() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setRessources(ressourcesStatic);
       setIsSeeded(false);
     } else {

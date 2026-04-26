@@ -16,7 +16,7 @@ export function useProgrammes() {
       .select("*")
       .order("numero", { ascending: true });
 
-    if (error || !data?.length) {
+    if (error) {
       setProgrammes(programmesStatic);
       setIsSeeded(false);
     } else {

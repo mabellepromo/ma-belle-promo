@@ -16,7 +16,7 @@ export function useMediaVideos() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setVideos(videosStatic);
       setIsSeeded(false);
     } else {

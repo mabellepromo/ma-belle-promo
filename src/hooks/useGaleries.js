@@ -17,7 +17,7 @@ export function useGaleries() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setGaleries(galeriesStatic);
       setIsSeeded(false);
     } else {

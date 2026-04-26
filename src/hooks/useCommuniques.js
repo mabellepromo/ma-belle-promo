@@ -16,7 +16,7 @@ export function useCommuniques() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error || !data?.length) {
+    if (error) {
       setCommuniques(communiquesStatic);
       setIsSeeded(false);
     } else {
