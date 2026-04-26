@@ -89,7 +89,6 @@
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    overflow-x: hidden;
     max-width: 100%;
     touch-action: pan-y; /* bloque le glissement horizontal sur iOS (toutes versions) */
   }
