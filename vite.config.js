@@ -70,10 +70,11 @@ export default defineConfig({
           if (id.includes('@supabase'))       return 'vendor-supabase';
           if (id.includes('@tanstack'))       return 'vendor-query';
           if (id.includes('lucide-react'))    return 'vendor-icons';
-          // scheduler et react-is doivent être avec react-dom (même groupe, sinon cycle)
+          // Tout l'écosystème React ensemble — scheduler, react-is, @remix-run/router (dep de react-router)
           if (
             id.includes('react-dom') || id.includes('react-router') ||
-            id.includes('/react/') || id.includes('/scheduler/') || id.includes('/react-is/')
+            id.includes('/react/') || id.includes('/scheduler/') ||
+            id.includes('/react-is/') || id.includes('@remix-run')
           ) return 'vendor-react';
           return 'vendor-libs';
         },
