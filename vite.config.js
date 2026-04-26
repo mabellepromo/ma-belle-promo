@@ -61,6 +61,23 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {},
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor-tiptap';
+          if (id.includes('framer-motion'))   return 'vendor-motion';
+          if (id.includes('@supabase'))       return 'vendor-supabase';
+          if (id.includes('@tanstack'))       return 'vendor-query';
+          if (id.includes('lucide-react'))    return 'vendor-icons';
+          // scheduler et react-is doivent être avec react-dom (même groupe, sinon cycle)
+          if (
+            id.includes('react-dom') || id.includes('react-router') ||
+            id.includes('/react/') || id.includes('/scheduler/') || id.includes('/react-is/')
+          ) return 'vendor-react';
+          return 'vendor-libs';
+        },
+      },
+    },
   },
 });
