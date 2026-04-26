@@ -89,7 +89,9 @@
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    overflow-x: hidden;
+    overflow-x: hidden; /* fallback */
+    overflow-x: clip;   /* Safari : clip réel sans scroll context */
+    max-width: 100%;
   }
   body {
     @apply bg-background text-foreground font-body;
@@ -98,6 +100,7 @@
     line-height: 1.7;
     overflow-x: hidden;
     overscroll-behavior-y: none;
+    max-width: 100%;
   }
 
   /* Safe area : navbar fixe (notch iOS) */

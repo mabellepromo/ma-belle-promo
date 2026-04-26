@@ -24,7 +24,7 @@ export function WindowFrame() {
         pointerEvents: "none",
         zIndex: 99990,
         boxShadow: `
-          0 0 0 200vmax #cce3d8,
+          0 0 0 300px #cce3d8,
           0 0 0 1px rgba(80,160,130,0.25),
           0 16px 40px rgba(30,100,70,0.15)
         `,
