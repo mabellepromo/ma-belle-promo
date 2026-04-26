@@ -103,7 +103,7 @@ export default function Confidentialite() {
           </Section>
 
           <Section title="6. Vos droits">
-            <p>Conformément au RGPD et à la réglementation togolaise sur la protection des données, vous disposez des droits suivants :</p>
+            <p>Conformément à la <strong className="text-foreground">loi togolaise n° 2019-014 du 29 octobre 2019</strong> relative à la protection des données à caractère personnel et, pour les membres résidant dans l'Union Européenne, au <strong className="text-foreground">Règlement Général sur la Protection des Données (RGPD)</strong>, vous disposez des droits suivants :</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong className="text-foreground">Droit d'accès</strong> — consulter vos données depuis votre <Link to="/espace-membre" className="text-primary hover:underline">espace membre</Link></li>
               <li><strong className="text-foreground">Droit de rectification</strong> — modifier votre profil depuis votre espace membre</li>

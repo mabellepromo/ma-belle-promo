@@ -71,8 +71,9 @@ export default function MentionsLegales() {
               </Link>.
             </p>
             <p>
-              Conformément aux principes du Règlement Général sur la Protection des Données (RGPD) et à la
-              loi togolaise sur la protection des données personnelles, vous disposez de droits sur vos données.
+              Conformément à la loi togolaise n° 2019-014 du 29 octobre 2019 relative à la protection des données
+              à caractère personnel et, pour les membres résidant dans l'Union Européenne, au RGPD,
+              vous disposez de droits sur vos données.
               Pour exercer ces droits, utilisez notre{" "}
               <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link>.
             </p>
@@ -91,7 +92,12 @@ export default function MentionsLegales() {
 
           <Section title="7. Droit applicable">
             <p>
-              Le présent site et ses mentions légales sont soumis au droit togolais.
+              Le présent site et ses mentions légales sont soumis au <strong className="text-foreground">droit togolais</strong>,
+              notamment la loi n° 2019-014 du 29 octobre 2019 relative à la protection des données à caractère personnel,
+              placée sous le contrôle de l'<strong className="text-foreground">Autorité de Protection des Données Personnelles (APDP)</strong>.
+            </p>
+            <p>
+              Pour les membres résidant dans l'Union Européenne, le RGPD s'applique en complément.
               Tout litige relatif à l'utilisation du site relèvera de la compétence exclusive des tribunaux de Lomé, Togo.
             </p>
           </Section>
