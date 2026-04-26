@@ -116,7 +116,6 @@ const AuthenticatedApp = () => {
     <>
     <PageTitleUpdater />
     <ScrollToTop />
-    <Suspense fallback={<PageLoader />}>
     <AnimatePresence mode="wait" initial={false}>
     <motion.div
       key={location.key}
@@ -125,6 +124,7 @@ const AuthenticatedApp = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.15, ease: "easeInOut" }}
     >
+    <Suspense fallback={<PageLoader />}>
     <Routes location={location}>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>
@@ -165,9 +165,9 @@ const AuthenticatedApp = () => {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
     </motion.div>
     </AnimatePresence>
-    </Suspense>
     </>
   );
 };
