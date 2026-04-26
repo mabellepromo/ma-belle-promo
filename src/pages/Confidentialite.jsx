@@ -109,7 +109,7 @@ export default function Confidentialite() {
               <li><strong className="text-foreground">Droit de rectification</strong> — modifier votre profil depuis votre espace membre</li>
               <li><strong className="text-foreground">Droit à l'effacement</strong> — demander la suppression de votre compte via notre <Link to="/informations/contacts" className="text-primary hover:underline">formulaire de contact</Link></li>
               <li><strong className="text-foreground">Droit d'opposition</strong> — s'opposer à un traitement en nous contactant par email</li>
-              <li><strong className="text-foreground">Droit à la portabilité</strong> — demander un export de vos données par email</li>
+              <li><strong className="text-foreground">Droit à la portabilité</strong> — télécharger directement vos données depuis votre <Link to="/espace-membre" className="text-primary hover:underline">espace membre</Link> (onglet "Mes données") au format JSON</li>
             </ul>
             <p className="mt-3">
               Pour exercer ces droits, utilisez notre{" "}

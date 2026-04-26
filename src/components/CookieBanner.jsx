@@ -43,7 +43,7 @@ export default function CookieBanner() {
                 <p className="text-sm font-semibold text-foreground mb-1">Ce site utilise des cookies</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Uniquement des cookies techniques nécessaires à la connexion et au bon fonctionnement du site. Aucun cookie publicitaire ou de tracking.{" "}
-                  <Link to="/confidentialite" onClick={accept} className="text-primary hover:underline font-medium">
+                  <Link to="/confidentialite" className="text-primary hover:underline font-medium">
                     En savoir plus
                   </Link>
                 </p>
