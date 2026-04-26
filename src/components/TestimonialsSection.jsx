@@ -106,10 +106,10 @@ export default function TestimonialsSection() {
 
             {/* Contrôles */}
             <div className="flex-shrink-0 flex items-center gap-1.5">
-              <button onClick={prev} className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
+              <button onClick={prev} aria-label="Témoignage précédent" className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
                 <ChevronLeft className="w-3 h-3" />
               </button>
-              <button onClick={next} className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
+              <button onClick={next} aria-label="Témoignage suivant" className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-accent hover:border-accent transition-colors">
                 <ChevronRight className="w-3 h-3" />
               </button>
             </div>

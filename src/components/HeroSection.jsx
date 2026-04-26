@@ -147,8 +147,9 @@ export default function HeroSection() {
 
             <WaterBubble>
               <motion.img
-                src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+                src="/Logo Redesign1.webp"
                 alt="Ma Belle Promo"
+                fetchPriority="high"
                 initial={{ opacity: 0, scale: 0.3 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
                 style={{

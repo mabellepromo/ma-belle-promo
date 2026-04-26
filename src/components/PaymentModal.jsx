@@ -95,7 +95,7 @@ export default function PaymentModal({ open, onClose, type = "don", user = null 
                     : "Montant libre — paiement sécurisé"}
                 </p>
               </div>
-              <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>

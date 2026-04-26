@@ -110,7 +110,7 @@ export default function FooterSection() {
                     required
                     className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0 sm:w-44"
                   />
-                  <button type="submit" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-colors">
+                  <button type="submit" aria-label="S'abonner à la newsletter" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-colors">
                     <ArrowRight className="w-3 h-3 text-primary-foreground" />
                   </button>
                 </div>

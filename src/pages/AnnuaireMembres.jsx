@@ -127,7 +127,7 @@ export default function AnnuaireMembres() {
               <Star className="w-3.5 h-3.5" /> Bureau
             </button>
             {hasFilters && (
-              <button onClick={resetFilters} className="h-9 w-9 flex items-center justify-center rounded-md border border-input bg-background hover:bg-muted transition-colors">
+              <button onClick={resetFilters} aria-label="Effacer les filtres" className="h-9 w-9 flex items-center justify-center rounded-md border border-input bg-background hover:bg-muted transition-colors">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -267,7 +267,7 @@ function MemberModal({ member, onClose, session, onEdit }) {
                 <Edit2 className="w-3 h-3" /> Modifier
               </button>
             )}
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/80 transition-colors">
+            <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/80 transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -368,7 +368,7 @@ function EditMemberModal({ member, onClose, onSave, isAdmin }) {
               <p className="text-muted-foreground text-xs">{member.nom}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -508,7 +508,7 @@ function AddMemberModal({ onClose, onSubmit }) {
               <p className="text-muted-foreground text-xs">{step === 1 ? "Renseignez les informations" : "Confirmez avant d'envoyer"}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -653,7 +653,7 @@ function ValidationModal({ pending, onValidate, onReject, onClose }) {
               <p className="text-muted-foreground text-xs">{pending.length} adhésion{pending.length > 1 ? "s" : ""} à valider</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
