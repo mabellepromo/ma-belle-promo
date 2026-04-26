@@ -60,4 +60,21 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('framer-motion'))                          return 'vendor-motion';
+          if (id.includes('@supabase'))                              return 'vendor-supabase';
+          if (id.includes('@tanstack'))                              return 'vendor-query';
+          if (id.includes('@radix-ui'))                             return 'vendor-radix';
+          if (id.includes('lucide-react'))                          return 'vendor-icons';
+          if (id.includes('react-dom') || id.includes('react-router') || id.includes('/react/')) return 'vendor-react';
+          if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor-tiptap';
+          return 'vendor-misc';
+        },
+      },
+    },
+  },
 });
