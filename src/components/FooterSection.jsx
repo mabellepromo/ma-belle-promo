@@ -44,7 +44,7 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-foreground text-background footer-safe-area">
       {/* Ligne d'accent en haut */}
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 

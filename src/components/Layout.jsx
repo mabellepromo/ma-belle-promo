@@ -4,9 +4,9 @@ import FooterSection from "./FooterSection";
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col" style={{ minHeight: "100dvh" }}>
       {/* Logo tampon fixe en filigrane sur toutes les pages */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
+      <div className="fixed inset-0 overflow-hidden flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
         <img
           src="/Logo Redesign1.webp"
           alt=""
@@ -16,7 +16,7 @@ export default function Layout() {
         />
       </div>
       <Navbar />
-      <main className="relative z-10 flex-1 pt-16 md:pt-20">
+      <main className="relative z-10 flex-1 main-safe-offset">
         <Outlet />
       </main>
       <FooterSection />

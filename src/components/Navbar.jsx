@@ -175,8 +175,11 @@ export default function Navbar() {
         backdropFilter: scrolled ? "blur(14px)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
         boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.35)" : "none",
+        paddingTop: "env(safe-area-inset-top, 0px)",
+        paddingLeft: "env(safe-area-inset-left, 0px)",
+        paddingRight: "env(safe-area-inset-right, 0px)",
       }}
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className="navbar-safe-area fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
       {/* Top accent bar */}
       <div className="h-0.5 bg-gradient-to-r from-emerald-400 via-yellow-300 to-emerald-500" />
@@ -185,7 +188,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
           <img
-            src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+            src="/Logo Redesign1.webp"
             alt="Ma Belle Promo"
             className="w-10 h-10 rounded-full object-cover shadow-md group-hover:shadow-primary/30 transition-shadow"
           />

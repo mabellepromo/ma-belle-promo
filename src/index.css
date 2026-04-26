@@ -86,12 +86,38 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground font-body;
     text-align: left;
     font-size: 15px;
     line-height: 1.7;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+  }
+
+  /* Safe area : navbar fixe (notch iOS) */
+  .navbar-safe-area {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Offset main sous navbar fixe + safe area */
+  .main-safe-offset {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+  }
+  @media (min-width: 768px) {
+    .main-safe-offset {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 5rem);
+    }
+  }
+
+  /* Footer : espace barre home iPhone */
+  .footer-safe-area {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Titres — élégance cabinet d'avocat */
