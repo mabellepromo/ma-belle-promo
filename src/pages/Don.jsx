@@ -14,7 +14,7 @@ const montants = [5000, 10000, 25000, 50000, 100000];
 const programmes = [
   { id: "general", label: "Fonds général MBP" },
   { id: "bourses", label: "Programme à destination des étudiants" },
-  { id: "humanitaire", label: "Actions humanitaires" },
+  { id: "humanitaire", label: "Programme communautaire" },
   { id: "conference", label: "Conférence, colloque" },
   { id: "autre", label: "Autre" },
 ];
