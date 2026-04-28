@@ -16,6 +16,8 @@ const programmes = [
   { id: "bourses", label: "Programme à destination des étudiants" },
   { id: "humanitaire", label: "Programme communautaire" },
   { id: "conference", label: "Conférence, colloque" },
+  { id: "plaidoyer", label: "Plaidoyer et lobbying" },
+  { id: "formation", label: "Formation et renforcement des capacités" },
   { id: "autre", label: "Autre" },
 ];
 
