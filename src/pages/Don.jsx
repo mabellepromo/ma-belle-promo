@@ -15,20 +15,25 @@ const programmes = [
   { id: "general", label: "Fonds général MBP" },
   { id: "bourses", label: "Programme Bourses étudiants" },
   { id: "humanitaire", label: "Actions humanitaires" },
-  { id: "numerique", label: "Ouvrage numérique collectif" },
+  { id: "conference", label: "Organisation d'une Conférence sur un sujet juridique" },
+  { id: "autre", label: "Autre" },
 ];
 
 export default function Don() {
   const navigate = useNavigate();
   const [montantSelectionne, setMontantSelectionne] = useState(null);
+  const [montantAutreActif, setMontantAutreActif] = useState(false);
   const [montantLibre, setMontantLibre] = useState("");
   const [programme, setProgramme] = useState("general");
+  const [programmeAutre, setProgrammeAutre] = useState("");
   const [form, setForm] = useState({ nom: "", prenom: "", email: "", tel: "", message: "" });
   const [mode, setMode] = useState("tmoney"); // tmoney | flooz | virement | especes
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const montantFinal = montantLibre ? parseInt(montantLibre) : montantSelectionne;
+  const montantFinal = montantAutreActif
+    ? (montantLibre ? parseInt(montantLibre) : null)
+    : montantSelectionne;
 
   const update = (f) => (e) => setForm({ ...form, [f]: e.target.value });
 
@@ -44,7 +49,8 @@ export default function Don() {
     }
     setLoading(true);
     await new Promise(r => setTimeout(r, 1200));
-    navigate("/don/merci", { state: { nom: form.prenom || form.nom, montant: montantFinal, programme } });
+    const programmeLabel = programme === "autre" ? (programmeAutre || "Autre") : programme;
+    navigate("/don/merci", { state: { nom: form.prenom || form.nom, montant: montantFinal, programme: programmeLabel } });
   };
 
   const modesPaiement = [
@@ -72,36 +78,50 @@ export default function Don() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="bg-card border border-border rounded-2xl p-7">
             <h2 className="font-heading text-lg font-bold text-foreground mb-5 flex items-center gap-2">
-              <Heart className="w-5 h-5 text-primary" /> Choisissez votre montant (FCFA)
+              <Heart className="w-5 h-5 text-primary" /> Choisissez votre montant (F CFA)
             </h2>
             <div className="flex flex-wrap gap-3 mb-4">
               {montants.map((m) => (
                 <button
                   key={m}
                   type="button"
-                  onClick={() => { setMontantSelectionne(m); setMontantLibre(""); }}
+                  onClick={() => { setMontantSelectionne(m); setMontantAutreActif(false); setMontantLibre(""); }}
                   className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all ${
-                    montantSelectionne === m && !montantLibre
+                    montantSelectionne === m && !montantAutreActif
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-background border-border text-foreground hover:border-primary hover:text-primary"
                   }`}
                 >
-                  {m.toLocaleString("fr-FR")} F
+                  {m.toLocaleString("fr-FR")} F CFA
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => { setMontantSelectionne(null); setMontantAutreActif(true); setMontantLibre(""); }}
+                className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all ${
+                  montantAutreActif
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-border text-foreground hover:border-primary hover:text-primary"
+                }`}
+              >
+                Autre
+              </button>
             </div>
-            <div className="relative">
-              <Input
-                type="number"
-                placeholder="Autre montant (FCFA)"
-                value={montantLibre}
-                onChange={(e) => { setMontantLibre(e.target.value); setMontantSelectionne(null); }}
-                className="h-11 pl-4"
-              />
-            </div>
+            {montantAutreActif && (
+              <div className="relative mb-2">
+                <input
+                  type="number"
+                  placeholder="Précisez le montant (F CFA)"
+                  value={montantLibre}
+                  onChange={(e) => setMontantLibre(e.target.value)}
+                  autoFocus
+                  className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+            )}
             {montantFinal > 0 && (
               <p className="mt-3 text-sm font-semibold text-primary">
-                ✓ Montant sélectionné : {montantFinal.toLocaleString("fr-FR")} FCFA
+                ✓ Montant sélectionné : {montantFinal.toLocaleString("fr-FR")} F CFA
               </p>
             )}
           </motion.div>
@@ -127,6 +147,18 @@ export default function Don() {
                 </button>
               ))}
             </div>
+            {programme === "autre" && (
+              <div className="mt-3">
+                <input
+                  type="text"
+                  placeholder="Veuillez préciser..."
+                  value={programmeAutre}
+                  onChange={(e) => setProgrammeAutre(e.target.value)}
+                  autoFocus
+                  className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+            )}
           </motion.div>
 
           {/* Mode de paiement */}
@@ -211,7 +243,7 @@ export default function Don() {
             ) : (
               <Heart className="w-5 h-5" />
             )}
-            {loading ? "Traitement en cours..." : `Confirmer mon don${montantFinal ? ` de ${montantFinal.toLocaleString("fr-FR")} FCFA` : ""}`}
+            {loading ? "Traitement en cours..." : `Confirmer mon don${montantFinal ? ` de ${montantFinal.toLocaleString("fr-FR")} F CFA` : ""}`}
           </Button>
         </form>
       </section>
