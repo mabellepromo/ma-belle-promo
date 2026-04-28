@@ -59,7 +59,7 @@ export default function Don() {
     { id: "tmoney", label: "TMoney", detail: "+228 90 05 36 06" },
     { id: "flooz", label: "Flooz", detail: "+228 96 02 00 00" },
     { id: "virement", label: "Virement bancaire", detail: "Ecobank Togo — RIB disponible sur demande" },
-    { id: "especes", label: "Espèces / en personne", detail: "12 BP 335 Baguida, Lomé" },
+    { id: "especes", label: "Espèces / en personne", detail: "12 BP 335 Baguida, Lomé", notice: "Un reçu de don sera établi et remis au donateur à titre de justificatif." },
   ];
 
   return (
@@ -183,6 +183,9 @@ export default function Don() {
                 >
                   <div className={`text-sm font-semibold ${mode === m.id ? "text-primary" : "text-foreground"}`}>{m.label}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{m.detail}</div>
+                  {m.notice && (
+                    <div className="text-xs text-muted-foreground mt-1.5 italic border-t border-border/50 pt-1.5">{m.notice}</div>
+                  )}
                 </button>
               ))}
             </div>
