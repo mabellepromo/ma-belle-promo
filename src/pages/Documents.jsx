@@ -1,18 +1,23 @@
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { Download, Eye, Lock } from "lucide-react";
+import { Download, Eye, Lock, Scale, Target, BookOpen, BarChart3, FileText } from "lucide-react";
 import { useDocuments } from "../hooks/useDocuments";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { Link } from "react-router-dom";
 
-const catColors = {
+const catColors = /** @type {Record<string, string>} */ ({
   "Gouvernance": "bg-blue-100 text-blue-700",
-  "Stratégie": "bg-green-100 text-green-700",
-  "Rapport": "bg-purple-100 text-purple-700",
-  "Finance": "bg-amber-100 text-amber-700",
-};
+  "Stratégie":   "bg-green-100 text-green-700",
+  "Rapport":     "bg-purple-100 text-purple-700",
+  "Finance":     "bg-amber-100 text-amber-700",
+});
 
-const typeIcons = { "PDF": "📄", "Excel": "📊", "Word": "📝" };
+const catIcons = /** @type {Record<string, {Icon: import("lucide-react").LucideIcon, bg: string, color: string}>} */ ({
+  "Gouvernance": { Icon: Scale,    bg: "bg-blue-100",   color: "text-blue-600"   },
+  "Stratégie":   { Icon: Target,   bg: "bg-green-100",  color: "text-green-600"  },
+  "Rapport":     { Icon: BookOpen, bg: "bg-purple-100", color: "text-purple-600" },
+  "Finance":     { Icon: BarChart3,bg: "bg-amber-100",  color: "text-amber-600"  },
+});
 
 export default function Documents() {
   const { documents } = useDocuments();
@@ -37,55 +42,59 @@ export default function Documents() {
         )}
 
         <div className="space-y-4">
-          {documents.map((doc, i) => (
-            <motion.div
-              key={doc.titre}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className="bg-card border border-border rounded-xl p-5 hover:shadow-md hover:border-primary/20 transition-all"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
-                  {typeIcons[doc.type] || "📄"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h3 className="font-heading font-bold text-foreground text-sm">{doc.titre}</h3>
-                    {doc.acces === "members" && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">
-                        <Lock className="w-2.5 h-2.5" /> Membres
-                      </span>
+          {documents.map((doc, i) => {
+            const cat = catIcons[doc.categorie] || { Icon: FileText, bg: "bg-muted", color: "text-muted-foreground" };
+            const { Icon, bg, color } = cat;
+            return (
+              <motion.div
+                key={doc.titre}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08 }}
+                className="bg-card border border-border rounded-xl p-5 hover:shadow-md hover:border-primary/20 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                    <Icon className={`w-6 h-6 ${color}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <h3 className="font-heading font-bold text-foreground text-sm">{doc.titre}</h3>
+                      {doc.acces === "members" && (
+                        <span className="flex items-center gap-1 px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">
+                          <Lock className="w-2.5 h-2.5" /> Membres
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${catColors[doc.categorie] || "bg-gray-100 text-gray-700"}`}>{doc.categorie}</span>
+                      <span className="text-xs text-muted-foreground">{doc.type} • {doc.taille} • {doc.date}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{doc.desc}</p>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    {doc.url && (doc.acces === "public" || (doc.acces === "members" && isMember)) ? (
+                      <>
+                        <a href={doc.url} target="_blank" rel="noreferrer"
+                          className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors" title="Aperçu">
+                          <Eye className="w-4 h-4" />
+                        </a>
+                        <a href={doc.url} download target="_blank" rel="noreferrer"
+                          className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors text-primary" title="Télécharger">
+                          <Download className="w-4 h-4" />
+                        </a>
+                      </>
+                    ) : (
+                      <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground cursor-not-allowed"
+                        title={!doc.url ? "Aucun fichier joint" : "Membres uniquement"}>
+                        <Lock className="w-4 h-4" />
+                      </button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${catColors[doc.categorie] || "bg-gray-100 text-gray-700"}`}>{doc.categorie}</span>
-                    <span className="text-xs text-muted-foreground">{doc.type} • {doc.taille} • {doc.date}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{doc.desc}</p>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  {doc.url && (doc.acces === "public" || (doc.acces === "members" && isMember)) ? (
-                    <>
-                      <a href={doc.url} target="_blank" rel="noreferrer"
-                        className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors" title="Aperçu">
-                        <Eye className="w-4 h-4" />
-                      </a>
-                      <a href={doc.url} download target="_blank" rel="noreferrer"
-                        className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors text-primary" title="Télécharger">
-                        <Download className="w-4 h-4" />
-                      </a>
-                    </>
-                  ) : (
-                    <button className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-muted-foreground cursor-not-allowed"
-                      title={!doc.url ? "Aucun fichier joint" : "Membres uniquement"}>
-                      <Lock className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
     </div>
