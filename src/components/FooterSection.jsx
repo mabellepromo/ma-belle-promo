@@ -77,7 +77,7 @@ export default function FooterSection() {
               </Link>
             ))}
             <a
-              href="https://passerelles-mbp.vercel.app/"
+              href="https://passerelles.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity text-background/50"
