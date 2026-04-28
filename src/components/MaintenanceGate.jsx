@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // ── Mettre à false quand le site est prêt à être public ──
-export const MAINTENANCE_MODE = false;
+export const MAINTENANCE_MODE = true;
 const ACCESS_CODE = "mbp2026";
 const STORAGE_KEY = "mbp_access_granted";
 
