@@ -54,6 +54,7 @@ import CookieBanner from '@/components/CookieBanner';
 import PageNotFound from './lib/PageNotFound';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
 import ScrollToTop from '@/components/ScrollToTop';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Pages chargées immédiatement (chemin critique)
 import Home from './pages/Home';
@@ -116,15 +117,17 @@ const AuthenticatedApp = () => {
     <>
     <PageTitleUpdater />
     <ScrollToTop />
-    <AnimatePresence mode="wait" initial={false}>
+    <div style={{ position: "relative" }}>
+    <AnimatePresence mode="popLayout" initial={false}>
     <motion.div
       key={location.key}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
     >
     <Suspense fallback={<PageLoader />}>
+    <ErrorBoundary key={location.pathname}>
     <Routes location={location}>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>
@@ -165,9 +168,11 @@ const AuthenticatedApp = () => {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </ErrorBoundary>
     </Suspense>
     </motion.div>
     </AnimatePresence>
+    </div>
     </>
   );
 };
