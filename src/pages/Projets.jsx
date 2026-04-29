@@ -41,7 +41,7 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
           <img
             src={projet.image}
             alt={projet.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
           />
           {/* Trait couleur catégorie */}
           <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: accent }} />
