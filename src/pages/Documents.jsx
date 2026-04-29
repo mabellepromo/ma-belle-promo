@@ -1,39 +1,17 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { Download, Eye, Lock, Scale, Target, BookOpen, BarChart3, FileText, FolderOpen } from "lucide-react";
+import { Download, Eye, Lock, Scale, Target, BookOpen, BarChart3, FileText, FolderOpen, Search, Tag } from "lucide-react";
 import { useDocuments } from "../hooks/useDocuments";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
 
+/** @type {Record<string, { Icon: import("lucide-react").LucideIcon, iconBg: string, color: string, accent: string, badge: string }>} */
 const CATEGORIES = {
-  "Gouvernance": {
-    Icon: Scale,
-    iconBg: "bg-blue-100",
-    color: "text-blue-600",
-    accent: "bg-blue-500",
-    badge: "bg-blue-100 text-blue-700",
-  },
-  "Stratégie": {
-    Icon: Target,
-    iconBg: "bg-green-100",
-    color: "text-green-600",
-    accent: "bg-green-500",
-    badge: "bg-green-100 text-green-700",
-  },
-  "Rapport": {
-    Icon: BookOpen,
-    iconBg: "bg-purple-100",
-    color: "text-purple-600",
-    accent: "bg-purple-500",
-    badge: "bg-purple-100 text-purple-700",
-  },
-  "Finance": {
-    Icon: BarChart3,
-    iconBg: "bg-amber-100",
-    color: "text-amber-600",
-    accent: "bg-amber-500",
-    badge: "bg-amber-100 text-amber-700",
-  },
+  "Gouvernance": { Icon: Scale,    iconBg: "bg-blue-100",   color: "text-blue-600",   accent: "bg-blue-500",   badge: "bg-blue-100 text-blue-700"   },
+  "Stratégie":   { Icon: Target,   iconBg: "bg-green-100",  color: "text-green-600",  accent: "bg-green-500",  badge: "bg-green-100 text-green-700"  },
+  "Rapport":     { Icon: BookOpen, iconBg: "bg-purple-100", color: "text-purple-600", accent: "bg-purple-500", badge: "bg-purple-100 text-purple-700" },
+  "Finance":     { Icon: BarChart3,iconBg: "bg-amber-100",  color: "text-amber-600",  accent: "bg-amber-500",  badge: "bg-amber-100 text-amber-700"  },
 };
 
 const FALLBACK_CAT = {
@@ -48,13 +26,27 @@ export default function Documents() {
   const { documents } = useDocuments();
   const { session } = useLocalAuth();
   const isMember = !!session;
+  const [search, setSearch] = useState("");
 
-  const grouped = documents.reduce((acc, doc) => {
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    if (!q) return documents;
+    return documents.filter(doc =>
+      doc.titre.toLowerCase().includes(q) ||
+      (doc.desc || "").toLowerCase().includes(q) ||
+      (doc.categorie || "").toLowerCase().includes(q)
+    );
+  }, [documents, search]);
+
+  /** @type {Record<string, typeof documents>} */
+  const grouped = useMemo(() => filtered.reduce((acc, doc) => {
     const cat = doc.categorie || "Autre";
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(doc);
     return acc;
-  }, {});
+  }, /** @type {Record<string, typeof documents>} */ ({})), [filtered]);
+
+  const totalCats = Object.keys(grouped).length;
 
   return (
     <div>
@@ -62,19 +54,33 @@ export default function Documents() {
 
       <section className="py-20 max-w-5xl mx-auto px-6">
 
-        {/* Barre de stats */}
+        {/* Barre de stats + recherche */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap gap-3 mb-10"
+          className="flex flex-col sm:flex-row gap-3 mb-8 items-start sm:items-center"
         >
-          <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-3">
-            <FolderOpen className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium">{documents.length} documents</span>
+          <div className="flex gap-3 flex-wrap">
+            <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-2.5">
+              <FolderOpen className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">{documents.length} documents</span>
+            </div>
+            <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-2.5">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{totalCats} catégorie{totalCats > 1 ? "s" : ""}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-3">
-            <FileText className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{Object.keys(grouped).length} catégories</span>
+
+          {/* Recherche */}
+          <div className="relative sm:ml-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Rechercher un document…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="h-10 pl-9 pr-4 rounded-xl border border-border bg-card text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors w-full sm:w-60 shadow-sm"
+            />
           </div>
         </motion.div>
 
@@ -95,9 +101,27 @@ export default function Documents() {
           </motion.div>
         )}
 
+        {/* État vide */}
+        <AnimatePresence>
+          {filtered.length === 0 && (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-20 text-muted-foreground"
+            >
+              <Tag className="w-10 h-10 mx-auto mb-3 opacity-20" />
+              <p className="text-lg font-medium mb-1">Aucun résultat</p>
+              <p className="text-sm">Essayez un autre mot-clé.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Sections par catégorie */}
         {Object.entries(grouped).map(([categorie, docs], sectionIndex) => {
-          const { Icon, iconBg, color, accent, badge } = CATEGORIES[categorie] || FALLBACK_CAT;
+          const cat = CATEGORIES[categorie] ?? FALLBACK_CAT;
+          const { Icon, iconBg, color, accent, badge } = cat;
 
           return (
             <motion.div

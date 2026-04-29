@@ -1,17 +1,24 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { FileText, Calendar, Download } from "lucide-react";
+import { FileText, Calendar, Download, Search, Tag } from "lucide-react";
 import SEO from "../components/SEO";
 import { useCommuniques } from "../hooks/useCommuniques";
+import { useState, useMemo } from "react";
 
 /** @type {Record<string, string>} */
 const typeColors = {
   "Communiqué de presse": "bg-blue-100 text-blue-700",
-  "Communiqué": "bg-teal-100 text-teal-700",
-  "Invitation": "bg-purple-100 text-purple-700",
-  "Rapport AG": "bg-amber-100 text-amber-700",
-  "Déclaration": "bg-red-100 text-red-700",
+  "Communiqué":           "bg-teal-100 text-teal-700",
+  "Invitation":           "bg-purple-100 text-purple-700",
+  "Rapport AG":           "bg-amber-100 text-amber-700",
+  "Déclaration":          "bg-red-100 text-red-700",
 };
+
+/** @param {string | number} date */
+function extractYear(date) {
+  const m = String(date).match(/\d{4}/);
+  return m ? m[0] : "—";
+}
 
 /** @param {{ titre: string, date: string, type: string, resume: string, url: string, contenu?: string }} c */
 function telecharger(c) {
@@ -82,6 +89,36 @@ function telecharger(c) {
 
 export default function Communiques() {
   const { communiques } = useCommuniques();
+  const [search, setSearch]   = useState("");
+  const [type, setType]       = useState("Tous");
+  const [year, setYear]       = useState("Toutes");
+
+  const allTypes = useMemo(() => {
+    const types = [...new Set(communiques.map(c => c.type))];
+    return ["Tous", ...types];
+  }, [communiques]);
+
+  const allYears = useMemo(() => {
+    const years = [...new Set(communiques.map(c => extractYear(c.date)))].sort((a, b) => Number(b) - Number(a));
+    return ["Toutes", ...years];
+  }, [communiques]);
+
+  const filtered = useMemo(() => communiques.filter(c => {
+    const matchType   = type === "Tous"    || c.type === type;
+    const matchYear   = year === "Toutes"  || extractYear(c.date) === year;
+    const q           = search.toLowerCase();
+    const matchSearch = !q || c.titre.toLowerCase().includes(q) || c.resume.toLowerCase().includes(q);
+    return matchType && matchYear && matchSearch;
+  }), [communiques, search, type, year]);
+
+  const isFiltering = search || type !== "Tous" || year !== "Toutes";
+
+  function resetFilters() {
+    setSearch("");
+    setType("Tous");
+    setYear("Toutes");
+  }
+
   return (
     <div>
       <SEO title="Communiqués" description="Les communiqués officiels de Ma Belle Promo, association des anciens diplômés de la Faculté de Droit du Développement de Lomé." path="/informations/communiques" />
@@ -91,19 +128,108 @@ export default function Communiques() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center text-muted-foreground text-lg mb-12 max-w-xl mx-auto"
+          className="text-center text-muted-foreground text-lg mb-10 max-w-xl mx-auto"
         >
           Retrouvez ici l'ensemble des communications officielles de Ma Belle Promo :
           communiqués de presse, invitations, déclarations et rapports d'assemblées.
         </motion.p>
 
+        {/* Barre de recherche + filtres */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card border border-border rounded-2xl p-4 mb-8 space-y-3"
+        >
+          {/* Recherche texte */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Rechercher un communiqué…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full h-10 pl-9 pr-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+            />
+          </div>
+
+          {/* Filtres type + année */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Pills par type */}
+            <div className="flex flex-wrap gap-1.5 flex-1">
+              {allTypes.map(t => (
+                <button
+                  key={t}
+                  onClick={() => setType(t)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    type === t
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70"
+                  }`}
+                >
+                  {t}
+                  {t !== "Tous" && (
+                    <span className="ml-1 opacity-40 text-[10px]">
+                      {communiques.filter(c => c.type === t).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Sélecteur d'année */}
+            <select
+              value={year}
+              onChange={e => setYear(e.target.value)}
+              className="h-8 px-3 rounded-xl border border-border bg-background text-xs text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+            >
+              {allYears.map(y => (
+                <option key={y} value={y}>{y === "Toutes" ? "Toutes les années" : y}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Réinitialiser */}
+          {isFiltering && (
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs text-muted-foreground">
+                {filtered.length} résultat{filtered.length > 1 ? "s" : ""}
+              </span>
+              <button
+                onClick={resetFilters}
+                className="text-xs text-primary hover:underline"
+              >
+                Réinitialiser les filtres
+              </button>
+            </div>
+          )}
+        </motion.div>
+
+        {/* État vide */}
+        <AnimatePresence>
+          {filtered.length === 0 && (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-20 text-muted-foreground"
+            >
+              <Tag className="w-10 h-10 mx-auto mb-3 opacity-20" />
+              <p className="text-lg font-medium mb-1">Aucun résultat</p>
+              <p className="text-sm">Essayez un autre mot-clé, type ou année.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Liste des communiqués */}
         <div className="space-y-5">
-          {communiques.map((c, i) => (
+          {filtered.map((c, i) => (
             <motion.div
               key={c.titre}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.09 }}
+              transition={{ delay: i * 0.06 }}
               className="bg-card border border-border rounded-2xl p-6 hover:shadow-md hover:border-primary/20 transition-all group"
             >
               <div className="flex items-start gap-4">
