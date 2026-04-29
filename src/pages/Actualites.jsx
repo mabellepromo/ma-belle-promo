@@ -160,7 +160,7 @@ function ListCard({ article, index }) {
       >
         <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
           <img loading="lazy" src={article.image} alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

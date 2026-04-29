@@ -146,7 +146,7 @@ export default function ArticleDetail() {
                 src={article.image}
                 alt={article.titre}
                 className="w-full h-full object-cover"
-                style={{ objectPosition: article.photo_position || "center" }}
+                style={{ objectPosition: article.photo_position || "top" }}
               />
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function ArticleDetail() {
                     <img
                       src={a.image}
                       alt={a.titre}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-4 flex flex-col flex-1">

@@ -58,7 +58,7 @@ export default function Galeries() {
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                     {g.cover ? (
                       <img loading="lazy" src={g.cover} alt={g.titre}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <Images className="w-12 h-12 text-muted-foreground/30" />

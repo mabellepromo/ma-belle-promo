@@ -157,7 +157,7 @@ function UpcomingCard({ evt }) {
         </div>
         {evt.image && (
           <div className="w-full md:w-64 h-44 rounded-2xl overflow-hidden flex-shrink-0">
-            <img src={evt.image} alt={evt.titre} className="w-full h-full object-cover" />
+            <img src={evt.image} alt={evt.titre} className="w-full h-full object-cover object-top" />
           </div>
         )}
       </div>

@@ -88,7 +88,7 @@ function ListCard({ projet, index }) {
         {/* Miniature */}
         <div className="w-16 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-muted relative">
           <img loading="lazy" src={projet.image} alt={projet.titre}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: accent }} />
         </div>
         {/* Texte */}
