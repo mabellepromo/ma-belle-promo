@@ -174,7 +174,8 @@ export default function Evenements() {
     const fromEvenements = evenements
       .filter(e => String(e.id) !== "1")
       .map((evt) => {
-        const article = evt.articleId ? articles.find(a => a.id === evt.articleId) : null;
+        const articleId = evt.articleId || evt.articleid;
+        const article = articleId ? articles.find(a => a.id === articleId) : null;
         return { ...evt, article, image: article?.image || evt.image };
       });
 
