@@ -94,7 +94,7 @@ export default function MentionsLegales() {
             <p>
               Le présent site et ses mentions légales sont soumis au <strong className="text-foreground">droit togolais</strong>,
               notamment la loi n° 2019-014 du 29 octobre 2019 relative à la protection des données à caractère personnel,
-              placée sous le contrôle de l'<strong className="text-foreground">Autorité de Protection des Données Personnelles (APDP)</strong>.
+              placée sous le contrôle de l'<strong className="text-foreground">Instance de Protection des Données à Caractère Personnel (IPDCP)</strong>.
             </p>
             <p>
               Pour les membres résidant dans l'Union Européenne, le RGPD s'applique en complément.
