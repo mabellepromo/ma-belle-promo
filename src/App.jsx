@@ -113,6 +113,14 @@ function PrivateRoute({ children }) {
 
 const AuthenticatedApp = () => {
   const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard')) return;
+    const block = (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); };
+    document.addEventListener('contextmenu', block);
+    return () => document.removeEventListener('contextmenu', block);
+  }, [location.pathname]);
+
   return (
     <>
     <PageTitleUpdater />
