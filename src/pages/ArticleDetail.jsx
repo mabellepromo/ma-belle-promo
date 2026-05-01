@@ -5,6 +5,7 @@ import SEO from "../components/SEO";
 import { Calendar, ArrowLeft, Clock, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import PhotoGallery from "../components/PhotoGallery";
+import ShareButtons from "../components/ShareButtons";
 import DOMPurify from "dompurify";
 
 const catColors = {
@@ -137,6 +138,8 @@ export default function ArticleDetail() {
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground pt-4 border-t border-border/40">
                   <Calendar className="w-4 h-4" /> {article.date}
                 </div>
+
+                <ShareButtons title={article.titre} description={article.extrait} />
               </div>
             </div>
 

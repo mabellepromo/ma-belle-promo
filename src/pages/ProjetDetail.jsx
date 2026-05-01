@@ -5,6 +5,7 @@ import SEO from "../components/SEO";
 import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import PhotoGallery from "../components/PhotoGallery";
+import ShareButtons from "../components/ShareButtons";
 import DOMPurify from "dompurify";
 
 const catColors = {
@@ -153,10 +154,12 @@ export default function ProjetDetail() {
 
               {/* Extrait sous le titre */}
               {(projet.extrait || projet.description) && (
-                <p className="text-sm md:text-base text-white/60 leading-relaxed max-w-lg">
+                <p className="text-sm md:text-base text-white/60 leading-relaxed max-w-lg mb-5">
                   {projet.extrait || projet.description}
                 </p>
               )}
+
+              <ShareButtons title={projet.titre} description={projet.extrait || projet.description} dark />
             </div>
 
             {/* ── Colonne droite : image dans un cadre ── */}
