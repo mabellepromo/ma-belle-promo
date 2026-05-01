@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import SEO from "../components/SEO";
-import { Calendar, ArrowLeft, ChevronRight } from "lucide-react";
+import { Calendar, ArrowLeft, ChevronRight, Play, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import PhotoGallery from "../components/PhotoGallery";
 import ShareButtons from "../components/ShareButtons";
@@ -89,16 +89,22 @@ export default function ProjetDetail() {
     ? projet.videos
     : projet.youtube ? [projet.youtube] : [];
 
-  const toEmbed = (url) => {
+  const getYoutubeId = (url) => {
     try {
       const u = new URL(url);
       if (u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be")) {
-        const vid = u.searchParams.get("v") || u.pathname.replace(/^\//, "").split("/").pop();
-        return vid ? `https://www.youtube.com/embed/${vid}` : null;
+        return u.searchParams.get("v") || u.pathname.replace(/^\//, "").split("/").pop() || null;
       }
+    } catch {}
+    return null;
+  };
+
+  const getVimeoEmbed = (url) => {
+    try {
+      const u = new URL(url);
       if (u.hostname.includes("vimeo.com")) {
-        const vid = u.pathname.replace(/^\//, "").split("/")[0];
-        return vid ? `https://player.vimeo.com/video/${vid}` : null;
+        const id = u.pathname.replace(/^\//, "").split("/")[0];
+        return id ? `https://player.vimeo.com/video/${id}` : null;
       }
     } catch {}
     return null;
@@ -227,14 +233,41 @@ export default function ProjetDetail() {
               </h2>
             </div>
             {videoList.map((url, i) => {
-              const embedUrl = toEmbed(url);
-              return embedUrl ? (
-                <div key={i} className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
-                  <iframe src={embedUrl} title={`Vidéo ${i + 1}`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen className="absolute inset-0 w-full h-full" />
-                </div>
-              ) : (
+              const ytId = getYoutubeId(url);
+              if (ytId) {
+                return (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                    className="group relative block w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+                    <img
+                      src={`https://i.ytimg.com/vi/${ytId}/sddefault.jpg`}
+                      alt={`Vidéo ${i + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.onerror = null; e.target.src = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`; }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                        <Play className="w-7 h-7 text-foreground ml-1" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                      <span className="px-4 py-2 bg-black/70 text-white text-sm font-semibold rounded-full flex items-center gap-2">
+                        <ExternalLink className="w-4 h-4" /> Voir sur YouTube
+                      </span>
+                    </div>
+                  </a>
+                );
+              }
+              const vimeoUrl = getVimeoEmbed(url);
+              if (vimeoUrl) {
+                return (
+                  <div key={i} className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+                    <iframe src={vimeoUrl} title={`Vidéo ${i + 1}`}
+                      allow="autoplay; fullscreen; picture-in-picture" allowFullScreen
+                      className="absolute inset-0 w-full h-full" />
+                  </div>
+                );
+              }
+              return (
                 <video key={i} controls className="w-full rounded-2xl shadow-lg" src={url}>
                   Votre navigateur ne supporte pas la lecture vidéo.
                 </video>
