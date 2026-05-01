@@ -9,7 +9,7 @@ export const evenements = [
     statut: "Passé",
     articleId: "numerique-togo",
     description: "L'association MA BELLE PROMO (MBP) et le Centre d'actions juridiques et sociales (CAJS) de Kara ont conjointement organisé un webinaire sur les enjeux du numérique au Togo.",
-    image: "https://i.ytimg.com/vi/enhXRt8erJ0/sddefault.jpg",
+    image: "/images/yt-numerique-togo.jpg",
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ export const evenements = [
     statut: "Passé",
     articleId: "reussir-impacter",
     description: "Le 2 décembre 2022 à l'Agora Senghor de Lomé, Ma Belle Promo a organisé une rencontre intergénérationnelle réunissant près de 200 participants autour des leviers pour réussir tout en impactant sa communauté.",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+    image: "/images/conference.jpg",
   },
   {
     id: 5,
@@ -45,6 +45,6 @@ export const evenements = [
     statut: "Passé",
     articleId: "gala-bienfaisance",
     description: "Le 30 juillet 2022 dans l'ancien immeuble Oro à Lomé, Ma Belle Promo s'est révélée au grand public lors de sa Soirée de Gala, lançant son programme de bourses avec un premier bénéficiaire.",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+    image: "/images/evenement.jpg",
   },
 ];

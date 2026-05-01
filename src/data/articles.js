@@ -6,12 +6,12 @@ export const articles = [
     extrait: "L'association MA BELLE PROMO et le CAJS de Kara ont conjointement organisé un webinaire sur les enjeux du numérique au Togo : protection des données, cybercriminalité et principes fondamentaux.",
     date: "11 Déc 2023",
     categorie: "Webinaire",
-    image: "https://i.ytimg.com/vi/enhXRt8erJ0/sddefault.jpg",
+    image: "/images/yt-numerique-togo.jpg",
     youtube: "https://www.youtube.com/watch?v=enhXRt8erJ0",
     photos: [
       "/images/evenements/webinaire-kara.jpg",
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+      "/images/campus.jpg",
+      "/images/conference.jpg",
     ],
     contenu: `L'association **MA BELLE PROMO (MBP)** et le **Centre d'actions juridiques et sociales (CAJS)** de Kara ont conjointement organisé un webinaire intitulé *« Les enjeux du numérique au Togo : regards croisés sur les principes fondamentaux, la protection des données et la cybercriminalité »*.
 
@@ -73,7 +73,7 @@ La Nuit du Droit a également offert une précieuse opportunité de réseautage,
     extrait: "Le 6 mai 2023, un webinaire organisé sur Zoom a permis à des étudiants en Faculté de Droit de découvrir la diversité des métiers juridiques à travers les témoignages de quatre experts.",
     date: "16 Mai 2023",
     categorie: "Webinaire",
-    image: "https://i.ytimg.com/vi/8aXcufgyVxk/maxresdefault.jpg",
+    image: "/images/yt-metiers-droit-2.jpg",
     youtube: "https://www.youtube.com/watch?v=8aXcufgyVxk",
     photos: [],
     contenu: `Le **6 mai 2023**, un webinaire exceptionnel a été organisé sur **Zoom** pour les étudiants en Faculté de Droit. Sous la modération d'**André Kangni AFANOU**, quatre panélistes ont partagé leurs parcours et conseils.
@@ -135,10 +135,10 @@ La rencontre s'est clôturée par les mots de **Me Sylvestre GOSSOU** et du **ju
     extrait: "Le 30 juillet 2022 dans l'ancien immeuble Oro à Lomé, Ma Belle Promo s'est révélée au grand public lors de sa Soirée de Gala, lançant son programme de bourses avec un premier bénéficiaire.",
     date: "30 Juil 2022",
     categorie: "Gala",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+    image: "/images/evenement.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+      "/images/evenement.jpg",
+      "/images/evenement.jpg",
     ],
     contenu: `L'association Ma Belle Promo s'est révélée au grand public lors de sa **Soirée de Gala et de bienfaisance**, tenue le **30 juillet 2022** à Lomé dans l'ancien immeuble Oro.
 
@@ -161,10 +161,10 @@ Cette soirée a permis à l'association de tisser des liens avec d'autres struct
     extrait: "Le 23 décembre 2021, Ma Belle Promo a rendu visite à l'Orphelinat « La Solution » avec des cadeaux plein les bras, maintenant sa tradition de soutien aux personnes en situation de précarité malgré la pandémie.",
     date: "23 Déc 2021",
     categorie: "Solidarité",
-    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
+    image: "/images/solidarite.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
+      "/images/solidarite.jpg",
+      "/images/solidarite.jpg",
     ],
     contenu: `Quoi de mieux que de voir un tout-petit avec les yeux brillants, tout émerveillé à l'approche de cette période si attendue ? **Noël est assurément la fête des enfants**, peu importe leur situation, et il est important que cela perdure pour de multiples raisons.
 
@@ -180,7 +180,7 @@ Noël est décidément magique.
     extrait: "Ma Belle Promo a organisé le 22 septembre 2021 son premier webinaire consacré aux métiers « classiques » du droit, premier d'une série de conférences destinées aux étudiants de la Faculté de Droit.",
     date: "22 Sept 2021",
     categorie: "Webinaire",
-    image: "https://i.ytimg.com/vi/1Qdm3Sj_qOU/maxresdefault.jpg",
+    image: "/images/yt-metiers-classiques.jpg",
     youtube: "https://www.youtube.com/watch?v=1Qdm3Sj_qOU",
     photos: [],
     contenu: `Ma Belle Promo a le plaisir de partager l'enregistrement de son **webinaire du 22 septembre 2021**, premier d'une série de conférences destinées aux étudiants de la Faculté de Droit.
@@ -199,11 +199,11 @@ La deuxième partie de cette série, consacrée aux **métiers émergents et non
     extrait: "En collaboration avec le CDFDH, Ma Belle Promo a organisé une séance de partage d'expériences animée par Koffi Junior AOUGA, membre de la diaspora MBP, avec les jeunes de deux associations togolaises de leadership.",
     date: "29 Juil 2021",
     categorie: "Conférence",
-    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&h=400&fit=crop",
+    image: "/images/formation.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+      "/images/formation.jpg",
+      "/images/reunion.jpg",
+      "/images/reunion.jpg",
     ],
     contenu: `En collaboration avec le **Centre de Documentation et de Formation sur les Droits de l'Homme (CDFDH)** présidé par André Kangni Afanou, Ma Belle Promo a organisé une séance de partage d'expériences avec les jeunes de l'**Alternative Leadership Group (ALG)** et de **ConnecTogo**.
 
@@ -223,9 +223,9 @@ Cet échange a été très apprécié par l'auditoire qui saura, on l'espère, f
     extrait: "Fraîchement élue Présidente de la Fédération Togolaise d'Athlétisme, Falilatou TCHANILE-DOGO, Trésorière Générale de MBP, représentait le Togo aux JO de Tokyo. On valorise le leadership et les talents à MBP.",
     date: "13 Juil 2021",
     categorie: "Événement",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=400&fit=crop",
+    image: "/images/webinaire.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=400&fit=crop",
+      "/images/webinaire.jpg",
     ],
     contenu: `Madame **Falilatou TCHANILE-DOGO**, **Trésorière Générale de Ma Belle Promo**, a été nommée **Présidente de la Fédération Togolaise d'Athlétisme (FTA)**.
 
@@ -243,11 +243,11 @@ Bonne chance à la délégation togolaise pour les JO de Tokyo !`,
     extrait: "Le 3 juillet 2021, Ma Belle Promo a tenu sa première Assemblée Générale Ordinaire depuis sa création en 2018, dans un format hybride présentiel et Zoom Meeting imposé par les restrictions sanitaires.",
     date: "3 Juil 2021",
     categorie: "Association",
-    image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+    image: "/images/reunion.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+      "/images/reunion.jpg",
+      "/images/reunion.jpg",
+      "/images/reunion.jpg",
     ],
     contenu: `Le **3 juillet 2021**, Ma Belle Promo a tenu sa **première Assemblée Générale Ordinaire** depuis sa création en 2018, dans un **format hybride** (présentiel et Zoom Meeting) en raison des restrictions sanitaires liées à la Covid-19.
 
@@ -272,9 +272,9 @@ Un grand **MERCI** à tous.`,
     extrait: "L'association MBP et le CDFDH ont organisé la remise des prix aux lauréats de la première édition du concours, le 29 novembre 2019, dans la Salle Ahadzi-Nonou à l'Université de Lomé.",
     date: "29 Nov 2019",
     categorie: "Prix",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+    image: "/images/evenement.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+      "/images/evenement.jpg",
     ],
     contenu: `L'association **Ma Belle Promo (MBP)** et le **Centre de Formation sur les Droits de l'Homme (CDFDH)** ont organisé la remise des prix aux lauréats de la première édition du concours **« Meilleur Mémoire sur les Droits de l'Homme »**, le **29 novembre 2019** dans la Salle AHADZI-NONOU à la présidence de l'Université de Lomé.
 
@@ -302,9 +302,9 @@ Les mémoires primés ont été **édités et publiés** en tant qu'ouvrages, mi
     extrait: "Dans le cadre de la Semaine de la Jeune Fille, Ma Belle Promo a organisé une rencontre au Campus universitaire de Lomé sur le thème « Séduction, Agression et Harcèlements sexuels : du permis à l'interdit ».",
     date: "30 Oct 2019",
     categorie: "Conférence",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&h=400&fit=crop",
+    image: "/images/gala.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+      "/images/conference.jpg",
     ],
     contenu: `Dans le cadre de la **Semaine de la Jeune Fille**, des rencontres se sont tenues au **Campus universitaire de Lomé**, à l'initiative du **Groupe de réflexion et d'action Femmes, Démocratie et Développement (GF2D)**.
 
@@ -326,10 +326,10 @@ Maître **Claude AMEGAN** a fait le tour de la question, sensibilisant son audit
     extrait: "Le 16 juillet 2019, Ma Belle Promo a rencontré le CDFDH pour poser les bases d'un partenariat actif, débouchant sur des actions communes importantes, notamment le concours du Meilleur Mémoire.",
     date: "17 Juil 2019",
     categorie: "Partenariat",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+    image: "/images/evenement.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+      "/images/evenement.jpg",
+      "/images/evenement.jpg",
     ],
     contenu: `Dans le cadre de notre futur partenariat avec le **Centre de Documentation et de Formation sur les Droits de l'Homme (CDFDH)** d'André Kangni **AFANOU**, Ma Belle Promo a eu une séance de travail avec son équipe le **mardi 16 juillet 2019 à 17h30**.
 
@@ -351,11 +351,11 @@ Cette collaboration a depuis débouché sur des actions communes importantes, no
     extrait: "Le Bureau Exécutif de Ma Belle Promo a été reçu par le décanat de la Faculté de Droit de l'Université de Lomé pour présenter officiellement l'association et explorer les futures collaborations.",
     date: "4 Juil 2019",
     categorie: "Partenariat",
-    image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+    image: "/images/reunion.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=400&fit=crop",
+      "/images/solidarite.jpg",
+      "/images/campus.jpg",
+      "/images/webinaire.jpg",
     ],
     contenu: `Le **Bureau Exécutif de Ma Belle Promo**, comme prévu, a été reçu par le décanat de la **Faculté de Droit de l'Université de Lomé**.
 
@@ -373,9 +373,9 @@ Cette rencontre avait pour objectifs de :
     extrait: "Le 11 avril 2019 sur les ondes de Nana FM, Ma Belle Promo a participé à une émission pour sensibiliser la gente féminine, actrice centrale du développement durable, aux enjeux des changements climatiques.",
     date: "11 Avr 2019",
     categorie: "Médias",
-    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&h=400&fit=crop",
+    image: "/images/formation.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&h=400&fit=crop",
+      "/images/gala.jpg",
     ],
     contenu: `Le **11 avril 2019**, une émission diffusée sur les ondes de **Nana FM** a permis de sensibiliser la gente féminine — actrice centrale du développement durable — aux enjeux des changements climatiques. Ma Belle Promo y a participé pour mettre en lumière le rôle des femmes dans la lutte pour l'environnement.
 
@@ -393,10 +393,10 @@ Cette initiative illustre l'engagement de Ma Belle Promo à dépasser le cadre p
     extrait: "La réunion du Bureau Exécutif du 23 mars 2019 a permis de dégager un plan d'action couvrant les formalités, le membership, la visibilité et les programmes de formation internes et publics.",
     date: "23 Mars 2019",
     categorie: "Association",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+    image: "/images/conference.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+      "/images/evenement.jpg",
+      "/images/reunion.jpg",
     ],
     contenu: `La **première réunion du Bureau Exécutif de Ma Belle Promo (BE-MBP)** s'est tenue le **23 mars 2019**. Elle a permis de poser les jalons organisationnels de l'association, quelques mois après sa création officielle.
 
@@ -426,9 +426,9 @@ D — Éducation (conférences, émissions, sensibilisation, productions vidéo)
     extrait: "Après l'Assemblée Générale Constitutive du 1er décembre 2018, Ma Belle Promo confirme le dépôt officiel de son dossier de déclaration auprès des autorités togolaises le 1er mars 2019.",
     date: "1 Mars 2019",
     categorie: "Association",
-    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
+    image: "/images/solidarite.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=700&h=400&fit=crop",
+      "/images/campus.jpg",
     ],
     contenu: `## Le processus de légalisation de Ma Belle Promo suit son cours
 
@@ -447,10 +447,10 @@ Merci à tous pour votre soutien et votre confiance.`,
     extrait: "L'association Ma Belle Promo a été conviée à la cérémonie d'hommage rendu au Professeur Tordjo, « Papa Tordjo » pour ses étudiants, décédé le 19 janvier 2019 après des décennies au service de l'Université de Lomé.",
     date: "19 Jan 2019",
     categorie: "Hommage",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=700&h=400&fit=crop",
+    image: "/images/webinaire.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=700&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&h=400&fit=crop",
+      "/images/formation.jpg",
+      "/images/gala.jpg",
     ],
     contenu: `**Hommage de la Faculté de Droit le 06 Février 2019 à « Papa Tordjo »**, auquel notre Association FDD MBP a été conviée.
 
@@ -473,9 +473,9 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
     extrait: "Ce 1er décembre 2018, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une structure officielle. L'association FDD Ma Belle Promo est officiellement née.",
     date: "1 Déc 2018",
     categorie: "Association",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
+    image: "/images/conference.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop",
+      "/images/evenement.jpg",
     ],
     contenu: `Ce **1er décembre 2018**, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une **structure officielle** lors de cette Assemblée Générale Constitutive.
 
@@ -495,9 +495,9 @@ L'association sera reconnue officiellement par les autorités le **03 octobre 20
     extrait: "Plusieurs années après la fin de leurs études, les anciens étudiants de la FDD promotion 1994-2000 se retrouvent pour célébrer leurs années estudiantines — prémices d'une belle aventure associative.",
     date: "28 Juil 2018",
     categorie: "Histoire",
-    image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=700&h=400&fit=crop",
+    image: "/images/reunion.jpg",
     photos: [
-      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=700&h=400&fit=crop",
+      "/images/solidarite.jpg",
     ],
     contenu: `Plusieurs années après la fin de nos études, **nous revoilà** lors des retrouvailles pour célébrer nos années estudiantines et faire quelque chose de cette magnifique promotion.
 

@@ -81,7 +81,7 @@ export default function HeroSection() {
       {/* Image fond subtile */}
       <motion.div style={{ y: bgY }} className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop"
+          src="/images/conference.jpg"
           alt=""
           fetchPriority="high"
           className="w-full h-full object-cover scale-110"
