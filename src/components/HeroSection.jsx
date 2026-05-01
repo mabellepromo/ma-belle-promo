@@ -86,6 +86,7 @@ export default function HeroSection() {
           fetchPriority="high"
           className="w-full h-full object-cover scale-110"
           style={{ opacity: 0.07, mixBlendMode: "luminosity" }}
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute inset-0" style={{
           background: "linear-gradient(150deg, hsla(150,30%,7%,0.88) 0%, hsla(150,32%,12%,0.70) 50%, hsla(150,28%,6%,0.90) 100%)",

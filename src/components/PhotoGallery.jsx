@@ -35,6 +35,7 @@ function Lightbox({ photos, idx, onClose }) {
         alt={`Photo ${current + 1}`}
         className="max-w-full max-h-[88vh] rounded-2xl object-contain select-none shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        onError={(e) => { e.target.onerror = null; e.target.style.opacity = "0"; }}
       />
       <button
         onClick={onClose}
@@ -96,6 +97,7 @@ function Cell({ photo, index, total, onOpen, className = "" }) {
         src={photo}
         alt={`Photo ${index + 1}`}
         className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+        onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }}
       />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
         <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
