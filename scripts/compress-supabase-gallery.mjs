@@ -37,19 +37,23 @@ for (const url of originalPhotos) {
   }
 
   const [, bucket, storagePath] = match;
-  const webpPath = storagePath.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  // Toujours partir du JPG original (même si le .webp existe déjà)
+  const origPath  = storagePath.replace(/\.webp$/i, '.jpg');
+  const origUrl   = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${origPath}`;
+  const webpPath  = origPath.replace(/\.(jpg|jpeg|png)$/i, '.webp');
   const webpUrl  = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${webpPath}`;
 
   // Toujours reconvertir (pour appliquer le redimensionnement)
 
   try {
-    // Télécharger l'image originale
-    const res = await fetch(url);
+    // Télécharger le JPG original (pas le WebP déjà converti)
+    const res = await fetch(origUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buffer = Buffer.from(await res.arrayBuffer());
 
-    // Redimensionner à 1200px max + convertir en WebP
+    // Redimensionner à 1200px max + convertir en WebP (rotate corrige l'orientation EXIF)
     const webpBuffer = await sharp(buffer)
+      .rotate()
       .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 85 })
       .toBuffer();

@@ -12,7 +12,9 @@
       "Bash(node -e \"const { Expand, Images } = require\\('lucide-react'\\); console.log\\('Expand:', Expand ? 'OK' : 'MISSING'\\); console.log\\('Images:', Images ? 'OK' : 'MISSING'\\);\")",
       "Bash(node -e \"const { ZoomIn, Grid } = require\\('lucide-react'\\); console.log\\('ZoomIn:', ZoomIn ? 'OK' : 'MISSING'\\); console.log\\('Grid:', Grid ? 'OK' : 'MISSING'\\);\")",
       "Bash(node -e \"const lucide = require\\('lucide-react'\\); const icons = Object.keys\\(lucide\\).filter\\(k => k.match\\(/zoom|grid|image|photo|expand|gallery|layout/i\\)\\); console.log\\(icons.join\\(', '\\)\\);\")",
-      "Bash(node -e \"const lucide = require\\('lucide-react'\\); console.log\\(Object.keys\\(lucide\\).filter\\(k => typeof lucide[k] === 'function'\\).slice\\(0,30\\).join\\(', '\\)\\);\")"
+      "Bash(node -e \"const lucide = require\\('lucide-react'\\); console.log\\(Object.keys\\(lucide\\).filter\\(k => typeof lucide[k] === 'function'\\).slice\\(0,30\\).join\\(', '\\)\\);\")",
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\maman\\.claude\\projects\\c--Users-maman-Downloads-Clone-Ma-Belle-Promo\\memory"
