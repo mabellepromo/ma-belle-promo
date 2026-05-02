@@ -33,108 +33,94 @@ const catLight = {
   "Prix":        "bg-yellow-100 text-yellow-700",
 };
 
-function extractYear(date) {
-  const m = String(date).match(/\d{4}/);
-  return m ? m[0] : "—";
-}
-
-function groupByYear(list) {
-  const map = {};
-  for (const a of list) {
-    const y = extractYear(a.date);
-    if (!map[y]) map[y] = [];
-    map[y].push(a);
-  }
-  return Object.entries(map).sort((a, b) => Number(b[0]) - Number(a[0]));
-}
-
-/* ── Carte hero (image en haut, texte en bas sur fond carte) ── */
-function HeroCard({ article }) {
+/* ── Article vedette : image gauche + texte droite ── */
+function FeaturedCard({ article }) {
   const pill = catPills[article.categorie] ?? "bg-primary/90 text-white";
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
+      className="mb-12"
     >
       <Link
         to={`/actualites/${article.id}`}
-        className="group block w-full rounded-3xl overflow-hidden shadow-2xl bg-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
+        className="group grid md:grid-cols-2 rounded-3xl overflow-hidden border border-border bg-card hover:shadow-2xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-500 shadow-md"
       >
-        {/* Image */}
-        <div className="relative h-72 md:h-96 overflow-hidden">
+        {/* Image gauche */}
+        <div className="relative h-72 md:h-full min-h-[300px] overflow-hidden">
           <img
             src={article.image}
             alt={article.titre}
             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r md:from-transparent md:to-card/5" />
           <span className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold rounded-full ${pill}`}>
             {article.categorie}
           </span>
         </div>
 
-        {/* Texte sur fond propre */}
-        <div className="p-8 md:p-10">
-          <h2 className="font-heading text-foreground text-2xl md:text-3xl font-bold leading-tight mb-3 group-hover:text-primary transition-colors">
+        {/* Texte droite */}
+        <div className="flex flex-col justify-center p-8 md:p-12">
+          <span className="text-xs text-muted-foreground flex items-center gap-1.5 mb-5">
+            <Calendar className="w-3.5 h-3.5 text-primary" /> {article.date}
+          </span>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground leading-tight mb-5 group-hover:text-primary transition-colors duration-300">
             {article.titre}
           </h2>
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-6 max-w-2xl">
-            {article.extrait}
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-muted-foreground text-xs">
-              <Calendar className="w-3.5 h-3.5" /> {article.date}
-            </span>
-            <span className="flex items-center gap-2 text-sm font-bold text-primary group-hover:gap-3 transition-all">
-              Lire l'article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </span>
-          </div>
+          {article.extrait && (
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-8">
+              {article.extrait}
+            </p>
+          )}
+          <span className="inline-flex items-center gap-2 text-sm font-bold text-primary group-hover:gap-3 transition-all duration-300">
+            Lire l'article <ArrowRight className="w-4 h-4" />
+          </span>
         </div>
       </Link>
     </motion.div>
   );
 }
 
-/* ── Carte medium (image + texte dessous) ── */
-function MediumCard({ article, index }) {
+/* ── Carte grille uniforme ── */
+function GridCard({ article, index }) {
   const pill = catPills[article.categorie] ?? "bg-primary/90 text-white";
-  const light = catLight[article.categorie] ?? "bg-gray-100 text-gray-700";
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
-      transition={{ duration: 0.5, delay: index * 0.07 }}
+      transition={{ duration: 0.5, delay: (index % 3) * 0.07 }}
       className="h-full"
     >
       <Link
         to={`/actualites/${article.id}`}
         className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        {/* Image */}
-        <div className="relative h-52 overflow-hidden bg-muted flex-shrink-0">
+        <div className="relative h-48 overflow-hidden bg-muted flex-shrink-0">
           <img
+            loading="lazy"
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-600"
+            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           <span className={`absolute bottom-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
             {article.categorie}
           </span>
         </div>
-
-        {/* Texte */}
         <div className="p-5 flex flex-col flex-1">
           <span className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
-            <Calendar className="w-3 h-3" /> {article.date}
+            <Calendar className="w-3 h-3 text-primary" /> {article.date}
           </span>
           <h3 className="font-heading text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-2 flex-1">
             {article.titre}
           </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
-            {article.extrait}
-          </p>
+          {article.extrait && (
+            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
+              {article.extrait}
+            </p>
+          )}
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary group-hover:gap-2.5 transition-all">
             Lire <ArrowRight className="w-3.5 h-3.5" />
           </span>
@@ -144,40 +130,6 @@ function MediumCard({ article, index }) {
   );
 }
 
-/* ── Carte liste (horizontale, compacte) ── */
-function ListCard({ article, index }) {
-  const light = catLight[article.categorie] ?? "bg-gray-100 text-gray-700";
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -16 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-20px" }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-    >
-      <Link
-        to={`/actualites/${article.id}`}
-        className="group flex gap-4 items-center py-4 border-b border-border/50 hover:border-primary/20 transition-colors"
-      >
-        <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
-          <img loading="lazy" src={article.image} alt={article.titre}
-            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${light}`}>{article.categorie}</span>
-            <span className="text-[10px] text-muted-foreground">{article.date}</span>
-          </div>
-          <h3 className="font-heading text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-            {article.titre}
-          </h3>
-        </div>
-        <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
-      </Link>
-    </motion.div>
-  );
-}
-
-/* ── Page principale ── */
 export default function Actualites() {
   const { articles } = useArticles();
   const [search, setSearch] = useState("");
@@ -196,14 +148,17 @@ export default function Actualites() {
     return matchCat && matchSearch;
   }), [articles, search, cat]);
 
-  const isFiltering = search || cat !== "Tous";
-  const grouped = useMemo(() => groupByYear(filtered), [filtered]);
+  const [featured, ...rest] = filtered;
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Actualités" description="Toutes les actualités de Ma Belle Promo : événements, projets, actions solidaires et nouvelles de l'association au Togo." path="/informations/actualites" />
+      <SEO
+        title="Actualités"
+        description="Toutes les actualités de Ma Belle Promo : événements, projets, actions solidaires et nouvelles de l'association au Togo."
+        path="/informations/actualites"
+      />
 
-      {/* ── En-tête éditorial ── */}
+      {/* ── En-tête ── */}
       <div className="bg-foreground border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -247,7 +202,7 @@ export default function Actualites() {
           </div>
         </div>
 
-        {/* ── Vide ── */}
+        {/* ── Aucun résultat ── */}
         {filtered.length === 0 && (
           <div className="text-center py-24 text-muted-foreground">
             <Tag className="w-10 h-10 mx-auto mb-3 opacity-20" />
@@ -256,62 +211,16 @@ export default function Actualites() {
           </div>
         )}
 
-        {/* ── Contenu groupé par année ── */}
-        {grouped.map(([year, list], gi) => (
-          <div key={year} className="mb-20">
+        {/* ── Article vedette ── */}
+        {featured && <FeaturedCard article={featured} />}
 
-            {/* Séparateur d'année */}
-            <motion.div
-              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-              viewport={{ once: true }} transition={{ duration: 0.5 }}
-              className="relative flex items-center gap-6 mb-10"
-            >
-              <span className="font-heading text-7xl md:text-8xl font-black text-primary/8 select-none leading-none flex-shrink-0">
-                {year}
-              </span>
-              <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
-              <span className="eyebrow text-muted-foreground/60 flex-shrink-0">
-                {list.length} article{list.length > 1 ? "s" : ""}
-              </span>
-            </motion.div>
-
-            {/* Layout selon le nombre d'articles */}
-            {list.length === 1 && (
-              <HeroCard article={list[0]} />
-            )}
-
-            {list.length === 2 && (
-              <div className="grid md:grid-cols-2 gap-6">
-                {list.map((a, i) => <MediumCard key={a.id} article={a} index={i} />)}
-              </div>
-            )}
-
-            {list.length >= 3 && (
-              <div className="space-y-8">
-                {/* Premier article : hero */}
-                <HeroCard article={list[0]} />
-
-                {/* Articles 2 & 3 : medium côte à côte */}
-                {list.length >= 2 && (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {list.slice(1, list.length <= 4 ? undefined : 4).map((a, i) => (
-                      <MediumCard key={a.id} article={a} index={i} />
-                    ))}
-                  </div>
-                )}
-
-                {/* Articles suivants : liste compacte */}
-                {list.length > 4 && (
-                  <div className="bg-card border border-border rounded-2xl px-6 py-2">
-                    {list.slice(4).map((a, i) => (
-                      <ListCard key={a.id} article={a} index={i} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+        {/* ── Grille uniforme ── */}
+        {rest.length > 0 && (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rest.map((a, i) => <GridCard key={a.id} article={a} index={i} />)}
           </div>
-        ))}
+        )}
+
       </div>
     </div>
   );
