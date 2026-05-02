@@ -281,11 +281,17 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, x: 30, scale: 0.94 }} animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.34, 1.1, 0.64, 1] }}
-            className="relative hidden lg:block"
+            className="relative hidden lg:flex flex-col items-center"
           >
+            {/* Cadres décalés */}
+            <div className="absolute top-8 right-3 left-3 bottom-0 rounded-3xl"
+              style={{ background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.18)" }} />
+            <div className="absolute -top-1 right-0 left-6 bottom-4 rounded-3xl"
+              style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }} />
+
             {/* Photo */}
-            <div className="relative w-full rounded-3xl overflow-hidden"
-              style={{ aspectRatio: "3/4", boxShadow: "0 24px 60px rgba(0,0,0,0.40)" }}>
+            <div className="relative z-10 w-full rounded-3xl overflow-hidden"
+              style={{ aspectRatio: "3/4", boxShadow: "0 24px 60px rgba(0,0,0,0.40), 0 0 0 1.5px rgba(255,255,255,0.10)" }}>
               <img
                 src="/images/membres/fabienne.webp"
                 alt="Fabienne SENAYA-ATAYI — Présidente"
