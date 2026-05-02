@@ -13,12 +13,13 @@ import {
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
-  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound
+  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
 import AccesSection from "./dashboard/AccesSection.jsx";
+import CotisationsSection from "./dashboard/CotisationsSection.jsx";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -203,10 +204,11 @@ export default function Dashboard() {
     {
       label: "Membres",
       items: [
-        { key: "membres",  label: `Membres`, badge: allMembers.length, icon: Users },
-        { key: "pending",  label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
-        { key: "messages", label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
-        { key: "acces",    label: "Accès membres", icon: KeyRound },
+        { key: "membres",      label: `Membres`, badge: allMembers.length, icon: Users },
+        { key: "cotisations",  label: "Cotisations", icon: Banknote },
+        { key: "pending",      label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
+        { key: "messages",     label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
+        { key: "acces",        label: "Accès membres", icon: KeyRound },
       ],
     },
     {
@@ -643,6 +645,7 @@ export default function Dashboard() {
           {tab === "documents"   && <DocumentsSection />}
           {tab === "galeries"    && <GaleriesSection />}
           {tab === "ressources"  && <RessourcesSection />}
+          {tab === "cotisations" && <CotisationsSection members={allMembers} />}
           {tab === "acces"       && <AccesSection />}
 
         </div>
