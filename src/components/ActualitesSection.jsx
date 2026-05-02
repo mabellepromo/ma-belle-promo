@@ -3,14 +3,13 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, Clock, ChevronRight } from "lucide-react";
 import { useArticles } from "../hooks/useArticles";
-import { useContent } from "../lib/localStore";
-import { evenements as evenementsStatic } from "../data/evenements";
+import { useEvenements } from "../hooks/useEvenements";
 
 const PLAN_IMAGE = "/Galeries/Reunion 18.05.2019/180519mbp-groupe1.webp";
 
 export default function ActualitesSection() {
   const { articles } = useArticles();
-  const evenements = useContent("evenements", evenementsStatic);
+  const { evenements } = useEvenements();
   const prochains = evenements
     .filter(e => e.statut?.toLowerCase() !== "passé")
     .slice(0, 3);

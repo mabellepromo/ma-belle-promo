@@ -34,10 +34,11 @@ appareils. Fonctionnelle mais non optimale pour les fonctionnalités
 de recherche avancée. Migration progressive vers un schéma
 relationnel classique planifiée mais non urgente.
 
-### Dette 2 : authentification LocalAuth
-Le fichier LocalAuth.jsx utilise localStorage pour simuler une
-authentification. N'offre aucune sécurité réelle. Migration vers
-Supabase Auth impérative avant toute mise en production.
+### Dette 2 : authentification LocalAuth — SOLDÉE
+Le fichier LocalAuth.jsx utilise désormais Supabase Auth réel
+(signInWithPassword, getSession, onAuthStateChange, JWT).
+Le nom "LocalAuth" est conservé pour ne pas casser les imports.
+Cette dette est clôturée.
 
 ## Comportement attendu de Claude Code
 
@@ -75,15 +76,16 @@ complet si absent.
 
 Trois sessions prioritaires identifiées dans cet ordre.
 
-Session A prioritaire : audit et stabilisation du Dashboard. Traite
-les patterns useCrud qui peuvent perdre des données silencieusement
-et met en place une gestion propre des états de chargement et d'erreur.
+Session A : audit et stabilisation du Dashboard — en cours.
 
-Session B : migration vers Supabase Auth pour remplacer LocalAuth.
-Débloque la mise en production.
+Session B : migration Supabase Auth — TERMINÉE (mai 2026).
+LocalAuth.jsx utilise désormais la vraie Supabase Auth.
 
-Session C : migration des articles vers une table relationnelle
-dédiée. Entrée dans la réduction de la dette 1.
+Session C (nouvelle priorité) : module Cotisations dans le dashboard.
+Suivi par membre et par année de qui a payé sa cotisation.
+
+Session D : migration articles vers table relationnelle dédiée.
+Réduction de la dette mbp_store.
 
 ## Contraintes de production
 Budget limité association. Privilégier solutions gratuites. Respect
