@@ -16,7 +16,7 @@ function WaterBubble({ children }) {
   const D = 280;
   const shouldReduce = useReducedMotion();
   return (
-    <div style={{ position: "relative", width: D, height: D, overflow: "hidden" }}>
+    <div style={{ position: "relative", width: D, height: D, overflow: "hidden", borderRadius: "50%" }}>
       {[0, 1].map((i) => (
         <motion.div
           key={i}
