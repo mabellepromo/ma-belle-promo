@@ -96,12 +96,12 @@ function GridCard({ article, index }) {
         to={`/actualites/${article.id}`}
         className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
       >
-        <div className="relative h-48 overflow-hidden bg-muted flex-shrink-0">
+        <div className="relative h-48 overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
           <img
             loading="lazy"
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            className={`w-full h-full group-hover:scale-105 transition-transform duration-500 ${article.photo_position === "contain" ? "object-contain" : "object-cover object-top"}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           <span className={`absolute bottom-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full ${pill}`}>
