@@ -48,14 +48,12 @@ function FeaturedCard({ article }) {
         className="group grid md:grid-cols-2 rounded-3xl overflow-hidden border border-border bg-card hover:shadow-2xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-500 shadow-md"
       >
         {/* Image gauche */}
-        <div className="relative h-72 md:h-full min-h-[300px] overflow-hidden">
+        <div className="relative h-72 md:h-full min-h-[300px] overflow-hidden bg-muted flex items-center justify-center">
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            style={{ objectPosition: article.photo_position || "center" }}
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r md:from-transparent md:to-card/5" />
           <span className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold rounded-full ${pill}`}>
             {article.categorie}
           </span>
