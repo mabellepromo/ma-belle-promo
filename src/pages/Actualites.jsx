@@ -52,7 +52,8 @@ function FeaturedCard({ article }) {
           <img
             src={article.image}
             alt={article.titre}
-            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            style={{ objectPosition: article.photo_position || "center" }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r md:from-transparent md:to-card/5" />
           <span className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold rounded-full ${pill}`}>
