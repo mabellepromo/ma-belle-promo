@@ -182,7 +182,7 @@ export default function Navbar() {
       className="navbar-safe-area fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
       {/* Top accent bar */}
-      <div className="h-0.5 bg-gradient-to-r from-emerald-400 via-yellow-300 to-emerald-500" />
+      <div className="h-0.5" style={{ background: "linear-gradient(to right, transparent, #34d399 15%, #fde047 50%, #10b981 85%, transparent)" }} />
 
       <div className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-16" : "h-20 md:h-24"}`}>
         {/* Logo */}
