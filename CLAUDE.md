@@ -25,20 +25,18 @@ Supabase pour le backend (PostgreSQL, Auth, Storage), ReactMarkdown
 et ReactQuill pour les contenus riches, Cormorant Garamond et Lato
 pour la typographie, hébergement Vercel.
 
-## Dettes techniques conscientes
+## Dettes techniques conscientes — TOUTES SOLDÉES (mai 2026)
 
-### Dette 1 : structure de données mbp_store
-La table Supabase mbp_store utilise un format clé-valeur JSON
-introduit pour résoudre un problème de synchronisation entre
-appareils. Fonctionnelle mais non optimale pour les fonctionnalités
-de recherche avancée. Migration progressive vers un schéma
-relationnel classique planifiée mais non urgente.
+### Dette 1 : structure de données mbp_store — SOLDÉE
+La table mbp_store (clé-valeur JSON) n'est plus utilisée par aucun
+composant. ActualitesSection.jsx lit désormais la table evenements
+directement via useEvenements(). La table mbp_store peut rester
+en base sans impact.
 
 ### Dette 2 : authentification LocalAuth — SOLDÉE
 Le fichier LocalAuth.jsx utilise désormais Supabase Auth réel
 (signInWithPassword, getSession, onAuthStateChange, JWT).
 Le nom "LocalAuth" est conservé pour ne pas casser les imports.
-Cette dette est clôturée.
 
 ## Comportement attendu de Claude Code
 
