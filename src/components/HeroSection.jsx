@@ -19,15 +19,19 @@ function WaterBubble({ children }) {
     /* Wrapper externe sans overflow — les anneaux ping peuvent dépasser */
     <div style={{ position: "relative", width: D, height: D }}>
 
-      {/* Anneaux CSS ping — en dehors de tout clip, animation CSS pure */}
-      {!shouldReduce && (
-        <>
-          <span className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping"
-            style={{ animationDuration: "2.5s", animationDelay: "0s" }} />
-          <span className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping"
-            style={{ animationDuration: "2.5s", animationDelay: "1.25s" }} />
-        </>
-      )}
+      {/* Anneaux d'ondulation — Framer Motion, hors clip, animation fluide */}
+      {[0, 1].map((i) => (
+        <motion.span
+          key={i}
+          animate={shouldReduce ? {} : { scale: [1, 1.65], opacity: [0.5, 0] }}
+          transition={{ duration: 3.5, repeat: Infinity, delay: i * 1.75, ease: "easeOut" }}
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            border: "1px solid rgba(144,255,180,0.70)",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
 
       {/* Bulle intérieure — overflow:hidden pour le clip circulaire */}
       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", overflow: "hidden" }}>
