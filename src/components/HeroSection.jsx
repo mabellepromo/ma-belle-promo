@@ -16,24 +16,10 @@ function WaterBubble({ children }) {
   const D = 280;
   const shouldReduce = useReducedMotion();
   return (
-    /* Conteneur externe sans overflow:hidden — les anneaux peuvent dépasser */
+    /* Conteneur sans overflow:hidden — les anneaux peuvent dépasser */
     <div style={{ position: "relative", width: D, height: D }}>
 
-      {/* Anneaux d'ondulation — visibles en dehors de la bulle */}
-      {[0, 1].map((i) => (
-        <motion.div
-          key={i}
-          animate={shouldReduce ? {} : { scale: [1, 1.7], opacity: [0.45, 0] }}
-          transition={{ duration: 3.5, repeat: Infinity, delay: i * 1.75, ease: "easeOut" }}
-          style={{
-            position: "absolute", inset: 0, borderRadius: "50%",
-            border: "1.5px solid rgba(144,255,180,0.35)",
-            pointerEvents: "none",
-          }}
-        />
-      ))}
-
-      {/* Cercle intérieur — overflow:hidden pour clipper la photo et les effets */}
+      {/* Cercle intérieur — content clippé en cercle */}
       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", overflow: "hidden" }}>
         <motion.div
           animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
@@ -68,6 +54,21 @@ function WaterBubble({ children }) {
           {children}
         </div>
       </div>
+
+      {/* Anneaux d'ondulation — rendus APRÈS la bulle, donc par-dessus ; pas de clip */}
+      {[0, 1].map((i) => (
+        <motion.div
+          key={i}
+          animate={shouldReduce ? {} : { scale: [1, 1.65], opacity: [0.7, 0] }}
+          transition={{ duration: 2.8, repeat: Infinity, delay: i * 1.4, ease: "easeOut" }}
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            border: "2px solid rgba(100,230,160,0.75)",
+            boxShadow: "0 0 8px rgba(100,230,160,0.25)",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
     </div>
   );
 }
