@@ -23,7 +23,7 @@ export default function CotisationsSection({ members }) {
   const { cotisations, loading, saving, marquerPaye, marquerEnAttente, marquerExempte, mettreAJour } =
     useCotisations(annee);
 
-  const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
+  const years = Array.from({ length: 8 }, (_, i) => currentYear + 2 - i);
 
   // Fusion membres + cotisations
   const rows = useMemo(() => (members ?? []).map(m => {
