@@ -16,59 +16,51 @@ function WaterBubble({ children }) {
   const D = 280;
   const shouldReduce = useReducedMotion();
   return (
-    /* Conteneur sans overflow:hidden — les anneaux peuvent dépasser */
-    <div style={{ position: "relative", width: D, height: D }}>
-
-      {/* Cercle intérieur — content clippé en cercle */}
-      <div style={{ position: "absolute", inset: 0, borderRadius: "50%", overflow: "hidden" }}>
-        <motion.div
-          animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute", inset: 0, borderRadius: "50%",
-            background: `radial-gradient(ellipse at 38% 32%,
-              rgba(255,255,255,0.28) 0%,
-              rgba(180,255,220,0.12) 30%,
-              rgba(0,120,60,0.10) 60%,
-              rgba(0,40,20,0.22) 100%)`,
-            backdropFilter: "blur(28px)",
-            WebkitBackdropFilter: "blur(28px)",
-            border: "1.5px solid rgba(255,255,255,0.20)",
-            boxShadow: [
-              "inset 0 6px 50px rgba(255,255,255,0.10)",
-              "inset 0 -8px 40px rgba(0,80,40,0.25)",
-              "0 25px 70px rgba(0,0,0,0.35)",
-            ].join(", "),
-          }}
-        />
-        {/* reflet */}
-        <div style={{
-          position: "absolute", top: "12%", left: "17%", width: "42%", height: "26%",
-          background: "radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.18) 40%, transparent 70%)",
-          borderRadius: "50%", filter: "blur(5px)", transform: "rotate(-25deg)",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", zIndex: 10,
-        }}>
-          {children}
-        </div>
-      </div>
-
-      {/* Anneaux d'ondulation — rendus APRÈS la bulle, donc par-dessus ; pas de clip */}
+    <div style={{ position: "relative", width: D, height: D, overflow: "hidden", borderRadius: "50%" }}>
+      {/* Anneaux — visibles à travers le verre semi-transparent */}
       {[0, 1].map((i) => (
         <motion.div
           key={i}
-          animate={shouldReduce ? {} : { scale: [1, 1.65], opacity: [0.7, 0] }}
-          transition={{ duration: 2.8, repeat: Infinity, delay: i * 1.4, ease: "easeOut" }}
+          animate={shouldReduce ? {} : { scale: [0.85, 2.2], opacity: [0.45, 0] }}
+          transition={{ duration: 5, repeat: Infinity, delay: i * 1.8, ease: "easeOut" }}
           style={{
             position: "absolute", inset: 0, borderRadius: "50%",
-            border: "2px solid rgba(100,230,160,0.75)",
-            boxShadow: "0 0 8px rgba(100,230,160,0.25)",
-            pointerEvents: "none",
+            border: "1.5px solid rgba(144,255,180,0.30)",
           }}
         />
       ))}
+      <motion.div
+        animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute", inset: 0, borderRadius: "50%",
+          background: `radial-gradient(ellipse at 38% 32%,
+            rgba(255,255,255,0.28) 0%,
+            rgba(180,255,220,0.12) 30%,
+            rgba(0,120,60,0.10) 60%,
+            rgba(0,40,20,0.22) 100%)`,
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)",
+          border: "1.5px solid rgba(255,255,255,0.20)",
+          boxShadow: [
+            "inset 0 6px 50px rgba(255,255,255,0.10)",
+            "inset 0 -8px 40px rgba(0,80,40,0.25)",
+            "0 25px 70px rgba(0,0,0,0.35)",
+          ].join(", "),
+        }}
+      />
+      {/* reflet */}
+      <div style={{
+        position: "absolute", top: "12%", left: "17%", width: "42%", height: "26%",
+        background: "radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.18) 40%, transparent 70%)",
+        borderRadius: "50%", filter: "blur(5px)", transform: "rotate(-25deg)",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center", zIndex: 10,
+      }}>
+        {children}
+      </div>
     </div>
   );
 }
