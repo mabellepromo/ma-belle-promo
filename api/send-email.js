@@ -41,6 +41,16 @@ const rateLimitMap = new Map();
 const RATE_LIMIT   = 5;
 const RATE_WINDOW  = 5 * 60 * 1000;
 
+/* ── Rate limiting relance cotisations (max 1 envoi-masse / heure / IP) ── */
+const relanceRateLimitMap = new Map();
+function checkRelanceRateLimit(ip) {
+  const now  = Date.now();
+  const last = relanceRateLimitMap.get(ip) || 0;
+  if (now - last < 60 * 60 * 1000) return false;
+  relanceRateLimitMap.set(ip, now);
+  return true;
+}
+
 function checkRateLimit(ip) {
   const now = Date.now();
   const timestamps = (rateLimitMap.get(ip) || []).filter(t => now - t < RATE_WINDOW);
@@ -213,6 +223,37 @@ function buildNewsletterConfirmPayload({ email, token, confirm_url }) {
   };
 }
 
+function buildRelanceCotisationPayload({ to_email, to_name, annee, message }) {
+  const greeting = to_name ? `Cher(e) <strong>${escHtml(to_name)}</strong>,` : "Cher(e) membre,";
+  const corps = message
+    ? escHtml(message).replace(/\n/g, "<br>")
+    : `Nous vous informons que votre cotisation annuelle pour l'exercice <strong>${escHtml(String(annee))}</strong> est en attente de règlement.<br><br>Nous vous remercions de bien vouloir procéder au paiement dans les meilleurs délais en contactant le bureau de l'association.`;
+
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:17px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:10px;">
+      Rappel — Cotisation ${escHtml(String(annee))}
+    </h2>
+    <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+    <div style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:24px;">${corps}</div>
+    <div style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:24px;">
+      <p style="margin:0;font-size:13px;color:#92400e;font-weight:600;">Pour régler votre cotisation :</p>
+      <p style="margin:6px 0 0;font-size:13px;color:#78350f;">Contactez le bureau ou écrivez-nous à <a href="mailto:contact@mabellepromo.org" style="color:#d97706;">contact@mabellepromo.org</a></p>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b7280;">
+      Cordialement,<br>
+      <strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+      <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+    </p>`;
+
+  return {
+    sender: SENDER,
+    to: [{ email: to_email, name: to_name || to_email }],
+    replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+    subject: `[MBP] Rappel cotisation ${annee}`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
 function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
     deletion_request:    { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
@@ -270,9 +311,56 @@ export default async function handler(req, res) {
 
   const { type, ...data } = req.body;
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
+  }
+
+  // ── Relance cotisations : envoi en masse, rate limit propre ──
+  if (type === "relance_cotisation") {
+    const { membres, annee, message } = data;
+    if (!Array.isArray(membres) || membres.length === 0) {
+      return res.status(400).json({ error: "Aucun membre à relancer." });
+    }
+    if (membres.length > 100) {
+      return res.status(400).json({ error: "Maximum 100 membres par envoi." });
+    }
+    if (!annee || typeof annee !== "number") {
+      return res.status(400).json({ error: "Année invalide." });
+    }
+    if (!checkRelanceRateLimit(ip)) {
+      return res.status(429).json({ error: "Une relance a déjà été envoyée dans la dernière heure. Réessayez plus tard." });
+    }
+
+    const membresValides = membres.filter(m => isValidEmail(m.email));
+    const membresInvalides = membres.filter(m => !isValidEmail(m.email));
+
+    const results = await Promise.allSettled(
+      membresValides.map(async m => {
+        const payload = buildRelanceCotisationPayload({ to_email: m.email, to_name: m.nom, annee, message: message || null });
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.message || "Erreur Brevo");
+        }
+        return m.nom;
+      })
+    );
+
+    const sent = results.filter(r => r.status === "fulfilled").length;
+    const errors = [
+      ...results
+        .map((r, i) => r.status === "rejected" ? { nom: membresValides[i].nom, reason: r.reason?.message } : null)
+        .filter(Boolean),
+      ...membresInvalides.map(m => ({ nom: m.nom, reason: "Email invalide ou manquant" })),
+    ];
+
+    console.log(`Relance cotisation ${annee}: ${sent} envoyés, ${errors.length} erreurs`);
+    return res.status(200).json({ success: true, sent, total: membres.length, errors });
   }
 
   // Validation des champs selon le type

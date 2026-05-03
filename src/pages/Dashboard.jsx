@@ -13,13 +13,15 @@ import {
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
-  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote
+  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
 import AccesSection from "./dashboard/AccesSection.jsx";
 import CotisationsSection from "./dashboard/CotisationsSection.jsx";
+import RapportAnnuel from "./dashboard/RapportAnnuel.jsx";
+import { useCotisations } from "../hooks/useCotisations";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -32,6 +34,8 @@ export default function Dashboard() {
 
   const { articles } = useArticles();
   const { evenements } = useEvenements();
+  const currentYear = new Date().getFullYear();
+  const { cotisations: cotisationsAnnee } = useCotisations(currentYear);
 
   const {
     allMembers, pendingMembers,
@@ -65,6 +69,23 @@ export default function Dashboard() {
 
     return () => supabase.removeChannel(channel);
   }, []);
+
+  const cotStats = useMemo(() => {
+    const rows    = (allMembers ?? []).map(m => {
+      const cot = cotisationsAnnee.find(c => String(c.member_id) === String(m.id));
+      return cot?.statut ?? "en_attente";
+    });
+    const payes   = rows.filter(s => s === "payé").length;
+    const exempts = rows.filter(s => s === "exempté").length;
+    const total   = allMembers.length;
+    const effectif = total - exempts;
+    return { payes, total, taux: effectif > 0 ? Math.round((payes / effectif) * 100) : 0 };
+  }, [allMembers, cotisationsAnnee]);
+
+  const prochainEvenement = useMemo(() =>
+    evenements.filter(e => e.statut?.toLowerCase() !== "passé")[0] ?? null,
+    [evenements]
+  );
 
   const filteredMembers = useMemo(() => {
     const q = search.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -205,7 +226,8 @@ export default function Dashboard() {
       label: "Membres",
       items: [
         { key: "membres",      label: `Membres`, badge: allMembers.length, icon: Users },
-        { key: "cotisations",  label: "Cotisations", icon: Banknote },
+        { key: "cotisations",  label: "Cotisations",    icon: Banknote },
+        { key: "rapport",      label: "Rapport annuel", icon: BarChart2 },
         { key: "pending",      label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
         { key: "messages",     label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
         { key: "acces",        label: "Accès membres", icon: KeyRound },
@@ -425,6 +447,62 @@ export default function Dashboard() {
                   ))}
                 </div>
               )}
+
+              {/* Cotisations + Prochain événement */}
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Taux de cotisation */}
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-emerald-500" />
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                          <Banknote className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-foreground">Cotisations {currentYear}</p>
+                          <p className="text-xs text-muted-foreground">{cotStats.payes} / {cotStats.total} membres</p>
+                        </div>
+                      </div>
+                      <span className="font-heading text-2xl font-black text-emerald-600">{cotStats.taux}%</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${cotStats.taux}%` }} />
+                    </div>
+                    <button onClick={() => setTab("cotisations")}
+                      className="mt-3 text-xs font-semibold text-emerald-600 hover:underline">
+                      Gérer les cotisations →
+                    </button>
+                  </div>
+                </div>
+
+                {/* Prochain événement */}
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-indigo-500" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-indigo-600" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground">Prochain événement</p>
+                    </div>
+                    {prochainEvenement ? (
+                      <>
+                        <p className="font-semibold text-foreground text-sm leading-snug">{prochainEvenement.titre}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {prochainEvenement.date}{prochainEvenement.lieu ? ` · ${prochainEvenement.lieu}` : ""}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">Aucun événement à venir.</p>
+                    )}
+                    <button onClick={() => setTab("evenements")}
+                      className="mt-3 text-xs font-semibold text-indigo-600 hover:underline">
+                      Gérer les événements →
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               <div className="grid lg:grid-cols-2 gap-6">
                 <div className="bg-background border border-border rounded-2xl p-5">
@@ -646,6 +724,7 @@ export default function Dashboard() {
           {tab === "galeries"    && <GaleriesSection />}
           {tab === "ressources"  && <RessourcesSection />}
           {tab === "cotisations" && <CotisationsSection members={allMembers} />}
+          {tab === "rapport"     && <RapportAnnuel members={allMembers} />}
           {tab === "acces"       && <AccesSection />}
 
         </div>

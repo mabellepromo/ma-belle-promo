@@ -1,5 +1,6 @@
 import { useState, useMemo, Fragment } from "react";
-import { Check, Clock, X, Download, Search, Banknote, Users, ShieldOff } from "lucide-react";
+import { toast } from "sonner";
+import { Check, Clock, X, Download, Search, Banknote, Users, ShieldOff, Mail, Send, AlertTriangle } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";
 import { inp, sel } from "./shared";
 
@@ -19,6 +20,9 @@ export default function CotisationsSection({ members }) {
   const [montantDefaut, setMontantDefaut] = useState(10000);
   const [editingId,     setEditingId]     = useState(null);
   const [editData,      setEditData]      = useState({});
+  const [showRelance,   setShowRelance]   = useState(false);
+  const [relanceMsg,    setRelanceMsg]    = useState("");
+  const [sendingRelance, setSendingRelance] = useState(false);
 
   const { cotisations, loading, saving, marquerPaye, marquerEnAttente, marquerExempte, mettreAJour } =
     useCotisations(annee);
@@ -65,6 +69,41 @@ export default function CotisationsSection({ members }) {
   async function saveEdit(memberId) {
     await mettreAJour(memberId, editData);
     setEditingId(null);
+  }
+
+  const enAttenteAvecEmail  = rows.filter(m => m.statut === "en_attente" && m.email);
+  const enAttenteSansEmail  = rows.filter(m => m.statut === "en_attente" && !m.email);
+
+  async function envoyerRelance() {
+    if (enAttenteAvecEmail.length === 0) return;
+    setSendingRelance(true);
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "relance_cotisation",
+          membres: enAttenteAvecEmail.map(m => ({ email: m.email, nom: m.nom })),
+          annee,
+          message: relanceMsg.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`${data.sent} relance${data.sent > 1 ? "s" : ""} envoyée${data.sent > 1 ? "s" : ""} avec succès !`);
+        if (data.errors?.length > 0) {
+          toast.warning(`${data.errors.length} envoi(s) échoué(s).`);
+        }
+        setShowRelance(false);
+        setRelanceMsg("");
+      } else {
+        toast.error(data.error || "Erreur lors de l'envoi.");
+      }
+    } catch (err) {
+      toast.error("Erreur réseau : " + err.message);
+    } finally {
+      setSendingRelance(false);
+    }
   }
 
   function exportCSV() {
@@ -116,12 +155,67 @@ export default function CotisationsSection({ members }) {
             />
             <span className="text-xs text-muted-foreground">FCFA</span>
           </div>
+          {stats.enAttente > 0 && (
+            <button onClick={() => setShowRelance(true)}
+              className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-amber-700 hover:bg-amber-100 transition-colors">
+              <Mail className="w-3.5 h-3.5" /> Relancer ({stats.enAttente})
+            </button>
+          )}
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors">
             <Download className="w-3.5 h-3.5" /> Exporter CSV
           </button>
         </div>
       </div>
+
+      {/* ── Modale relance ── */}
+      {showRelance && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="font-heading text-lg font-bold text-foreground mb-1 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-amber-500" /> Relance cotisations {annee}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {enAttenteAvecEmail.length} email{enAttenteAvecEmail.length > 1 ? "s" : ""} seront envoyés.
+            </p>
+
+            {enAttenteSansEmail.length > 0 && (
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+                <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700">
+                  <strong>{enAttenteSansEmail.length} membre{enAttenteSansEmail.length > 1 ? "s" : ""}</strong> sans email seront ignoré{enAttenteSansEmail.length > 1 ? "s" : ""} : {enAttenteSansEmail.map(m => m.nom).join(", ")}.
+                </p>
+              </div>
+            )}
+
+            <label className="text-xs font-semibold text-muted-foreground mb-1 block">
+              Message personnalisé <span className="font-normal">(optionnel)</span>
+            </label>
+            <textarea
+              value={relanceMsg}
+              onChange={e => setRelanceMsg(e.target.value)}
+              placeholder="Laissez vide pour utiliser le message par défaut…"
+              rows={4}
+              className="w-full rounded-xl border border-border bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:border-primary/50 resize-none mb-4"
+            />
+
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => { setShowRelance(false); setRelanceMsg(""); }}
+                disabled={sendingRelance}
+                className="px-4 py-2 rounded-xl border border-border text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50">
+                Annuler
+              </button>
+              <button onClick={envoyerRelance}
+                disabled={sendingRelance || enAttenteAvecEmail.length === 0}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50">
+                {sendingRelance
+                  ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Envoi…</>
+                  : <><Send className="w-3.5 h-3.5" /> Envoyer {enAttenteAvecEmail.length} relance{enAttenteAvecEmail.length > 1 ? "s" : ""}</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
