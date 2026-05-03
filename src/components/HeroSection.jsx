@@ -17,18 +17,7 @@ function WaterBubble({ children }) {
   const shouldReduce = useReducedMotion();
   return (
     <div style={{ position: "relative", width: D, height: D, overflow: "hidden", borderRadius: "50%" }}>
-      {/* Anneaux — visibles à travers le verre semi-transparent */}
-      {[0, 1].map((i) => (
-        <motion.div
-          key={i}
-          animate={shouldReduce ? {} : { scale: [0.85, 2.2], opacity: [0.45, 0] }}
-          transition={{ duration: 5, repeat: Infinity, delay: i * 1.8, ease: "easeOut" }}
-          style={{
-            position: "absolute", inset: 0, borderRadius: "50%",
-            border: "1.5px solid rgba(144,255,180,0.30)",
-          }}
-        />
-      ))}
+      {/* Fond glassmorphism */}
       <motion.div
         animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
@@ -55,12 +44,27 @@ function WaterBubble({ children }) {
         background: "radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.18) 40%, transparent 70%)",
         borderRadius: "50%", filter: "blur(5px)", transform: "rotate(-25deg)",
       }} />
+      {/* Contenu */}
       <div style={{
         position: "absolute", inset: 0, display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", zIndex: 10,
       }}>
         {children}
       </div>
+      {/* Anneaux — rendus EN DERNIER pour être au-dessus du backdrop-filter */}
+      {[0, 1].map((i) => (
+        <motion.div
+          key={i}
+          animate={shouldReduce ? {} : { scale: [0.5, 1.05], opacity: [0.7, 0] }}
+          transition={{ duration: 3, repeat: Infinity, delay: i * 1.5, ease: "easeOut" }}
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            border: "2px solid rgba(144,255,180,0.80)",
+            zIndex: 20,
+            pointerEvents: "none",
+          }}
+        />
+      ))}
     </div>
   );
 }
