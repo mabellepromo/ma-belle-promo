@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import {
   User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X,
   Download, Shield, Clock, CheckCircle, AlertCircle, Trash2,
-  ShieldCheck, Camera, Linkedin, BookOpen, ChevronDown, ChevronRight,
+  ShieldCheck, Linkedin, BookOpen, ChevronDown, ChevronRight,
   CreditCard,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import PageHero from "../components/PageHero";
 import PaymentModal from "../components/PaymentModal";
-import { compressImage } from "../lib/imageUtils";
 
 const MONTANT_COTISATION = 30000; // FCFA — montant annuel attendu
 
@@ -52,10 +51,8 @@ export default function EspaceMembre() {
   const [saving,          setSaving]          = useState(false);
   const [tab,             setTab]             = useState("profil");
   const [deletionRequested, setDeletionRequested] = useState(false);
-  const [uploadingPhoto,  setUploadingPhoto]  = useState(false);
   const [paymentModal,    setPaymentModal]    = useState(false);
   const [expandedCot,     setExpandedCot]     = useState(null);
-  const photoInputRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -102,26 +99,6 @@ export default function EspaceMembre() {
   const totalVerse      = cotisations.reduce((s, c) => s + (c.montant || 0), 0);
   const anneesPayes     = cotisations.filter(c => c.statut === "payé").length;
   const statutCfg       = STATUT_CONFIG[statutEnCours] ?? STATUT_CONFIG["en_attente"];
-
-  async function handlePhotoChange(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast.error("Image trop grande (max 10 Mo)."); return; }
-    setUploadingPhoto(true);
-    try {
-      const dataUrl = await compressImage(file, 400, 0.85);
-      if (member?.id) {
-        await supabase.from("members").update({ photo: dataUrl }).eq("id", member.id);
-      }
-      setMember(p => ({ ...p, photo: dataUrl }));
-      toast.success("Photo mise à jour !");
-    } catch {
-      toast.error("Erreur lors du changement de photo.");
-    } finally {
-      setUploadingPhoto(false);
-      e.target.value = "";
-    }
-  }
 
   async function handleSave() {
     setSaving(true);
@@ -214,10 +191,8 @@ export default function EspaceMembre() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card border border-border rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-5">
 
-          {/* Avatar — cliquer pour changer la photo */}
-          <div className="relative flex-shrink-0 cursor-pointer group"
-            onClick={() => photoInputRef.current?.click()}
-            title="Cliquer pour changer la photo">
+          {/* Avatar */}
+          <div className="relative flex-shrink-0">
             <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md">
               {member?.photo ? (
                 <img src={member.photo} alt={user.full_name} className="w-full h-full object-cover object-top" />
@@ -229,13 +204,7 @@ export default function EspaceMembre() {
                 </div>
               )}
             </div>
-            <div className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              {uploadingPhoto
-                ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                : <Camera className="w-5 h-5 text-white" />}
-            </div>
           </div>
-          <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
 
           {/* Infos */}
           <div className="text-center sm:text-left flex-1">
@@ -397,7 +366,6 @@ export default function EspaceMembre() {
             {editing && (
               <p className="text-xs text-muted-foreground mt-5 bg-primary/5 rounded-xl p-3">
                 Après enregistrement, vos informations seront mises à jour dans l'annuaire des membres et dans tout le site.
-                Votre photo se change en cliquant directement sur elle dans la carte en haut.
               </p>
             )}
           </motion.div>
