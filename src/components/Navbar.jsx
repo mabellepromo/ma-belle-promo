@@ -70,15 +70,16 @@ function DesktopDropdown({ item }) {
       {/* Bouton déclencheur */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+        className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
         style={{
-          color: open ? "#ffffff" : "rgba(255,255,255,0.70)",
+          color: open ? "#ffffff" : "rgba(255,255,255,0.62)",
           background: open ? "rgba(52,211,153,0.10)" : "transparent",
+          letterSpacing: "0.10em",
         }}
       >
         {item.label}
         <ChevronDown
-          className="w-3.5 h-3.5 flex-shrink-0"
+          className="w-3 h-3 flex-shrink-0"
           style={{
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)",
@@ -242,18 +243,18 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: scrolled ? "rgba(5,18,11,0.88)" : "var(--brand-dark-mid)",
-        backdropFilter: scrolled ? "blur(14px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
-        boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.35)" : "none",
+        background: scrolled ? "rgba(5,18,11,0.92)" : "var(--brand-dark-mid)",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
+        boxShadow: scrolled ? "0 2px 32px rgba(0,0,0,0.40)" : "none",
         paddingTop: "env(safe-area-inset-top, 0px)",
         paddingLeft: "env(safe-area-inset-left, 0px)",
         paddingRight: "env(safe-area-inset-right, 0px)",
       }}
       className="navbar-safe-area fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
-      {/* Top accent bar */}
-      <div className="h-0.5" style={{ background: "linear-gradient(to right, transparent, #34d399 15%, #fde047 50%, #10b981 85%, transparent)" }} />
+      {/* Ligne d'accent supérieure */}
+      <div className="h-px" style={{ background: "linear-gradient(to right, transparent, #34d399 15%, #fde047 50%, #10b981 85%, transparent)" }} />
 
       {/* Barre de progression scroll */}
       <div style={{ height: 2, background: "rgba(255,255,255,0.04)", position: "relative", overflow: "hidden" }}>
@@ -266,9 +267,10 @@ export default function Navbar() {
         }} />
       </div>
 
-      <div className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-16" : "h-20 md:h-24"}`}>
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+      <div className={`max-w-7xl mx-auto px-6 flex items-center transition-all duration-300 ${scrolled ? "h-14" : "h-20 md:h-24"}`}>
+
+        {/* ── MOBILE : logo gauche ── */}
+        <Link to="/" className="md:hidden flex items-center gap-3 group flex-shrink-0">
           <img
             src="/Logo Redesign1.webp"
             alt="Ma Belle Promo"
@@ -280,60 +282,107 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
+        {/* ── DESKTOP : groupe nav gauche ── */}
+        <div className="hidden md:flex flex-1 items-center justify-end gap-0.5">
+          {navItems.slice(0, 2).map((item) => (
             <DesktopDropdown key={item.label} item={item} />
           ))}
         </div>
 
-        {/* CTA + mobile toggle */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/don")}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-wide uppercase"
-            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
-          >
-            ♥ Faire un don
-          </button>
-          {session ? (
-            <>
-              {isAdmin && (
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
-                  style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-                </button>
-              )}
-              <div
-                className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs rounded-full"
-                style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.70)" }}
-              >
-                <User className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="max-w-[100px] truncate">{session.nom}</span>
-                <button
-                  onClick={() => { logout(); navigate("/"); }}
-                  title="Se déconnecter"
-                  className="ml-1 hover:text-white transition-colors flex-shrink-0"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </>
-          ) : (
+        {/* Séparateur doré gauche */}
+        <div className="hidden md:block flex-shrink-0 mx-5" style={{
+          width: 1, height: 34,
+          background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)",
+        }} />
+
+        {/* ── DESKTOP : logo centré ── */}
+        <Link to="/" className="hidden md:flex flex-col items-center group flex-shrink-0">
+          <img
+            src="/Logo Redesign1.webp"
+            alt="Ma Belle Promo"
+            className="rounded-full object-cover shadow-lg group-hover:shadow-primary/40 transition-all duration-300"
+            style={{ width: scrolled ? 34 : 48, height: scrolled ? 34 : 48 }}
+          />
+          <div style={{
+            maxHeight: scrolled ? 0 : 36,
+            opacity: scrolled ? 0 : 1,
+            overflow: "hidden",
+            transition: "max-height 0.3s ease, opacity 0.25s ease",
+            marginTop: scrolled ? 0 : 4,
+            textAlign: "center",
+          }}>
+            <div className="font-heading text-[11px] font-bold tracking-[0.14em] uppercase whitespace-nowrap" style={{ color: "#e2f5ed" }}>
+              Ma Belle Promo
+            </div>
+            <div className="text-[8px] tracking-[0.28em] uppercase whitespace-nowrap" style={{ color: "rgba(255,255,255,0.32)" }}>
+              FDD · MBP · Togo
+            </div>
+          </div>
+        </Link>
+
+        {/* Séparateur doré droit */}
+        <div className="hidden md:block flex-shrink-0 mx-5" style={{
+          width: 1, height: 34,
+          background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)",
+        }} />
+
+        {/* ── DESKTOP : groupe nav droit + CTAs ── */}
+        <div className="hidden md:flex flex-1 items-center gap-0.5">
+          {navItems.slice(2).map((item) => (
+            <DesktopDropdown key={item.label} item={item} />
+          ))}
+
+          {/* CTAs */}
+          <div className="ml-auto flex items-center gap-2">
             <button
-              onClick={() => navigate("/espace-membre")}
-              className="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-full transition-colors"
-              style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
+              onClick={() => navigate("/don")}
+              className="flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
+              style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
             >
-              <User className="w-3.5 h-3.5" /> Mon espace
+              ♥ Don
             </button>
-          )}
-          {/* Indicateur mobile : prénom + déconnexion (visible uniquement < 640px) */}
+            {session ? (
+              <>
+                {isAdmin && (
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-semibold rounded-full transition-colors tracking-wide"
+                    style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                  </button>
+                )}
+                <div
+                  className="flex items-center gap-1.5 px-3 py-2 text-[10px] rounded-full"
+                  style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.70)" }}
+                >
+                  <User className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="max-w-[90px] truncate">{session.nom}</span>
+                  <button
+                    onClick={() => { logout(); navigate("/"); }}
+                    title="Se déconnecter"
+                    className="ml-1 hover:text-white transition-colors flex-shrink-0"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate("/espace-membre")}
+                className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-semibold rounded-full transition-colors tracking-wide"
+                style={{ border: "1px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.75)" }}
+              >
+                <User className="w-3.5 h-3.5" /> Mon espace
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── MOBILE : indicateur session + hamburger ── */}
+        <div className="md:hidden ml-auto flex items-center gap-3">
           {session && (
-            <div className="md:hidden flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs"
+            <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs"
               style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.75)" }}>
               <User className="w-3 h-3 flex-shrink-0" />
               <span className="max-w-[72px] truncate">{session.nom.split(" ")[0]}</span>
@@ -348,7 +397,7 @@ export default function Navbar() {
           )}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/80"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/80"
           >
             <AnimatePresence mode="wait">
               {open ? (
@@ -373,7 +422,7 @@ export default function Navbar() {
         />
       )}
 
-      {/* Mobile menu */}
+      {/* Menu mobile */}
       {open && (
         <motion.div
           initial={{ opacity: 0, y: -6 }}
@@ -381,70 +430,73 @@ export default function Navbar() {
           transition={{ duration: 0.18, ease: "easeOut" }}
           className="md:hidden bg-background border-t border-border relative z-50"
         >
-            <div className="px-4 py-4 space-y-2 max-h-[75vh] overflow-y-auto">
-              {/* Bloc utilisateur — toujours en premier */}
-              {session ? (
-                <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#fecaca", background: "#fef2f2" }}>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{session.nom}</p>
-                      <p className="text-xs text-muted-foreground">{isAdmin ? "Administrateur" : "Membre"}</p>
-                    </div>
-                    <button
-                      onClick={() => { setOpen(false); logout(); navigate("/"); }}
-                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-                      style={{ color: "#dc2626", background: "#fee2e2" }}
-                    >
-                      <LogOut className="w-3.5 h-3.5" /> Quitter
-                    </button>
+          <div className="px-4 py-4 space-y-2 max-h-[75vh] overflow-y-auto">
+            {/* Bloc utilisateur */}
+            {session ? (
+              <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#fecaca", background: "#fef2f2" }}>
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-primary" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{session.nom}</p>
+                    <p className="text-xs text-muted-foreground">{isAdmin ? "Administrateur" : "Membre"}</p>
+                  </div>
+                  <button
+                    onClick={() => { setOpen(false); logout(); navigate("/"); }}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                    style={{ color: "#dc2626", background: "#fee2e2" }}
+                  >
+                    <LogOut className="w-3.5 h-3.5" /> Quitter
+                  </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => { setOpen(false); navigate("/login"); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
-                >
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <User className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  Se connecter / Mon espace
-                </button>
-              )}
+              </div>
+            ) : (
+              <button
+                onClick={() => { setOpen(false); navigate("/login"); }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <User className="w-3.5 h-3.5 text-primary" />
+                </div>
+                Se connecter / Mon espace
+              </button>
+            )}
 
-              {/* Home */}
+            {/* Accueil */}
+            <button
+              onClick={() => { setOpen(false); navigate("/"); }}
+              className="flex items-center gap-2.5 w-full px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
+            >
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                <Home className="w-3.5 h-3.5 text-white" />
+              </div>
+              Accueil
+            </button>
+
+            {navItems.map((item) => (
+              <MobileMenuItem key={item.label} item={item} onClose={() => setOpen(false)} />
+            ))}
+
+            {isAdmin && (
               <button
-                onClick={() => { setOpen(false); navigate("/"); }}
-                className="flex items-center gap-2.5 w-full px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
+                onClick={() => { setOpen(false); navigate("/dashboard"); }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-primary bg-primary/10 rounded-xl border border-primary/20 hover:bg-primary/20 transition-colors"
               >
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                  <Home className="w-3.5 h-3.5 text-white" />
+                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
                 </div>
-                Accueil
+                Tableau de bord
               </button>
-              {navItems.map((item) => (
-                <MobileMenuItem key={item.label} item={item} onClose={() => setOpen(false)} />
-              ))}
-              {isAdmin && (
-                <button
-                  onClick={() => { setOpen(false); navigate("/dashboard"); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-primary bg-primary/10 rounded-xl border border-primary/20 hover:bg-primary/20 transition-colors"
-                >
-                  <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  Tableau de bord
-                </button>
-              )}
-              <button
-                onClick={() => { setOpen(false); navigate("/implications/soutenir"); }}
-                className="w-full mt-2 px-5 py-3.5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold rounded-xl tracking-wide"
-              >
-                ♥ Faire un don
-              </button>
-            </div>
+            )}
+
+            <button
+              onClick={() => { setOpen(false); navigate("/implications/soutenir"); }}
+              className="w-full mt-2 px-5 py-3.5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold rounded-xl tracking-wide"
+            >
+              ♥ Faire un don
+            </button>
+          </div>
         </motion.div>
       )}
     </nav>
