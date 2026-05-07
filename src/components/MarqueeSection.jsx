@@ -14,85 +14,74 @@ const MARQUEE_CSS = `
     from { transform: translateX(-50%); }
     to   { transform: translateX(0); }
   }
-  .mq-left  { animation: marquee-left  32s linear infinite; }
-  .mq-right { animation: marquee-right 44s linear infinite; }
+  .mq-left  { animation: marquee-left  28s linear infinite; }
+  .mq-right { animation: marquee-right 36s linear infinite; }
   .mq-left:hover,
   .mq-right:hover { animation-play-state: paused; }
+  .mq-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 3px 13px;
+    border-radius: 20px;
+    font-family: Lato, sans-serif;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.26);
+    color: rgba(251,191,36,0.80);
+  }
+  .mq-pill:hover {
+    background: rgba(251,191,36,0.16);
+    border-color: rgba(251,191,36,0.52);
+    color: #fbbf24;
+  }
 `;
 
-/* Items simples : juste un label texte
-   Items cliquables internes  : { label, to }  — React Router Link
-   Items cliquables externes  : { label, href } — <a target="_blank"> */
+/* Tous les items sont des liens — internes { to } ou externes { href } */
 const ROW1 = [
-  { label: "Adhésion", to: "/implications/adhesion" },
-  "Ma Belle Promo",
-  { label: "Événements", to: "/activites/evenements" },
-  "Amitié · Solidarité",
-  { label: "Actualités", to: "/informations/actualites" },
-  "Promotion 1994–2000",
-  { label: "Nos Projets", to: "/activites/projets" },
-  "FDD · Lomé · Togo",
+  { label: "Notre Credo",        to: "/association/credo" },
+  { label: "Notre Ambition",     to: "/association/ambition" },
+  { label: "Notre Équipe",       to: "/association/equipe" },
+  { label: "Nos Sponsors",       to: "/association/sponsors" },
+  { label: "Événements",         to: "/activites/evenements" },
+  { label: "Nos Projets",        to: "/activites/projets" },
+  { label: "Nos Programmes",     to: "/activites/programmes" },
+  { label: "Passerelles",        href: "https://passerelles.vercel.app" },
 ];
 
 const ROW2 = [
-  { label: "Programme Passerelles", href: "https://passerelles.vercel.app" },
-  "48 Membres",
-  { label: "Faire un don", to: "/implications/soutenir" },
-  "Excellence Juridique",
-  { label: "Annuaire des membres", to: "/annuaire" },
-  "Récépissé N°0920",
-  { label: "Nous contacter", to: "/informations/contacts" },
-  "Université de Lomé",
+  { label: "Adhésion",           to: "/implications/adhesion" },
+  { label: "Cotisation",         to: "/implications/cotisation" },
+  { label: "Nous Soutenir",      to: "/implications/soutenir" },
+  { label: "Faire un Don",       to: "/don" },
+  { label: "Actualités",         to: "/informations/actualites" },
+  { label: "Médiathèque",        to: "/informations/mediatheque" },
+  { label: "Documents",          to: "/informations/documents" },
+  { label: "Communiqués",        to: "/informations/communiques" },
+  { label: "Annuaire",           to: "/annuaire" },
+  { label: "Contacts",           to: "/informations/contacts" },
 ];
 
-const textStyle = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.10em",
-  textTransform: "uppercase",
-  whiteSpace: "nowrap",
-  padding: "0 14px",
-  fontFamily: "Lato, sans-serif",
-  textDecoration: "none",
-  transition: "color 0.2s",
-};
-
-function Item({ item, gemColor, gem }) {
-  const label = typeof item === "string" ? item : item.label;
-
-  const isInternal = typeof item === "object" && item.to;
-  const isExternal = typeof item === "object" && item.href;
-
-  const linkStyle = { ...textStyle, color: "#34d399" };
+function Item({ item, gem, gemColor }) {
+  const isExternal = Boolean(item.href);
 
   return (
-    <span style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-      {isInternal ? (
-        <Link
-          to={item.to}
-          style={linkStyle}
-          onMouseEnter={e => e.currentTarget.style.color = "#6ee7b7"}
-          onMouseLeave={e => e.currentTarget.style.color = "#34d399"}
-        >
-          {label}
-        </Link>
-      ) : isExternal ? (
-        <a
-          href={item.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={linkStyle}
-          onMouseEnter={e => e.currentTarget.style.color = "#6ee7b7"}
-          onMouseLeave={e => e.currentTarget.style.color = "#34d399"}
-        >
-          {label}
+    <span style={{ display: "flex", alignItems: "center", flexShrink: 0, padding: "0 6px" }}>
+      {isExternal ? (
+        <a href={item.href} target="_blank" rel="noopener noreferrer" className="mq-pill">
+          {item.label}
         </a>
       ) : (
-        <span style={{ ...textStyle, color: "rgba(255,255,255,0.62)" }}>
-          {label}
-        </span>
+        <Link to={item.to} className="mq-pill">
+          {item.label}
+        </Link>
       )}
-      <span style={{ color: gemColor, fontSize: 7, opacity: 0.80 }}>{gem}</span>
+      <span style={{ color: gemColor, fontSize: 6, opacity: 0.55, marginLeft: 6 }}>{gem}</span>
     </span>
   );
 }
@@ -101,7 +90,7 @@ function Row({ items, cls, gem, gemColor }) {
   const doubled = [...items, ...items];
   return (
     <div style={{ overflow: "hidden", display: "flex" }}>
-      <div className={cls} style={{ display: "flex", width: "max-content", willChange: "transform" }}>
+      <div className={cls} style={{ display: "flex", alignItems: "center", width: "max-content", willChange: "transform" }}>
         {doubled.map((item, i) => (
           <Item key={i} item={item} gem={gem} gemColor={gemColor} />
         ))}
@@ -112,7 +101,7 @@ function Row({ items, cls, gem, gemColor }) {
 
 export default function MarqueeSection() {
   return (
-    <div style={{ background: BG, position: "relative", overflow: "hidden", padding: "12px 0" }}>
+    <div style={{ background: BG, position: "relative", overflow: "hidden", padding: "10px 0" }}>
       <style>{MARQUEE_CSS}</style>
 
       {/* Fade haut */}
@@ -131,14 +120,14 @@ export default function MarqueeSection() {
         background: `linear-gradient(to left, ${BG}, transparent)`,
       }} />
 
-      {/* Rangée 1 — gauche, losanges or */}
-      <Row cls="mq-left"  items={ROW1} gem="◆" gemColor="#fbbf24" />
+      {/* Rangée 1 — gauche */}
+      <Row cls="mq-left"  items={ROW1} gem="◆" gemColor="rgba(251,191,36,0.40)" />
 
       {/* Filet séparateur */}
-      <div style={{ height: 1, margin: "8px 0", background: "rgba(52,211,153,0.10)" }} />
+      <div style={{ height: 1, margin: "7px 0", background: "rgba(251,191,36,0.10)" }} />
 
-      {/* Rangée 2 — droite, losanges verts */}
-      <Row cls="mq-right" items={ROW2} gem="◆" gemColor="#34d399" />
+      {/* Rangée 2 — droite */}
+      <Row cls="mq-right" items={ROW2} gem="◆" gemColor="rgba(251,191,36,0.40)" />
 
       {/* Fade bas */}
       <div style={{
