@@ -1,6 +1,8 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { UserPlus, HeartHandshake } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const MotionLink = motion(Link);
 
 const Spiral = ({ color = "#34d399", flip = false }) => (
   <svg
@@ -30,6 +32,12 @@ const Spiral = ({ color = "#34d399", flip = false }) => (
 );
 
 export default function CredibiliteSection() {
+  const shouldReduce = useReducedMotion();
+
+  const cardHover = shouldReduce ? {} : { whileHover: { y: -4 } };
+  const btnHover = shouldReduce ? {} : { whileHover: { scale: 1.06 }, whileTap: { scale: 0.94 } };
+  const springTransition = { type: "spring", stiffness: 380, damping: 22 };
+
   return (
     <section className="relative py-10 overflow-hidden" style={{ background: "var(--brand-dark-mid)" }}>
 
@@ -59,53 +67,73 @@ export default function CredibiliteSection() {
 
       <div className="relative z-10 max-w-3xl mx-auto px-6">
         <div className="grid sm:grid-cols-2 gap-4">
+
+          {/* Carte Devenir membre */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            {...cardHover}
+            transition={{
+              opacity: { duration: 0.5 },
+              x: { duration: 0.5 },
+              y: springTransition,
+            }}
             className="rounded-xl p-5 border flex items-center gap-4"
             style={{ background: "rgba(52,211,153,0.10)", borderColor: "rgba(52,211,153,0.30)" }}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(52,211,153,0.20)" }}>
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: "rgba(52,211,153,0.20)" }}>
               <UserPlus className="w-5 h-5 text-emerald-400" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Devenir membre</h3>
               <p className="text-white/50 text-xs mt-0.5">Anciens de la FDD de Lomé</p>
             </div>
-            <Link
+            <MotionLink
               to="/implications/adhesion"
-              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
+              {...btnHover}
+              transition={springTransition}
+              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold"
               style={{ background: "rgba(52,211,153,0.25)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.40)" }}
             >
               Adhérer
-            </Link>
+            </MotionLink>
           </motion.div>
 
+          {/* Carte Nous soutenir */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            {...cardHover}
+            transition={{
+              opacity: { duration: 0.5, delay: 0.1 },
+              x: { duration: 0.5, delay: 0.1 },
+              y: springTransition,
+            }}
             className="rounded-xl p-5 border flex items-center gap-4"
             style={{ background: "rgba(251,191,36,0.09)", borderColor: "rgba(251,191,36,0.30)" }}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.18)" }}>
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: "rgba(251,191,36,0.18)" }}>
               <HeartHandshake className="w-5 h-5 text-yellow-400" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Nous soutenir</h3>
               <p className="text-white/50 text-xs mt-0.5">Actions sociales au Togo</p>
             </div>
-            <Link
+            <MotionLink
               to="/implications/soutenir"
-              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
+              {...btnHover}
+              transition={springTransition}
+              className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold"
               style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
             >
               Donner
-            </Link>
+            </MotionLink>
           </motion.div>
+
         </div>
       </div>
     </section>

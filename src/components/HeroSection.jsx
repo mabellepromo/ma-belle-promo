@@ -1,14 +1,54 @@
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion, useInView } from "framer-motion";
 import { ArrowDown, ChevronRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+const MotionLink = motion(Link);
+
 const stats = [
-  { value: "2018", label: "Fondée en" },
-  { value: "45+", label: "Membres actifs" },
-  { value: "10+", label: "Projets réalisés" },
-  { value: "8 ans", label: "D'engagement" },
+  { from: 2010, to: 2018, suffix: "", label: "Fondée en" },
+  { from: 0, to: 45, suffix: "+", label: "Membres actifs" },
+  { from: 0, to: 10, suffix: "+", label: "Projets réalisés" },
+  { from: 0, to: 8, suffix: " ans", label: "D'engagement" },
 ];
+
+function useCountUp(from, to, duration, trigger, shouldReduce) {
+  const [count, setCount] = useState(from);
+  useEffect(() => {
+    if (!trigger) return;
+    if (shouldReduce) { setCount(to); return; }
+    let startTime = null;
+    let raf;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(from + (to - from) * eased));
+      if (progress < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [trigger, from, to, duration, shouldReduce]);
+  return count;
+}
+
+function StatCard({ from, to, suffix, label }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-20px" });
+  const shouldReduce = useReducedMotion();
+  const count = useCountUp(from, to, 1.8, inView, shouldReduce);
+  return (
+    <div ref={ref} className="text-center rounded-xl py-2.5 px-2"
+      style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.12)" }}>
+      <div style={{ fontSize: 20, fontWeight: 800, color: "white", lineHeight: 1 }}>
+        {count}{suffix}
+      </div>
+      <div style={{ fontSize: 9, color: "rgba(110,231,183,0.55)", marginTop: 4, letterSpacing: "0.10em", textTransform: "uppercase" }}>
+        {label}
+      </div>
+    </div>
+  );
+}
 
 /* ══ BULLE D'EAU ══ */
 /** @param {{ children: import("react").ReactNode }} props */
@@ -16,7 +56,6 @@ function WaterBubble({ children }) {
   const D = 280;
   const shouldReduce = useReducedMotion();
   return (
-    /* Wrapper externe sans overflow — les anneaux ping peuvent dépasser */
     <div style={{ position: "relative", width: D, height: D }}>
 
       {/* Anneaux d'ondulation — CSS pur, fluide et fin */}
@@ -85,6 +124,12 @@ export default function HeroSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+
+  const hoverTap = shouldReduce ? {} : {
+    whileHover: { scale: 1.04 },
+    whileTap: { scale: 0.96 },
+  };
+  const springTransition = { type: "spring", stiffness: 400, damping: 20 };
 
   return (
     <section
@@ -198,18 +243,14 @@ export default function HeroSection() {
               </motion.div>
             </WaterBubble>
 
-            {/* Stats sous la bulle */}
+            {/* Stats — compteurs animés au scroll */}
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 1.1 }}
               className="grid grid-cols-2 gap-2 w-full"
             >
               {stats.map((s, i) => (
-                <div key={i} className="text-center rounded-xl py-2.5 px-2"
-                  style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.12)" }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: "white", lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: 9, color: "rgba(110,231,183,0.55)", marginTop: 4, letterSpacing: "0.10em", textTransform: "uppercase" }}>{s.label}</div>
-                </div>
+                <StatCard key={i} from={s.from} to={s.to} suffix={s.suffix} label={s.label} />
               ))}
             </motion.div>
 
@@ -229,26 +270,39 @@ export default function HeroSection() {
           </motion.div>
 
           {/* ── COL 2 : Titre + message + CTAs ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <h1 className="font-heading leading-none mb-1 text-center md:text-left"
-              style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}>
+          <div>
+            {/* Axe 2 — blur-in reveal sur chaque ligne de titre */}
+            <motion.h1
+              className="font-heading leading-none mb-1 text-center md:text-left"
+              style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}
+              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
               L'excellence juridique partagée,
-            </h1>
-            <h1 className="font-heading leading-none mb-6 text-center md:text-left"
+            </motion.h1>
+            <motion.h1
+              className="font-heading leading-none mb-6 text-center md:text-left"
               style={{
                 fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, letterSpacing: "-0.04em",
                 background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}>
+              }}
+              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, delay: 0.38, ease: "easeOut" }}
+            >
               au service de l'avenir
-            </h1>
+            </motion.h1>
 
             {/* Citation présidente */}
-            <div className="relative mb-8 pl-5"
-              style={{ borderLeft: "2px solid rgba(52,211,153,0.45)" }}>
+            <motion.div
+              className="relative mb-8 pl-5"
+              style={{ borderLeft: "2px solid rgba(52,211,153,0.45)" }}
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.58, ease: "easeOut" }}
+            >
               <span className="block text-4xl font-serif leading-none mb-2" style={{ color: "#6ee7b7", opacity: 0.6 }}>"</span>
               <blockquote className="font-heading text-lg md:text-xl leading-relaxed font-semibold mb-4"
                 style={{ color: "rgba(255,255,255,0.88)" }}>
@@ -261,13 +315,20 @@ export default function HeroSection() {
                   <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Présidente de Ma Belle Promo</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <button
+            {/* CTAs — Axe 3 : micro-interactions spring */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.74 }}
+            >
+              <motion.button
+                {...hoverTap}
+                transition={springTransition}
                 onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
-                className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
+                className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full"
                 style={{
                   padding: "14px 28px",
                   background: "linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.18))",
@@ -277,20 +338,23 @@ export default function HeroSection() {
                 }}
               >
                 Notre mission <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-              <Link to="/implications/soutenir"
-                className="flex items-center gap-2 justify-center font-bold text-sm rounded-full transition-all"
+              </motion.button>
+              <MotionLink
+                to="/implications/soutenir"
+                {...hoverTap}
+                transition={springTransition}
+                className="flex items-center gap-2 justify-center font-bold text-sm rounded-full"
                 style={{
                   padding: "14px 28px",
                   background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
                   color: "#000",
                   boxShadow: "0 4px 20px rgba(251,191,36,0.40)",
-                }}>
+                }}
+              >
                 Nous soutenir
-              </Link>
-            </div>
-
-          </motion.div>
+              </MotionLink>
+            </motion.div>
+          </div>
 
           {/* ── COL 3 : Photo présidente ── */}
           <motion.div

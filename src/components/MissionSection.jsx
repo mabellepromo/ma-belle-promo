@@ -1,13 +1,29 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+const MotionLink = motion(Link);
+
+/* Axe 5 — glow pulse CSS pur sur le bouton primaire */
+const GLOW_CSS = `
+  @keyframes glow-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(21,128,61,0); }
+    50%      { box-shadow: 0 0 0 14px rgba(21,128,61,0.30); }
+  }
+  .btn-glow { animation: glow-pulse 2.4s ease-in-out infinite; }
+`;
+
 export default function MissionSection() {
+  const shouldReduce = useReducedMotion();
+  const springTransition = { type: "spring", stiffness: 400, damping: 20 };
+
   return (
     <section id="mission" className="py-16 md:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <style>{GLOW_CSS}</style>
 
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center mb-0">
+
+          {/* Colonne texte */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -37,22 +53,31 @@ export default function MissionSection() {
               Récépissé de déclaration d'association porte le{" "}
               <strong className="text-foreground">N°0920/MATDCL-SG-DLPAP-DOCA</strong>.
             </p>
+
             <div className="mt-8 flex gap-4">
-              <Link
+              <MotionLink
                 to="/association/credo"
-                className="px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
+                whileHover={shouldReduce ? undefined : { scale: 1.04 }}
+                whileTap={shouldReduce ? undefined : { scale: 0.96 }}
+                transition={springTransition}
+                className={`px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-full${shouldReduce ? "" : " btn-glow"}`}
               >
                 Notre Credo
-              </Link>
-              <Link
+              </MotionLink>
+
+              <MotionLink
                 to="/implications/soutenir"
+                whileHover={shouldReduce ? undefined : { scale: 1.04 }}
+                whileTap={shouldReduce ? undefined : { scale: 0.96 }}
+                transition={springTransition}
                 className="px-6 py-3 border border-border text-sm font-semibold rounded-full hover:bg-muted transition-colors text-foreground"
               >
                 Nous soutenir
-              </Link>
+              </MotionLink>
             </div>
           </motion.div>
 
+          {/* Colonne image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -68,7 +93,7 @@ export default function MissionSection() {
                 className="w-full h-80 md:h-96 object-cover object-top"
               />
             </div>
-            {/* Badge récépissé */}
+
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -80,10 +105,11 @@ export default function MissionSection() {
               <p className="text-sm font-bold text-foreground">depuis le 03 oct. 2019</p>
               <p className="text-xs text-primary mt-0.5">N°0920/MATDCL-SG-DLPAP-DOCA</p>
             </motion.div>
+
             <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-accent/20 -z-10" />
           </motion.div>
-        </div>
 
+        </div>
       </div>
     </section>
   );

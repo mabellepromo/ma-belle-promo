@@ -1,11 +1,79 @@
 // @ts-nocheck
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, Clock, ChevronRight } from "lucide-react";
 import { useArticles } from "../hooks/useArticles";
 import { useEvenements } from "../hooks/useEvenements";
 
 const PLAN_IMAGE = "/Galeries/Reunion 18.05.2019/180519mbp-groupe1.webp";
+
+// Axe 6 — shimmer pendant le chargement de l'image
+const SHIMMER_CSS = `
+  @keyframes img-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+  .img-shimmer {
+    background: linear-gradient(90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--card))  50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: img-shimmer 1.4s ease-in-out infinite;
+  }
+`;
+
+function ArticleCard({ article, i }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const shouldReduce = useReducedMotion();
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: i * 0.15 }}
+      className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
+    >
+      <div className="relative h-48 overflow-hidden">
+        {/* Shimmer tant que l'image n'est pas chargée */}
+        {!imgLoaded && !shouldReduce && (
+          <div className="absolute inset-0 img-shimmer" />
+        )}
+        <img
+          loading="lazy"
+          src={article.image}
+          alt={article.titre}
+          onLoad={() => setImgLoaded(true)}
+          className={`w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+      </div>
+
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-3">
+          <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-primary/10 text-primary">
+            {article.categorie}
+          </span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Calendar className="w-3 h-3" /> {article.date}
+          </span>
+        </div>
+        <h3 className="font-heading text-base font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+          {article.titre}
+        </h3>
+        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
+          {(article.extrait || article.contenu || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120)}
+        </p>
+        <Link to={`/actualites/${article.id}`} className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:gap-2.5 transition-all">
+          Lire la suite <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </motion.article>
+  );
+}
 
 export default function ActualitesSection() {
   const { articles } = useArticles();
@@ -16,6 +84,7 @@ export default function ActualitesSection() {
 
   return (
     <section id="actualites" className="py-12 md:py-16 bg-muted/50">
+      <style>{SHIMMER_CSS}</style>
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,48 +102,10 @@ export default function ActualitesSection() {
           </p>
         </motion.div>
 
+        {/* Cartes articles avec shimmer image */}
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
           {articles.slice(0, 3).map((article, i) => (
-            <motion.article
-              key={article.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
-            >
-              {/* Image */}
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  loading="lazy"
-                  src={article.image}
-                  alt={article.titre}
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              </div>
-
-              {/* Texte */}
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-primary/10 text-primary">
-                    {article.categorie}
-                  </span>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> {article.date}
-                  </span>
-                </div>
-                <h3 className="font-heading text-base font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
-                  {article.titre}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
-                  {(article.extrait || article.contenu || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120)}
-                </p>
-                <Link to={`/actualites/${article.id}`} className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:gap-2.5 transition-all">
-                  Lire la suite <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </motion.article>
+            <ArticleCard key={article.id} article={article} i={i} />
           ))}
         </div>
 
@@ -131,20 +162,14 @@ export default function ActualitesSection() {
               to="/activites/plan-action-2026"
               className="group relative block h-full min-h-[220px] rounded-2xl overflow-hidden border border-border hover:shadow-xl hover:border-primary/20 transition-all duration-500"
             >
-              {/* Image de fond */}
               <img
                 src={PLAN_IMAGE}
                 alt="Plan d'action MBP 2026"
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700"
               />
-
-              {/* Dégradé overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-
-              {/* Contenu */}
               <div className="relative z-10 h-full flex flex-col justify-between p-6">
-                {/* Badge haut */}
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-accent/90 text-foreground backdrop-blur-sm">
                     Feuille de route
@@ -153,8 +178,6 @@ export default function ActualitesSection() {
                     Adoption mars 2026
                   </span>
                 </div>
-
-                {/* Titre bas */}
                 <div>
                   <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">3 axes · 4 objectifs</p>
                   <h3 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight mb-3 group-hover:text-accent transition-colors duration-300">

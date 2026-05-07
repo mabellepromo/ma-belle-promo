@@ -7,6 +7,7 @@ import ActualitesSection from "../components/ActualitesSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import ContactSection from "../components/ContactSection";
 import FooterSection from "../components/FooterSection";
+import MarqueeSection from "../components/MarqueeSection";
 import SEO from "../components/SEO";
 
 const jsonLd = {
@@ -27,13 +28,13 @@ const jsonLd = {
   ]
 };
 
-/* Dégradé de transition entre sections claire et sombre */
-const light = "hsl(40,20%,98%)";
-const dark  = "hsl(150,30%,10%)";
-const muted = "hsl(40,20%,96%)";
+/* Dégradé de transition entre sections — même famille de teinte (150°) */
+const light = "hsl(150,10%,97%)";
+const dark  = "hsl(150,28%,12%)";
+const muted = "hsl(150,10%,93%)";
 
 function Fade({ from, to }) {
-  return <div style={{ height: 80, background: `linear-gradient(to bottom, ${from}, ${to})` }} />;
+  return <div style={{ height: 140, background: `linear-gradient(to bottom, ${from}, ${to})` }} />;
 }
 
 export default function Home() {
@@ -45,7 +46,8 @@ export default function Home() {
       </Helmet>
       <Navbar />
       <HeroSection />
-      {/* Hero finit déjà avec un fondu vers bg-background — pas de Fade ici */}
+      {/* Ruban défilant — transition visuelle entre le Hero et la Mission */}
+      <MarqueeSection />
       <MissionSection />
       <Fade from={light} to={dark} />
       <CredibiliteSection />

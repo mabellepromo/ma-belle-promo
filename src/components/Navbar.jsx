@@ -55,10 +55,9 @@ function DesktopDropdown({ item }) {
 
   const scheduleClose = () => {
     cancelClose();
-    closeTimer.current = setTimeout(() => setOpen(false), 180);
+    closeTimer.current = setTimeout(() => setOpen(false), 200);
   };
 
-  // Clean up timer on unmount
   useEffect(() => () => cancelClose(), []);
 
   return (
@@ -68,40 +67,107 @@ function DesktopDropdown({ item }) {
       onMouseEnter={() => { cancelClose(); setOpen(true); }}
       onMouseLeave={scheduleClose}
     >
+      {/* Bouton déclencheur */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-3.5 py-2 text-sm font-medium transition-colors duration-150"
-        style={{ color: open ? "#ffffff" : "rgba(255,255,255,0.70)" }}
+        className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+        style={{
+          color: open ? "#ffffff" : "rgba(255,255,255,0.70)",
+          background: open ? "rgba(52,211,153,0.10)" : "transparent",
+        }}
       >
         {item.label}
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className="w-3.5 h-3.5 flex-shrink-0"
+          style={{
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)",
+            color: open ? "#6ee7b7" : "inherit",
+          }}
+        />
       </button>
 
       <AnimatePresence>
         {open && (
+          /* Déroule comme un parchemin — clipPath de haut en bas */
           <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.12 }}
+            initial={{ opacity: 0, clipPath: "inset(0 0 100% 0 round 14px)" }}
+            animate={{ opacity: 1, clipPath: "inset(0 0 0% 0 round 14px)" }}
+            exit={{ opacity: 0, clipPath: "inset(0 0 100% 0 round 14px)", transition: { duration: 0.22, ease: "easeIn" } }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
-            className="absolute top-full left-0 mt-1 w-52 rounded-lg shadow-xl py-1 z-50 border"
-            style={{ background: "var(--brand-dark-mid)", borderColor: "rgba(255,255,255,0.10)" }}
+            className="absolute top-full left-0 mt-2 w-max z-50"
+            style={{ filter: "drop-shadow(0 12px 36px rgba(0,0,0,0.55))" }}
           >
-            {item.children.map((child) => (
-              <Link
-                key={child.label}
-                to={child.href}
-                onClick={() => setOpen(false)}
-                className="block px-4 py-2 text-sm transition-colors"
-                style={{ color: "rgba(255,255,255,0.65)" }}
-                onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.65)"}
-              >
-                {child.label}
-              </Link>
-            ))}
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "linear-gradient(170deg, rgba(12,34,20,0.98) 0%, rgba(7,20,12,0.99) 100%)",
+                border: "1px solid rgba(52,211,153,0.20)",
+              }}
+            >
+              {/* Ligne décorative parchemin en haut */}
+              <div style={{
+                height: 2,
+                background: "linear-gradient(to right, transparent 0%, #34d399 25%, #fbbf24 60%, #34d399 85%, transparent 100%)",
+              }} />
+
+              {/* Titre de catégorie */}
+              <div className="px-6 pt-3 pb-1.5">
+                <span className="text-[10px] font-bold tracking-[0.18em] uppercase"
+                  style={{ color: "rgba(110,231,183,0.50)" }}>
+                  {item.label}
+                </span>
+              </div>
+
+              {/* Séparateur */}
+              <div className="mx-6 mb-1" style={{ height: "1px", background: "rgba(52,211,153,0.12)" }} />
+
+              {/* Items en cascade */}
+              <div className="py-1.5">
+                {item.children.map((child, i) => (
+                  <motion.div
+                    key={child.label}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.10 + i * 0.055, duration: 0.25, ease: "easeOut" }}
+                  >
+                    <Link
+                      to={child.href}
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center gap-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 whitespace-nowrap"
+                      style={{ color: "rgba(255,255,255,0.60)" }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.background = "rgba(52,211,153,0.09)";
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.color = "rgba(255,255,255,0.60)";
+                        e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      {/* Point marqueur */}
+                      <span style={{
+                        width: 5, height: 5, borderRadius: "50%", flexShrink: 0,
+                        background: "rgba(52,211,153,0.40)",
+                        transition: "background 0.15s, transform 0.15s",
+                      }}
+                        className="group-hover:!bg-emerald-400 group-hover:scale-125"
+                      />
+                      {child.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Ligne décorative en bas */}
+              <div style={{
+                height: 1,
+                margin: "0 24px 12px",
+                background: "rgba(251,191,36,0.12)",
+              }} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -153,6 +219,7 @@ function MobileMenuItem({ item, onClose }) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const { session, logout } = useLocalAuth();
@@ -163,8 +230,12 @@ export default function Navbar() {
   }, [location]);
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handler);
+    const handler = () => {
+      setScrolled(window.scrollY > 20);
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(h > 0 ? Math.min(window.scrollY / h, 1) : 0);
+    };
+    window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
@@ -183,6 +254,17 @@ export default function Navbar() {
     >
       {/* Top accent bar */}
       <div className="h-0.5" style={{ background: "linear-gradient(to right, transparent, #34d399 15%, #fde047 50%, #10b981 85%, transparent)" }} />
+
+      {/* Barre de progression scroll */}
+      <div style={{ height: 2, background: "rgba(255,255,255,0.04)", position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", top: 0, left: 0, height: "100%",
+          width: `${progress * 100}%`,
+          background: "linear-gradient(to right, #34d399, #fbbf24)",
+          transition: "width 0.1s linear",
+          boxShadow: progress > 0 ? "0 0 8px rgba(52,211,153,0.60)" : "none",
+        }} />
+      </div>
 
       <div className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-16" : "h-20 md:h-24"}`}>
         {/* Logo */}
