@@ -17,8 +17,8 @@ export function WindowFrame() {
         pointerEvents: "none",
         zIndex: 99990,
         boxShadow: [
-          "inset 0 0 0 max(1.4vw, 8px) #cce3d8",
-          "inset 0 0 0 calc(max(1.4vw, 8px) + 1px) rgba(80,160,130,0.22)",
+          "inset 0 0 0 max(0.5vw, 4px) #cce3d8",
+          "inset 0 0 0 calc(max(0.5vw, 4px) + 1px) rgba(80,160,130,0.22)",
         ].join(", "),
       }}
     />
