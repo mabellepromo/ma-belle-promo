@@ -274,7 +274,7 @@ export default function HeroSection() {
             {/* Axe 2 — blur-in reveal sur chaque ligne de titre */}
             <motion.h1
               className="font-heading leading-none mb-1 text-center md:text-left"
-              style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}
+              style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}
               initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -284,7 +284,7 @@ export default function HeroSection() {
             <motion.h1
               className="font-heading leading-none mb-6 text-center md:text-left"
               style={{
-                fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 900, letterSpacing: "-0.04em",
+                fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, letterSpacing: "-0.04em",
                 background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}
