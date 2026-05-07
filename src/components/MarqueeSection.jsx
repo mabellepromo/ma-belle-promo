@@ -27,18 +27,13 @@ const MARQUEE_CSS = `
     text-transform: uppercase;
     white-space: nowrap;
     padding: 3px 13px;
-    border-radius: 20px;
     font-family: Lato, sans-serif;
     text-decoration: none;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
-    background: rgba(251,191,36,0.07);
-    border: 1px solid rgba(251,191,36,0.26);
-    color: rgba(251,191,36,0.80);
+    transition: color 0.2s;
+    color: rgba(167,243,208,0.75);
   }
   .mq-pill:hover {
-    background: rgba(251,191,36,0.16);
-    border-color: rgba(251,191,36,0.52);
-    color: #fbbf24;
+    color: #a7f3d0;
   }
 `;
 
