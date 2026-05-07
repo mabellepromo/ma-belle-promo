@@ -45,9 +45,11 @@ export default function Home() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <Navbar />
-      <HeroSection />
-      {/* Ruban défilant — transition visuelle entre le Hero et la Mission */}
-      <MarqueeSection />
+      {/* Hero + bandeau défilant = exactement un écran */}
+      <div style={{ height: "100dvh", display: "flex", flexDirection: "column" }}>
+        <HeroSection />
+        <MarqueeSection />
+      </div>
       <MissionSection />
       <Fade from={light} to={dark} />
       <CredibiliteSection />

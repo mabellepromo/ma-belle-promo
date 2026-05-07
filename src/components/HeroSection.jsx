@@ -135,7 +135,7 @@ export default function HeroSection() {
     <section
       ref={ref}
       id="hero"
-      className="relative min-h-screen flex flex-col overflow-hidden"
+      className="relative flex-1 flex flex-col overflow-hidden"
       style={{ background: "linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-dark-light) 40%, var(--brand-dark-mid) 70%, hsl(150,28%,6%) 100%)" }}
     >
       {/* Image fond subtile */}
