@@ -99,10 +99,10 @@ export default function MarqueeSection() {
     <div style={{ background: BG, position: "relative", overflow: "hidden", padding: "10px 0" }}>
       <style>{MARQUEE_CSS}</style>
 
-      {/* Fade haut */}
+      {/* Fade haut — fondu depuis le bas sombre du Hero */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: 28, zIndex: 2, pointerEvents: "none",
-        background: `linear-gradient(to bottom, ${LIGHT}, transparent)`,
+        background: `linear-gradient(to bottom, ${BG}, transparent)`,
       }} />
 
       {/* Fade gauche + droit */}
