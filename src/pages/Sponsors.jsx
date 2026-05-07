@@ -61,9 +61,12 @@ export default function Sponsors() {
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit du Développement de
             l'Université de Lomé — promotion 1994–2000 —, elle a très vite choisi de ne pas se replier
             sur elle-même. Certes, nous cultivons l'excellence qui fut notre socle commun : séminaires
-            de haut niveau, conférences thématiques, webinaires qui font dialoguer expertise juridique
+            de haut niveau, conférences thématiques,{" "}
+            <Link to="/activites/programmes" style={{ color: "#6ee7b7", textDecoration: "none", borderBottom: "1px solid rgba(110,231,183,0.4)" }}>webinaires</Link>
+            {" "}qui font dialoguer expertise juridique
             et réalités africaines contemporaines. Mais nous avons aussi fait le choix d'aller vers la
-            communauté, loin des carcans académiques, là où le besoin est réel : projets caritatifs,
+            communauté, loin des carcans académiques, là où le besoin est réel :{" "}
+            <Link to="/activites/projets" style={{ color: "#6ee7b7", textDecoration: "none", borderBottom: "1px solid rgba(110,231,183,0.4)" }}>projets caritatifs</Link>,
             actions sociales, accompagnement des jeunes à travers notre programme de mentorat{" "}
             <a
               href="https://passerelles.vercel.app"
