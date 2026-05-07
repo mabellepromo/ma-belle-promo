@@ -38,8 +38,8 @@ const navItems = [
       { label: "Galeries membres", href: "/galeries", membersOnly: true },
       { label: "Médiathèque", href: "/informations/mediatheque" },
       { label: "Documents", href: "/informations/documents" },
-      { label: "Contacts", href: "/informations/contacts" },
       { label: "Communiqués", href: "/informations/communiques" },
+      { label: "Contacts", href: "/informations/contacts" },
     ],
   },
 ];
