@@ -267,7 +267,7 @@ export default function Navbar() {
         }} />
       </div>
 
-      <div className={`max-w-7xl mx-auto px-6 flex items-center transition-all duration-300 ${scrolled ? "h-14" : "h-20 md:h-24"}`}>
+      <div className={`max-w-7xl mx-auto px-6 flex items-center transition-all duration-300 ${scrolled ? "min-h-14" : "min-h-20 md:min-h-24"}`}>
 
         {/* ── MOBILE : logo gauche ── */}
         <Link to="/" className="md:hidden flex items-center gap-3 group flex-shrink-0">
