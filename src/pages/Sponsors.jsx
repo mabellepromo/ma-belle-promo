@@ -55,7 +55,7 @@ export default function Sponsors() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-heading leading-relaxed mb-10"
-            style={{ fontSize: "clamp(1.15rem, 2.2vw, 1.45rem)", color: "rgba(255,255,255,0.88)", fontWeight: 500 }}
+            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
           >
             FDD Ma Belle Promo n'est pas une association comme les autres. Née en 2018 de la rencontre
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit du Développement de
@@ -98,7 +98,7 @@ export default function Sponsors() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.65 }}
             className="font-heading leading-relaxed mb-14"
-            style={{ fontSize: "clamp(1.15rem, 2.2vw, 1.45rem)", color: "rgba(255,255,255,0.88)", fontWeight: 500 }}
+            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
           >
             Ce qui rend notre démarche singulière, c'est qu'elle a été essentiellement portée jusqu'ici
             par la seule volonté de nos membres — sur leurs ressources propres, sans autre appui que
