@@ -1,5 +1,7 @@
 /* Ruban défilant — CSS pur, deux rangées en sens opposés */
 
+import { Link } from "react-router-dom";
+
 const BG = "var(--brand-dark-mid)";
 const LIGHT = "hsl(150,10%,97%)";
 
@@ -19,57 +21,67 @@ const MARQUEE_CSS = `
 `;
 
 /* Items simples : juste un label texte
-   Items cliquables : { label, to } avec une route React Router */
+   Items cliquables internes  : { label, to }  — React Router Link
+   Items cliquables externes  : { label, href } — <a target="_blank"> */
 const ROW1 = [
-  { label: "Le programme de mentorat Passerelles a pris son envol", to: "https://passerelles.vercel.app" },
+  { label: "Adhésion", to: "/implications/adhesion" },
   "Ma Belle Promo",
-  "Amitié",
-  "Solidarité",
-  { label: "Le programme de mentorat Passerelles a pris son envol", to: "https://passerelles.vercel.app" },
-  "Faculté de Droit",
-  "Lomé · Togo",
+  { label: "Événements", to: "/activites/evenements" },
+  "Amitié · Solidarité",
+  { label: "Actualités", to: "/informations/actualites" },
   "Promotion 1994–2000",
+  { label: "Nos Projets", to: "/activites/projets" },
+  "FDD · Lomé · Togo",
 ];
 
 const ROW2 = [
-  { label: "45 candidats", to: "https://passerelles.vercel.app" },
-  "FDD · Université de Lomé",
-  { label: "11 binômes", to: "https://passerelles.vercel.app" },
-  "Ensemble pour l'Avenir",
-  "Anciens Diplômés",
-  { label: "45 candidats", to: "https://passerelles.vercel.app" },
+  { label: "Programme Passerelles", href: "https://passerelles.vercel.app" },
   "48 Membres",
-  { label: "11 binômes", to: "https://passerelles.vercel.app" },
+  { label: "Faire un don", to: "/implications/soutenir" },
+  "Excellence Juridique",
+  { label: "Annuaire des membres", to: "/annuaire" },
   "Récépissé N°0920",
+  { label: "Nous contacter", to: "/informations/contacts" },
+  "Université de Lomé",
 ];
 
-function Item({ item, gemColor, gem }) {
-  const textStyle = {
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: "0.10em",
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
-    padding: "0 14px",
-    fontFamily: "Lato, sans-serif",
-  };
+const textStyle = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.10em",
+  textTransform: "uppercase",
+  whiteSpace: "nowrap",
+  padding: "0 14px",
+  fontFamily: "Lato, sans-serif",
+  textDecoration: "none",
+  transition: "color 0.2s",
+};
 
+function Item({ item, gemColor, gem }) {
   const label = typeof item === "string" ? item : item.label;
-  const isLink = typeof item === "object" && item.to;
+
+  const isInternal = typeof item === "object" && item.to;
+  const isExternal = typeof item === "object" && item.href;
+
+  const linkStyle = { ...textStyle, color: "#34d399" };
 
   return (
     <span style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-      {isLink ? (
+      {isInternal ? (
+        <Link
+          to={item.to}
+          style={linkStyle}
+          onMouseEnter={e => e.currentTarget.style.color = "#6ee7b7"}
+          onMouseLeave={e => e.currentTarget.style.color = "#34d399"}
+        >
+          {label}
+        </Link>
+      ) : isExternal ? (
         <a
-          href={item.to}
+          href={item.href}
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            ...textStyle,
-            color: "#34d399",
-            textDecoration: "none",
-            transition: "color 0.2s",
-          }}
+          style={linkStyle}
           onMouseEnter={e => e.currentTarget.style.color = "#6ee7b7"}
           onMouseLeave={e => e.currentTarget.style.color = "#34d399"}
         >
@@ -103,13 +115,13 @@ export default function MarqueeSection() {
     <div style={{ background: BG, position: "relative", overflow: "hidden", padding: "12px 0" }}>
       <style>{MARQUEE_CSS}</style>
 
-      {/* Fade haut — fondu depuis le beige du Hero vers le fond sombre */}
+      {/* Fade haut */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: 28, zIndex: 2, pointerEvents: "none",
         background: `linear-gradient(to bottom, ${LIGHT}, transparent)`,
       }} />
 
-      {/* Fade gauche + droit — effet "infini" */}
+      {/* Fade gauche + droit */}
       <div style={{
         position: "absolute", top: 0, left: 0, bottom: 0, width: 96, zIndex: 3, pointerEvents: "none",
         background: `linear-gradient(to right, ${BG}, transparent)`,
@@ -128,7 +140,7 @@ export default function MarqueeSection() {
       {/* Rangée 2 — droite, losanges verts */}
       <Row cls="mq-right" items={ROW2} gem="◆" gemColor="#34d399" />
 
-      {/* Fade bas — fondu vers le beige de MissionSection */}
+      {/* Fade bas */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, height: 28, zIndex: 2, pointerEvents: "none",
         background: `linear-gradient(to top, ${LIGHT}, transparent)`,
