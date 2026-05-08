@@ -517,15 +517,26 @@ export default function Dashboard() {
                       <p className="text-xs text-muted-foreground">Document officiel — 13 articles + 4 annexes · à personnaliser avant signature</p>
                     </div>
                   </div>
-                  <a
-                    href="/documents/Convention_Partenariat_MBP.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0 transition-all hover:opacity-90"
-                    style={{ background: "#1b6b45", color: "#fff" }}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
-                  </a>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <a
+                      href="/documents/Dossier_Partenariat_MBP.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+                      style={{ background: "#9a7118", color: "#fff" }}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Dossier
+                    </a>
+                    <a
+                      href="/documents/Convention_Partenariat_MBP.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+                      style={{ background: "#1b6b45", color: "#fff" }}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Convention
+                    </a>
+                  </div>
                 </div>
               </div>
 

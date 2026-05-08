@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Dossier de Partenariat — FDD Ma Belle Promo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vert:       #1b6b45;
+    --vert-clair: #e8f5ee;
+    --vert-fonce: #0f3d28;
+    --vert-mid:   #155236;
+    --or:         #9a7118;
+    --or-vif:     #c8960a;
+    --or-clair:   #fdf6e3;
+    --or-pale:    #f5e6b8;
+    --texte:      #1a1a1a;
+    --gris:       #555;
+    --gris-clair: #f4f4f4;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  body {
+    font-family: "Lato", Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: var(--texte);
+    margin: 0;
+    padding: 24px 0 48px;
+    background: #9aa4a8;
+  }
+
+  /* ── Cadre A4 ── */
+  .a4-doc {
+    width: 210mm;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.35);
+  }
+
+  /* ── Pages ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    flex-direction: column;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  /* ══════════════════════════════
+     PAGE 1 — COUVERTURE
+  ══════════════════════════════ */
+  .cover {
+    background: var(--vert-fonce);
+    color: #fff;
+  }
+  .cover-top-band {
+    height: 5pt;
+    background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
+  }
+  .cover-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 36pt 44pt;
+    position: relative;
+  }
+  .cover-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 18px),
+      repeating-linear-gradient(-45deg, #fff 0px, #fff 1px, transparent 1px, transparent 18px);
+  }
+  .cover-logo { height: 64pt; width: auto; margin-bottom: 36pt; position: relative; }
+  .cover-eyebrow {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 9pt; letter-spacing: 0.30em; text-transform: uppercase;
+    color: var(--or-vif); margin-bottom: 10pt; position: relative;
+  }
+  .cover-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 46pt; font-weight: 700; line-height: 1.05;
+    color: #fff; margin: 0 0 8pt; position: relative;
+  }
+  .cover-title span { color: var(--or-vif); }
+  .cover-subtitle {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 16pt; font-style: italic; font-weight: 400;
+    color: rgba(255,255,255,0.65); margin-bottom: 40pt; position: relative;
+  }
+  .cover-divider {
+    width: 60pt; height: 2pt; margin-bottom: 28pt;
+    background: linear-gradient(to right, var(--or-vif), transparent);
+    position: relative;
+  }
+  .cover-pitch {
+    font-size: 11pt; color: rgba(255,255,255,0.80); line-height: 1.7;
+    max-width: 340pt; margin-bottom: 40pt; position: relative;
+  }
+  .cover-tags {
+    display: flex; flex-wrap: wrap; gap: 8pt; position: relative; margin-bottom: auto;
+  }
+  .cover-tag {
+    font-size: 8pt; letter-spacing: 0.10em; text-transform: uppercase;
+    border: 1pt solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.65);
+    padding: 4pt 10pt; border-radius: 20pt;
+  }
+  .cover-footer {
+    border-top: 1pt solid rgba(255,255,255,0.12);
+    padding-top: 16pt; margin-top: 32pt;
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative;
+  }
+  .cover-footer p { font-size: 8pt; color: rgba(255,255,255,0.40); margin: 0; }
+  .cover-footer-badge {
+    background: var(--or); color: #fff;
+    font-size: 8pt; font-weight: 700; letter-spacing: 0.08em;
+    padding: 4pt 12pt; border-radius: 2pt;
+  }
+  .cover-bottom-band {
+    height: 5pt;
+    background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
+  }
+
+  /* ══════════════════════════════
+     PAGES INTÉRIEURES — structure commune
+  ══════════════════════════════ */
+  .page-header {
+    background: var(--vert-fonce);
+    padding: 10pt 28pt;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .page-header img { height: 22pt; width: auto; }
+  .page-header-label {
+    font-size: 7.5pt; letter-spacing: 0.20em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    font-family: "Cormorant Garamond", serif;
+  }
+  .page-header-gold {
+    height: 3pt;
+    background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
+    flex-shrink: 0;
+  }
+  .page-body { flex: 1; padding: 24pt 28pt 20pt; }
+  .page-footer {
+    padding: 8pt 28pt;
+    border-top: 1pt solid #e0e0e0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .page-footer p { font-size: 7.5pt; color: #aaa; margin: 0; }
+  .page-num {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 9pt; color: var(--vert); font-weight: 600;
+  }
+
+  /* ── Titres de section ── */
+  .section-eyebrow {
+    font-size: 7.5pt; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--or-vif); margin-bottom: 5pt; display: block;
+  }
+  .section-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 22pt; font-weight: 700; color: var(--vert-fonce);
+    margin: 0 0 5pt; line-height: 1.1;
+  }
+  .section-rule {
+    width: 40pt; height: 2pt; margin-bottom: 18pt;
+    background: linear-gradient(to right, var(--or-vif), transparent);
+  }
+
+  /* ── Blocs de contenu ── */
+  .intro-text {
+    font-size: 10.5pt; color: #333; line-height: 1.75; text-align: justify;
+    margin-bottom: 16pt;
+  }
+  .pull-quote {
+    border-left: 3pt solid var(--or-vif);
+    padding: 10pt 16pt;
+    margin: 16pt 0;
+    background: var(--or-clair);
+    border-radius: 0 4pt 4pt 0;
+  }
+  .pull-quote p {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 13pt; font-style: italic; color: var(--vert-fonce);
+    margin: 0; line-height: 1.5;
+  }
+
+  /* Chiffres clés */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10pt;
+    margin: 16pt 0;
+  }
+  .stat-box {
+    background: var(--vert-fonce);
+    border-radius: 6pt; padding: 14pt 10pt; text-align: center;
+  }
+  .stat-num {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 26pt; font-weight: 700; color: var(--or-vif);
+    display: block; line-height: 1;
+  }
+  .stat-label {
+    font-size: 8pt; color: rgba(255,255,255,0.65);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    display: block; margin-top: 4pt;
+  }
+
+  /* Activités */
+  .activites-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10pt;
+    margin: 14pt 0;
+  }
+  .activite-card {
+    border: 1pt solid #e0e0e0; border-radius: 6pt;
+    padding: 12pt 14pt; position: relative; overflow: hidden;
+  }
+  .activite-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3pt;
+    background: var(--vert);
+  }
+  .activite-icon {
+    font-size: 18pt; margin-bottom: 6pt; display: block;
+  }
+  .activite-titre {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 12pt; font-weight: 700; color: var(--vert-fonce);
+    margin-bottom: 4pt; display: block;
+  }
+  .activite-desc {
+    font-size: 9pt; color: var(--gris); line-height: 1.55;
+  }
+
+  /* Valeurs */
+  .valeurs-list { list-style: none; margin: 0; padding: 0; }
+  .valeurs-list li {
+    display: flex; align-items: flex-start; gap: 10pt;
+    padding: 8pt 0; border-bottom: 1pt solid #f0f0f0;
+    font-size: 10pt;
+  }
+  .valeurs-list li:last-child { border-bottom: none; }
+  .valeur-icon {
+    width: 24pt; height: 24pt; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11pt;
+    background: var(--vert-clair);
+  }
+  .valeur-content strong { color: var(--vert-fonce); display: block; font-size: 10pt; margin-bottom: 1pt; }
+  .valeur-content span { color: var(--gris); font-size: 9pt; }
+
+  /* Avantages partenaire */
+  .avantages-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10pt;
+    margin: 14pt 0;
+  }
+  .avantage-box {
+    background: var(--vert-clair); border-radius: 6pt;
+    padding: 14pt 12pt; text-align: center;
+    border: 1pt solid rgba(27,107,69,0.15);
+  }
+  .avantage-icon { font-size: 20pt; margin-bottom: 6pt; display: block; }
+  .avantage-titre {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 12pt; font-weight: 700; color: var(--vert-fonce);
+    display: block; margin-bottom: 4pt;
+  }
+  .avantage-desc { font-size: 9pt; color: #444; line-height: 1.5; }
+
+  /* Tableau niveaux */
+  table.niveaux {
+    width: 100%; border-collapse: collapse;
+    margin: 14pt 0; font-size: 9pt;
+  }
+  table.niveaux thead th {
+    padding: 8pt 10pt; text-align: left;
+    font-size: 8pt; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    background: var(--vert-fonce);
+  }
+  table.niveaux thead th:first-child { border-radius: 4pt 0 0 0; }
+  table.niveaux thead th:last-child  { border-radius: 0 4pt 0 0; }
+  table.niveaux tbody tr:nth-child(even) td { background: #f9f9f9; }
+  table.niveaux tbody td {
+    padding: 9pt 10pt; border-bottom: 1pt solid #eee;
+    vertical-align: middle; color: #333;
+  }
+  table.niveaux tbody td:first-child { font-weight: 700; font-size: 10pt; }
+  .niveau-badge {
+    display: inline-flex; align-items: center; gap: 5pt;
+    font-size: 9.5pt; font-weight: 700;
+  }
+  .check { color: var(--vert); font-size: 11pt; }
+  .dash  { color: #ccc; font-size: 11pt; }
+  .niveau-montant {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 11pt; font-weight: 700; color: var(--vert);
+  }
+
+  /* Témoignage */
+  .temoignage {
+    background: var(--vert-fonce); border-radius: 8pt;
+    padding: 18pt 22pt; margin: 14pt 0; position: relative;
+  }
+  .temoignage::before {
+    content: "\201C";
+    font-family: "Cormorant Garamond", serif;
+    font-size: 60pt; color: var(--or-vif); opacity: 0.4;
+    position: absolute; top: 0; left: 14pt; line-height: 1;
+  }
+  .temoignage p {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 12pt; font-style: italic; color: rgba(255,255,255,0.88);
+    line-height: 1.6; margin: 0 0 8pt; padding-top: 12pt;
+  }
+  .temoignage cite {
+    font-size: 8.5pt; color: var(--or-vif); font-style: normal;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* Page contact */
+  .contact-hero {
+    background: var(--vert-fonce); margin: -24pt -28pt 20pt;
+    padding: 28pt 28pt 24pt;
+    position: relative; overflow: hidden;
+  }
+  .contact-hero::after {
+    content: ""; position: absolute; inset: 0; opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 16px);
+  }
+  .contact-hero-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 28pt; font-weight: 700; color: #fff;
+    margin: 0 0 6pt; position: relative;
+  }
+  .contact-hero-sub {
+    font-size: 10.5pt; color: rgba(255,255,255,0.65);
+    margin: 0; position: relative;
+  }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16pt;
+    margin-bottom: 16pt;
+  }
+  .contact-block { border: 1pt solid #e0e0e0; border-radius: 6pt; padding: 14pt; }
+  .contact-block-label {
+    font-size: 7.5pt; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--or-vif); display: block; margin-bottom: 8pt;
+  }
+  .contact-block p { font-size: 10pt; color: #333; margin: 3pt 0; }
+  .contact-block a { color: var(--vert); text-decoration: none; }
+  .etapes-list { list-style: none; margin: 0; padding: 0; }
+  .etapes-list li {
+    display: flex; align-items: flex-start; gap: 12pt; margin-bottom: 10pt;
+  }
+  .etape-num {
+    width: 22pt; height: 22pt; border-radius: 50%; flex-shrink: 0;
+    background: var(--vert); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9pt; font-weight: 700;
+  }
+  .etape-content strong { display: block; font-size: 10pt; color: var(--vert-fonce); margin-bottom: 2pt; }
+  .etape-content span { font-size: 9pt; color: var(--gris); }
+  .cta-box {
+    background: var(--or); border-radius: 6pt;
+    padding: 16pt 20pt; text-align: center; margin-top: 16pt;
+  }
+  .cta-box p { color: #fff; margin: 0 0 4pt; font-size: 10pt; }
+  .cta-box strong { font-family: "Cormorant Garamond", serif; font-size: 15pt; color: #fff; display: block; }
+  .cta-box a { color: #fff; text-decoration: underline; font-weight: 700; }
+
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    body { background: #fff !important; padding: 0 !important; }
+    .a4-doc { width: 100% !important; box-shadow: none !important; margin: 0 !important; }
+    .page { page-break-after: always; min-height: 297mm; }
+  }
+</style>
+</head>
+<body>
+<div class="a4-doc">
+
+<!-- ════════════════════════════════════════
+     PAGE 1 — COUVERTURE
+════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top-band"></div>
+  <div class="cover-inner">
+    <div class="cover-pattern"></div>
+    <img src="/Logo%20Redesign1.png" alt="Logo Ma Belle Promo" class="cover-logo">
+    <span class="cover-eyebrow">Dossier de Partenariat · 2026</span>
+    <h1 class="cover-title">Ensemble,<br>allons plus <span>loin</span>.</h1>
+    <p class="cover-subtitle">Une invitation à rejoindre une aventure humaine authentique</p>
+    <div class="cover-divider"></div>
+    <p class="cover-pitch">
+      FDD Ma Belle Promo est une association de juristes, cadres et entrepreneurs
+      togolais qui, depuis 2018, œuvre pour l'excellence, la solidarité et le
+      développement humain. Nous cherchons des partenaires qui partagent cette
+      conviction : <strong style="color:rgba(255,255,255,0.95)">les grandes transformations se
+      construisent dans l'alliance.</strong>
+    </p>
+    <div class="cover-tags">
+      <span class="cover-tag">Mentorat</span>
+      <span class="cover-tag">Formation juridique</span>
+      <span class="cover-tag">Action sociale</span>
+      <span class="cover-tag">Réseau d'excellence</span>
+      <span class="cover-tag">Lomé · Togo</span>
+    </div>
+    <div class="cover-footer">
+      <p>mabellepromo.org &nbsp;·&nbsp; Récépissé N°0920 &nbsp;·&nbsp; Lomé, République du Togo</p>
+      <span class="cover-footer-badge">CONFIDENTIEL</span>
+    </div>
+  </div>
+  <div class="cover-bottom-band"></div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 2 — QUI SOMMES-NOUS ?
+════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP">
+    <span class="page-header-label">Dossier de Partenariat 2026</span>
+  </div>
+  <div class="page-header-gold"></div>
+
+  <div class="page-body">
+    <span class="section-eyebrow">Notre histoire</span>
+    <h2 class="section-title">Qui sommes-nous ?</h2>
+    <div class="section-rule"></div>
+
+    <p class="intro-text">
+      L'Association <strong>FDD Ma Belle Promo</strong> est née en 2018 de la rencontre de juristes,
+      cadres et entrepreneurs diplômés de la <strong>Faculté de Droit du Développement de
+      l'Université de Lomé</strong>, promotion 1994–2000. Fondée sur un socle commun d'excellence
+      académique, elle a très vite choisi de ne pas se replier sur elle-même.
+    </p>
+    <p class="intro-text">
+      Nous cultivons l'expertise qui fut notre socle : séminaires de haut niveau, conférences
+      thématiques, webinaires qui font dialoguer droit et réalités africaines contemporaines.
+      Mais nous avons aussi fait le choix d'aller vers la communauté — là où le besoin est réel :
+      actions caritatives, soutien aux familles vulnérables, et surtout accompagnement des jeunes
+      à travers notre programme de mentorat <strong>PASSERELLES</strong>.
+    </p>
+
+    <div class="pull-quote">
+      <p>"Ce qui rend notre démarche singulière, c'est qu'elle a été portée jusqu'ici
+      par la seule volonté de nos membres — sur leurs ressources propres.
+      Toute ambition qui grandit appelle naturellement des alliances à sa hauteur."</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-num">2018</span>
+        <span class="stat-label">Fondation</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">48</span>
+        <span class="stat-label">Membres actifs</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">7+</span>
+        <span class="stat-label">Années d'actions</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">100%</span>
+        <span class="stat-label">Autofinancé</span>
+      </div>
+    </div>
+
+    <ul class="valeurs-list">
+      <li>
+        <div class="valeur-icon">⚖️</div>
+        <div class="valeur-content">
+          <strong>Excellence</strong>
+          <span>Un niveau d'exigence hérité de la formation juridique, appliqué à chaque initiative.</span>
+        </div>
+      </li>
+      <li>
+        <div class="valeur-icon">🤝</div>
+        <div class="valeur-content">
+          <strong>Solidarité</strong>
+          <span>L'entraide entre membres et le soutien aux communautés comme moteur d'action.</span>
+        </div>
+      </li>
+      <li>
+        <div class="valeur-icon">🌍</div>
+        <div class="valeur-content">
+          <strong>Engagement africain</strong>
+          <span>Une conviction profonde : le développement de l'Afrique passe par ses propres cadres.</span>
+        </div>
+      </li>
+      <li>
+        <div class="valeur-icon">🔒</div>
+        <div class="valeur-content">
+          <strong>Indépendance</strong>
+          <span>Aucun partenariat ne remet en cause notre liberté programmatique ou nos prises de position.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="page-footer">
+    <p>Association FDD Ma Belle Promo · mabellepromo.org</p>
+    <span class="page-num">02 / 06</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 3 — CE QUE NOUS FAISONS
+════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP">
+    <span class="page-header-label">Dossier de Partenariat 2026</span>
+  </div>
+  <div class="page-header-gold"></div>
+
+  <div class="page-body">
+    <span class="section-eyebrow">Nos programmes</span>
+    <h2 class="section-title">Ce que nous faisons</h2>
+    <div class="section-rule"></div>
+
+    <p class="intro-text">
+      Nos actions s'articulent autour de quatre pôles complémentaires, tous financés à ce jour
+      par les seules contributions de nos membres. Chacun représente un terrain d'engagement
+      concret pour un partenaire souhaitant ancrer son soutien dans des réalités mesurables.
+    </p>
+
+    <div class="activites-grid">
+      <div class="activite-card">
+        <span class="activite-icon">🎓</span>
+        <span class="activite-titre">Programme PASSERELLES</span>
+        <p class="activite-desc">
+          Notre programme phare de mentorat : des membres seniors accompagnent des étudiants
+          et jeunes diplômés en droit dans leur insertion professionnelle. Orientation,
+          mise en réseau, coaching de carrière — un pont entre générations.
+        </p>
+      </div>
+      <div class="activite-card">
+        <span class="activite-icon">🏛️</span>
+        <span class="activite-titre">Séminaires & Conférences</span>
+        <p class="activite-desc">
+          Des rendez-vous thématiques de haut niveau qui réunissent juristes,
+          économistes, décideurs et acteurs de la société civile autour des grands
+          enjeux du droit et du développement en Afrique.
+        </p>
+      </div>
+      <div class="activite-card">
+        <span class="activite-icon">💻</span>
+        <span class="activite-titre">Webinaires</span>
+        <p class="activite-desc">
+          Des sessions en ligne accessibles à tous, qui démocratisent l'expertise
+          juridique et permettent à nos membres en diaspora de contribuer
+          activement aux débats qui façonnent l'avenir du continent.
+        </p>
+      </div>
+      <div class="activite-card">
+        <span class="activite-icon">❤️</span>
+        <span class="activite-titre">Actions caritatives & sociales</span>
+        <p class="activite-desc">
+          Visites de structures de soin, soutien aux familles vulnérables,
+          actions de solidarité communautaire — parce que l'excellence n'a
+          de sens que lorsqu'elle se met au service du plus grand nombre.
+        </p>
+      </div>
+    </div>
+
+    <div class="temoignage">
+      <p>
+        "Le programme PASSERELLES m'a ouvert des portes que je n'imaginais pas pouvoir franchir
+        seul. Avoir un mentor qui connaît le terrain juridique togolais, qui a les contacts et
+        qui prend le temps — c'est inestimable pour un jeune diplômé."
+      </p>
+      <cite>— Bénéficiaire du programme PASSERELLES, promotion 2024</cite>
+    </div>
+
+    <p class="intro-text" style="margin-top:14pt; font-size:9.5pt; color:#555;">
+      Toutes ces actions sont documentées, évaluées et font l'objet d'un rapport d'activités
+      annuel transmis à nos partenaires. La traçabilité et la redevabilité sont au cœur
+      de notre engagement envers ceux qui nous font confiance.
+    </p>
+  </div>
+
+  <div class="page-footer">
+    <p>Association FDD Ma Belle Promo · mabellepromo.org</p>
+    <span class="page-num">03 / 06</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 4 — POURQUOI NOUS REJOINDRE ?
+════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP">
+    <span class="page-header-label">Dossier de Partenariat 2026</span>
+  </div>
+  <div class="page-header-gold"></div>
+
+  <div class="page-body">
+    <span class="section-eyebrow">Ce que vous y gagnez</span>
+    <h2 class="section-title">Pourquoi nous rejoindre ?</h2>
+    <div class="section-rule"></div>
+
+    <p class="intro-text">
+      Être partenaire de Ma Belle Promo, ce n'est pas répondre à une sollicitation ordinaire.
+      C'est saisir une opportunité rare : celle d'ancrer votre nom dans une aventure humaine
+      crédible, portée par des femmes et des hommes dont le droit de regard sur l'avenir
+      de l'Afrique ne fait aucun doute.
+    </p>
+
+    <div class="avantages-grid">
+      <div class="avantage-box">
+        <span class="avantage-icon">🌐</span>
+        <span class="avantage-titre">Visibilité</span>
+        <p class="avantage-desc">
+          Votre logo sur notre site, nos réseaux sociaux, nos supports d'événements
+          et nos publications officielles. Une présence cohérente et durable.
+        </p>
+      </div>
+      <div class="avantage-box">
+        <span class="avantage-icon">🔗</span>
+        <span class="avantage-titre">Réseau</span>
+        <p class="avantage-desc">
+          Accès au réseau exclusif de juristes, cadres et entrepreneurs togolais.
+          Des connexions qui ouvrent des portes institutionnelles et professionnelles.
+        </p>
+      </div>
+      <div class="avantage-box">
+        <span class="avantage-icon">💡</span>
+        <span class="avantage-titre">Impact</span>
+        <p class="avantage-desc">
+          Association directe à des actions concrètes et mesurables.
+          Un rapport d'impact annuel documente l'utilisation de votre contribution.
+        </p>
+      </div>
+      <div class="avantage-box">
+        <span class="avantage-icon">🏆</span>
+        <span class="avantage-titre">Réputation</span>
+        <p class="avantage-desc">
+          S'associer à une association portée par des diplômés en droit renforce
+          votre image de sérieux, de responsabilité et d'engagement sociétal.
+        </p>
+      </div>
+      <div class="avantage-box">
+        <span class="avantage-icon">📣</span>
+        <span class="avantage-titre">Expression</span>
+        <p class="avantage-box">
+          Opportunité de prendre la parole lors de nos événements, de partager
+          votre expertise devant un public qualifié et attentif.
+        </p>
+      </div>
+      <div class="avantage-box">
+        <span class="avantage-icon">🤲</span>
+        <span class="avantage-titre">Sens</span>
+        <p class="avantage-desc">
+          Un engagement qui va au-delà du business : participer à la formation
+          de la prochaine génération de leaders africains.
+        </p>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      <p>"Les organisations qui choisissent de s'associer à Ma Belle Promo ne répondent pas
+      à une sollicitation ordinaire — elles saisissent l'occasion de faire partie
+      d'une histoire, et de lui permettre d'aller encore plus loin."</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>Association FDD Ma Belle Promo · mabellepromo.org</p>
+    <span class="page-num">04 / 06</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 5 — NIVEAUX DE PARTENARIAT
+════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP">
+    <span class="page-header-label">Dossier de Partenariat 2026</span>
+  </div>
+  <div class="page-header-gold"></div>
+
+  <div class="page-body">
+    <span class="section-eyebrow">Modalités</span>
+    <h2 class="section-title">Niveaux de partenariat</h2>
+    <div class="section-rule"></div>
+
+    <p class="intro-text">
+      Quatre niveaux d'engagement, pensés pour s'adapter à la réalité et aux ambitions
+      de chaque partenaire. Chaque niveau donne accès à un ensemble de contreparties
+      claires, formalisées dans la Convention de Partenariat signée conjointement.
+    </p>
+
+    <table class="niveaux">
+      <thead>
+        <tr>
+          <th>Niveau</th>
+          <th>Contribution annuelle</th>
+          <th>Logo site web</th>
+          <th>Réseaux sociaux</th>
+          <th>Événements</th>
+          <th>Rapport d'impact</th>
+          <th>Prise de parole</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="niveau-badge">💎 Platine</span></td>
+          <td><span class="niveau-montant">≥ 500 000 FCFA</span></td>
+          <td><span class="check">✓</span> 1re position</td>
+          <td><span class="check">✓</span> Prioritaire</td>
+          <td><span class="check">✓</span> Tous</td>
+          <td><span class="check">✓</span> Détaillé</td>
+          <td><span class="check">✓</span> Invité d'honneur</td>
+        </tr>
+        <tr>
+          <td><span class="niveau-badge">🥇 Or</span></td>
+          <td><span class="niveau-montant">≥ 200 000 FCFA</span></td>
+          <td><span class="check">✓</span> 2e position</td>
+          <td><span class="check">✓</span> Régulier</td>
+          <td><span class="check">✓</span> Principaux</td>
+          <td><span class="check">✓</span> Annuel</td>
+          <td><span class="check">✓</span> Sur demande</td>
+        </tr>
+        <tr>
+          <td><span class="niveau-badge">🥈 Argent</span></td>
+          <td><span class="niveau-montant">≥ 100 000 FCFA</span></td>
+          <td><span class="check">✓</span> 3e position</td>
+          <td><span class="check">✓</span> Ponctuel</td>
+          <td><span class="check">✓</span> Sélectifs</td>
+          <td><span class="check">✓</span> Annuel</td>
+          <td><span class="dash">–</span></td>
+        </tr>
+        <tr>
+          <td><span class="niveau-badge">🥉 Bronze</span></td>
+          <td><span class="niveau-montant">≥ 50 000 FCFA</span></td>
+          <td><span class="check">✓</span> Liste</td>
+          <td><span class="dash">–</span></td>
+          <td><span class="dash">–</span></td>
+          <td><span class="check">✓</span> Synthèse</td>
+          <td><span class="dash">–</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:8.5pt; color:#888; margin-top:6pt; font-style:italic;">
+      * Contributions en francs CFA (FCFA). Des modalités en nature (compétences, matériel, services)
+      sont également possibles et font l'objet d'une valorisation convenue entre les parties.
+    </p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10pt; margin-top:16pt;">
+      <div style="background:var(--vert-clair); border-radius:6pt; padding:14pt; border:1pt solid rgba(27,107,69,0.15);">
+        <p style="font-family:'Cormorant Garamond',serif; font-size:12pt; font-weight:700; color:var(--vert-fonce); margin:0 0 6pt;">Contributions en nature</p>
+        <p style="font-size:9pt; color:#444; margin:0; line-height:1.6;">
+          Mise à disposition d'un expert, d'une salle, de matériel ou d'une plateforme
+          technique — toute contribution non financière peut être valorisée et intégrée
+          dans le cadre du partenariat.
+        </p>
+      </div>
+      <div style="background:var(--or-clair); border-radius:6pt; padding:14pt; border:1pt solid rgba(154,113,24,0.15);">
+        <p style="font-family:'Cormorant Garamond',serif; font-size:12pt; font-weight:700; color:var(--vert-fonce); margin:0 0 6pt;">Partenariat sur mesure</p>
+        <p style="font-size:9pt; color:#444; margin:0; line-height:1.6;">
+          Vous avez un projet spécifique en tête ? Nous sommes ouverts à construire
+          ensemble une formule de collaboration qui serve vos objectifs
+          autant que les nôtres.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>Association FDD Ma Belle Promo · mabellepromo.org</p>
+    <span class="page-num">05 / 06</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 6 — CONTACT & PROCHAINE ÉTAPE
+════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP">
+    <span class="page-header-label">Dossier de Partenariat 2026</span>
+  </div>
+  <div class="page-header-gold"></div>
+
+  <div class="page-body">
+    <div class="contact-hero">
+      <div style="position:relative;">
+        <h2 class="contact-hero-title">Parlons-en.</h2>
+        <p class="contact-hero-sub">
+          Une conversation suffit à faire naître les plus belles collaborations.
+          Voici comment nous rejoindre.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16pt;">
+      <span class="section-eyebrow">Processus</span>
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:14pt; font-weight:700; color:var(--vert-fonce); margin:4pt 0 12pt;">Comment démarrer ?</h3>
+      <ul class="etapes-list">
+        <li>
+          <div class="etape-num">1</div>
+          <div class="etape-content">
+            <strong>Premier contact</strong>
+            <span>Écrivez-nous ou appelez-nous. Un membre du bureau vous répondra sous 48h.</span>
+          </div>
+        </li>
+        <li>
+          <div class="etape-num">2</div>
+          <div class="etape-content">
+            <strong>Échange de découverte</strong>
+            <span>Un rendez-vous (en présentiel ou en visio) pour comprendre vos objectifs et vous présenter nos projets en cours.</span>
+          </div>
+        </li>
+        <li>
+          <div class="etape-num">3</div>
+          <div class="etape-content">
+            <strong>Proposition personnalisée</strong>
+            <span>Nous vous soumettons une proposition de partenariat adaptée à votre profil et à vos ambitions.</span>
+          </div>
+        </li>
+        <li>
+          <div class="etape-num">4</div>
+          <div class="etape-content">
+            <strong>Signature de la convention</strong>
+            <span>Formalisation du partenariat par une convention bilatérale garantissant les droits et obligations de chaque partie.</span>
+          </div>
+        </li>
+        <li>
+          <div class="etape-num">5</div>
+          <div class="etape-content">
+            <strong>Démarrage & suivi</strong>
+            <span>Votre nom entre dans l'histoire de Ma Belle Promo. Un interlocuteur dédié assure le suivi tout au long du partenariat.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-block">
+        <span class="contact-block-label">Nous écrire</span>
+        <p>📧 <a href="mailto:contact@mabellepromo.org">contact@mabellepromo.org</a></p>
+        <p>🌐 <a href="https://mabellepromo.org">mabellepromo.org</a></p>
+      </div>
+      <div class="contact-block">
+        <span class="contact-block-label">Nous trouver</span>
+        <p>📍 Lomé, République du Togo</p>
+        <p>🪪 Récépissé d'enregistrement N°0920</p>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <p>Prêt à faire partie de cette histoire ?</p>
+      <strong>Contactez-nous dès aujourd'hui</strong>
+      <p style="margin-top:6pt; font-size:9pt;">
+        <a href="https://mabellepromo.org/informations/contacts">mabellepromo.org/informations/contacts</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>© 2026 Association FDD Ma Belle Promo · Lomé, Togo · Tous droits réservés</p>
+    <span class="page-num">06 / 06</span>
+  </div>
+</div>
+
+</div><!-- /a4-doc -->
+</body>
+</html>
