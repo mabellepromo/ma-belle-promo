@@ -569,10 +569,6 @@ function openDoc(html, filename = "document-mbp.html") {
 
   const { frame, remove, mkBarBtn } = _createOverlayShell(filename);
 
-  frame.contentDocument.open();
-  frame.contentDocument.write(resolved);
-  frame.contentDocument.close();
-
   const doPrint = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} };
 
   mkBarBtn("✕ Fermer",                "#1a5c38", remove);
@@ -589,12 +585,14 @@ function openDoc(html, filename = "document-mbp.html") {
     }
   });
 
-  setTimeout(() => {
+  frame.onload = () => {
     try {
       const btn = frame.contentDocument.querySelector(".print-btn");
       if (btn) btn.onclick = doPrint;
     } catch (e) {}
-  }, 400);
+  };
+
+  frame.srcdoc = resolved;
 }
 
 // ── Ouvre un document HTML statique via son URL (convention, dossier…) ──────
@@ -883,7 +881,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reçu de cotisation ${annee} — ${member.nom}</title>
-  <style>${MBP_STYLE}<style>${RECU_COMPACT}</style>
+  <style>${MBP_STYLE}</style><style>${RECU_COMPACT}</style>
 </head>
 <body>
   <button class="no-print print-btn" type="button">
