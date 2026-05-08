@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { compressImage } from "../lib/imageUtils";
+import { genererAttestation } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
@@ -688,6 +689,10 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => genererAttestation(m)} title="Attestation de membre"
+                          className="w-7 h-7 rounded-lg hover:bg-amber-50 flex items-center justify-center text-muted-foreground hover:text-amber-600 transition-colors">
+                          <FileText className="w-3.5 h-3.5" />
+                        </button>
                         <button onClick={() => setEditingMember({ ...m })} className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
                         <button onClick={() => setConfirmDialog({ title: `Supprimer ${m.nom} ?`, message: "Cette action est irréversible.", onConfirm: () => { deleteMember(m.id); setConfirmDialog(null); } })} className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>

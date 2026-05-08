@@ -79,7 +79,8 @@
       repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 18px),
       repeating-linear-gradient(-45deg, #fff 0px, #fff 1px, transparent 1px, transparent 18px);
   }
-  .cover-logo { height: 64pt; width: auto; margin-bottom: 36pt; position: relative; }
+  .cover-logo-wrap { align-self: flex-start; margin-bottom: 36pt; position: relative; }
+  .cover-logo { height: 64pt; width: auto; display: block; }
   .cover-eyebrow {
     font-family: "Cormorant Garamond", serif;
     font-size: 9pt; letter-spacing: 0.30em; text-transform: uppercase;
@@ -103,7 +104,7 @@
   }
   .cover-pitch {
     font-size: 11pt; color: rgba(255,255,255,0.80); line-height: 1.7;
-    max-width: 340pt; margin-bottom: 40pt; position: relative;
+    margin-bottom: 40pt; position: relative;
   }
   .cover-tags {
     display: flex; flex-wrap: wrap; gap: 8pt; position: relative; margin-bottom: auto;
@@ -396,7 +397,9 @@
   <div class="cover-top-band"></div>
   <div class="cover-inner">
     <div class="cover-pattern"></div>
-    <img src="/Logo%20Redesign1.png" alt="Logo Ma Belle Promo" class="cover-logo">
+    <div class="cover-logo-wrap">
+      <img src="/Logo%20Redesign1.png" alt="Logo Ma Belle Promo" class="cover-logo">
+    </div>
     <span class="cover-eyebrow">Dossier de Partenariat · 2026</span>
     <h1 class="cover-title">Ensemble,<br>allons plus <span>loin</span>.</h1>
     <p class="cover-subtitle">Une invitation à rejoindre une aventure humaine authentique</p>

@@ -2,10 +2,11 @@ import { useState, useMemo, Fragment } from "react";
 import { toast } from "sonner";
 import {
   Check, Clock, X, Download, Search, Banknote, Users, ShieldOff,
-  Mail, Send, AlertTriangle, Plus, CreditCard,
+  Mail, Send, AlertTriangle, Plus, CreditCard, FileText,
 } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";
 import { inp, sel } from "./shared";
+import { genererRecu } from "../../lib/documentGenerators";
 
 const STATUT_CONFIG = {
   "payé":       { label: "Payé",       color: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500" },
@@ -403,6 +404,14 @@ export default function CotisationsSection({ members }) {
                             <button onClick={() => setShowRelance({ id: m.id, email: m.email, nom: m.nom })}
                               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors">
                               <Mail className="w-3 h-3" /> Relancer
+                            </button>
+                          )}
+                          {(m.statut === "payé" || m.statut === "partiel") && (
+                            <button
+                              onClick={() => genererRecu(m, annee, m.cotisation?.montant, m.cotisation?.date_paiement, m.cotisation?.mode_paiement)}
+                              title="Générer le reçu de cotisation"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors">
+                              <FileText className="w-3 h-3" /> Reçu
                             </button>
                           )}
                           {(m.statut === "payé" || m.statut === "exempté" || m.statut === "partiel") && (
