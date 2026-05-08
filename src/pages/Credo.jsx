@@ -1,51 +1,92 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { 
+  Heart, 
+  Handshake, 
+  Users, 
+  Globe, 
+  Star, 
+  Compass,
+  ArrowRight 
+} from "lucide-react";
 import SEO from "../components/SEO";
 
 const valeurs = [
   {
     numero: "01",
     titre: "Amitié",
-    texte: "Ma Belle Promo est avant tout une famille. Les liens d'amitié tissés sur les bancs de la Faculté de Droit de Lomé sont indéfectibles. Nous cultivons ces liens au fil des années, à travers nos rencontres, retrouvailles et activités communes.",
+    texte: "Ma Belle Promo est avant tout une famille. Les liens d'amitié tissés sur les bancs de la Faculté de Droit de Lomé sont indéfectibles. Nous cultivons ces liens au fil des années, transformant les rencontres académiques en relations durables et authentiques.",
     accent: "bg-rose-400",
+    accentDark: "bg-rose-500",
+    Icon: Heart,
+    gradient: "from-rose-50 to-pink-50",
+    borderColor: "border-rose-200",
+    hoverBg: "hover:from-rose-100 hover:to-pink-100",
   },
   {
     numero: "02",
     titre: "Solidarité",
-    texte: "Échange, partage et réciprocité sont les valeurs qui animent Ma Belle Promo. Nous avons vocation à être non seulement des ambassadrices et ambassadeurs de l'institution mais, du fait de nos expériences et nos talents, à constituer avant tout une source d'inspiration pour les générations futures.",
+    texte: "Échange, partage et réciprocité sont les valeurs qui animent Ma Belle Promo. Nous avons vocation à être non seulement des ambassadrices et ambassadeurs de l'institution mais, du fait de nos expériences et talents, une source d'inspiration.",
     accent: "bg-amber-400",
+    accentDark: "bg-amber-500",
+    Icon: Handshake,
+    gradient: "from-amber-50 to-yellow-50",
+    borderColor: "border-amber-200",
+    hoverBg: "hover:from-amber-100 hover:to-yellow-100",
   },
   {
     numero: "03",
     titre: "Entraide",
-    texte: "Nous contribuons activement à l'épanouissement de nos membres et à l'accompagnement des étudiants actuels de la Faculté de Droit. Partage de compétences, mentorat, soutien : l'entraide est notre moteur quotidien.",
+    texte: "Nous contribuons activement à l'épanouissement de nos membres et à l'accompagnement des étudiants actuels de la Faculté de Droit. Partage de compétences, mentorat, soutien : l'entraide est au cœur de notre démarche collective.",
     accent: "bg-emerald-500",
+    accentDark: "bg-emerald-600",
+    Icon: Users,
+    gradient: "from-emerald-50 to-teal-50",
+    borderColor: "border-emerald-200",
+    hoverBg: "hover:from-emerald-100 hover:to-teal-100",
   },
   {
     numero: "04",
     titre: "Engagement communautaire",
-    texte: "Ma Belle Promo s'ouvre sur sa communauté pour mener des actions concertées dans divers domaines : aide aux personnes vulnérables, soutien aux étudiants, actions solidaires. Nos leaders sont engagés pour changer la vie des personnes destinataires de nos actions.",
+    texte: "Ma Belle Promo s'ouvre sur sa communauté pour mener des actions concertées dans divers domaines : aide aux personnes vulnérables, soutien aux étudiants, actions solidaires. Nos leaders créent de l'impact positif et durable.",
     accent: "bg-blue-400",
+    accentDark: "bg-blue-500",
+    Icon: Globe,
+    gradient: "from-blue-50 to-cyan-50",
+    borderColor: "border-blue-200",
+    hoverBg: "hover:from-blue-100 hover:to-cyan-100",
   },
   {
     numero: "05",
     titre: "Excellence",
-    texte: "Diplômés de la Faculté de Droit de l'Université de Lomé, nous portons haut le flambeau de l'excellence académique et professionnelle. Notre réseau est composé d'avocats, de magistrats, d'universitaires, de cadres d'entreprises, d'experts internationaux — une force collective au service du droit.",
+    texte: "Diplômés de la Faculté de Droit de l'Université de Lomé, nous portons haut le flambeau de l'excellence académique et professionnelle. Notre réseau rassemble des avocats, magistrats et professionnels reconnus.",
     accent: "bg-violet-400",
+    accentDark: "bg-violet-500",
+    Icon: Star,
+    gradient: "from-violet-50 to-purple-50",
+    borderColor: "border-violet-200",
+    hoverBg: "hover:from-violet-100 hover:to-purple-100",
   },
   {
     numero: "06",
     titre: "Ouverture sur le monde",
-    texte: "Ma Belle Promo se veut un réseau ouvert sur le monde, facilitant le retour et l'intégration des membres de la diaspora, et permettant à ses membres de développer leurs contacts personnels et professionnels au-delà des frontières togolaises.",
+    texte: "Ma Belle Promo se veut un réseau ouvert sur le monde, facilitant le retour et l'intégration des membres de la diaspora, et permettant à ses membres de développer leurs contacts personnels et professionnels.",
     accent: "bg-teal-400",
+    accentDark: "bg-teal-500",
+    Icon: Compass,
+    gradient: "from-teal-50 to-cyan-50",
+    borderColor: "border-teal-200",
+    hoverBg: "hover:from-teal-100 hover:to-cyan-100",
   },
 ];
 
 export default function Credo() {
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Notre Credo" description="Les valeurs fondatrices de Ma Belle Promo : amitié, solidarité et entraide au service des anciens diplômés de la FDD de l'Université de Lomé." path="/association/credo" />
+      <SEO 
+        title="Notre Credo" 
+        description="Les valeurs fondatrices de Ma Belle Promo : amitié, solidarité et entraide au service des anciens diplômés de la FDD de l'Université de Lomé." 
+      />
 
       {/* ── Hero 80vh ── */}
       <div className="relative flex flex-col items-center justify-center h-[58vh] bg-foreground overflow-hidden px-6">
@@ -93,68 +134,119 @@ export default function Credo() {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-px h-16 bg-white/20" />
       </div>
 
-      {/* ── Grille des valeurs ── */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
+      {/* ── Grille des valeurs REDESIGNÉE ── */}
+      <section className="max-w-7xl mx-auto px-6 py-24">
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="eyebrow text-primary text-center mb-12"
-        >
-          Six valeurs fondamentales
-        </motion.p>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {valeurs.map((v, i) => (
-            <motion.div
-              key={v.titre}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="group relative bg-card border border-border rounded-2xl p-7 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300"
-            >
-              {/* Numéro géant en filigrane */}
-              <div className="absolute -bottom-4 -right-2 font-heading text-[7rem] font-black leading-none select-none pointer-events-none text-foreground/[0.04]">
-                {v.numero}
-              </div>
-
-              {/* Trait accent top */}
-              <div className={`w-8 h-0.5 mb-5 group-hover:w-14 transition-all duration-300 ${v.accent}`} />
-
-              <h3 className="font-heading text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                {v.titre}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed relative z-10 text-justify">
-                {v.texte}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Récépissé */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/40 border border-border rounded-2xl"
+          className="text-center mb-16"
         >
-          <p className="text-sm text-muted-foreground text-center sm:text-left">
-            Association officiellement reconnue par les autorités togolaises depuis le{" "}
-            <strong className="text-foreground">03 octobre 2019</strong>
-            <span className="block text-xs text-primary font-semibold mt-0.5">
-              Récépissé N°0920/MATDCL-SG-DLPAP-DOCA
-            </span>
+          <p className="eyebrow text-primary mb-4">
+            Six valeurs fondamentales
           </p>
-          <Link
-            to="/implications/adhesion"
-            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
-          >
-            Nous rejoindre <ArrowRight className="w-4 h-4" />
-          </Link>
+          <h2 className="font-heading text-4xl font-bold text-foreground">
+            Les piliers de Ma Belle Promo
+          </h2>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {valeurs.map((v, i) => {
+            const IconComponent = v.Icon;
+            return (
+              <motion.div
+                key={v.titre}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative h-full"
+              >
+                {/* Carte principale */}
+                <div className={`relative h-full bg-gradient-to-br ${v.gradient} border ${v.borderColor} rounded-3xl p-8 overflow-hidden transition-all duration-500 ${v.hoverBg} hover:shadow-2xl hover:border-opacity-60 flex flex-col`}>
+                  
+                  {/* Arrière-plan décoratif */}
+                  <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-10 transition-opacity duration-500">
+                    <div className={`w-full h-full rounded-full ${v.accent}`} />
+                  </div>
+
+                  {/* Numéro géant en filigrane */}
+                  <div className="absolute -bottom-8 -right-4 font-heading text-8xl font-black leading-none select-none pointer-events-none opacity-[0.08] transition-opacity group-hover:opacity-[0.12]">
+                    {v.numero}
+                  </div>
+
+                  {/* Icône et accent bar */}
+                  <div className="relative z-10 flex items-start justify-between mb-6">
+                    <div className={`p-3 rounded-2xl ${v.accent} bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300 transform group-hover:scale-110`}>
+                      <IconComponent className={`w-8 h-8 ${v.accent.replace('bg-', 'text-')}`} />
+                    </div>
+                    <div className={`w-1.5 h-12 ${v.accent} rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:h-16`} />
+                  </div>
+
+                  {/* Contenu */}
+                  <div className="relative z-10 flex-1 flex flex-col">
+                    <h3 className="font-heading text-2xl font-bold text-foreground mb-3 group-hover:text-transparent group-hover:bg-clip-text transition-all duration-300" 
+                        style={{
+                          backgroundImage: `linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))`,
+                        }}>
+                      {v.titre}
+                    </h3>
+                    <p className="text-muted-foreground text-base leading-relaxed text-justify group-hover:text-foreground transition-colors duration-300">
+                      {v.texte}
+                    </p>
+                  </div>
+
+                  {/* Ligne accent animée au bas */}
+                  <div className="relative z-10 mt-6 pt-6 border-t border-current border-opacity-10">
+                    <div className={`w-0 h-1 ${v.accent} rounded-full group-hover:w-12 transition-all duration-500`} />
+                  </div>
+                </div>
+
+                {/* Lueur au survol */}
+                <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-20 ${v.accent} blur-xl transition-opacity duration-500 pointer-events-none -z-10`} />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Récépissé - Redesigné */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-24 relative"
+        >
+          <div className="relative bg-gradient-to-r from-primary/5 via-primary/3 to-primary/5 border border-primary/20 rounded-3xl p-8 md:p-12 overflow-hidden group">
+            
+            {/* Décoration arrière-plan */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl" />
+            </div>
+
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-8">
+              <div className="flex-1">
+                <p className="text-lg text-foreground font-semibold mb-2">
+                  🏛️ Reconnaissance officielle
+                </p>
+                <p className="text-muted-foreground">
+                  Association officiellement reconnue par les autorités togolaises depuis le{" "}
+                  <strong className="text-foreground font-bold">03 octobre 2019</strong>
+                </p>
+                <p className="text-sm text-primary font-semibold mt-3 bg-primary/10 w-fit px-4 py-2 rounded-full">
+                  Récépissé N°0920/MATDCL-SG-DLPAP-DOCA
+                </p>
+              </div>
+              <Link
+                to="/implications/adhesion"
+                className="flex-shrink-0 inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-semibold rounded-full hover:shadow-lg hover:from-primary hover:to-primary transition-all duration-300 transform hover:scale-105 whitespace-nowrap"
+              >
+                Nous rejoindre <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
         </motion.div>
       </section>
     </div>
