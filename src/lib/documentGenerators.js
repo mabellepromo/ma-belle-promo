@@ -423,12 +423,65 @@ export function genererAttestation(member) {
       </div>
 
       <div class="signature-block">
+
+        <!-- Gauche : mini carte de membre -->
         <div class="signature-col">
-          <span class="sig-label">Délivrée à Lomé, le</span>
-          <div class="sig-area"><span>${today()}</span></div>
-          <span class="sig-name">Pour l'Association</span>
+          <span class="sig-label">Délivrée à Lomé, le ${today()}</span>
+
+          <!-- Carte de membre format crédit -->
+          <div style="margin-top:10px;width:204px;height:129px;border-radius:10px;background:linear-gradient(135deg,#0a3d28 0%,#0f5c3a 55%,#1a7a4e 100%);box-shadow:0 5px 18px rgba(10,61,40,0.38);position:relative;overflow:hidden;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;">
+
+            <!-- Filet doré haut -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,#b8861a,#e6b84a,#b8861a);"></div>
+
+            <!-- Cercles décoratifs fond -->
+            <div style="position:absolute;bottom:-28px;right:-28px;width:100px;height:100px;border-radius:50%;border:18px solid rgba(255,255,255,0.04);"></div>
+            <div style="position:absolute;bottom:10px;right:-50px;width:130px;height:130px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);"></div>
+
+            <!-- En-tête carte -->
+            <div style="display:flex;align-items:center;gap:7px;position:relative;">
+              <img src="/Logo%20Redesign1.png" style="height:18px;width:auto;opacity:0.92;" onerror="this.style.display='none'" />
+              <div>
+                <div style="font-family:'Lato',sans-serif;font-size:5.5pt;font-weight:700;color:rgba(255,255,255,0.90);letter-spacing:0.07em;text-transform:uppercase;">FDD Ma Belle Promo</div>
+                <div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.48);letter-spacing:0.08em;text-transform:uppercase;margin-top:1px;">Carte de Membre</div>
+              </div>
+            </div>
+
+            <!-- Corps : photo + identité -->
+            <div style="display:flex;align-items:center;gap:10px;position:relative;">
+              <!-- Photo miniature anneau or -->
+              <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#b8861a,#e6b84a,#b8861a);">
+                <div style="width:100%;height:100%;border-radius:50%;padding:1.5px;background:#fff;">
+                  ${member.photo
+                    ? `<img src="${member.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:top;display:block;" onerror="this.style.display='none'" />`
+                    : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#0a3d28,#1a7a4e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11pt;font-family:'Cormorant Garamond',serif;font-weight:700;">${initiale}</div>`
+                  }
+                </div>
+              </div>
+              <!-- Texte identité -->
+              <div style="min-width:0;flex:1;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:9.5pt;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.nom}</div>
+                <div style="font-family:'Lato',sans-serif;font-size:5pt;color:#e6b84a;text-transform:uppercase;letter-spacing:0.09em;margin-top:2px;">${titre}</div>
+                ${localisation ? `<div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.48);margin-top:2px;">${localisation}</div>` : ""}
+                ${member.profession ? `<div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.40);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.profession}</div>` : ""}
+              </div>
+            </div>
+
+            <!-- Pied : ref + année -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;position:relative;">
+              <div style="font-family:'Lato',sans-serif;font-size:5pt;color:rgba(255,255,255,0.38);letter-spacing:0.06em;">${ref}</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:8pt;font-weight:700;color:#e6b84a;letter-spacing:0.06em;">${new Date().getFullYear()}</div>
+            </div>
+
+            <!-- Filet doré bas -->
+            <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#b8861a,#e6b84a,#b8861a,transparent);"></div>
+          </div>
+
+          <span class="sig-name" style="margin-top:10px;">Pour l'Association</span>
           <span class="sig-title">FDD Ma Belle Promo</span>
         </div>
+
+        <!-- Droite : cachet présidente -->
         <div class="signature-col">
           <span class="sig-label">Signature et cachet</span>
           <div style="height:100px;display:flex;align-items:center;overflow:visible;">
@@ -439,6 +492,7 @@ export function genererAttestation(member) {
           <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
           <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
         </div>
+
       </div>
 
     </div>
