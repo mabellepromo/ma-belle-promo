@@ -177,93 +177,271 @@ const MBP_STYLE = `
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     margin-top: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
   }
 
   .signature-col {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .sig-label {
     font-family: 'Lato', sans-serif;
     font-size: 8pt;
     font-weight: 700;
-    color: #0a3d28;
+    color: #888;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
 
   .sig-area {
-    border: 1px dashed #b0c8bb;
-    border-radius: 6px;
     height: 80px;
+    border-bottom: 1px solid #ccc;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f9fcfa;
+    align-items: flex-end;
+    padding-bottom: 6px;
   }
 
   .sig-area span {
-    font-family: 'Lato', sans-serif;
-    font-size: 8pt;
-    color: #bbb;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11pt;
+    color: #555;
+    font-style: italic;
   }
 
   .sig-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 10.5pt;
-    color: #333;
-    font-weight: 600;
+    font-family: 'Lato', sans-serif;
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0a3d28;
+    margin-top: 4px;
   }
 
   .sig-title {
     font-family: 'Lato', sans-serif;
-    font-size: 8pt;
-    color: #777;
+    font-size: 8.5pt;
+    color: #666;
   }
 
   .doc-footer {
-    padding: 14px 44px;
-    border-top: 1px solid #e8e8e8;
+    background: #f7faf8;
+    border-top: 1px solid #c8ddd2;
+    padding: 12px 44px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     gap: 16px;
-    background: #fafafa;
+    margin-top: auto;
   }
 
   .footer-text {
     font-family: 'Lato', sans-serif;
     font-size: 7.5pt;
-    color: #aaa;
+    color: #999;
     line-height: 1.5;
   }
 
-  .amount-highlight {
-    background: linear-gradient(135deg, #0a3d28, #1a5e3a);
-    border-radius: 8px;
-    padding: 16px 24px;
+  .gold-seal {
+    position: absolute;
+    bottom: 80px;
+    right: 44px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #b8861a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(184,134,26,0.06);
+    padding: 8px;
+    gap: 2px;
+  }
+
+  .gold-seal-top {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: #b8861a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+
+  .gold-seal-year {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14pt;
+    font-weight: 700;
+    color: #b8861a;
+  }
+
+  .gold-seal-bottom {
+    font-family: 'Lato', sans-serif;
+    font-size: 6pt;
+    color: #b8861a;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .photo-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #b8861a;
+    padding: 3px;
+    background: linear-gradient(135deg, #f9f3e3, #fff);
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(184,134,26,0.25);
+  }
+
+  .photo-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+
+  .mini-card {
+    width: 86mm;
+    height: 54mm;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    font-family: 'Lato', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .mini-card-header {
+    background: linear-gradient(135deg, #0a3d28 0%, #1a7a4e 100%);
+    padding: 6px 10px 5px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
-  .amount-highlight .amount-label {
-    font-family: 'Lato', sans-serif;
+  .mini-card-logo {
+    height: 20px;
+    width: auto;
+    opacity: 0.92;
+  }
+
+  .mini-card-org {
+    font-size: 6.5pt;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .mini-card-chip {
+    width: 22px;
+    height: 16px;
+    background: linear-gradient(135deg, #e6b84a, #b8861a);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .mini-card-body {
+    background: #fff;
+    flex: 1;
+    padding: 5px 10px 4px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mini-card-photo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    border: 2px solid #b8861a;
+    flex-shrink: 0;
+  }
+
+  .mini-card-initiale {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0a3d28, #1a7a4e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14pt;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid #b8861a;
+  }
+
+  .mini-card-info { flex: 1; min-width: 0; }
+
+  .mini-card-name {
     font-size: 9pt;
     font-weight: 700;
-    color: rgba(255,255,255,0.75);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    color: #0a3d28;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .amount-highlight .amount-value {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22pt;
-    font-weight: 700;
-    color: #f0c040;
+  .mini-card-detail {
+    font-size: 6.5pt;
+    color: #555;
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+
+  .mini-card-id {
+    font-size: 6pt;
+    font-family: monospace;
+    color: #888;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .mini-card-footer {
+    background: linear-gradient(135deg, #0a3d28 0%, #1a7a4e 100%);
+    padding: 4px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .mini-card-footer-text {
+    font-size: 5.5pt;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.05em;
+  }
+
+  .mini-card-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .mini-card-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.30);
+  }
+
+  .mini-card-dots span:last-child {
+    background: #b8861a;
   }
 
   .print-btn {
@@ -302,56 +480,35 @@ const RECU_COMPACT = `
   .intro-text { font-size: 10pt !important; line-height: 1.4 !important; }
   .info-box { padding: 8px 13px !important; gap: 5px 13px !important; }
   .info-value { font-size: 10pt !important; }
-  .info-label { font-size: 6.5pt !important; }
-  .notice-box { padding: 6px 11px !important; }
-  .notice-box p { font-size: 8.5pt !important; line-height: 1.35 !important; }
-  .signature-block { margin-top: 2px !important; gap: 14px !important; }
-  .sig-area { height: 48px !important; }
-  .sig-name { font-size: 9pt !important; }
-  .sig-title { font-size: 7.5pt !important; }
-  .doc-footer { padding: 6px 30px !important; }
-  .amount-highlight { padding: 8px 14px !important; }
-  .amount-highlight .amount-value { font-size: 16pt !important; }
-  .amount-highlight .amount-label { font-size: 8pt !important; }
-  @media print {
-    .a4 { min-height: 0 !important; height: 297mm !important; overflow: hidden !important; }
-  }
+  .info-label { font-size: 7pt !important; }
+  .signature-block { gap: 14px !important; padding-top: 10px !important; margin-top: 6px !important; }
+  .sig-area { height: 54px !important; }
+  .doc-footer { padding: 8px 30px !important; }
+  .footer-text { font-size: 7pt !important; }
+  .notice-box { padding: 8px 12px !important; }
+  .notice-box p { font-size: 9.5pt !important; line-height: 1.4 !important; }
+  @media print { .a4 { height: 297mm; } }
 `;
-
-function padZero(n) { return String(n).padStart(2, "0"); }
-
-function formatDate(isoDate) {
-  if (!isoDate) return "—";
-  const d = new Date(isoDate);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-}
 
 function today() {
   return new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function refNumber(prefix, parts) {
-  const now = new Date();
-  return `${prefix}-${now.getFullYear()}${padZero(now.getMonth() + 1)}${padZero(now.getDate())}-${parts}`;
+function refNumber(prefix, suffix) {
+  const ts = Date.now().toString(36).toUpperCase().slice(-4);
+  return `${prefix}-${suffix}-${ts}`;
 }
 
-function openDoc(html, filename = "document-mbp.html") {
-  const origin = window.location.origin;
-  const resolved = html
-    .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
-    .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
-
-  // Nettoie les éléments précédents
+// ── Overlay partagé ─────────────────────────────────────────────────────────
+function _createOverlayShell(filename) {
   document.getElementById("__mbp_overlay")?.remove();
   document.getElementById("__mbp_bar")?.remove();
   document.getElementById("__mbp_frame")?.remove();
 
-  // Overlay sombre (cliquable pour fermer)
   const overlay = document.createElement("div");
   overlay.id = "__mbp_overlay";
   overlay.style.cssText = "position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.70);";
 
-  // Barre de contrôle en haut
   const bar = document.createElement("div");
   bar.id = "__mbp_bar";
   bar.style.cssText = [
@@ -366,6 +523,15 @@ function openDoc(html, filename = "document-mbp.html") {
   titleEl.style.cssText = "flex:1;font-size:12px;font-weight:600;color:rgba(255,255,255,0.60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
   titleEl.textContent = filename;
   bar.appendChild(titleEl);
+
+  const frame = document.createElement("iframe");
+  frame.id = "__mbp_frame";
+  frame.style.cssText = [
+    "position:fixed;top:50px;left:50%;transform:translateX(-50%)",
+    "width:min(794px,96vw);height:calc(100vh - 50px)",
+    "z-index:9999;border:none;background:#fff",
+    "box-shadow:0 8px 40px rgba(0,0,0,0.5)",
+  ].join(";");
 
   const remove = () => { overlay.remove(); bar.remove(); frame.remove(); };
   overlay.onclick = (e) => { if (e.target === overlay) remove(); };
@@ -387,19 +553,21 @@ function openDoc(html, filename = "document-mbp.html") {
     return b;
   };
 
-  // Iframe centrée, largeur A4
-  const frame = document.createElement("iframe");
-  frame.id = "__mbp_frame";
-  frame.style.cssText = [
-    "position:fixed;top:50px;left:50%;transform:translateX(-50%)",
-    "width:min(794px,96vw);height:calc(100vh - 50px)",
-    "z-index:9999;border:none;background:#fff",
-    "box-shadow:0 8px 40px rgba(0,0,0,0.5)",
-  ].join(";");
-
   document.body.appendChild(overlay);
   document.body.appendChild(bar);
   document.body.appendChild(frame);
+
+  return { frame, remove, mkBarBtn };
+}
+
+// ── Ouvre un document HTML généré (attestation, reçu…) ──────────────────────
+function openDoc(html, filename = "document-mbp.html") {
+  const origin = window.location.origin;
+  const resolved = html
+    .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
+    .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
+
+  const { frame, remove, mkBarBtn } = _createOverlayShell(filename);
 
   frame.contentDocument.open();
   frame.contentDocument.write(resolved);
@@ -407,8 +575,8 @@ function openDoc(html, filename = "document-mbp.html") {
 
   const doPrint = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} };
 
-  mkBarBtn("✕ Fermer",             "#1a5c38",   remove);
-  mkBarBtn("🖨 Imprimer / PDF",    "#b8861a",   doPrint);
+  mkBarBtn("✕ Fermer",                "#1a5c38", remove);
+  mkBarBtn("🖨 Imprimer / PDF",       "#b8861a", doPrint);
   mkBarBtn("📎 Joindre à un message", "#1d4ed8", () => {
     try {
       const b64 = btoa(unescape(encodeURIComponent(resolved)));
@@ -421,13 +589,44 @@ function openDoc(html, filename = "document-mbp.html") {
     }
   });
 
-  // Connecter aussi le bouton interne du document
   setTimeout(() => {
     try {
       const btn = frame.contentDocument.querySelector(".print-btn");
       if (btn) btn.onclick = doPrint;
     } catch (e) {}
   }, 400);
+}
+
+// ── Ouvre un document HTML statique via son URL (convention, dossier…) ──────
+export function openDocUrl(url, filename) {
+  const { frame, remove, mkBarBtn } = _createOverlayShell(filename);
+
+  frame.src = url;
+
+  const doPrint = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} };
+
+  frame.onload = () => {
+    try {
+      // Masquer la barre d'aide interne — notre barre parent la remplace
+      const hint = frame.contentDocument.getElementById("editHint");
+      if (hint) hint.style.display = "none";
+    } catch (e) {}
+  };
+
+  mkBarBtn("✕ Fermer",                "#1a5c38", remove);
+  mkBarBtn("🖨 Imprimer / PDF",       "#b8861a", doPrint);
+  mkBarBtn("📎 Joindre à un message", "#1d4ed8", () => {
+    try {
+      const currentHtml = "<!DOCTYPE html>" + frame.contentDocument.documentElement.outerHTML;
+      const b64 = btoa(unescape(encodeURIComponent(currentHtml)));
+      window.dispatchEvent(new CustomEvent("mbp:compose-with-attachment", {
+        detail: { name: filename, content: b64 }
+      }));
+      remove();
+    } catch (e) {
+      alert("Erreur lors de la préparation de la pièce jointe.");
+    }
+  });
 }
 
 export function genererAttestation(member) {
@@ -473,138 +672,108 @@ export function genererAttestation(member) {
 
       <div class="doc-title-block">
         <div class="doc-title">Attestation de Membre</div>
-        <div class="doc-ref">Réf. : ${ref} · Délivrée le ${today()}</div>
+        <div class="doc-ref">Réf. ${ref}</div>
       </div>
 
-      <p class="intro-text">
-        Je soussigné(e), Président(e) de l'association <strong>FDD Ma Belle Promo</strong>,
-        association de diplômés de la Faculté de Droit du Développement de l'Université de Lomé,
-        promotion 1994–2000, atteste par la présente que :
-      </p>
-
-      <!-- Bloc membre : infos à gauche, photo à droite -->
-      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:10px;padding:22px 26px;display:flex;gap:30px;align-items:center;">
-
-        <!-- Grille d'informations -->
-        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:13px 26px;">
-          <div class="info-row full-width">
-            <span class="info-label">Nom complet</span>
-            <span class="info-value" style="font-size:14pt;">${member.nom}</span>
-          </div>
-          ${member.profession ? `
-          <div class="info-row">
-            <span class="info-label">Profession</span>
-            <span class="info-value">${member.profession}</span>
-          </div>` : ""}
-          ${localisation ? `
-          <div class="info-row">
-            <span class="info-label">Localisation</span>
-            <span class="info-value">${localisation}</span>
-          </div>` : ""}
-          ${member.email ? `
-          <div class="info-row">
-            <span class="info-label">Adresse e-mail</span>
-            <span class="info-value">${member.email}</span>
-          </div>` : ""}
-          <div class="info-row">
-            <span class="info-label">Qualité</span>
-            <span class="info-value" style="color:#0a3d28;text-transform:capitalize">${titre}</span>
-          </div>
+      <!-- Photo + texte côte à côte -->
+      <div style="display:flex;align-items:flex-start;gap:28px;">
+        <div class="photo-ring" style="width:100px;height:100px;flex-shrink:0;">
+          ${photoContent}
         </div>
-
-        <!-- Photo encadrée -->
-        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;">
-          <!-- Anneau doré extérieur -->
-          <div style="width:120px;height:120px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#b8861a 0%,#e6b84a 50%,#b8861a 100%);box-shadow:0 4px 18px rgba(184,134,26,0.35);">
-            <!-- Anneau blanc intérieur + image -->
-            <div style="width:100%;height:100%;border-radius:50%;padding:2px;background:#fff;">
-              ${photoContent}
-            </div>
-          </div>
-          <span style="font-family:'Lato',sans-serif;font-size:6pt;font-weight:700;color:#9a8030;text-transform:uppercase;letter-spacing:0.12em;">Photo officielle</span>
-        </div>
-
-      </div>
-
-      <p class="intro-text">
-        est bien <strong>${titre}</strong> de l'association FDD Ma Belle Promo, à jour de ses obligations statutaires à la date de délivrance de la présente attestation.
-      </p>
-
-      <div class="notice-box">
-        <p>
-          La présente attestation est délivrée à la demande de l'intéressé(e) et pour servir et valoir ce que de droit.
+        <p class="intro-text" style="flex:1;">
+          L'Association <strong>FDD Ma Belle Promo (MBP)</strong>, association des diplômés
+          de la Faculté de Droit du Développement de l'Université de Lomé, promotion 1994–2000,
+          atteste par le présent document que
+          <strong>${member.nom}</strong> est <strong>${titre}</strong> en règle de ladite association.
         </p>
       </div>
 
-      <div class="signature-block">
+      <div class="info-box">
+        <div class="info-row">
+          <span class="info-label">Nom complet</span>
+          <span class="info-value">${member.nom}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Statut</span>
+          <span class="info-value">${member.bureau ? "Membre du Bureau Exécutif" : "Membre actif"}</span>
+        </div>
+        ${member.profession ? `
+        <div class="info-row">
+          <span class="info-label">Profession</span>
+          <span class="info-value">${member.profession}</span>
+        </div>` : ""}
+        ${localisation ? `
+        <div class="info-row">
+          <span class="info-label">Localisation</span>
+          <span class="info-value">${localisation}</span>
+        </div>` : ""}
+        ${member.anneeObtention ? `
+        <div class="info-row">
+          <span class="info-label">Promotion</span>
+          <span class="info-value">${member.anneeObtention} — FDD / Université de Lomé</span>
+        </div>` : ""}
+        <div class="info-row full-width">
+          <span class="info-label">Date de délivrance</span>
+          <span class="info-value">${today()}</span>
+        </div>
+      </div>
 
-        <!-- Gauche : mini carte de membre -->
-        <div class="signature-col">
-          <span class="sig-label">Délivrée à Lomé, le ${today()}</span>
+      <div class="notice-box">
+        <p>
+          Cette attestation est délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.
+          Elle ne constitue pas un document d'état civil et ne remplace en aucun cas les pièces officielles.
+        </p>
+      </div>
 
-          <!-- Carte de membre format crédit -->
-          <div style="margin-top:10px;width:204px;height:129px;border-radius:10px;background:linear-gradient(135deg,#0a3d28 0%,#0f5c3a 55%,#1a7a4e 100%);box-shadow:0 5px 18px rgba(10,61,40,0.38);position:relative;overflow:hidden;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;">
+      <!-- Signatures + carte membre -->
+      <div style="display:flex;align-items:flex-end;gap:24px;margin-top:auto;">
 
-            <!-- Filet doré haut -->
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,#b8861a,#e6b84a,#b8861a);"></div>
-
-            <!-- Cercles décoratifs fond -->
-            <div style="position:absolute;bottom:-28px;right:-28px;width:100px;height:100px;border-radius:50%;border:18px solid rgba(255,255,255,0.04);"></div>
-            <div style="position:absolute;bottom:10px;right:-50px;width:130px;height:130px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);"></div>
-
-            <!-- En-tête carte -->
-            <div style="display:flex;align-items:center;gap:7px;position:relative;">
-              <img src="/Logo%20Redesign1.png" style="height:18px;width:auto;opacity:0.92;" onerror="this.style.display='none'" />
-              <div>
-                <div style="font-family:'Lato',sans-serif;font-size:5.5pt;font-weight:700;color:rgba(255,255,255,0.90);letter-spacing:0.07em;text-transform:uppercase;">FDD Ma Belle Promo</div>
-                <div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.48);letter-spacing:0.08em;text-transform:uppercase;margin-top:1px;">Carte de Membre</div>
-              </div>
-            </div>
-
-            <!-- Corps : photo + identité -->
-            <div style="display:flex;align-items:center;gap:10px;position:relative;">
-              <!-- Photo miniature anneau or -->
-              <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#b8861a,#e6b84a,#b8861a);">
-                <div style="width:100%;height:100%;border-radius:50%;padding:1.5px;background:#fff;">
-                  ${member.photo
-                    ? `<img src="${member.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:top;display:block;" onerror="this.style.display='none'" />`
-                    : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#0a3d28,#1a7a4e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11pt;font-family:'Cormorant Garamond',serif;font-weight:700;">${initiale}</div>`
-                  }
-                </div>
-              </div>
-              <!-- Texte identité -->
-              <div style="min-width:0;flex:1;">
-                <div style="font-family:'Cormorant Garamond',serif;font-size:9.5pt;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.nom}</div>
-                <div style="font-family:'Lato',sans-serif;font-size:5pt;color:#e6b84a;text-transform:uppercase;letter-spacing:0.09em;margin-top:2px;">${titre}</div>
-                ${localisation ? `<div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.48);margin-top:2px;">${localisation}</div>` : ""}
-                ${member.profession ? `<div style="font-family:'Lato',sans-serif;font-size:4.5pt;color:rgba(255,255,255,0.40);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.profession}</div>` : ""}
-              </div>
-            </div>
-
-            <!-- Pied : ref + année -->
-            <div style="display:flex;justify-content:space-between;align-items:flex-end;position:relative;">
-              <div style="font-family:'Lato',sans-serif;font-size:5pt;color:rgba(255,255,255,0.38);letter-spacing:0.06em;">${ref}</div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:8pt;font-weight:700;color:#e6b84a;letter-spacing:0.06em;">${new Date().getFullYear()}</div>
-            </div>
-
-            <!-- Filet doré bas -->
-            <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#b8861a,#e6b84a,#b8861a,transparent);"></div>
+        <div class="signature-block" style="flex:1;margin-top:0;padding-top:16px;border-top:1px solid #e0e0e0;">
+          <div class="signature-col">
+            <span class="sig-label">Émis à Lomé, le</span>
+            <div class="sig-area"><span>${today()}</span></div>
+            <span class="sig-name">Le Trésorier</span>
+            <span class="sig-title">FDD Ma Belle Promo</span>
           </div>
-
-          <span class="sig-name" style="margin-top:10px;">Pour l'Association</span>
-          <span class="sig-title">FDD Ma Belle Promo</span>
+          <div class="signature-col">
+            <span class="sig-label">Signature et cachet</span>
+            <div style="height:80px;display:flex;align-items:center;overflow:visible;">
+              <img src="/images/FDD.png" alt="Cachet"
+                   style="max-height:100px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.5cm);"
+                   onerror="this.style.display='none'" />
+            </div>
+            <span class="sig-name" style="margin-top:18px;">Fabienne SENAYA-ATAYI</span>
+            <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
+          </div>
         </div>
 
-        <!-- Droite : cachet présidente -->
-        <div class="signature-col">
-          <span class="sig-label">Signature et cachet</span>
-          <div style="height:100px;display:flex;align-items:center;overflow:visible;">
-            <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.5cm);"
+        <!-- Mini carte membre -->
+        <div class="mini-card">
+          <div class="mini-card-header">
+            <img class="mini-card-logo" src="/Logo%20Redesign1.png" alt="MBP"
                  onerror="this.style.display='none'" />
+            <span class="mini-card-org">FDD Ma Belle Promo<br/>Lomé · 1994–2000</span>
+            <div class="mini-card-chip"></div>
           </div>
-          <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
-          <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
+          <div class="mini-card-body">
+            ${member.photo
+              ? `<img class="mini-card-photo" src="${member.photo}" alt="${member.nom}"
+                      onerror="this.style.display='none'" />`
+              : `<div class="mini-card-initiale">${initiale}</div>`
+            }
+            <div class="mini-card-info">
+              <div class="mini-card-name">${member.nom}</div>
+              <div class="mini-card-detail">
+                ${member.profession ? `${member.profession}<br/>` : ""}
+                ${member.bureau ? "Membre du Bureau Exécutif" : "Membre actif"}
+              </div>
+              <div class="mini-card-id">ID · ${ref}</div>
+            </div>
+          </div>
+          <div class="mini-card-footer">
+            <span class="mini-card-footer-text">mabellepromo.org</span>
+            <div class="mini-card-dots"><span></span><span></span><span></span></div>
+          </div>
         </div>
 
       </div>
@@ -614,7 +783,7 @@ export function genererAttestation(member) {
     <div class="doc-footer">
       <div class="footer-text">
         FDD Ma Belle Promo · www.mabellepromo.org<br/>
-        Document généré le ${today()} · Réf. ${ref}
+        Faculté de Droit du Développement — Université de Lomé, Togo
       </div>
       <div class="footer-text" style="text-align:right">
         Ce document est officiel et authentique.<br/>
@@ -630,106 +799,91 @@ export function genererAttestation(member) {
 }
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {
-  const ref      = refNumber("REC", `${annee}-${String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP"}`);
-  const verse    = Number(montant) || 0;
-  const attendu  = Number(montantAttendu) || verse;
-  const reste    = Math.max(0, attendu - verse);
-  const partiel  = statut === "partiel" || (verse > 0 && reste > 0);
-  const fmt      = n => n > 0 ? Number(n).toLocaleString("fr-FR") : "—";
-  const listeV   = Array.isArray(versements) && versements.length > 0 ? versements : null;
-  const modeFormate = modePaiement
-    ? modePaiement.charAt(0).toUpperCase() + modePaiement.slice(1)
-    : "Non précisé";
+  const ref = refNumber("REC", String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP");
 
-  // ── Tableau des versements (si multi-paiements) ──────────────────────────
-  const versementsHTML = listeV ? `
-    <div style="margin:16px 0 0;">
-      <div style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:8px;">
-        Détail des versements (${listeV.length})
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
-        <thead>
-          <tr style="background:#e8f5ee;">
-            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">#</th>
-            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Date</th>
-            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Mode</th>
-            <th style="padding:4px 8px;text-align:right;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Montant</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${listeV.map((v, i) => `
-          <tr style="background:${i % 2 === 0 ? "#fff" : "#fafafa"};border-bottom:1px solid #eee;">
-            <td style="padding:4px 8px;color:#aaa;font-size:7.5pt;">${i + 1}</td>
-            <td style="padding:4px 8px;">${formatDate(v.date)}</td>
-            <td style="padding:4px 8px;text-transform:capitalize;">${v.mode || "—"}</td>
-            <td style="padding:4px 8px;text-align:right;font-weight:700;">${Number(v.montant).toLocaleString("fr-FR")} FCFA</td>
-          </tr>`).join("")}
-        </tbody>
-        <tfoot>
-          <tr style="background:#e8f5ee;border-top:2px solid #0a3d28;">
-            <td colspan="3" style="padding:5px 8px;font-weight:700;color:#0a3d28;font-family:'Lato',sans-serif;font-size:7.5pt;">Total versé à ce jour</td>
-            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#0a3d28;font-family:'Cormorant Garamond',serif;font-size:11pt;">${fmt(verse)} FCFA</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>` : "";
+  const MODES = {
+    virement:  "Virement bancaire",
+    tmoney:    "TMoney",
+    flooz:     "Flooz",
+    especes:   "Espèces",
+    cheque:    "Chèque",
+    autre:     "Autre",
+  };
+  const modeLabel   = MODES[modePaiement] || modePaiement || "—";
+  const montantNum  = Number(montant) || 0;
+  const attenduNum  = Number(montantAttendu) || 0;
+  const modeFormate = modeLabel;
 
-  // ── Bloc montant : bilan 3 colonnes (partiel) ou highlight vert (soldé) ──
-  const montantHTML = partiel ? `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0;">
-      <div style="background:#e8f5ee;border-radius:8px;padding:9px 8px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Versé</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#0a3d28;">${fmt(verse)}</div>
-        <div style="font-size:6.5pt;color:#666;margin-top:2px;">FCFA</div>
-      </div>
-      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:9px 8px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Attendu</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#444;">${fmt(attendu)}</div>
-        <div style="font-size:6.5pt;color:#666;margin-top:2px;">FCFA</div>
-      </div>
-      <div style="background:#fff8e8;border:1px solid #f59e0b;border-radius:8px;padding:9px 8px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Reste à payer</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#b45309;">${fmt(reste)}</div>
-        <div style="font-size:6.5pt;color:#b45309;margin-top:2px;">FCFA</div>
-      </div>
-    </div>` : `
-    <div class="amount-highlight">
-      <div>
-        <div class="amount-label">Montant reçu — cotisation soldée</div>
-        <div style="font-family:'Lato',sans-serif;font-size:8pt;color:rgba(255,255,255,0.55);margin-top:3px;">Exercice ${annee} · Paiement complet</div>
-      </div>
-      <div class="amount-value">${fmt(verse)} FCFA</div>
-    </div>`;
+  const dateFormatee = datePaiement
+    ? new Date(datePaiement).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+    : today();
 
-  // ── Notice adaptée ────────────────────────────────────────────────────────
-  const noticeHTML = partiel ? `
-    <div class="notice-box">
-      <p>Ce reçu atteste un <strong style="color:#6b4c00">versement partiel</strong> de <strong style="color:#6b4c00">${fmt(verse)} FCFA</strong>
-      au titre de la cotisation ${annee}. Le solde de <strong style="color:#6b4c00">${fmt(reste)} FCFA</strong> reste dû.
-      Un nouveau reçu sera émis à réception de chaque versement complémentaire.</p>
-    </div>` : `
-    <div class="notice-box">
-      <p>Ce reçu constitue la preuve officielle du règlement <strong style="color:#6b4c00">complet</strong>
-      de la cotisation de l'exercice <strong style="color:#6b4c00">${annee}</strong>.
-      Conservez-le précieusement. Pour toute question, contactez le trésorier de l'association.</p>
-    </div>`;
+  const versementsHTML = (() => {
+    if (!Array.isArray(versements) || versements.length <= 1) return "";
+    const rows = versements.map(v => `
+      <tr>
+        <td style="padding:4px 8px;border-bottom:1px solid #e0e0e0;font-size:9pt;">
+          ${new Date(v.date).toLocaleDateString("fr-FR", { day:"numeric", month:"short", year:"numeric" })}
+        </td>
+        <td style="padding:4px 8px;border-bottom:1px solid #e0e0e0;font-size:9pt;text-align:right;">
+          ${Number(v.montant).toLocaleString("fr-FR")} F CFA
+        </td>
+        <td style="padding:4px 8px;border-bottom:1px solid #e0e0e0;font-size:9pt;">
+          ${MODES[v.mode] || v.mode || "—"}
+        </td>
+      </tr>`).join("");
+    return `
+      <div style="margin-top:2px;">
+        <p style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">
+          Détail des versements
+        </p>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;">
+          <thead>
+            <tr style="background:#f7faf8;">
+              <th style="padding:5px 8px;font-size:7.5pt;text-align:left;color:#666;">Date</th>
+              <th style="padding:5px 8px;font-size:7.5pt;text-align:right;color:#666;">Montant</th>
+              <th style="padding:5px 8px;font-size:7.5pt;text-align:left;color:#666;">Mode</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  })();
 
-  // ── Badge statut ──────────────────────────────────────────────────────────
-  const badgeHTML = partiel
-    ? `<span style="display:inline-block;margin-top:8px;background:#fff8e8;border:1px solid #f59e0b;border-radius:4px;padding:3px 12px;font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#b45309;letter-spacing:0.08em;text-transform:uppercase;">PAIEMENT PARTIEL</span>`
-    : `<span style="display:inline-block;margin-top:8px;background:#e8f5ee;border:1px solid #0a3d28;border-radius:4px;padding:3px 12px;font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;letter-spacing:0.08em;text-transform:uppercase;">✓ COTISATION SOLDÉE</span>`;
+  const montantHTML = (() => {
+    const isPartiel = statut === "partiel";
+    const resteNum  = attenduNum > 0 ? Math.max(0, attenduNum - montantNum) : 0;
+    return `
+      <div style="background:linear-gradient(135deg,#0a3d28,#1a7a4e);border-radius:8px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <p style="font-family:'Lato',sans-serif;font-size:7.5pt;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">
+            Montant reçu
+          </p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:22pt;font-weight:700;color:#e6b84a;line-height:1;">
+            ${montantNum.toLocaleString("fr-FR")} F CFA
+          </p>
+        </div>
+        ${isPartiel && attenduNum > 0 ? `
+        <div style="text-align:right;">
+          <p style="font-family:'Lato',sans-serif;font-size:7pt;color:rgba(255,255,255,0.55);margin-bottom:2px;">Attendu / Reste</p>
+          <p style="font-family:'Lato',sans-serif;font-size:9pt;color:rgba(255,255,255,0.80);">
+            ${attenduNum.toLocaleString("fr-FR")} F CFA · Solde : ${resteNum.toLocaleString("fr-FR")} F CFA
+          </p>
+        </div>` : ""}
+      </div>`;
+  })();
 
-  const dateLabel = listeV ? "Dernier versement" : "Date de paiement";
-  const modeLabel = listeV ? "Mode (dernier versement)" : "Mode de règlement";
+  const noticeHTML = statut === "partiel"
+    ? `<div class="notice-box"><p>Paiement partiel — un solde reste dû. Ce reçu ne vaut pas quittance définitive.</p></div>`
+    : `<div class="notice-box"><p>Paiement intégral reçu. Ce document vaut quittance définitive pour l'exercice ${annee}.</p></div>`;
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${partiel ? "Reçu partiel" : "Reçu"} cotisation ${annee} — ${member.nom}</title>
-  <style>${MBP_STYLE}</style>
-  <style>${RECU_COMPACT}</style>
+  <title>Reçu de cotisation ${annee} — ${member.nom}</title>
+  <style>${MBP_STYLE}<style>${RECU_COMPACT}</style>
 </head>
 <body>
   <button class="no-print print-btn" type="button">
@@ -753,37 +907,26 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
     <div class="doc-body">
 
       <div class="doc-title-block">
-        <div class="doc-title">${partiel ? "Reçu de Versement Partiel" : "Reçu de Cotisation"}</div>
-        <div class="doc-ref">Réf. : ${ref} · Émis le ${today()}</div>
-        ${badgeHTML}
+        <div class="doc-title">Reçu de Cotisation</div>
+        <div class="doc-ref">Réf. ${ref} · Exercice ${annee}</div>
       </div>
 
       <p class="intro-text">
-        L'association <strong>FDD Ma Belle Promo</strong> accuse réception du versement effectué
-        par le/la membre ci-dessous au titre de la cotisation annuelle pour l'exercice
-        <strong>${annee}</strong>.
+        L'Association <strong>FDD Ma Belle Promo</strong> accuse réception du paiement de la cotisation annuelle
+        pour l'exercice <strong>${annee}</strong>, versé par :
       </p>
 
       <div class="info-box">
-        <div class="info-row full-width">
-          <span class="info-label">Membre cotisant</span>
+        <div class="info-row">
+          <span class="info-label">Membre</span>
           <span class="info-value">${member.nom}</span>
         </div>
-        ${member.email ? `
-        <div class="info-row full-width">
-          <span class="info-label">Adresse e-mail</span>
-          <span class="info-value">${member.email}</span>
-        </div>` : ""}
         <div class="info-row">
-          <span class="info-label">Exercice</span>
-          <span class="info-value">${annee}</span>
+          <span class="info-label">Date de paiement</span>
+          <span class="info-value">${dateFormatee}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">${dateLabel}</span>
-          <span class="info-value">${formatDate(datePaiement)}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">${modeLabel}</span>
+          <span class="info-label">Mode de paiement</span>
           <span class="info-value">${modeFormate}</span>
         </div>
         <div class="info-row">

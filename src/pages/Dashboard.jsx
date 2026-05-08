@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { compressImage } from "../lib/imageUtils";
-import { genererAttestation } from "../lib/documentGenerators";
+import { genererAttestation, openDocUrl } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
@@ -535,24 +535,20 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
-                    <a
-                      href="/documents/Dossier_Partenariat_MBP.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => openDocUrl("/documents/Dossier_Partenariat_MBP.html", "Dossier-Partenariat-MBP.html")}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
                       style={{ background: "#9a7118", color: "#fff" }}
                     >
-                      <ExternalLink className="w-3.5 h-3.5" /> Dossier
-                    </a>
-                    <a
-                      href="/documents/Convention_Partenariat_MBP.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      <FileText className="w-3.5 h-3.5" /> Dossier
+                    </button>
+                    <button
+                      onClick={() => openDocUrl("/documents/Convention_Partenariat_MBP.html", "Convention-Partenariat-MBP.html")}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
                       style={{ background: "#1b6b45", color: "#fff" }}
                     >
-                      <ExternalLink className="w-3.5 h-3.5" /> Convention
-                    </a>
+                      <FileText className="w-3.5 h-3.5" /> Convention
+                    </button>
                   </div>
                 </div>
               </div>
