@@ -289,6 +289,35 @@ const MBP_STYLE = `
   .print-btn:hover { background: #0f5c3a; }
 `;
 
+const RECU_COMPACT = `
+  .doc-header { padding: 13px 26px 10px !important; }
+  .doc-header-logo { height: 38px !important; }
+  .asso-name { font-size: 12.5pt !important; }
+  .asso-sub { font-size: 8pt !important; }
+  .gold-bar { height: 3px !important; }
+  .doc-body { padding: 13px 30px 10px !important; gap: 9px !important; }
+  .doc-title { font-size: 16pt !important; }
+  .doc-title-block { padding-bottom: 9px !important; }
+  .doc-ref { margin-top: 3px !important; font-size: 7pt !important; }
+  .intro-text { font-size: 10pt !important; line-height: 1.4 !important; }
+  .info-box { padding: 8px 13px !important; gap: 5px 13px !important; }
+  .info-value { font-size: 10pt !important; }
+  .info-label { font-size: 6.5pt !important; }
+  .notice-box { padding: 6px 11px !important; }
+  .notice-box p { font-size: 8.5pt !important; line-height: 1.35 !important; }
+  .signature-block { margin-top: 2px !important; gap: 14px !important; }
+  .sig-area { height: 48px !important; }
+  .sig-name { font-size: 9pt !important; }
+  .sig-title { font-size: 7.5pt !important; }
+  .doc-footer { padding: 6px 30px !important; }
+  .amount-highlight { padding: 8px 14px !important; }
+  .amount-highlight .amount-value { font-size: 16pt !important; }
+  .amount-highlight .amount-label { font-size: 8pt !important; }
+  @media print {
+    .a4 { min-height: 0 !important; height: 297mm !important; overflow: hidden !important; }
+  }
+`;
+
 function padZero(n) { return String(n).padStart(2, "0"); }
 
 function formatDate(isoDate) {
@@ -311,25 +340,50 @@ function openDoc(html) {
   const resolved = html
     .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
     .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
-  const win = window.open("", "_blank");
-  if (!win) {
-    alert("Popups bloqués — autorisez les popups pour mabellepromo.org (icône dans la barre d'adresse) et réessayez.");
-    return;
-  }
-  win.document.write(resolved);
-  win.document.close();
-  win.focus();
 
-  // Lier le bouton et déclencher l'impression depuis le contexte parent
-  // (window.print() dans un popup est bloqué par Chrome — appel parent requis)
-  const doPrint = () => { try { win.focus(); win.print(); } catch (e) { /* silent */ } };
+  // Nettoie les éléments précédents
+  document.getElementById("__mbp_overlay")?.remove();
+  document.getElementById("__mbp_frame")?.remove();
+
+  // Overlay sombre cliquable pour fermer
+  const overlay = document.createElement("div");
+  overlay.id = "__mbp_overlay";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.65);display:flex;align-items:flex-start;justify-content:center;padding-top:10px;gap:10px;";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.innerHTML = "✕ Fermer";
+  closeBtn.style.cssText = "position:fixed;top:12px;right:16px;z-index:10000;background:#0a3d28;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-family:sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,0.4);";
+
+  const printBtn2 = document.createElement("button");
+  printBtn2.innerHTML = "🖨 Imprimer / PDF";
+  printBtn2.style.cssText = "position:fixed;top:12px;right:152px;z-index:10000;background:#b8861a;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-family:sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,0.4);";
+
+  const remove = () => { overlay.remove(); frame.remove(); closeBtn.remove(); printBtn2.remove(); };
+  closeBtn.onclick = remove;
+  overlay.onclick = (e) => { if (e.target === overlay) remove(); };
+  document.body.appendChild(overlay);
+  document.body.appendChild(closeBtn);
+  document.body.appendChild(printBtn2);
+
+  // Iframe centrée, largeur A4, hauteur viewport
+  const frame = document.createElement("iframe");
+  frame.id = "__mbp_frame";
+  frame.style.cssText = "position:fixed;top:50px;left:50%;transform:translateX(-50%);width:min(794px,96vw);height:calc(100vh - 62px);z-index:9999;border:none;border-radius:3px;box-shadow:0 8px 40px rgba(0,0,0,0.5);background:#fff;";
+  document.body.appendChild(frame);
+
+  frame.contentDocument.open();
+  frame.contentDocument.write(resolved);
+  frame.contentDocument.close();
+
+  // Lier le bouton interne + le bouton externe depuis le parent (même origine)
+  const doPrint = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} };
+  printBtn2.onclick = doPrint;
   setTimeout(() => {
     try {
-      const btn = win.document.querySelector(".print-btn");
+      const btn = frame.contentDocument.querySelector(".print-btn");
       if (btn) btn.onclick = doPrint;
-    } catch (e) { /* silent */ }
-    doPrint();
-  }, 600);
+    } catch (e) {}
+  }, 400);
 }
 
 export function genererAttestation(member) {
@@ -549,28 +603,28 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
       <div style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:8px;">
         Détail des versements (${listeV.length})
       </div>
-      <table style="width:100%;border-collapse:collapse;font-size:9.5pt;">
+      <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
         <thead>
           <tr style="background:#e8f5ee;">
-            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">#</th>
-            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Date</th>
-            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Mode</th>
-            <th style="padding:6px 10px;text-align:right;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Montant</th>
+            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">#</th>
+            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Date</th>
+            <th style="padding:4px 8px;text-align:left;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Mode</th>
+            <th style="padding:4px 8px;text-align:right;font-size:6.5pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Montant</th>
           </tr>
         </thead>
         <tbody>
           ${listeV.map((v, i) => `
           <tr style="background:${i % 2 === 0 ? "#fff" : "#fafafa"};border-bottom:1px solid #eee;">
-            <td style="padding:6px 10px;color:#aaa;font-size:8pt;">${i + 1}</td>
-            <td style="padding:6px 10px;">${formatDate(v.date)}</td>
-            <td style="padding:6px 10px;text-transform:capitalize;">${v.mode || "—"}</td>
-            <td style="padding:6px 10px;text-align:right;font-weight:700;">${Number(v.montant).toLocaleString("fr-FR")} FCFA</td>
+            <td style="padding:4px 8px;color:#aaa;font-size:7.5pt;">${i + 1}</td>
+            <td style="padding:4px 8px;">${formatDate(v.date)}</td>
+            <td style="padding:4px 8px;text-transform:capitalize;">${v.mode || "—"}</td>
+            <td style="padding:4px 8px;text-align:right;font-weight:700;">${Number(v.montant).toLocaleString("fr-FR")} FCFA</td>
           </tr>`).join("")}
         </tbody>
         <tfoot>
           <tr style="background:#e8f5ee;border-top:2px solid #0a3d28;">
-            <td colspan="3" style="padding:8px 10px;font-weight:700;color:#0a3d28;font-family:'Lato',sans-serif;font-size:8pt;">Total versé à ce jour</td>
-            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#0a3d28;font-family:'Cormorant Garamond',serif;font-size:12pt;">${fmt(verse)} FCFA</td>
+            <td colspan="3" style="padding:5px 8px;font-weight:700;color:#0a3d28;font-family:'Lato',sans-serif;font-size:7.5pt;">Total versé à ce jour</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#0a3d28;font-family:'Cormorant Garamond',serif;font-size:11pt;">${fmt(verse)} FCFA</td>
           </tr>
         </tfoot>
       </table>
@@ -578,21 +632,21 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
 
   // ── Bloc montant : bilan 3 colonnes (partiel) ou highlight vert (soldé) ──
   const montantHTML = partiel ? `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0;">
-      <div style="background:#e8f5ee;border-radius:8px;padding:14px 10px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Versé</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#0a3d28;">${fmt(verse)}</div>
-        <div style="font-size:7pt;color:#666;margin-top:2px;">FCFA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0;">
+      <div style="background:#e8f5ee;border-radius:8px;padding:9px 8px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Versé</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#0a3d28;">${fmt(verse)}</div>
+        <div style="font-size:6.5pt;color:#666;margin-top:2px;">FCFA</div>
       </div>
-      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:14px 10px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Attendu</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#444;">${fmt(attendu)}</div>
-        <div style="font-size:7pt;color:#666;margin-top:2px;">FCFA</div>
+      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:9px 8px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Attendu</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#444;">${fmt(attendu)}</div>
+        <div style="font-size:6.5pt;color:#666;margin-top:2px;">FCFA</div>
       </div>
-      <div style="background:#fff8e8;border:1px solid #f59e0b;border-radius:8px;padding:14px 10px;text-align:center;">
-        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Reste à payer</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#b45309;">${fmt(reste)}</div>
-        <div style="font-size:7pt;color:#b45309;margin-top:2px;">FCFA</div>
+      <div style="background:#fff8e8;border:1px solid #f59e0b;border-radius:8px;padding:9px 8px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:6.5pt;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:4px;">Reste à payer</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13pt;font-weight:700;color:#b45309;">${fmt(reste)}</div>
+        <div style="font-size:6.5pt;color:#b45309;margin-top:2px;">FCFA</div>
       </div>
     </div>` : `
     <div class="amount-highlight">
@@ -631,6 +685,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${partiel ? "Reçu partiel" : "Reçu"} cotisation ${annee} — ${member.nom}</title>
   <style>${MBP_STYLE}</style>
+  <style>${RECU_COMPACT}</style>
 </head>
 <body>
   <button class="no-print print-btn" type="button">
