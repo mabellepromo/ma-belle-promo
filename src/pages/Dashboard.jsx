@@ -44,9 +44,10 @@ export default function Dashboard() {
     isSeeded, seedFromStatic, saving: memberSaving,
   } = useMemberStore({ realtime: true });
 
-  const [tab,           setTab]          = useState("overview");
-  const [search,        setSearch]       = useState("");
-  const [compose,       setCompose]      = useState(false);
+  const [tab,                setTab]               = useState("overview");
+  const [search,             setSearch]            = useState("");
+  const [compose,            setCompose]           = useState(false);
+  const [pendingAttachment,  setPendingAttachment] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember,  setAddingMember]  = useState(null);
   const [confirmDialog,  setConfirmDialog]  = useState(null);
@@ -69,6 +70,16 @@ export default function Dashboard() {
       .subscribe();
 
     return () => supabase.removeChannel(channel);
+  }, []);
+
+  useEffect(() => {
+    function onAttachment(e) {
+      setPendingAttachment(e.detail);
+      setTab("messages");
+      setCompose(true);
+    }
+    window.addEventListener("mbp:compose-with-attachment", onAttachment);
+    return () => window.removeEventListener("mbp:compose-with-attachment", onAttachment);
   }, []);
 
   const cotStats = useMemo(() => {
@@ -276,7 +287,12 @@ export default function Dashboard() {
   return (
     <div className="h-screen flex overflow-hidden" style={{ background: "#f1f5f9" }}>
 
-      {compose && <ComposeModal onClose={() => setCompose(false)} />}
+      {compose && (
+        <ComposeModal
+          initialAttachment={pendingAttachment}
+          onClose={() => { setCompose(false); setPendingAttachment(null); }}
+        />
+      )}
 
       {/* ── SIDEBAR ── */}
       <aside className="w-64 flex-shrink-0 h-screen flex flex-col"

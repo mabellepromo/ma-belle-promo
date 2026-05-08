@@ -11,13 +11,33 @@ import { SectionLoader, inp, ta, sel, Field } from "./shared.jsx";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
 
-export function ComposeModal({ onClose }) {
+export function ComposeModal({ onClose, initialAttachment = null }) {
   const [recipients, setRecipients] = useState([{ email: "", nom: "" }]);
-  const [form, setForm]   = useState({ sujet: "", corps: "", expNom: "", expPoste: "" });
-  const [files, setFiles] = useState([]);
+  const [form, setForm]         = useState({ sujet: "", corps: "", expNom: "", expPoste: "" });
+  const [attachments, setAttachments] = useState(initialAttachment ? [initialAttachment] : []);
   const [status, setStatus]     = useState("idle");
   const [sentCount, setSentCount] = useState(0);
   const [errMsg, setErrMsg]     = useState("");
+
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ name: file.name, content: btoa(reader.result) });
+      reader.onerror = reject;
+      reader.readAsBinaryString(file);
+    });
+  }
+
+  async function handleFileInput(e) {
+    const picked = Array.from(e.target.files || []);
+    const converted = await Promise.all(picked.map(fileToBase64));
+    setAttachments(prev => [...prev, ...converted].slice(0, 5));
+    e.target.value = "";
+  }
+
+  function removeAttachment(i) {
+    setAttachments(prev => prev.filter((_, idx) => idx !== i));
+  }
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
   const expediteurs = equipeStatic.map(m => ({ nom: m.nom, poste: m.role }));
@@ -51,6 +71,7 @@ export function ComposeModal({ onClose }) {
             date,
             sender_name:   form.expNom   || "Le Bureau Exécutif",
             sender_poste:  form.expPoste || "",
+            attachments:   attachments.length ? attachments : undefined,
           }),
         });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -178,19 +199,29 @@ export function ComposeModal({ onClose }) {
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Pièces jointes</p>
-            <label className="flex items-center gap-3 p-3 border border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/30 transition-colors">
-              <Paperclip className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-xs text-muted-foreground">
-                {files.length > 0 ? files.map(fi => fi.name).join(", ") : "Cliquer pour sélectionner des fichiers…"}
-              </span>
-              <input type="file" multiple className="hidden" onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])} />
-            </label>
-            {files.length > 0 && (
-              <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
-                <Paperclip className="w-3 h-3" />
-                {files.length} fichier{files.length > 1 ? "s" : ""} sélectionné{files.length > 1 ? "s" : ""} — les pièces jointes ne sont pas encore prises en charge
-              </p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              Pièces jointes {attachments.length > 0 && <span className="text-primary">({attachments.length}/5)</span>}
+            </p>
+            {attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {attachments.map((a, i) => (
+                  <div key={i} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary/8 border border-primary/20 rounded-lg text-xs font-medium text-primary max-w-[220px]">
+                    <Paperclip className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{a.name}</span>
+                    <button type="button" onClick={() => removeAttachment(i)} disabled={status === "sending"}
+                      className="ml-1 text-primary/60 hover:text-red-500 transition-colors flex-shrink-0 disabled:opacity-40">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {attachments.length < 5 && (
+              <label className="flex items-center gap-3 p-3 border border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/30 transition-colors">
+                <Paperclip className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-xs text-muted-foreground">Ajouter un fichier… (max 5)</span>
+                <input type="file" multiple className="hidden" disabled={status === "sending"} onChange={handleFileInput} />
+              </label>
             )}
           </div>
         </div>

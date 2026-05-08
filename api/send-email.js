@@ -382,6 +382,10 @@ export default async function handler(req, res) {
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
     else                                 payload = buildAdminAlertPayload(data);
 
+    if (type === "reply" && Array.isArray(data.attachments) && data.attachments.length) {
+      payload.attachment = data.attachments.slice(0, 5).map(a => ({ name: a.name, content: a.content }));
+    }
+
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {

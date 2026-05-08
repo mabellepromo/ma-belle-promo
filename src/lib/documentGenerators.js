@@ -335,7 +335,7 @@ function refNumber(prefix, parts) {
   return `${prefix}-${now.getFullYear()}${padZero(now.getMonth() + 1)}${padZero(now.getDate())}-${parts}`;
 }
 
-function openDoc(html) {
+function openDoc(html, filename = "document-mbp.html") {
   const origin = window.location.origin;
   const resolved = html
     .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
@@ -344,40 +344,59 @@ function openDoc(html) {
   // Nettoie les éléments précédents
   document.getElementById("__mbp_overlay")?.remove();
   document.getElementById("__mbp_frame")?.remove();
-
-  // Overlay sombre cliquable pour fermer
-  const overlay = document.createElement("div");
-  overlay.id = "__mbp_overlay";
-  overlay.style.cssText = "position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.65);display:flex;align-items:flex-start;justify-content:center;padding-top:10px;gap:10px;";
-
-  const closeBtn = document.createElement("button");
-  closeBtn.innerHTML = "✕ Fermer";
-  closeBtn.style.cssText = "position:fixed;top:12px;right:16px;z-index:10000;background:#0a3d28;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-family:sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,0.4);";
-
-  const printBtn2 = document.createElement("button");
-  printBtn2.innerHTML = "🖨 Imprimer / PDF";
-  printBtn2.style.cssText = "position:fixed;top:12px;right:152px;z-index:10000;background:#b8861a;color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;font-family:sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,0.4);";
-
-  const remove = () => { overlay.remove(); frame.remove(); closeBtn.remove(); printBtn2.remove(); };
-  closeBtn.onclick = remove;
-  overlay.onclick = (e) => { if (e.target === overlay) remove(); };
-  document.body.appendChild(overlay);
-  document.body.appendChild(closeBtn);
-  document.body.appendChild(printBtn2);
+  document.querySelectorAll(".__mbp_topbtn").forEach(el => el.remove());
 
   // Iframe centrée, largeur A4, hauteur viewport
   const frame = document.createElement("iframe");
   frame.id = "__mbp_frame";
   frame.style.cssText = "position:fixed;top:50px;left:50%;transform:translateX(-50%);width:min(794px,96vw);height:calc(100vh - 62px);z-index:9999;border:none;border-radius:3px;box-shadow:0 8px 40px rgba(0,0,0,0.5);background:#fff;";
+
+  // Overlay sombre
+  const overlay = document.createElement("div");
+  overlay.id = "__mbp_overlay";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.65);";
+
+  const remove = () => {
+    overlay.remove(); frame.remove();
+    document.querySelectorAll(".__mbp_topbtn").forEach(el => el.remove());
+  };
+  overlay.onclick = (e) => { if (e.target === overlay) remove(); };
+  document.body.appendChild(overlay);
   document.body.appendChild(frame);
 
   frame.contentDocument.open();
   frame.contentDocument.write(resolved);
   frame.contentDocument.close();
 
-  // Lier le bouton interne + le bouton externe depuis le parent (même origine)
+  // ── Boutons flottants (contexte parent) ──────────────────────────────────
+  const btnStyle = "position:fixed;top:12px;z-index:10000;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-family:sans-serif;font-weight:700;font-size:12px;box-shadow:0 2px 12px rgba(0,0,0,0.4);.__mbp_topbtn";
+
+  const mkBtn = (label, right, bg, cb) => {
+    const b = document.createElement("button");
+    b.className = "__mbp_topbtn";
+    b.innerHTML = label;
+    b.style.cssText = `${btnStyle};right:${right}px;background:${bg};color:#fff;`;
+    b.onclick = cb;
+    document.body.appendChild(b);
+    return b;
+  };
+
+  mkBtn("✕ Fermer",           16,  "#0a3d28", remove);
   const doPrint = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} };
-  printBtn2.onclick = doPrint;
+  mkBtn("🖨 Imprimer / PDF",  142, "#b8861a", doPrint);
+  mkBtn("📎 Joindre à un message", 298, "#1d4ed8", () => {
+    try {
+      const b64 = btoa(unescape(encodeURIComponent(resolved)));
+      window.dispatchEvent(new CustomEvent("mbp:compose-with-attachment", {
+        detail: { name: filename, content: b64 }
+      }));
+      remove();
+    } catch (e) {
+      alert("Erreur lors de la préparation de la pièce jointe.");
+    }
+  });
+
+  // Lier aussi le bouton interne depuis le parent
   setTimeout(() => {
     try {
       const btn = frame.contentDocument.querySelector(".print-btn");
@@ -582,7 +601,7 @@ export function genererAttestation(member) {
 </body>
 </html>`;
 
-  openDoc(html);
+  openDoc(html, `Attestation-MBP-${member.nom.replace(/\s+/g, "-")}.html`);
 }
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {
@@ -788,5 +807,5 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
 </body>
 </html>`;
 
-  openDoc(html);
+  openDoc(html, `Recu-MBP-${annee}-${member.nom.replace(/\s+/g, "-")}.html`);
 }
