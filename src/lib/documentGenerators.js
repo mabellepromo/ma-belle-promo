@@ -434,7 +434,8 @@ export function genererAttestation(member) {
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement) {
   const ref = refNumber("REC", `${annee}-${String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP"}`);
-  const montantFormate = Number(montant || 0).toLocaleString("fr-FR");
+  const montantNum = Number(montant) || 0;
+  const montantFormate = montantNum > 0 ? montantNum.toLocaleString("fr-FR") : "—";
   const modeFormate = modePaiement
     ? modePaiement.charAt(0).toUpperCase() + modePaiement.slice(1)
     : "Non précisé";

@@ -434,7 +434,7 @@ export default function CotisationsSection({ members }) {
                           )}
                           {(m.statut === "payé" || m.statut === "partiel") && (
                             <button
-                              onClick={() => genererRecu(m, annee, m.cotisation?.montant, m.cotisation?.date_paiement, m.cotisation?.mode_paiement)}
+                              onClick={() => genererRecu(m, annee, m.cotisation?.montant || montantDefaut, m.cotisation?.date_paiement, m.cotisation?.mode_paiement)}
                               title="Générer le reçu de cotisation"
                               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors">
                               <FileText className="w-3 h-3" /> Reçu
