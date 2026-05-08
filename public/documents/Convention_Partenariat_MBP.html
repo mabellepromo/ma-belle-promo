@@ -144,7 +144,7 @@
   /* ═══════════════════════════════════════
      CORPS DU DOCUMENT
   ═══════════════════════════════════════ */
-  .doc-content { padding: 2.2cm 3.2cm 2.2cm; }
+  .doc-content { padding: 1.6cm 2cm 1.6cm; }
 
   .page-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -305,7 +305,7 @@
 
   .annexe-header {
     background: var(--vert-fonce);
-    padding: 16pt 30pt;
+    padding: 16pt 20pt;
     display: flex; align-items: center;
     justify-content: space-between; gap: 16pt;
     margin-bottom: 0;
@@ -338,7 +338,7 @@
     height: 4pt; margin-bottom: 20pt;
     background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
   }
-  .annexe-content { padding: 0 30pt 30pt; }
+  .annexe-content { padding: 0 20pt 20pt; }
 
   /* Tableaux */
   table.tableau { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 10.5pt; }
@@ -371,12 +371,19 @@
 
   @page {
     size: A4 portrait;
-    margin: 25mm 30mm;
+    margin: 14mm 16mm;
   }
   @media print {
     body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
     .a4-doc { width: auto !important; box-shadow: none !important; margin: 0 !important; }
+    /* En impression, @page gère les marges — on supprime le padding intérieur */
+    .doc-content { padding: 0 !important; }
+    .annexe-content { padding: 0 !important; }
+    .annexe-header { padding-left: 8pt !important; padding-right: 8pt !important; }
     .cover { page-break-after: always; min-height: auto; }
+    .cover-top { padding-left: 16pt !important; padding-right: 16pt !important; }
+    .cover-body { padding: 24pt 40pt !important; }
+    .cover-bottom { padding-left: 16pt !important; padding-right: 16pt !important; }
     h2 { page-break-after: avoid; }
     h3 { page-break-after: avoid; }
     table { page-break-inside: avoid; }
