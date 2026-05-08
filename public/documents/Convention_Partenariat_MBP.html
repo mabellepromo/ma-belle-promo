@@ -207,7 +207,37 @@
   .italic { font-style: italic; }
   .underline { text-decoration: underline; }
   .center { text-align: center !important; }
-  .champ { font-weight: 600; text-decoration: underline; color: #1a1a99; }
+  .champ {
+    font-weight: 600;
+    text-decoration: underline;
+    color: #1a1a99;
+    cursor: text;
+    border-radius: 3px;
+    padding: 0 3px;
+    outline: none;
+    transition: background 0.15s;
+    display: inline-block;
+    min-width: 60px;
+  }
+  .champ:hover { background: rgba(26,26,153,0.07); }
+  .champ:focus { background: rgba(26,26,153,0.13); outline: 2px solid rgba(26,26,153,0.30); }
+  .edit-hint {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #1b6b45; color: #fff;
+    padding: 8px 20px;
+    font-family: Arial, sans-serif; font-size: 13px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .edit-hint strong { color: #a7f3d0; }
+  .edit-hint button {
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
+  }
+  .edit-hint button:hover { background: rgba(255,255,255,0.25); }
+  @media print {
+    .edit-hint { display: none !important; }
+    .champ { color: #000 !important; text-decoration: none !important; background: none !important; outline: none !important; padding: 0 !important; }
+  }
   .case { font-family: Arial, sans-serif; }
   .indent { margin-left: 18pt; }
 
@@ -343,7 +373,7 @@
 <div class="cover">
 
   <div class="cover-top">
-    <img src="public/Logo Redesign1.png" alt="Logo Ma Belle Promo">
+    <img src="../Logo%20Redesign1.png" alt="Logo Ma Belle Promo">
     <div class="cover-top-text">
       <strong>Association FDD Ma Belle Promo</strong>
       <span>Faculté de Droit du Développement — Université de Lomé, Promo 1994–2000</span>
@@ -399,7 +429,7 @@
 
   <!-- En-tête de page -->
   <div class="page-header">
-    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <img src="../Logo%20Redesign1.png" alt="Logo MBP">
     <div class="page-header-text">
       <strong>Association FDD Ma Belle Promo</strong>
       mabellepromo.org &nbsp;|&nbsp; Lomé, Togo &nbsp;|&nbsp; Récépissé N°0920
@@ -669,7 +699,7 @@
 ═══════════════════════════════════════════════════════ -->
 <div class="annexe-section">
   <div class="annexe-header">
-    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <img src="../Logo%20Redesign1.png" alt="Logo MBP">
     <div class="annexe-header-content">
       <span class="annexe-num">Annexe I</span>
       <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Visibilité et communication réciproque</h2>
@@ -811,7 +841,7 @@
 ═══════════════════════════════════════════════════════ -->
 <div class="annexe-section">
   <div class="annexe-header">
-    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <img src="../Logo%20Redesign1.png" alt="Logo MBP">
     <div class="annexe-header-content">
       <span class="annexe-num">Annexe II</span>
       <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Contribution du Partenaire</h2>
@@ -943,7 +973,7 @@
 ═══════════════════════════════════════════════════════ -->
 <div class="annexe-section">
   <div class="annexe-header">
-    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <img src="../Logo%20Redesign1.png" alt="Logo MBP">
     <div class="annexe-header-content">
       <span class="annexe-num">Annexe III</span>
       <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Plan d'actions et indicateurs de résultats</h2>
@@ -1103,7 +1133,7 @@
 ═══════════════════════════════════════════════════════ -->
 <div class="annexe-section">
   <div class="annexe-header">
-    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <img src="../Logo%20Redesign1.png" alt="Logo MBP">
     <div class="annexe-header-content">
       <span class="annexe-num">Annexe IV</span>
       <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Politique de protection des données personnelles</h2>
@@ -1267,5 +1297,41 @@
   </div>
 </div>
 
+<!-- Barre d'aide à l'édition -->
+<div class="edit-hint" id="editHint">
+  <span>📝 <strong>Cliquez sur un champ bleu souligné</strong> pour le modifier directement — le texte sélectionné disparaît dès que vous tapez.</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="window.print()">🖨 Imprimer / PDF</button>
+    <button onclick="document.getElementById('editHint').style.display='none'">✕ Fermer</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Rendre tous les champs éditables
+  document.querySelectorAll('.champ').forEach(function (el) {
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.setAttribute('data-placeholder', el.textContent.trim());
+
+    // Sélectionner tout le texte au clic pour remplacer facilement
+    el.addEventListener('focus', function () {
+      var range = document.createRange();
+      range.selectNodeContents(this);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
+
+    // Empêcher le retour à la ligne dans les champs inline
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+    });
+  });
+
+  // Ajuster le padding-top du body pour compenser la barre fixe
+  document.body.style.paddingTop = '42px';
+});
+</script>
 </body>
 </html>
