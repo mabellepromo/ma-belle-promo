@@ -307,13 +307,17 @@ function refNumber(prefix, parts) {
 }
 
 function openDoc(html) {
-  const win = window.open("", "_blank");
+  const origin = window.location.origin;
+  const resolved = html
+    .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
+    .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
+  const blob = new Blob([resolved], { type: "text/html;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, "_blank");
   if (!win) {
     alert("Le navigateur a bloqué l'ouverture d'un nouvel onglet. Veuillez autoriser les popups pour ce site.");
-    return;
   }
-  win.document.write(html);
-  win.document.close();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 export function genererAttestation(member) {
