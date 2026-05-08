@@ -504,6 +504,31 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Convention de partenariat */}
+              <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #1b6b45, #9a7118)" }} />
+                <div className="p-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#e8f5ee" }}>
+                      <FileText className="w-4 h-4" style={{ color: "#1b6b45" }} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">Convention de Partenariat</p>
+                      <p className="text-xs text-muted-foreground">Document officiel — 13 articles + 4 annexes · à personnaliser avant signature</p>
+                    </div>
+                  </div>
+                  <a
+                    href="/documents/Convention_Partenariat_MBP.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0 transition-all hover:opacity-90"
+                    style={{ background: "#1b6b45", color: "#fff" }}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" /> Ouvrir
+                  </a>
+                </div>
+              </div>
+
               <div className="grid lg:grid-cols-2 gap-6">
                 <div className="bg-background border border-border rounded-2xl p-5">
                   <h3 className="font-heading font-bold text-foreground mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-primary" /> Pages privées</h3>

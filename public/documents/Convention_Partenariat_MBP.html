@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Convention de Partenariat — FDD Ma Belle Promo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vert:        #1b6b45;
+    --vert-clair:  #e8f5ee;
+    --vert-fonce:  #0f3d28;
+    --or:          #9a7118;
+    --or-vif:      #c8960a;
+    --or-clair:    #fdf6e3;
+    --texte:       #1a1a1a;
+    --gris:        #555;
+    --bordure:     #ccc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "EB Garamond", "Times New Roman", serif;
+    font-size: 11.5pt;
+    line-height: 1.65;
+    color: var(--texte);
+    margin: 0; padding: 0;
+    background: #fff;
+  }
+
+  /* ═══════════════════════════════════════
+     PAGE DE GARDE
+  ═══════════════════════════════════════ */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    page-break-after: always;
+    break-after: page;
+  }
+  .cover-top {
+    background: var(--vert-fonce);
+    padding: 24pt 40pt;
+    display: flex;
+    align-items: center;
+    gap: 18pt;
+  }
+  .cover-top img { height: 72pt; width: auto; }
+  .cover-top-text { color: rgba(255,255,255,0.9); font-family: "Cormorant Garamond", serif; }
+  .cover-top-text strong {
+    font-size: 12pt; font-weight: 600; letter-spacing: 0.06em;
+    color: #fff; display: block; margin-bottom: 3pt;
+  }
+  .cover-top-text span {
+    font-size: 9pt; color: rgba(255,255,255,0.55); font-style: italic;
+  }
+  .cover-gold-band {
+    height: 5pt;
+    background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
+  }
+  .cover-body {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 36pt 60pt; text-align: center; position: relative;
+  }
+  .cover-watermark {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.03; font-family: "Cormorant Garamond", serif;
+    font-size: 100pt; font-weight: 700; color: var(--vert);
+    pointer-events: none; user-select: none; letter-spacing: 0.04em;
+  }
+  .cover-eyebrow {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 9.5pt; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--or); margin-bottom: 14pt;
+    position: relative;
+  }
+  .cover-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 36pt; font-weight: 700;
+    color: var(--vert-fonce); margin: 0 0 6pt; line-height: 1.1;
+    position: relative;
+  }
+  .cover-subtitle {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 14pt; font-style: italic;
+    color: var(--gris); margin-bottom: 30pt; position: relative;
+  }
+  .cover-parties {
+    display: flex; width: 100%; max-width: 460pt;
+    margin: 0 auto 30pt;
+    border: 1.5pt solid var(--vert);
+    border-radius: 5pt; overflow: hidden;
+    font-family: "Cormorant Garamond", serif; position: relative;
+  }
+  .cover-partie { flex: 1; padding: 12pt 16pt; text-align: center; }
+  .cover-partie:first-child {
+    background: var(--vert-clair); border-right: 1pt solid var(--vert);
+  }
+  .cover-partie-label {
+    font-size: 7.5pt; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--vert); display: block; margin-bottom: 5pt;
+  }
+  .cover-partie-name {
+    font-size: 11pt; font-weight: 600; color: var(--texte); display: block;
+  }
+  .cover-meta {
+    display: flex; gap: 28pt; justify-content: center;
+    font-family: "Cormorant Garamond", serif; position: relative;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; align-items: center; gap: 3pt; }
+  .cover-meta-label {
+    font-size: 7.5pt; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--vert);
+  }
+  .cover-meta-val { font-size: 11pt; color: var(--texte); font-weight: 500; }
+  .cover-bottom {
+    background: var(--or);
+    padding: 9pt 40pt;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cover-bottom-text {
+    color: #fff; font-size: 8pt; margin: 0;
+    font-family: "Cormorant Garamond", serif; letter-spacing: 0.05em;
+  }
+  .cover-confidential {
+    background: var(--vert-fonce); color: rgba(255,255,255,0.85);
+    font-size: 7.5pt; padding: 3pt 10pt; border-radius: 2pt;
+    font-family: "Cormorant Garamond", serif; letter-spacing: 0.12em;
+  }
+
+  /* ═══════════════════════════════════════
+     CORPS DU DOCUMENT
+  ═══════════════════════════════════════ */
+  .doc-content { padding: 1.8cm 2.8cm 1.8cm; }
+
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 7pt; margin-bottom: 18pt;
+    border-bottom: 2pt solid var(--vert);
+  }
+  .page-header img { height: 30pt; width: auto; }
+  .page-header-text {
+    text-align: right; font-size: 8pt; color: var(--gris);
+    font-family: "Cormorant Garamond", serif; line-height: 1.45;
+  }
+  .page-header-text strong { color: var(--vert); font-size: 9pt; display: block; }
+
+  .doc-main-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 20pt; font-weight: 700; color: var(--vert-fonce);
+    text-align: center; margin: 0 0 4pt;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .doc-main-subtitle {
+    text-align: center; font-size: 10.5pt;
+    color: var(--gris); font-style: italic; margin-bottom: 3pt;
+  }
+  .doc-version {
+    text-align: center; font-size: 9pt; color: var(--gris); margin-bottom: 16pt;
+  }
+
+  .separateur {
+    border: none; height: 2.5pt; margin: 14pt 0;
+    background: linear-gradient(to right, var(--vert), var(--or-vif), transparent);
+  }
+  .separateur-fin {
+    border: none; height: 1pt; margin: 10pt 0;
+    background: linear-gradient(to right, var(--vert), transparent);
+  }
+
+  .entre-parties {
+    margin: 14pt 0; padding: 12pt 16pt;
+    border-left: 4pt solid var(--vert);
+    background: var(--vert-clair);
+    border-radius: 0 4pt 4pt 0;
+  }
+  .entre-parties p { margin: 5pt 0; text-align: justify; }
+
+  .preambule {
+    font-style: italic; color: #333; margin: 8pt 0;
+    text-align: justify; padding-left: 14pt;
+    border-left: 2.5pt solid var(--or);
+  }
+
+  h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 12.5pt; font-weight: 700; color: #fff;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-top: 20pt; margin-bottom: 8pt;
+    padding: 6pt 12pt;
+    background: var(--vert);
+    border-radius: 3pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 11.5pt; font-weight: 600; color: var(--vert-fonce);
+    margin-top: 12pt; margin-bottom: 4pt;
+    border-bottom: 0.5pt solid var(--bordure); padding-bottom: 2pt;
+  }
+  p { margin: 5pt 0; text-align: justify; }
+  ul { margin: 5pt 0 5pt 20pt; padding: 0; }
+  li { margin-bottom: 3pt; text-align: justify; }
+
+  .article-num { font-weight: bold; }
+  .bold { font-weight: bold; }
+  .italic { font-style: italic; }
+  .underline { text-decoration: underline; }
+  .center { text-align: center !important; }
+  .champ { font-weight: 600; text-decoration: underline; color: #1a1a99; }
+  .case { font-family: Arial, sans-serif; }
+  .indent { margin-left: 18pt; }
+
+  .alerte {
+    background: var(--or-clair);
+    border-left: 3.5pt solid var(--or-vif);
+    padding: 7pt 12pt; margin: 8pt 0; font-size: 10.5pt;
+    border-radius: 0 3pt 3pt 0;
+  }
+
+  /* Signatures */
+  table.signatures { width: 100%; border-collapse: collapse; margin-top: 18pt; }
+  table.signatures td {
+    width: 50%; vertical-align: top;
+    padding: 12pt 14pt; border: 1pt solid #888;
+  }
+  table.signatures td:first-child { background: var(--vert-clair); }
+  table.signatures p { margin: 3pt 0; }
+  .label-champ {
+    font-size: 9pt; color: var(--gris); display: block;
+    margin-top: 14pt; margin-bottom: 2pt; font-style: italic;
+  }
+  .ligne-signature {
+    border-bottom: 1pt solid #333; min-height: 26pt;
+    display: block; margin-bottom: 6pt;
+  }
+
+  .note-bas {
+    font-size: 8.5pt; font-style: italic; color: var(--gris);
+    margin-top: 18pt; border-top: 1pt solid #bbb;
+    padding-top: 8pt; text-align: justify;
+  }
+
+  /* Pied de page document */
+  .doc-footer {
+    margin-top: 22pt; padding-top: 7pt;
+    border-top: 2pt solid var(--vert);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 8pt; color: var(--gris);
+    font-family: "Cormorant Garamond", serif;
+  }
+  .doc-footer-confidential {
+    background: var(--vert-fonce); color: rgba(255,255,255,0.85);
+    padding: 2pt 9pt; border-radius: 2pt;
+    font-size: 7.5pt; letter-spacing: 0.1em;
+  }
+
+  /* ═══════════════════════════════════════
+     ANNEXES
+  ═══════════════════════════════════════ */
+  .annexe-section { page-break-before: always; break-before: page; }
+
+  .annexe-header {
+    background: var(--vert-fonce);
+    padding: 16pt 22pt;
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 16pt;
+    margin-bottom: 0;
+  }
+  .annexe-header img {
+    height: 36pt; width: auto;
+    filter: brightness(0) invert(1); opacity: 0.85;
+  }
+  .annexe-header-content { flex: 1; }
+  .annexe-num {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 9pt; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--or-vif);
+    display: block; margin-bottom: 4pt;
+  }
+  .annexe-titre-doc {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 17pt; font-weight: 700; color: #fff; margin: 0;
+  }
+  .annexe-sous-titre-doc {
+    font-size: 9.5pt; color: rgba(255,255,255,0.6);
+    font-style: italic; margin-top: 3pt; display: block;
+  }
+  .annexe-ref-doc {
+    font-size: 8pt; color: rgba(255,255,255,0.45);
+    font-style: italic; text-align: right; white-space: nowrap;
+    font-family: "Cormorant Garamond", serif;
+  }
+  .annexe-gold-band {
+    height: 4pt; margin-bottom: 20pt;
+    background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or));
+  }
+  .annexe-content { padding: 0 22pt 22pt; }
+
+  /* Tableaux */
+  table.tableau { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 10.5pt; }
+  table.tableau th {
+    background: var(--vert); color: #fff;
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600; font-size: 10pt;
+    border: 1pt solid var(--vert); padding: 5pt 8pt; text-align: left;
+  }
+  table.tableau td { border: 0.5pt solid #ccc; padding: 5pt 8pt; vertical-align: top; }
+  table.tableau tr:nth-child(even) td { background: #f4faf7; }
+
+  /* Annexe h2/h3 */
+  .annexe-content h3 {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 12pt; font-weight: 700; color: var(--vert);
+    margin-top: 18pt; margin-bottom: 5pt;
+    padding: 5pt 10pt;
+    background: var(--vert-clair);
+    border-left: 4pt solid var(--vert);
+    border-radius: 0 3pt 3pt 0;
+    page-break-after: avoid;
+  }
+  .annexe-pied {
+    margin-top: 18pt; padding-top: 7pt;
+    border-top: 1pt solid var(--bordure);
+    font-size: 9pt; color: var(--gris); font-style: italic;
+    text-align: center;
+  }
+
+  @media print {
+    body { margin: 0; padding: 0; }
+    .cover { page-break-after: always; }
+    h2 { page-break-after: avoid; }
+    h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE DE GARDE
+═══════════════════════════════════════════════════════ -->
+<div class="cover">
+
+  <div class="cover-top">
+    <img src="public/Logo Redesign1.png" alt="Logo Ma Belle Promo">
+    <div class="cover-top-text">
+      <strong>Association FDD Ma Belle Promo</strong>
+      <span>Faculté de Droit du Développement — Université de Lomé, Promo 1994–2000</span>
+      <span>mabellepromo.org &nbsp;|&nbsp; Lomé, République du Togo</span>
+    </div>
+  </div>
+  <div class="cover-gold-band"></div>
+
+  <div class="cover-body">
+    <div class="cover-watermark">MBP</div>
+    <div class="cover-eyebrow">Document officiel &mdash; Partenariat</div>
+    <h1 class="cover-title">Convention de<br>Partenariat</h1>
+    <p class="cover-subtitle">Accord de collaboration entre Ma Belle Promo et son partenaire</p>
+
+    <div class="cover-parties">
+      <div class="cover-partie">
+        <span class="cover-partie-label">L'Association</span>
+        <span class="cover-partie-name">FDD Ma Belle Promo</span>
+      </div>
+      <div class="cover-partie">
+        <span class="cover-partie-label">Le Partenaire</span>
+        <span class="cover-partie-name"><span class="champ" style="color:#1a1a99;">[Nom du Partenaire]</span></span>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">N° de convention</span>
+        <span class="cover-meta-val"><span class="champ" style="color:#1a1a99;">[N° CONV-MBP-____]</span></span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Version</span>
+        <span class="cover-meta-val">1.0</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Date de signature</span>
+        <span class="cover-meta-val"><span class="champ" style="color:#1a1a99;">[Date]</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <p class="cover-bottom-text">FDD Ma Belle Promo &mdash; Récépissé N°0920 &mdash; Lomé, Togo</p>
+    <span class="cover-confidential">CONFIDENTIEL</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     CORPS DU DOCUMENT
+═══════════════════════════════════════════════════════ -->
+<div class="doc-content">
+
+  <!-- En-tête de page -->
+  <div class="page-header">
+    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <div class="page-header-text">
+      <strong>Association FDD Ma Belle Promo</strong>
+      mabellepromo.org &nbsp;|&nbsp; Lomé, Togo &nbsp;|&nbsp; Récépissé N°0920
+    </div>
+  </div>
+
+  <h1 class="doc-main-title">Convention de Partenariat</h1>
+  <p class="doc-main-subtitle">Entre l'Association Ma Belle Promo et <span class="champ">[Nom du Partenaire]</span></p>
+  <p class="doc-version">Version 1.0 &mdash; Document confidentiel &mdash; Prêt à signature</p>
+
+  <hr class="separateur">
+
+  <h2>Entre les soussignés</h2>
+
+  <div class="entre-parties">
+    <p><span class="bold">L'Association FDD Ma Belle Promo</span>, ci-après désignée <span class="bold">« MBP »</span> ou <span class="bold">« l'Association »</span>,<br>
+    Association de droit togolais, enregistrée sous le récépissé N°0920,<br>
+    dont le siège social est situé à <span class="champ">[Adresse siège]</span>, Lomé, République du Togo,<br>
+    représentée par <span class="bold">Madame <span class="champ">[Nom de la Présidente]</span></span>, en sa qualité de Présidente,<br>
+    dûment habilitée à cet effet,</p>
+
+    <p class="center bold">&mdash; ET &mdash;</p>
+
+    <p><span class="bold"><span class="champ">[Dénomination sociale complète du Partenaire]</span></span>, ci-après désigné <span class="bold">« le Partenaire »</span>,<br>
+    <span class="champ">[Forme juridique]</span>, immatriculé(e) sous le numéro <span class="champ">[numéro]</span>,<br>
+    dont le siège social est situé à <span class="champ">[Adresse complète]</span>,<br>
+    représenté(e) par <span class="bold"><span class="champ">[Nom, Prénom]</span></span>, en sa qualité de <span class="champ">[Fonction]</span>,<br>
+    dûment habilité(e) à engager la structure.</p>
+  </div>
+
+  <p class="center bold">Il a été convenu et arrêté ce qui suit :</p>
+
+  <hr class="separateur-fin">
+
+  <h2>Préambule</h2>
+
+  <p class="preambule">Ma Belle Promo (MBP) est une association de juristes, cadres et entrepreneurs, diplômés de la Faculté de Droit du Développement de l'Université de Lomé (promotion 1994–2000), fondée sur les valeurs d'excellence, de solidarité et d'engagement au service du développement humain et juridique de l'Afrique. À travers ses programmes — dont le programme de mentorat <span class="bold">PASSERELLES</span> —, l'Association accompagne des étudiants et jeunes diplômés dans leur insertion professionnelle, organise des séminaires, conférences et webinaires de haut niveau, et conduit des actions caritatives et sociales au bénéfice des communautés.</p>
+
+  <p class="preambule">Convaincus que les transformations durables se construisent dans l'alliance entre acteurs engagés, les Parties ont souhaité formaliser leur collaboration dans un cadre transparent, équilibré et juridiquement robuste, propre à garantir l'intégrité de chacune et la qualité des actions menées ensemble.</p>
+
+  <p class="preambule">La présente convention a pour objet de définir les droits, obligations et garanties réciproques des Parties dans le cadre de ce partenariat.</p>
+
+  <hr class="separateur-fin">
+
+  <h2>Article 1 — Objet du partenariat</h2>
+
+  <p><span class="article-num">1.1</span> La présente convention définit les modalités et conditions du partenariat établi entre MBP et le Partenaire en vue de <span class="champ">[description précise de l'objet : soutien financier / mise à disposition de compétences / co-organisation d'événements / autre]</span>.</p>
+
+  <p><span class="article-num">1.2</span> Ce partenariat s'inscrit dans le cadre des missions statutaires de MBP et vise notamment à :</p>
+  <ul>
+    <li>Soutenir le programme <span class="bold">PASSERELLES</span> et ses bénéficiaires ;</li>
+    <li>Contribuer à l'organisation de <span class="champ">[séminaires / conférences / webinaires / actions caritatives]</span> ;</li>
+    <li>Renforcer la capacité d'action de l'Association au service de ses publics cibles.</li>
+  </ul>
+
+  <p><span class="article-num">1.3</span> La présente convention ne constitue pas un contrat de travail, de prestation de services commerciaux, ni une relation de subordination entre les Parties. Elle formalise exclusivement un partenariat à finalité non lucrative.</p>
+
+  <h2>Article 2 — Durée</h2>
+
+  <p><span class="article-num">2.1</span> La présente convention prend effet à compter de sa date de signature par les deux Parties et est conclue pour une durée de <span class="champ">[durée]</span>, soit jusqu'au <span class="champ">[date de fin]</span>.</p>
+
+  <p><span class="article-num">2.2</span> Elle est renouvelable par tacite reconduction pour des périodes identiques, sauf dénonciation adressée par lettre recommandée avec accusé de réception, au moins <span class="bold">soixante (60) jours</span> avant l'échéance.</p>
+
+  <p><span class="article-num">2.3</span> Toute modification substantielle de l'objet ou des conditions du partenariat fait l'objet d'un avenant écrit et signé des deux Parties.</p>
+
+  <h2>Article 3 — Engagements de l'Association MBP</h2>
+
+  <p>Dans le cadre du présent partenariat, MBP s'engage à :</p>
+
+  <h3>3.1 Transparence et redevabilité</h3>
+  <ul>
+    <li>Fournir au Partenaire, dans un délai de <span class="champ">[30 / 60] jours</span> suivant la clôture de chaque exercice ou période convenue, un <span class="bold">rapport d'activité</span> détaillé rendant compte de l'utilisation des ressources allouées et des résultats obtenus ;</li>
+    <li>Communiquer sans délai tout événement susceptible d'affecter substantiellement la bonne exécution du partenariat.</li>
+  </ul>
+
+  <h3>3.2 Visibilité et valorisation</h3>
+  <ul>
+    <li>Mentionner le Partenaire, selon les modalités définies en <span class="bold">Annexe I</span>, sur les supports de communication liés aux actions couvertes par la présente convention ;</li>
+    <li>Associer le Partenaire aux événements publics pertinents, dans les limites convenues.</li>
+  </ul>
+
+  <h3>3.3 Bonne gestion</h3>
+  <ul>
+    <li>Affecter les ressources issues du partenariat exclusivement aux actions visées à l'Article 1 ;</li>
+    <li>Tenir une comptabilité distincte permettant de retracer l'utilisation des contributions du Partenaire ;</li>
+    <li>Se conformer aux dispositions légales et réglementaires applicables aux associations dans les pays d'intervention.</li>
+  </ul>
+
+  <h3>3.4 Éthique et intégrité</h3>
+  <ul>
+    <li>Agir en toutes circonstances conformément à ses valeurs fondatrices : excellence, solidarité, indépendance, respect de la dignité humaine ;</li>
+    <li>Refuser toute contribution ou instruction du Partenaire susceptible de compromettre son indépendance ou de contrevenir à l'éthique associative.</li>
+  </ul>
+
+  <h2>Article 4 — Engagements du Partenaire</h2>
+
+  <h3>4.1 Contribution</h3>
+  <p>Le Partenaire s'engage à apporter à MBP, selon les modalités précisées en <span class="bold">Annexe II</span>, la contribution suivante :</p>
+  <ul>
+    <li>&#9744; Contribution financière d'un montant de <span class="champ">[montant en chiffres et en lettres] [devise]</span>, versée selon l'échéancier : <span class="champ">[détail]</span> ;</li>
+    <li>&#9744; Mise à disposition de <span class="champ">[compétences / ressources humaines / matérielles / techniques]</span> ;</li>
+    <li>&#9744; Autre : <span class="champ">[description]</span>.</li>
+  </ul>
+
+  <h3>4.2 Respect de l'identité de MBP</h3>
+  <ul>
+    <li>Ne pas utiliser le nom, les logos, visuels ou toute référence à MBP à des fins promotionnelles, commerciales ou politiques sans accord écrit préalable de l'Association ;</li>
+    <li>Ne formuler aucune instruction, directe ou indirecte, susceptible d'influencer les orientations programmatiques ou les prises de position publiques de MBP.</li>
+  </ul>
+
+  <h3>4.3 Loyauté et non-concurrence</h3>
+  <p>Le Partenaire s'abstient, pendant la durée de la convention et dans un délai de <span class="champ">[12 / 24] mois</span> suivant son terme, de développer ou soutenir un programme directement concurrent aux activités couvertes par le présent partenariat, sans l'accord préalable et écrit de MBP.</p>
+
+  <h3>4.4 Signalement</h3>
+  <p>Le Partenaire s'engage à informer MBP sans délai de tout changement dans sa gouvernance, sa situation financière ou juridique susceptible d'affecter l'exécution du présent accord.</p>
+
+  <h2>Article 5 — Gouvernance et modalités opérationnelles</h2>
+
+  <p><span class="article-num">5.1 Comité de suivi.</span> Les Parties conviennent d'instituer un comité de suivi composé de <span class="champ">[nombre]</span> représentants de chaque Partie, se réunissant au minimum <span class="champ">[trimestriellement / semestriellement]</span>, en présentiel ou par visioconférence.</p>
+
+  <p><span class="article-num">5.2 Interlocuteurs désignés.</span></p>
+  <ul>
+    <li>Pour MBP : <span class="champ">[Nom, Prénom, Fonction, courriel]</span></li>
+    <li>Pour le Partenaire : <span class="champ">[Nom, Prénom, Fonction, courriel]</span></li>
+  </ul>
+
+  <p><span class="article-num">5.3 Décisions.</span> Toute décision modificatrice des conditions du partenariat requiert l'accord écrit des deux Parties. Les décisions opérationnelles courantes relèvent de la responsabilité exclusive de MBP.</p>
+
+  <p><span class="article-num">5.4 Reporting.</span> MBP transmettra au Partenaire un rapport d'étape <span class="champ">[semestriel / trimestriel]</span> et un rapport final à l'issue de la convention ou de chaque phase convenue.</p>
+
+  <h2>Article 6 — Confidentialité et protection des données</h2>
+
+  <p><span class="article-num">6.1 Confidentialité générale.</span> Chaque Partie s'engage à traiter comme strictement confidentielles toutes les informations communiquées par l'autre Partie dans le cadre du présent partenariat. Cette obligation court pendant toute la durée de la convention et pendant <span class="bold">cinq (5) ans</span> suivant son terme ou sa résiliation.</p>
+
+  <p><span class="article-num">6.2 Protection des données personnelles.</span> Les traitements sont effectués en conformité avec :</p>
+  <ul>
+    <li>Le <span class="bold">Règlement Général sur la Protection des Données (RGPD — UE 2016/679)</span> lorsqu'applicable ;</li>
+    <li>La <span class="bold">loi togolaise n°2019-014</span> relative à la protection des données à caractère personnel ;</li>
+    <li>Toute réglementation locale applicable dans les pays d'intervention.</li>
+  </ul>
+
+  <p><span class="article-num">6.3 Données des bénéficiaires.</span> Les données personnelles des bénéficiaires du programme PASSERELLES et des activités de MBP sont traitées exclusivement par MBP. Le Partenaire n'a aucun droit d'accès à ces données, sauf accord écrit exprès de MBP et consentement des personnes concernées.</p>
+
+  <p><span class="article-num">6.4 Violation de données.</span> Toute violation de données personnelles devra être notifiée à l'autre Partie dans un délai de <span class="bold">soixante-douze (72) heures</span> suivant sa découverte.</p>
+
+  <h2>Article 7 — Propriété intellectuelle et usage des signes distinctifs</h2>
+
+  <p><span class="article-num">7.1</span> MBP conserve l'entière propriété de l'ensemble de ses signes distinctifs : dénomination, logo, contenus pédagogiques, bases de données, méthodologies et tout autre élément de propriété intellectuelle.</p>
+
+  <p><span class="article-num">7.2</span> Le Partenaire est autorisé, à titre non exclusif, non cessible et révocable, à utiliser le nom et le logo de MBP <span class="bold">uniquement</span> dans le cadre des communications directement liées au présent partenariat. Toute autre utilisation est expressément interdite.</p>
+
+  <p><span class="article-num">7.3</span> À l'expiration ou à la résiliation de la convention, chaque Partie cesse immédiatement tout usage des signes distinctifs de l'autre.</p>
+
+  <h2>Article 8 — Responsabilité et limitation</h2>
+
+  <p><span class="article-num">8.1</span> La responsabilité de MBP ne peut être engagée qu'en cas de faute prouvée, directement imputable à l'Association. En tout état de cause, elle est limitée au montant des contributions effectivement reçues du Partenaire au titre de la période concernée.</p>
+
+  <p><span class="article-num">8.2</span> MBP ne saurait être tenue responsable de dommages indirects, immatériels ou consécutifs.</p>
+
+  <p><span class="article-num">8.3 Force majeure.</span> Aucune Partie ne peut être tenue responsable de l'inexécution de ses obligations résultant d'un cas de force majeure. La Partie concernée en informe l'autre dans les <span class="bold">quarante-huit (48) heures</span>.</p>
+
+  <h2>Article 9 — Indépendance des parties</h2>
+
+  <p><span class="article-num">9.1</span> Les Parties sont et demeurent des entités juridiquement et opérationnellement indépendantes. La présente convention ne crée entre elles aucun lien de subordination, de mandant à mandataire, ni aucune forme de société de fait.</p>
+
+  <p><span class="article-num">9.2</span> MBP conserve une totale liberté dans la définition de ses orientations stratégiques, de ses prises de position publiques et de ses relations avec des tiers.</p>
+
+  <p><span class="article-num">9.3</span> Aucune disposition de la présente convention ne peut être interprétée comme conférant au Partenaire un droit de regard, de contrôle ou d'influence sur la gouvernance interne de MBP.</p>
+
+  <h2>Article 10 — Résiliation et manquements</h2>
+
+  <p><span class="article-num">10.1 Résiliation amiable.</span> Les Parties peuvent mettre fin à la convention d'un commun accord, par écrit, avec un préavis de <span class="bold">trente (30) jours</span>.</p>
+
+  <p><span class="article-num">10.2 Résiliation pour manquement.</span> En cas de manquement grave, l'autre Partie peut résilier la convention de plein droit après mise en demeure restée sans effet pendant <span class="bold">quinze (15) jours calendaires</span>.</p>
+
+  <p><span class="article-num">10.3 Manquements graves justifiant résiliation immédiate :</span></p>
+  <ul>
+    <li>Utilisation non autorisée des signes distinctifs ou des ressources de MBP ;</li>
+    <li>Atteinte à la réputation, à l'intégrité ou à l'indépendance de MBP ;</li>
+    <li>Violation des obligations de confidentialité ou de protection des données ;</li>
+    <li>Implication du Partenaire dans une procédure pénale ou disciplinaire susceptible de compromettre l'image de MBP ;</li>
+    <li>Fausse déclaration ou communication trompeuse relative au présent partenariat.</li>
+  </ul>
+
+  <p><span class="article-num">10.4</span> Les obligations de confidentialité, de propriété intellectuelle et les clauses protectrices subsistent après la fin de la convention.</p>
+
+  <h2>Article 11 — Droit applicable et résolution des litiges</h2>
+
+  <p><span class="article-num">11.1</span> La présente convention est régie et interprétée conformément au <span class="bold">droit togolais</span>, sans préjudice des dispositions impératives du droit international applicables.</p>
+
+  <p><span class="article-num">11.2 Règlement amiable.</span> En cas de différend, les Parties s'engagent à rechercher en priorité une solution amiable dans un délai de <span class="bold">trente (30) jours</span> suivant la notification écrite du différend.</p>
+
+  <p><span class="article-num">11.3 Médiation.</span> À défaut de résolution amiable, les Parties peuvent recourir à une médiation conduite par un médiateur indépendant désigné d'un commun accord.</p>
+
+  <p><span class="article-num">11.4 Juridiction compétente.</span> À défaut de règlement amiable, tout litige sera soumis à la compétence exclusive des <span class="bold">juridictions compétentes de Lomé (Togo)</span>.</p>
+
+  <h2>Article 12 — Clauses protectrices renforcées pour MBP</h2>
+
+  <p><span class="article-num">12.1 Clause d'intégrité.</span> Le Partenaire déclare sur l'honneur ne faire l'objet d'aucune procédure pénale, disciplinaire ou administrative en cours susceptible d'entacher sa réputation ou celle de MBP.</p>
+
+  <p><span class="article-num">12.2 Clause anti-corruption.</span> Les Parties s'engagent à respecter strictement toutes les lois applicables en matière de lutte contre la corruption, le blanchiment d'argent et le financement illicite. Tout soupçon fondé de corruption donne lieu à résiliation immédiate de plein droit.</p>
+
+  <p><span class="article-num">12.3 Clause de sauvegarde réputationnelle.</span> Le Partenaire s'interdit toute déclaration publique, communication médiatique ou publication — notamment sur les réseaux sociaux — susceptible de nuire à l'image, à la réputation ou à la crédibilité de MBP, de son programme PASSERELLES ou de ses bénéficiaires, que ce soit pendant ou après la durée du partenariat.</p>
+
+  <p><span class="article-num">12.4 Clause de non-sollicitation.</span> Pendant la durée du partenariat et dans les <span class="bold">vingt-quatre (24) mois</span> suivant son terme, le Partenaire s'engage à ne pas solliciter, directement ou indirectement, les bénéficiaires, membres, collaborateurs ou bénévoles de MBP à des fins commerciales ou concurrentielles.</p>
+
+  <p><span class="article-num">12.5 Clause d'exclusivité sectorielle (optionnelle).</span> Dans le secteur d'activité de <span class="champ">[préciser]</span>, MBP s'engage à ne pas contracter un partenariat similaire avec un concurrent direct du Partenaire pendant la durée de la convention, sous réserve que le Partenaire honore l'intégralité de ses engagements.</p>
+
+  <p><span class="article-num">12.6 Solidité institutionnelle.</span> Le Partenaire reconnaît qu'aucune contribution financière ne lui confère un droit de siège, de vote ou d'influence au sein des organes de MBP. La gouvernance, les décisions stratégiques et les orientations programmatiques relèvent exclusivement des instances statutaires de l'Association.</p>
+
+  <h2>Article 13 — Dispositions générales</h2>
+
+  <p><span class="article-num">13.1 Intégralité.</span> La présente convention, ses annexes et tout avenant éventuel constituent l'intégralité de l'accord entre les Parties et remplacent tous accords ou engagements antérieurs portant sur le même objet.</p>
+
+  <p><span class="article-num">13.2 Divisibilité.</span> Si l'une quelconque des dispositions est déclarée nulle ou inapplicable, les autres dispositions demeurent pleinement en vigueur.</p>
+
+  <p><span class="article-num">13.3 Renonciation.</span> Le fait pour une Partie de ne pas se prévaloir d'un manquement ne saurait être interprété comme une renonciation à se prévaloir de manquements ultérieurs.</p>
+
+  <p><span class="article-num">13.4 Notifications.</span> Toute notification formelle sera effectuée par lettre recommandée avec accusé de réception ou par courrier électronique avec accusé de réception explicite, aux coordonnées des interlocuteurs désignés à l'Article 5.2.</p>
+
+  <hr class="separateur">
+
+  <h2>Signatures</h2>
+
+  <p>Fait en deux exemplaires originaux, à <span class="champ">[Ville]</span>, le <span class="champ">[Date]</span></p>
+
+  <table class="signatures">
+    <tr>
+      <td>
+        <p><span class="bold">Pour l'Association FDD Ma Belle Promo</span></p>
+        <p><span class="champ">[Nom, Prénom]</span></p>
+        <p>Présidente</p>
+        <span class="label-champ">Signature :</span>
+        <span class="ligne-signature">&nbsp;</span>
+        <span class="label-champ">Date :</span>
+        <span class="ligne-signature">&nbsp;</span>
+        <span class="label-champ">Cachet :</span>
+        <span class="ligne-signature">&nbsp;</span>
+      </td>
+      <td>
+        <p><span class="bold">Pour <span class="champ">[Nom du Partenaire]</span></span></p>
+        <p><span class="champ">[Nom, Prénom]</span></p>
+        <p><span class="champ">[Fonction]</span></p>
+        <span class="label-champ">Signature :</span>
+        <span class="ligne-signature">&nbsp;</span>
+        <span class="label-champ">Date :</span>
+        <span class="ligne-signature">&nbsp;</span>
+        <span class="label-champ">Cachet :</span>
+        <span class="ligne-signature">&nbsp;</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Pied de page du corps -->
+  <div class="doc-footer">
+    <span>FDD Ma Belle Promo &mdash; mabellepromo.org &mdash; Lomé, Togo</span>
+    <span class="doc-footer-confidential">CONFIDENTIEL</span>
+  </div>
+
+  <p class="note-bas">Ce document est un modèle professionnel à finalité associative. Il est recommandé de le soumettre à un conseil juridique qualifié avant signature, notamment pour adaptation aux spécificités du droit local togolais et de toute autre juridiction concernée. Les champs en <span style="color:#1a1a99;text-decoration:underline;">bleu souligné</span> sont à personnaliser avant utilisation.</p>
+
+</div><!-- /doc-content -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ANNEXE I — VISIBILITÉ ET COMMUNICATION
+═══════════════════════════════════════════════════════ -->
+<div class="annexe-section">
+  <div class="annexe-header">
+    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <div class="annexe-header-content">
+      <span class="annexe-num">Annexe I</span>
+      <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Visibilité et communication réciproque</h2>
+      <span class="annexe-sous-titre-doc">Charte d'utilisation des logos, formats de mention, supports concernés</span>
+    </div>
+    <span class="annexe-ref-doc">Convention N° <span class="champ" style="color:rgba(255,255,255,0.6);">[N°]</span><br>Partenaire : <span class="champ" style="color:rgba(255,255,255,0.6);">[Nom]</span></span>
+  </div>
+  <div class="annexe-gold-band"></div>
+
+  <div class="annexe-content">
+
+    <h3>I.1 — Supports concernés par la mention du Partenaire</h3>
+    <p>La mention du nom et/ou du logo du Partenaire sera assurée par MBP sur les supports suivants, selon le niveau de partenariat convenu (cocher les cases applicables) :</p>
+
+    <table class="tableau">
+      <tr>
+        <th style="width:5%">&#9744;</th>
+        <th style="width:38%">Support de communication</th>
+        <th style="width:30%">Format de mention</th>
+        <th>Fréquence / Condition</th>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Site web officiel de MBP (mabellepromo.org) — page Partenaires</td>
+        <td>Logo + lien hypertexte vers le site du Partenaire</td>
+        <td>Pendant toute la durée du partenariat</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Réseaux sociaux MBP (Facebook, LinkedIn, WhatsApp)</td>
+        <td>Mention @Partenaire + logo sur les publications liées</td>
+        <td>À chaque publication relative aux actions couvertes</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Supports print : programmes, flyers, kakémonos d'événements</td>
+        <td>Logo positionné selon la charte ci-dessous</td>
+        <td>Pour chaque événement couvert par le partenariat</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Rapports d'activité et publications officielles de MBP</td>
+        <td>Mention « Avec le soutien de [Partenaire] » + logo</td>
+        <td>Annuellement</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Présentations et supports de conférences / webinaires</td>
+        <td>Slide de remerciements avec logo</td>
+        <td>À chaque événement concerné</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Newsletter / bulletin électronique de MBP</td>
+        <td>Encart partenaire (format à définir)</td>
+        <td><span class="champ">[mensuelle / trimestrielle]</span></td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Communiqués de presse</td>
+        <td>Mention explicite du soutien du Partenaire</td>
+        <td>Événements majeurs uniquement</td>
+      </tr>
+      <tr>
+        <td class="case">&#9744;</td>
+        <td>Autre : <span class="champ">[préciser]</span></td>
+        <td><span class="champ">[préciser]</span></td>
+        <td><span class="champ">[préciser]</span></td>
+      </tr>
+    </table>
+
+    <h3>I.2 — Charte d'utilisation des logos</h3>
+    <p><span class="bold">A. Logo de MBP utilisé par le Partenaire</span></p>
+    <ul>
+      <li>Le Partenaire reçoit un fichier logo de MBP en haute définition (PNG transparent, SVG) transmis par MBP à la signature de la convention ;</li>
+      <li>Taille minimale d'affichage : <span class="bold">80 px</span> en version numérique, <span class="bold">2 cm</span> en version imprimée ;</li>
+      <li>Zone de protection : espace vide autour du logo égal à la hauteur de la lettre « M » du logotype ;</li>
+      <li>Usage interdit : distorsion, changement de couleur, ajout de texte superposé, utilisation sur fond ne garantissant pas la lisibilité ;</li>
+      <li>Toute utilisation doit être soumise pour validation à MBP au moins <span class="bold">cinq (5) jours ouvrables</span> avant diffusion.</li>
+    </ul>
+
+    <p><span class="bold">B. Logo du Partenaire utilisé par MBP</span></p>
+    <ul>
+      <li>Le Partenaire transmet à MBP ses fichiers logo en haute définition dans un délai de <span class="bold">dix (10) jours ouvrables</span> suivant la signature ;</li>
+      <li>MBP applique les mêmes règles de protection et de lisibilité ;</li>
+      <li>Le Partenaire peut demander validation des maquettes avant diffusion dans un délai raisonnable.</li>
+    </ul>
+
+    <h3>I.3 — Positionnement selon le niveau de partenariat</h3>
+    <table class="tableau">
+      <tr>
+        <th>Niveau</th>
+        <th>Positionnement logo</th>
+        <th>Taille relative</th>
+        <th>Mention verbale</th>
+      </tr>
+      <tr>
+        <td><span class="bold">💎 Platine</span></td>
+        <td>1re position, seul sur sa ligne</td>
+        <td>120 % du logo standard</td>
+        <td>« Partenaire principal »</td>
+      </tr>
+      <tr>
+        <td><span class="bold">🥇 Or</span></td>
+        <td>2e position ou ligne dédiée</td>
+        <td>100 %</td>
+        <td>« Partenaire Or »</td>
+      </tr>
+      <tr>
+        <td><span class="bold">🥈 Argent</span></td>
+        <td>3e position, ligne partagée</td>
+        <td>80 %</td>
+        <td>« Partenaire Argent »</td>
+      </tr>
+      <tr>
+        <td><span class="bold">🥉 Bronze</span></td>
+        <td>Parmi les partenaires, sans ordre imposé</td>
+        <td>60 %</td>
+        <td>« Partenaire Bronze »</td>
+      </tr>
+    </table>
+
+    <h3>I.4 — Réciprocité : visibilité accordée à MBP par le Partenaire (optionnel)</h3>
+    <ul>
+      <li><span class="case">&#9744;</span> Mention sur le site internet du Partenaire : <span class="champ">[URL de la page]</span></li>
+      <li><span class="case">&#9744;</span> Mention sur les réseaux sociaux du Partenaire avec lien vers mabellepromo.org</li>
+      <li><span class="case">&#9744;</span> Autre : <span class="champ">[préciser]</span></li>
+    </ul>
+
+    <div class="alerte">Toute communication faisant apparaître les deux entités de façon conjointe doit être approuvée par écrit par les deux interlocuteurs désignés (Article 5.2) avant diffusion.</div>
+
+    <p class="annexe-pied">Annexe I — Partie intégrante de la Convention de Partenariat N° <span class="champ">[N°]</span> signée le <span class="champ">[Date]</span></p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ANNEXE II — CONTRIBUTION DU PARTENAIRE
+═══════════════════════════════════════════════════════ -->
+<div class="annexe-section">
+  <div class="annexe-header">
+    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <div class="annexe-header-content">
+      <span class="annexe-num">Annexe II</span>
+      <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Contribution du Partenaire</h2>
+      <span class="annexe-sous-titre-doc">Montant, échéancier, modalités de versement, conditions suspensives</span>
+    </div>
+    <span class="annexe-ref-doc">Convention N° <span class="champ" style="color:rgba(255,255,255,0.6);">[N°]</span><br>Partenaire : <span class="champ" style="color:rgba(255,255,255,0.6);">[Nom]</span></span>
+  </div>
+  <div class="annexe-gold-band"></div>
+
+  <div class="annexe-content">
+
+    <h3>II.1 — Nature et montant de la contribution</h3>
+    <table class="tableau">
+      <tr>
+        <th>Type de contribution</th>
+        <th>Description</th>
+        <th>Valorisation</th>
+      </tr>
+      <tr>
+        <td>&#9744; Contribution financière</td>
+        <td>Versement numéraire en soutien aux activités MBP</td>
+        <td><span class="champ">[Montant en chiffres]</span> FCFA<br>(<span class="champ">[Montant en lettres]</span> francs CFA)</td>
+      </tr>
+      <tr>
+        <td>&#9744; Mise à disposition de compétences</td>
+        <td><span class="champ">[expert, consultant, formateur, etc.]</span></td>
+        <td><span class="champ">[Valorisation estimée]</span> FCFA</td>
+      </tr>
+      <tr>
+        <td>&#9744; Mise à disposition de ressources matérielles</td>
+        <td><span class="champ">[locaux, équipements, véhicules, etc.]</span></td>
+        <td><span class="champ">[Valorisation estimée]</span> FCFA</td>
+      </tr>
+      <tr>
+        <td>&#9744; Mise à disposition de ressources techniques</td>
+        <td><span class="champ">[accès plateforme, licences logicielles, etc.]</span></td>
+        <td><span class="champ">[Valorisation estimée]</span> FCFA</td>
+      </tr>
+      <tr>
+        <td>&#9744; Autre</td>
+        <td><span class="champ">[Décrire]</span></td>
+        <td><span class="champ">[Valorisation]</span></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:right;font-weight:bold;background:var(--vert-clair);">TOTAL de la contribution</td>
+        <td style="font-weight:bold;background:var(--vert-clair);"><span class="champ">[Montant total]</span> FCFA</td>
+      </tr>
+    </table>
+
+    <h3>II.2 — Échéancier de versement</h3>
+    <table class="tableau">
+      <tr>
+        <th>Tranche</th>
+        <th>Montant (FCFA)</th>
+        <th>Date d'exigibilité</th>
+        <th>Condition de déclenchement</th>
+      </tr>
+      <tr>
+        <td>1re tranche — Acompte</td>
+        <td><span class="champ">[Montant]</span></td>
+        <td><span class="champ">[Date]</span></td>
+        <td>À la signature de la convention</td>
+      </tr>
+      <tr>
+        <td>2e tranche</td>
+        <td><span class="champ">[Montant]</span></td>
+        <td><span class="champ">[Date]</span></td>
+        <td><span class="champ">[ex. : avant le 30 juin / à la remise du rapport d'étape]</span></td>
+      </tr>
+      <tr>
+        <td>3e tranche (solde)</td>
+        <td><span class="champ">[Montant]</span></td>
+        <td><span class="champ">[Date]</span></td>
+        <td><span class="champ">[ex. : à la remise du rapport final]</span></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:right;font-weight:bold;background:var(--vert-clair);">TOTAL</td>
+        <td colspan="2" style="font-weight:bold;background:var(--vert-clair);"><span class="champ">[Montant total]</span> FCFA</td>
+      </tr>
+    </table>
+
+    <h3>II.3 — Modalités de versement</h3>
+    <p><span class="bold">Coordonnées bancaires de MBP :</span></p>
+    <table class="tableau">
+      <tr>
+        <td style="width:38%;font-weight:bold;">Établissement bancaire</td>
+        <td><span class="champ">[Nom de la banque]</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Titulaire du compte</td>
+        <td>Association FDD Ma Belle Promo</td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Numéro de compte</td>
+        <td><span class="champ">[Numéro de compte]</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Code banque / Agence</td>
+        <td><span class="champ">[Codes]</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Référence à indiquer</td>
+        <td>PARTENARIAT MBP — <span class="champ">[Nom du Partenaire]</span> — <span class="champ">[Année]</span></td>
+      </tr>
+    </table>
+
+    <p>Modes de paiement acceptés :</p>
+    <ul>
+      <li><span class="case">&#9744;</span> Virement bancaire (privilégié)</li>
+      <li><span class="case">&#9744;</span> Chèque à l'ordre de « Association FDD Ma Belle Promo »</li>
+      <li><span class="case">&#9744;</span> Mobile Money (numéro communiqué sur demande)</li>
+      <li><span class="case">&#9744;</span> Espèces (uniquement pour montants ≤ 100 000 FCFA, avec reçu signé)</li>
+    </ul>
+    <p>MBP délivre un <span class="bold">reçu de contribution</span> dans les <span class="bold">cinq (5) jours ouvrables</span> suivant chaque réception effective.</p>
+
+    <h3>II.4 — Conditions suspensives et retard de paiement</h3>
+    <p>MBP n'est tenue d'exécuter ses obligations de visibilité et de reporting qu'à compter de la réception effective de la première tranche. Tout retard supérieur à <span class="bold">quinze (15) jours</span> sur une échéance convenue est notifié par écrit ; passé ce délai sans régularisation, MBP peut suspendre les contreparties de l'Annexe I.</p>
+
+    <h3>II.5 — Clause de remboursement partiel</h3>
+    <p>En cas de résiliation à l'initiative de MBP, le solde non utilisé est restitué dans les <span class="bold">soixante (60) jours</span> suivant la résiliation, accompagné d'un état récapitulatif d'utilisation des fonds. En cas de résiliation par la faute du Partenaire, MBP conserve les sommes correspondant aux actions déjà engagées.</p>
+
+    <p class="annexe-pied">Annexe II — Partie intégrante de la Convention de Partenariat N° <span class="champ">[N°]</span> signée le <span class="champ">[Date]</span></p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ANNEXE III — PLAN D'ACTIONS ET INDICATEURS
+═══════════════════════════════════════════════════════ -->
+<div class="annexe-section">
+  <div class="annexe-header">
+    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <div class="annexe-header-content">
+      <span class="annexe-num">Annexe III</span>
+      <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Plan d'actions et indicateurs de résultats</h2>
+      <span class="annexe-sous-titre-doc">Activités prévues, calendrier, livrables, critères d'évaluation</span>
+    </div>
+    <span class="annexe-ref-doc">Convention N° <span class="champ" style="color:rgba(255,255,255,0.6);">[N°]</span><br>Partenaire : <span class="champ" style="color:rgba(255,255,255,0.6);">[Nom]</span></span>
+  </div>
+  <div class="annexe-gold-band"></div>
+
+  <div class="annexe-content">
+
+    <h3>III.1 — Actions couvertes par le partenariat</h3>
+    <table class="tableau">
+      <tr>
+        <th>Réf.</th>
+        <th>Action / Activité</th>
+        <th>Pilote</th>
+        <th>Période prévue</th>
+        <th>Contribution du Partenaire</th>
+        <th>Livrable attendu</th>
+      </tr>
+      <tr>
+        <td>A1</td>
+        <td>Programme PASSERELLES — session de mentorat <span class="champ">[Année]</span></td>
+        <td>MBP</td>
+        <td><span class="champ">[Période]</span></td>
+        <td><span class="champ">[Financière / Expertise / Autre]</span></td>
+        <td>Rapport de session + liste des bénéficiaires accompagnés</td>
+      </tr>
+      <tr>
+        <td>A2</td>
+        <td>Séminaire / Conférence : <span class="champ">[Thème]</span></td>
+        <td>MBP</td>
+        <td><span class="champ">[Date / Trimestre]</span></td>
+        <td><span class="champ">[Financière / Logistique / Intervenant]</span></td>
+        <td>Compte-rendu + supports diffusés</td>
+      </tr>
+      <tr>
+        <td>A3</td>
+        <td>Action caritative / sociale : <span class="champ">[Intitulé]</span></td>
+        <td>MBP</td>
+        <td><span class="champ">[Période]</span></td>
+        <td><span class="champ">[Financière / Matérielle]</span></td>
+        <td>Rapport d'impact + photographies</td>
+      </tr>
+      <tr>
+        <td>A4</td>
+        <td>Webinaire : <span class="champ">[Thème]</span></td>
+        <td>MBP</td>
+        <td><span class="champ">[Date / Trimestre]</span></td>
+        <td><span class="champ">[Financière / Intervenant technique]</span></td>
+        <td>Enregistrement + liste des participants</td>
+      </tr>
+      <tr>
+        <td>A5</td>
+        <td><span class="champ">[Autre action à définir]</span></td>
+        <td><span class="champ">[MBP / Conjoint]</span></td>
+        <td><span class="champ">[Période]</span></td>
+        <td><span class="champ">[Type]</span></td>
+        <td><span class="champ">[Livrable]</span></td>
+      </tr>
+    </table>
+
+    <h3>III.2 — Indicateurs quantitatifs</h3>
+    <table class="tableau">
+      <tr>
+        <th>Indicateur</th>
+        <th>Valeur cible</th>
+        <th>Source de vérification</th>
+        <th>Fréquence</th>
+      </tr>
+      <tr>
+        <td>Bénéficiaires directs du programme PASSERELLES</td>
+        <td><span class="champ">[N]</span> mentorés</td>
+        <td>Base de données MBP / rapport de session</td>
+        <td>Par session</td>
+      </tr>
+      <tr>
+        <td>Événements organisés (séminaires, conférences, webinaires)</td>
+        <td><span class="champ">[N]</span> événements</td>
+        <td>Rapports d'événements</td>
+        <td>Annuelle</td>
+      </tr>
+      <tr>
+        <td>Participants cumulés aux événements</td>
+        <td><span class="champ">[N]</span> participants</td>
+        <td>Listes d'émargement / inscriptions en ligne</td>
+        <td>Par événement</td>
+      </tr>
+      <tr>
+        <td>Portée des publications avec mention du Partenaire</td>
+        <td><span class="champ">[N]</span> impressions</td>
+        <td>Statistiques réseaux sociaux</td>
+        <td>Trimestrielle</td>
+      </tr>
+      <tr>
+        <td>Actions caritatives / sociales menées</td>
+        <td><span class="champ">[N]</span> actions</td>
+        <td>Rapport d'activité MBP</td>
+        <td>Annuelle</td>
+      </tr>
+    </table>
+
+    <h3>III.3 — Indicateurs qualitatifs</h3>
+    <ul>
+      <li>Satisfaction des bénéficiaires du programme PASSERELLES (questionnaire d'évaluation, score cible : <span class="champ">[≥ X/5]</span>) ;</li>
+      <li>Pertinence perçue des thématiques abordées lors des événements (retours des participants) ;</li>
+      <li>Qualité et régularité des échanges entre les interlocuteurs désignés (Art. 5.2) ;</li>
+      <li>Cohérence de la représentation du Partenaire dans les communications de MBP ;</li>
+      <li><span class="champ">[Autre indicateur qualitatif]</span>.</li>
+    </ul>
+
+    <h3>III.4 — Calendrier de reporting</h3>
+    <table class="tableau">
+      <tr>
+        <th>Document</th>
+        <th>Contenu</th>
+        <th>Délai</th>
+        <th>Destinataire</th>
+      </tr>
+      <tr>
+        <td>Rapport d'étape semestriel</td>
+        <td>Avancement des actions, indicateurs, état financier</td>
+        <td>30 jours après le semestre</td>
+        <td>Interlocuteur désigné du Partenaire</td>
+      </tr>
+      <tr>
+        <td>Rapport final annuel</td>
+        <td>Bilan complet, indicateurs atteints, photographies</td>
+        <td>60 jours après la clôture</td>
+        <td>Direction du Partenaire + interlocuteur désigné</td>
+      </tr>
+      <tr>
+        <td>Relevé d'utilisation des fonds</td>
+        <td>Ventilation des dépenses par action</td>
+        <td>Joint au rapport final annuel</td>
+        <td>Interlocuteur désigné du Partenaire</td>
+      </tr>
+      <tr>
+        <td>Note événementielle</td>
+        <td>Compte-rendu succinct de chaque événement majeur</td>
+        <td>15 jours après l'événement</td>
+        <td>Interlocuteur désigné du Partenaire</td>
+      </tr>
+    </table>
+
+    <h3>III.5 — Évaluation conjointe</h3>
+    <p>Les Parties conviennent de tenir, à l'issue de chaque semestre, une réunion de bilan (présentiel ou visioconférence) au cours de laquelle les indicateurs sont revus, les ajustements discutés et les perspectives de renouvellement évoquées. Un compte-rendu écrit est validé par les deux interlocuteurs dans les <span class="bold">dix (10) jours ouvrables</span>.</p>
+
+    <p class="annexe-pied">Annexe III — Partie intégrante de la Convention de Partenariat N° <span class="champ">[N°]</span> signée le <span class="champ">[Date]</span></p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ANNEXE IV — POLITIQUE DE PROTECTION DES DONNÉES
+═══════════════════════════════════════════════════════ -->
+<div class="annexe-section">
+  <div class="annexe-header">
+    <img src="public/Logo Redesign1.png" alt="Logo MBP">
+    <div class="annexe-header-content">
+      <span class="annexe-num">Annexe IV</span>
+      <h2 class="annexe-titre-doc" style="margin:0;background:none;color:#fff;padding:0;text-transform:none;letter-spacing:normal;border:none;border-radius:0;font-size:17pt;">Politique de protection des données personnelles</h2>
+      <span class="annexe-sous-titre-doc">Conformité RGPD et loi togolaise n°2019-014</span>
+    </div>
+    <span class="annexe-ref-doc">Convention N° <span class="champ" style="color:rgba(255,255,255,0.6);">[N°]</span><br>Partenaire : <span class="champ" style="color:rgba(255,255,255,0.6);">[Nom]</span></span>
+  </div>
+  <div class="annexe-gold-band"></div>
+
+  <div class="annexe-content">
+
+    <h3>IV.1 — Responsable de traitement</h3>
+    <table class="tableau">
+      <tr>
+        <td style="width:35%;font-weight:bold;">Dénomination</td>
+        <td>Association FDD Ma Belle Promo (MBP)</td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Siège social</td>
+        <td><span class="champ">[Adresse siège]</span>, Lomé, République du Togo</td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Référent données / Contact</td>
+        <td><span class="champ">[Nom, Prénom du référent]</span> — contact@mabellepromo.org</td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Site web</td>
+        <td>mabellepromo.org</td>
+      </tr>
+    </table>
+
+    <h3>IV.2 — Catégories de données traitées et finalités</h3>
+    <table class="tableau">
+      <tr>
+        <th>Catégorie de personnes</th>
+        <th>Données collectées</th>
+        <th>Finalité(s)</th>
+        <th>Base légale</th>
+      </tr>
+      <tr>
+        <td>Membres de l'association</td>
+        <td>Nom, prénom, profession, coordonnées, photo, cotisations</td>
+        <td>Gestion de l'adhésion, annuaire interne, communications associatives</td>
+        <td>Exécution du contrat d'adhésion / Intérêt légitime</td>
+      </tr>
+      <tr>
+        <td>Bénéficiaires PASSERELLES</td>
+        <td>Nom, prénom, cursus académique, coordonnées, suivi de mentorat</td>
+        <td>Accompagnement individualisé, suivi pédagogique, statistiques anonymisées</td>
+        <td>Consentement explicite</td>
+      </tr>
+      <tr>
+        <td>Participants aux événements</td>
+        <td>Nom, prénom, courriel, organisation d'appartenance</td>
+        <td>Inscription, gestion logistique, envoi des comptes-rendus</td>
+        <td>Consentement / Intérêt légitime</td>
+      </tr>
+      <tr>
+        <td>Partenaires et donateurs</td>
+        <td>Raison sociale, nom du représentant, coordonnées, données financières</td>
+        <td>Gestion contractuelle, émission de reçus, reporting</td>
+        <td>Exécution du contrat / Obligation légale</td>
+      </tr>
+      <tr>
+        <td>Visiteurs du site web</td>
+        <td>Données de navigation (cookies techniques et analytiques)</td>
+        <td>Fonctionnement du site, statistiques de fréquentation anonymes</td>
+        <td>Consentement / Intérêt légitime</td>
+      </tr>
+    </table>
+
+    <h3>IV.3 — Durée de conservation</h3>
+    <table class="tableau">
+      <tr>
+        <th>Catégorie de données</th>
+        <th>Durée de conservation</th>
+      </tr>
+      <tr>
+        <td>Données des membres actifs</td>
+        <td>Pendant la durée de l'adhésion + 3 ans après résiliation</td>
+      </tr>
+      <tr>
+        <td>Données des bénéficiaires PASSERELLES</td>
+        <td>Durée du programme + 5 ans (fins statistiques anonymisées au-delà)</td>
+      </tr>
+      <tr>
+        <td>Données des partenaires et donateurs</td>
+        <td>Durée contractuelle + 10 ans (obligations comptables et fiscales)</td>
+      </tr>
+      <tr>
+        <td>Données des participants aux événements</td>
+        <td>3 ans à compter de l'événement</td>
+      </tr>
+      <tr>
+        <td>Données de navigation (logs)</td>
+        <td>13 mois maximum</td>
+      </tr>
+    </table>
+
+    <h3>IV.4 — Droits des personnes concernées</h3>
+    <p>Exercables par courriel à <span class="bold">contact@mabellepromo.org</span> :</p>
+    <ul>
+      <li><span class="bold">Droit d'accès</span> : obtenir confirmation et copie des données traitées ;</li>
+      <li><span class="bold">Droit de rectification</span> : faire corriger des données inexactes ou incomplètes ;</li>
+      <li><span class="bold">Droit à l'effacement</span> : demander la suppression, sous réserve des obligations légales de conservation ;</li>
+      <li><span class="bold">Droit d'opposition</span> : s'opposer à un traitement fondé sur l'intérêt légitime ;</li>
+      <li><span class="bold">Droit à la limitation</span> : demander la suspension du traitement dans certains cas ;</li>
+      <li><span class="bold">Droit à la portabilité</span> : recevoir les données dans un format structuré et lisible par machine ;</li>
+      <li><span class="bold">Retrait du consentement</span> à tout moment, sans affecter la licéité des traitements antérieurs.</li>
+    </ul>
+    <p>MBP s'engage à répondre à toute demande dans un délai de <span class="bold">trente (30) jours</span>.</p>
+
+    <h3>IV.5 — Sécurité des données</h3>
+    <ul>
+      <li>Chiffrement des données en transit (HTTPS/TLS) et au repos ;</li>
+      <li>Authentification à deux facteurs pour les accès administrateurs ;</li>
+      <li>Contrôle des accès fondé sur le principe du moindre privilège ;</li>
+      <li>Sauvegardes régulières et sécurisées ;</li>
+      <li>Sensibilisation des personnes habilitées à accéder aux données.</li>
+    </ul>
+
+    <h3>IV.6 — Sous-traitants et transferts internationaux</h3>
+    <table class="tableau">
+      <tr>
+        <th>Sous-traitant</th>
+        <th>Rôle</th>
+        <th>Localisation</th>
+        <th>Garantie</th>
+      </tr>
+      <tr>
+        <td><span class="bold">Supabase Inc.</span></td>
+        <td>Hébergement base de données, authentification, stockage</td>
+        <td>UE (AWS Frankfurt)</td>
+        <td>DPA — supabase.com/privacy</td>
+      </tr>
+      <tr>
+        <td><span class="bold">Vercel Inc.</span></td>
+        <td>Hébergement et déploiement du site web</td>
+        <td>États-Unis / Edge mondial</td>
+        <td>DPA — vercel.com/legal</td>
+      </tr>
+      <tr>
+        <td><span class="bold">Brevo (ex-Sendinblue)</span></td>
+        <td>Envoi de courriels transactionnels et de communication</td>
+        <td>UE (France)</td>
+        <td>DPA — Clauses contractuelles types UE</td>
+      </tr>
+    </table>
+
+    <h3>IV.7 — Violation de données</h3>
+    <p>En cas de violation susceptible d'engendrer un risque pour les personnes concernées, MBP notifie le Partenaire dans les <span class="bold">72 heures</span> suivant la découverte, documente la violation et prend les mesures correctives nécessaires.</p>
+
+    <h3>IV.8 — Engagements du Partenaire</h3>
+    <ul>
+      <li>Ne pas collecter, stocker ou traiter de données personnelles de bénéficiaires, membres ou contacts de MBP sans accord écrit préalable ;</li>
+      <li>Informer MBP immédiatement en cas de violation ou soupçon de violation des données communiquées par MBP ;</li>
+      <li>Supprimer toute donnée personnelle de MBP dans les <span class="bold">trente (30) jours</span> suivant la fin de la convention, sur simple demande écrite.</li>
+    </ul>
+
+    <p class="annexe-pied">Annexe IV — Partie intégrante de la Convention de Partenariat N° <span class="champ">[N°]</span> signée le <span class="champ">[Date]</span></p>
+  </div>
+</div>
+
+</body>
+</html>
