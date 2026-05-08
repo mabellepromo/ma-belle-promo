@@ -408,7 +408,7 @@ export function genererAttestation(member) {
           <span class="sig-label">Signature et cachet</span>
           <div class="sig-area" style="background:transparent;border:none;padding:4px;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:80px;max-width:100%;object-fit:contain;display:block;margin:auto;"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;"
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name">La Présidente</span>
@@ -613,7 +613,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
           <span class="sig-label">Signature et cachet</span>
           <div class="sig-area" style="background:transparent;border:none;padding:4px;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:80px;max-width:100%;object-fit:contain;display:block;margin:auto;"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;"
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name">Pour l'Association</span>
