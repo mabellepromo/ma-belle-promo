@@ -39,7 +39,7 @@ const navItems = [
       { label: "Médiathèque", href: "/informations/mediatheque" },
       { label: "Documents", href: "/informations/documents" },
       { label: "Communiqués", href: "/informations/communiques" },
-      { label: "Contacts", href: "/informations/contacts" },
+      { label: "Contact", href: "/informations/contacts" },
     ],
   },
 ];
