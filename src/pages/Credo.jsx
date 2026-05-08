@@ -168,13 +168,15 @@ export default function Credo() {
                 <div className={`relative h-full bg-gradient-to-br ${v.gradient} border ${v.borderColor} rounded-3xl p-8 overflow-hidden transition-all duration-500 ${v.hoverBg} hover:shadow-2xl hover:border-opacity-60 flex flex-col`}>
                   
                   {/* Arrière-plan décoratif */}
-                  <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-10 transition-opacity duration-500">
+                  <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
                     <div className={`w-full h-full rounded-full ${v.accent}`} />
                   </div>
 
-                  {/* Numéro géant en filigrane */}
-                  <div className="absolute -bottom-8 -right-4 font-heading text-8xl font-black leading-none select-none pointer-events-none opacity-[0.08] transition-opacity group-hover:opacity-[0.12]">
-                    {v.numero}
+                  {/* Numéro géant en filigrane - Visible mais transparent */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                    <div className="font-heading text-8xl md:text-9xl font-black leading-none opacity-[0.15] transition-opacity group-hover:opacity-[0.25]">
+                      {v.numero}
+                    </div>
                   </div>
 
                   {/* Icône et accent bar */}
@@ -193,7 +195,7 @@ export default function Credo() {
                         }}>
                       {v.titre}
                     </h3>
-                    <p className="text-muted-foreground text-base leading-relaxed text-justify group-hover:text-foreground transition-colors duration-300">
+                    <p className="text-muted-foreground text-base leading-relaxed text-justify group-hover:text-foreground transition-colors duration-300 line-clamp-none">
                       {v.texte}
                     </p>
                   </div>
@@ -222,7 +224,7 @@ export default function Credo() {
           <div className="relative bg-gradient-to-r from-primary/5 via-primary/3 to-primary/5 border border-primary/20 rounded-3xl p-8 md:p-12 overflow-hidden group">
             
             {/* Décoration arrière-plan */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500">
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none">
               <div className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl" />
             </div>
 
