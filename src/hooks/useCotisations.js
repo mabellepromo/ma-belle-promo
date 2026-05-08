@@ -34,8 +34,9 @@ export function useCotisations(annee) {
         { member_id: String(memberId), annee, ...patch, updated_at: new Date().toISOString() },
         { onConflict: "member_id,annee" }
       );
-      if (error) toast.error("Erreur : " + error.message);
-      else await load();
+      if (error) { toast.error("Erreur : " + error.message); return false; }
+      await load();
+      return true;
     } finally {
       setSaving(false);
     }
@@ -62,8 +63,8 @@ export function useCotisations(annee) {
   }
 
   async function mettreAJour(memberId, patch) {
-    await upsert(memberId, patch);
-    toast.success("Mise à jour enregistrée.");
+    const ok = await upsert(memberId, patch);
+    if (ok) toast.success("Mise à jour enregistrée.");
   }
 
   return { cotisations, loading, saving, marquerPaye, marquerEnAttente, marquerExempte, mettreAJour, reload: load };
