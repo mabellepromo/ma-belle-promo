@@ -15,7 +15,7 @@ const PAGE_TITLES = {
   "/association/credo":          "Notre Credo",
   "/association/ambition":       "Notre Ambition",
   "/association/equipe":         "Notre Équipe",
-  "/association/sponsors":       "Nos Sponsors",
+  "/association/sponsors":       "Nos Partenaires",
   "/activites/evenements":       "Événements",
   "/activites/projets":          "Nos Réalisations",
   "/activites/programmes":       "Nos Programmes",

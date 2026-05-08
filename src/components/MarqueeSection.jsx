@@ -42,7 +42,7 @@ const ROW1 = [
   { label: "Notre Credo",        to: "/association/credo" },
   { label: "Notre Ambition",     to: "/association/ambition" },
   { label: "Notre Équipe",       to: "/association/equipe" },
-  { label: "Nos Sponsors",       to: "/association/sponsors" },
+  { label: "Nos Partenaires",    to: "/association/sponsors" },
   { label: "Événements",         to: "/activites/evenements" },
   { label: "Nos Projets",        to: "/activites/projets" },
   { label: "Nos Programmes",     to: "/activites/programmes" },

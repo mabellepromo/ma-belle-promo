@@ -196,7 +196,7 @@ export default function Dashboard() {
     { key: "projets",     label: "Projets",     icon: Star },
     { key: "programmes",  label: "Programmes",  icon: Tag },
     { key: "equipe",      label: "Équipe",      icon: UserCheck },
-    { key: "sponsors",    label: "Sponsors",    icon: Globe },
+    { key: "sponsors",    label: "Partenaires",  icon: Globe },
     { key: "communiques", label: "Communiqués", icon: Mail },
     { key: "mediatheque", label: "Médiathèque", icon: Image },
     { key: "documents",   label: "Documents",   icon: Download },
@@ -256,7 +256,7 @@ export default function Dashboard() {
       label: "Organisation",
       items: [
         { key: "equipe",   label: "Équipe",   icon: UserCheck },
-        { key: "sponsors", label: "Sponsors", icon: Globe },
+        { key: "sponsors", label: "Partenaires", icon: Globe },
       ],
     },
   ];

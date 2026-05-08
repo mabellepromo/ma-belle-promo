@@ -365,11 +365,11 @@ export function SponsorsSection() {
 
   return (
     <div>
-      <CrudHeader title="Sponsors & Partenaires" count={items.length} onAdd={() => setForm({ ...empty })} />
+      <CrudHeader title="Partenaires" count={items.length} onAdd={() => setForm({ ...empty })} />
       {form && (
-        <FormPanel title={form._editing ? "Modifier le sponsor" : "Nouveau sponsor"} onClose={() => setForm(null)} onSave={doSave}>
+        <FormPanel title={form._editing ? "Modifier le partenaire" : "Nouveau partenaire"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
-            <Field label="Nom du sponsor" required><input className={inp} value={form.nom} onChange={f("nom")} /></Field>
+            <Field label="Nom du partenaire" required><input className={inp} value={form.nom} onChange={f("nom")} /></Field>
             <Field label="Niveau"><select className={sel} value={form.niveau} onChange={f("niveau")}>{NIVEAUX.map(n => <option key={n}>{n}</option>)}</select></Field>
             <div className="md:col-span-2"><ImgField label="Logo" value={form.logo} onChange={v => setForm(p => ({ ...p, logo: v }))} /></div>
             <div className="md:col-span-2"><Field label="Site web"><input className={inp} type="url" value={form.url} onChange={f("url")} /></Field></div>
@@ -380,7 +380,7 @@ export function SponsorsSection() {
       {items.length === 0 && (
         <div className="text-center py-16 text-muted-foreground">
           <Globe className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Aucun sponsor. Cliquez sur <strong>+ Ajouter</strong> pour en créer un.</p>
+          <p className="text-sm">Aucun partenaire. Cliquez sur <strong>+ Ajouter</strong> pour en créer un.</p>
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

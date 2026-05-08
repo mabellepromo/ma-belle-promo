@@ -11,7 +11,7 @@ const navItems = [
       { label: "Notre Credo", href: "/association/credo" },
       { label: "Notre Ambition", href: "/association/ambition" },
       { label: "Notre Équipe", href: "/association/equipe" },
-      { label: "Nos Sponsors", href: "/association/sponsors" },
+      { label: "Nos Partenaires", href: "/association/sponsors" },
     ],
   },
   {

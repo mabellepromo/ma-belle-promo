@@ -21,11 +21,11 @@ export default function Sponsors() {
   return (
     <div>
       <SEO
-        title="Nos Sponsors"
+        title="Nos Partenaires"
         description="Les partenaires et mécènes de Ma Belle Promo. Rejoignez une aventure humaine authentique au service de l'avenir de l'Afrique."
         path="/association/sponsors"
       />
-      <PageHero title="Nos Sponsors" subtitle="L'Association — Partenaires & Mécènes" />
+      <PageHero title="Nos Partenaires" subtitle="L'Association — Partenaires & Mécènes" />
 
       {/* ── Section éditoriale ── */}
       <section
