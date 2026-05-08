@@ -320,6 +320,13 @@ export function genererAttestation(member) {
   const ref = refNumber("ATT", String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP");
   const titre = member.bureau ? "membre du Bureau" : "membre actif";
   const localisation = [member.ville, member.pays].filter(Boolean).join(", ");
+  const initiale = (member.nom || "M").charAt(0).toUpperCase();
+
+  const photoContent = member.photo
+    ? `<img src="${member.photo}" alt="Photo de ${member.nom}"
+           style="width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:top;display:block;"
+           onerror="this.style.display='none'" />`
+    : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#0a3d28,#1a7a4e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:30pt;font-family:'Cormorant Garamond',serif;font-weight:700;">${initiale}</div>`;
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -361,30 +368,48 @@ export function genererAttestation(member) {
         promotion 1994–2000, atteste par la présente que :
       </p>
 
-      <div class="info-box">
-        <div class="info-row full-width">
-          <span class="info-label">Nom complet</span>
-          <span class="info-value">${member.nom}</span>
+      <!-- Bloc membre : infos à gauche, photo à droite -->
+      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:10px;padding:22px 26px;display:flex;gap:30px;align-items:center;">
+
+        <!-- Grille d'informations -->
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:13px 26px;">
+          <div class="info-row full-width">
+            <span class="info-label">Nom complet</span>
+            <span class="info-value" style="font-size:14pt;">${member.nom}</span>
+          </div>
+          ${member.profession ? `
+          <div class="info-row">
+            <span class="info-label">Profession</span>
+            <span class="info-value">${member.profession}</span>
+          </div>` : ""}
+          ${localisation ? `
+          <div class="info-row">
+            <span class="info-label">Localisation</span>
+            <span class="info-value">${localisation}</span>
+          </div>` : ""}
+          ${member.email ? `
+          <div class="info-row">
+            <span class="info-label">Adresse e-mail</span>
+            <span class="info-value">${member.email}</span>
+          </div>` : ""}
+          <div class="info-row">
+            <span class="info-label">Qualité</span>
+            <span class="info-value" style="color:#0a3d28;text-transform:capitalize">${titre}</span>
+          </div>
         </div>
-        ${member.profession ? `
-        <div class="info-row">
-          <span class="info-label">Profession</span>
-          <span class="info-value">${member.profession}</span>
-        </div>` : ""}
-        ${localisation ? `
-        <div class="info-row">
-          <span class="info-label">Localisation</span>
-          <span class="info-value">${localisation}</span>
-        </div>` : ""}
-        ${member.email ? `
-        <div class="info-row">
-          <span class="info-label">Adresse e-mail</span>
-          <span class="info-value">${member.email}</span>
-        </div>` : ""}
-        <div class="info-row">
-          <span class="info-label">Qualité</span>
-          <span class="info-value" style="color:#0a3d28;text-transform:capitalize">${titre}</span>
+
+        <!-- Photo encadrée -->
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <!-- Anneau doré extérieur -->
+          <div style="width:120px;height:120px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#b8861a 0%,#e6b84a 50%,#b8861a 100%);box-shadow:0 4px 18px rgba(184,134,26,0.35);">
+            <!-- Anneau blanc intérieur + image -->
+            <div style="width:100%;height:100%;border-radius:50%;padding:2px;background:#fff;">
+              ${photoContent}
+            </div>
+          </div>
+          <span style="font-family:'Lato',sans-serif;font-size:6pt;font-weight:700;color:#9a8030;text-transform:uppercase;letter-spacing:0.12em;">Photo officielle</span>
         </div>
+
       </div>
 
       <p class="intro-text">
