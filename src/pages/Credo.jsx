@@ -16,67 +16,49 @@ const valeurs = [
     numero: "01",
     titre: "Amitié",
     texte: "Ma Belle Promo est avant tout une famille. Les liens d'amitié tissés sur les bancs de la Faculté de Droit de Lomé sont indéfectibles. Nous cultivons ces liens au fil des années, transformant les rencontres académiques en relations durables et authentiques.",
-    accent: "bg-rose-400",
-    accentDark: "bg-rose-500",
+    accent: "bg-yellow-400",
+    accentDark: "bg-yellow-500",
     Icon: Heart,
-    gradient: "from-rose-50 to-pink-50",
-    borderColor: "border-rose-200",
-    hoverBg: "hover:from-rose-100 hover:to-pink-100",
   },
   {
     numero: "02",
     titre: "Solidarité",
     texte: "Échange, partage et réciprocité sont les valeurs qui animent Ma Belle Promo. Nous avons vocation à être non seulement des ambassadrices et ambassadeurs de l'institution mais, du fait de nos expériences et talents, une source d'inspiration.",
-    accent: "bg-amber-400",
-    accentDark: "bg-amber-500",
+    accent: "bg-amber-500",
+    accentDark: "bg-amber-600",
     Icon: Handshake,
-    gradient: "from-amber-50 to-yellow-50",
-    borderColor: "border-amber-200",
-    hoverBg: "hover:from-amber-100 hover:to-yellow-100",
   },
   {
     numero: "03",
     titre: "Entraide",
     texte: "Nous contribuons activement à l'épanouissement de nos membres et à l'accompagnement des étudiants actuels de la Faculté de Droit. Partage de compétences, mentorat, soutien : l'entraide est au cœur de notre démarche collective.",
-    accent: "bg-emerald-500",
-    accentDark: "bg-emerald-600",
+    accent: "bg-green-500",
+    accentDark: "bg-green-600",
     Icon: Users,
-    gradient: "from-emerald-50 to-teal-50",
-    borderColor: "border-emerald-200",
-    hoverBg: "hover:from-emerald-100 hover:to-teal-100",
   },
   {
     numero: "04",
     titre: "Engagement communautaire",
     texte: "Ma Belle Promo s'ouvre sur sa communauté pour mener des actions concertées dans divers domaines : aide aux personnes vulnérables, soutien aux étudiants, actions solidaires. Nos leaders créent de l'impact positif et durable.",
-    accent: "bg-blue-400",
-    accentDark: "bg-blue-500",
+    accent: "bg-yellow-400",
+    accentDark: "bg-yellow-500",
     Icon: Globe,
-    gradient: "from-blue-50 to-cyan-50",
-    borderColor: "border-blue-200",
-    hoverBg: "hover:from-blue-100 hover:to-cyan-100",
   },
   {
     numero: "05",
     titre: "Excellence",
     texte: "Diplômés de la Faculté de Droit de l'Université de Lomé, nous portons haut le flambeau de l'excellence académique et professionnelle. Notre réseau rassemble des avocats, magistrats et professionnels reconnus.",
-    accent: "bg-violet-400",
-    accentDark: "bg-violet-500",
+    accent: "bg-amber-500",
+    accentDark: "bg-amber-600",
     Icon: Star,
-    gradient: "from-violet-50 to-purple-50",
-    borderColor: "border-violet-200",
-    hoverBg: "hover:from-violet-100 hover:to-purple-100",
   },
   {
     numero: "06",
     titre: "Ouverture sur le monde",
     texte: "Ma Belle Promo se veut un réseau ouvert sur le monde, facilitant le retour et l'intégration des membres de la diaspora, et permettant à ses membres de développer leurs contacts personnels et professionnels.",
-    accent: "bg-teal-400",
-    accentDark: "bg-teal-500",
+    accent: "bg-green-500",
+    accentDark: "bg-green-600",
     Icon: Compass,
-    gradient: "from-teal-50 to-cyan-50",
-    borderColor: "border-teal-200",
-    hoverBg: "hover:from-teal-100 hover:to-cyan-100",
   },
 ];
 
@@ -164,53 +146,35 @@ export default function Credo() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="group relative h-full"
               >
-                {/* Carte principale */}
-                <div className={`relative h-full bg-gradient-to-br ${v.gradient} border ${v.borderColor} rounded-3xl p-8 overflow-hidden transition-all duration-500 ${v.hoverBg} hover:shadow-2xl hover:border-opacity-60 flex flex-col`}
+                {/* Cadre extérieur avec liseret brillant */}
+                <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
                   style={{
-                    perspective: '1200px',
+                    background: `linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #00AA00 100%)`,
+                    padding: '2px',
+                  }}>
+                  <div className={`absolute inset-0 rounded-3xl`}
+                    style={{
+                      background: `linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #00AA00 100%)`,
+                      filter: 'blur(8px)',
+                      opacity: 0.6,
+                    }} />
+                </div>
+
+                {/* Carte principale */}
+                <div className={`relative h-full bg-white border-2 rounded-3xl p-8 overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col`}
+                  style={{
+                    borderImage: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #00AA00 100%) 1',
+                    boxShadow: '0 0 0 1px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.1)',
                   }}>
                   
                   {/* Arrière-plan décoratif */}
-                  <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
+                  <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none">
                     <div className={`w-full h-full rounded-full ${v.accent}`} />
                   </div>
 
-                  {/* Coin feuille - Haut droit */}
-                  <motion.div 
-                    className="absolute top-0 right-0 w-16 h-16 pointer-events-none"
-                    whileHover={{ 
-                      rotateY: 20,
-                    }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Triangle principal (coin plié) */}
-                    <div className={`absolute top-0 right-0 w-0 h-0 border-l-16 border-b-16 border-l-transparent ${v.accent} opacity-70 shadow-lg`}
-                      style={{
-                        borderLeft: '40px solid transparent',
-                        borderBottom: '40px solid currentColor',
-                        filter: 'drop-shadow(-2px 2px 3px rgba(0,0,0,0.15))',
-                      }}
-                    />
-                    
-                    {/* Pli intérieur (effet de profondeur) */}
-                    <div className={`absolute top-0 right-0 w-0 h-0 border-l-16 border-b-16 border-l-transparent opacity-50`}
-                      style={{
-                        borderLeft: '35px solid transparent',
-                        borderBottom: '35px solid rgba(255,255,255,0.4)',
-                      }}
-                    />
-
-                    {/* Ombre du pli */}
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{
-                        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                      }}
-                    />
-                  </motion.div>
-
                   {/* Numéro en bas à droite - Transparent */}
                   <div className="absolute bottom-6 right-6 pointer-events-none select-none">
-                    <span className="font-heading text-7xl font-black opacity-[0.15] transition-opacity group-hover:opacity-[0.25]">
+                    <span className="font-heading text-7xl font-black opacity-[0.08] transition-opacity group-hover:opacity-[0.12]">
                       {v.numero}
                     </span>
                   </div>
@@ -227,7 +191,7 @@ export default function Credo() {
                   <div className="relative z-10 flex-1 flex flex-col pr-12">
                     <h3 className="font-heading text-2xl font-bold text-foreground mb-3 group-hover:text-transparent group-hover:bg-clip-text transition-all duration-300" 
                         style={{
-                          backgroundImage: `linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))`,
+                          backgroundImage: `linear-gradient(135deg, #FFD700 0%, #00AA00 100%)`,
                         }}>
                       {v.titre}
                     </h3>
@@ -238,7 +202,10 @@ export default function Credo() {
                 </div>
 
                 {/* Lueur au survol */}
-                <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-20 ${v.accent} blur-xl transition-opacity duration-500 pointer-events-none -z-10`} />
+                <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-15 blur-xl transition-opacity duration-500 pointer-events-none -z-10`}
+                  style={{
+                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #00AA00 100%)',
+                  }} />
               </motion.div>
             );
           })}
@@ -282,12 +249,6 @@ export default function Credo() {
           </div>
         </motion.div>
       </section>
-
-      <style>{`
-        @supports (clip-path: polygon(0 0, 100% 0, 0 100%)) {
-          /* Support pour le coin plié */
-        }
-      `}</style>
     </div>
   );
 }
