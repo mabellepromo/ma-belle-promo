@@ -406,12 +406,12 @@ export function genererAttestation(member) {
         </div>
         <div class="signature-col">
           <span class="sig-label">Signature et cachet</span>
-          <div class="sig-area" style="background:transparent;border:none;padding:4px;">
+          <div style="height:100px;display:flex;align-items:center;overflow:visible;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;transform:translateX(-2cm);"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-4cm);"
                  onerror="this.style.display='none'" />
           </div>
-          <span class="sig-name">Fabienne SENAYA-ATAYI</span>
+          <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
           <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
         </div>
       </div>
@@ -611,12 +611,12 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
         </div>
         <div class="signature-col">
           <span class="sig-label">Signature et cachet</span>
-          <div class="sig-area" style="background:transparent;border:none;padding:4px;">
+          <div style="height:100px;display:flex;align-items:center;overflow:visible;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;transform:translateX(-2cm);"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-4cm);"
                  onerror="this.style.display='none'" />
           </div>
-          <span class="sig-name">Fabienne SENAYA-ATAYI</span>
+          <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
           <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
         </div>
       </div>
