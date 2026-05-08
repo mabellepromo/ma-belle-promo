@@ -411,8 +411,8 @@ export function genererAttestation(member) {
                  style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;"
                  onerror="this.style.display='none'" />
           </div>
-          <span class="sig-name">La Présidente</span>
-          <span class="sig-title">FDD Ma Belle Promo</span>
+          <span class="sig-name">Fabienne SENAYA-ATAYI</span>
+          <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
         </div>
       </div>
 
@@ -616,8 +616,8 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
                  style="max-height:120px;max-width:100%;object-fit:contain;display:block;margin:auto;"
                  onerror="this.style.display='none'" />
           </div>
-          <span class="sig-name">Pour l'Association</span>
-          <span class="sig-title">FDD Ma Belle Promo</span>
+          <span class="sig-name">Fabienne SENAYA-ATAYI</span>
+          <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
         </div>
       </div>
 
