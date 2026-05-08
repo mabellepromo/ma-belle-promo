@@ -209,6 +209,38 @@ export default function Sponsors() {
           </div>
         </div>
 
+        {/* RIB */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+          className="mb-10 border border-border rounded-2xl overflow-hidden"
+        >
+          <div className="px-6 py-4 bg-muted/40 border-b border-border flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-primary" />
+            <span className="font-heading font-bold text-sm text-foreground">Virement bancaire — Coordonnées</span>
+          </div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-border">
+            {[
+              { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
+              { label: "Banque", value: "ECOBANK Togo" },
+              { label: "Swift / BIC", value: "ECOCTGTGXXX", mono: true },
+            ].map(({ label, value, mono }) => (
+              <div key={label} className="px-5 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">{label}</p>
+                <p className={`text-sm font-semibold text-foreground ${mono ? "font-mono" : ""}`}>{value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-border px-5 py-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">IBAN</p>
+            <p className="text-sm font-semibold font-mono text-foreground tracking-wider">TG53 TG05 5017 1014 1766 3880 0153</p>
+          </div>
+          <div className="border-t border-border px-5 py-3 bg-muted/20">
+            <p className="text-xs text-muted-foreground">
+              Référence à indiquer : <span className="font-semibold text-foreground">PARTENARIAT MBP — [Votre nom] — [Année]</span>
+            </p>
+          </div>
+        </motion.div>
+
         {/* CTA */}
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}

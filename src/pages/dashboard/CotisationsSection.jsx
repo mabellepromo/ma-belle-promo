@@ -255,6 +255,32 @@ export default function CotisationsSection({ members }) {
         </div>
       )}
 
+      {/* RIB */}
+      <div className="rounded-xl border border-border bg-white overflow-hidden">
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/40 border-b border-border">
+          <Banknote className="w-3.5 h-3.5 text-primary" />
+          <span className="text-xs font-bold text-foreground uppercase tracking-wide">Coordonnées bancaires — ECOBANK Togo</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border text-xs">
+          <div className="px-4 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Titulaire</p>
+            <p className="font-semibold text-foreground">ASSOCIATION MA BELLE PROMO MBP</p>
+          </div>
+          <div className="px-4 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">IBAN</p>
+            <p className="font-mono font-semibold text-foreground tracking-wide">TG53TG0550171014176638800153</p>
+          </div>
+          <div className="px-4 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Swift / BIC</p>
+            <p className="font-mono font-semibold text-foreground">ECOCTGTGXXX</p>
+          </div>
+          <div className="px-4 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">N° de compte</p>
+            <p className="font-mono font-semibold text-foreground">141766388001</p>
+          </div>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {STAT_CARDS.map(({ label, value, icon: Icon, bg, text, bar }) => (
