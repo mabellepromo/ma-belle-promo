@@ -58,7 +58,7 @@ export default function Don() {
   const modesPaiement = [
     { id: "tmoney", label: "TMoney", detail: "+228 90 05 36 06" },
     { id: "flooz", label: "Flooz", detail: "+228 96 02 00 00" },
-    { id: "virement", label: "Virement bancaire", detail: "Ecobank Togo — RIB disponible sur demande" },
+    { id: "virement", label: "Virement bancaire", detail: "ECOBANK Togo · IBAN : TG53TG0550171014176638800153", notice: "Swift/BIC : ECOCTGTGXXX · N° compte : 141766388001" },
     { id: "especes", label: "Espèces / en personne", detail: "12 BP 335 Baguida, Lomé", notice: "Un reçu de don sera établi et remis au donateur à titre de justificatif." },
   ];
 
@@ -189,6 +189,29 @@ export default function Don() {
                 </button>
               ))}
             </div>
+
+            {mode === "virement" && (
+              <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
+                <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 text-xs font-bold uppercase tracking-widest text-primary">
+                  Coordonnées bancaires complètes
+                </div>
+                <div className="divide-y divide-border/60">
+                  {[
+                    { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
+                    { label: "Banque", value: "ECOBANK Togo" },
+                    { label: "IBAN", value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
+                    { label: "Swift / BIC", value: "ECOCTGTGXXX", mono: true },
+                    { label: "N° de compte", value: "141766388001", mono: true },
+                    { label: "Référence", value: "DON MBP — [Votre nom]" },
+                  ].map(({ label, value, mono }) => (
+                    <div key={label} className="flex items-baseline gap-3 px-4 py-2">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
+                      <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Donateur */}
