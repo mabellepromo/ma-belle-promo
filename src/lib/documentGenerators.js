@@ -515,7 +515,7 @@ export function genererAttestation(member) {
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · mabellepromo.vercel.app<br/>
+        FDD Ma Belle Promo · www.mabellepromo.org<br/>
         Document généré le ${today()} · Réf. ${ref}
       </div>
       <div class="footer-text" style="text-align:right">
@@ -720,7 +720,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · mabellepromo.vercel.app<br/>
+        FDD Ma Belle Promo · www.mabellepromo.org<br/>
         Document généré le ${today()} · Réf. ${ref}
       </div>
       <div class="footer-text" style="text-align:right">
