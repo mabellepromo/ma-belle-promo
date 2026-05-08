@@ -311,13 +311,14 @@ function openDoc(html) {
   const resolved = html
     .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
     .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
-  const blob = new Blob([resolved], { type: "text/html;charset=utf-8" });
-  const url  = URL.createObjectURL(blob);
-  const win  = window.open(url, "_blank");
+  const win = window.open("", "_blank");
   if (!win) {
     alert("Le navigateur a bloqué l'ouverture d'un nouvel onglet. Veuillez autoriser les popups pour ce site.");
+    return;
   }
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  win.document.write(resolved);
+  win.document.close();
+  win.focus();
 }
 
 export function genererAttestation(member) {
@@ -341,7 +342,7 @@ export function genererAttestation(member) {
   <style>${MBP_STYLE}</style>
 </head>
 <body>
-  <button class="no-print print-btn" onclick="window.print()">
+  <button class="no-print print-btn" onclick="window.focus();window.print()">
     🖨 Imprimer / Enregistrer PDF
   </button>
 
@@ -621,7 +622,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
   <style>${MBP_STYLE}</style>
 </head>
 <body>
-  <button class="no-print print-btn" onclick="window.print()">
+  <button class="no-print print-btn" onclick="window.focus();window.print()">
     🖨 Imprimer / Enregistrer PDF
   </button>
 
