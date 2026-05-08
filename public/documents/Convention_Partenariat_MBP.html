@@ -16,7 +16,12 @@
     --gris:        #555;
     --bordure:     #ccc;
   }
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
   body {
     font-family: "EB Garamond", "Times New Roman", serif;
     font-size: 11.5pt;
