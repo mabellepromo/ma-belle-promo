@@ -144,6 +144,21 @@ export default function Sponsors() {
       {/* ── Reste de la page ── */}
       <section className="py-20 max-w-5xl mx-auto px-6">
 
+        {/* Emplacements partenaires */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+          {[1,2,3,4,5,6,7,8].map((n) => (
+            <motion.div
+              key={n}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: n * 0.05 }}
+              className="h-24 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground/40 text-sm font-medium hover:border-primary/30 hover:text-primary/40 transition-colors"
+            >
+              Partenaire
+            </motion.div>
+          ))}
+        </div>
+
         {/* Niveaux de partenariat */}
         <div className="mb-16">
           <motion.h2
