@@ -432,20 +432,105 @@ export function genererAttestation(member) {
   openDoc(html);
 }
 
-export function genererRecu(member, annee, montant, datePaiement, modePaiement) {
-  const ref = refNumber("REC", `${annee}-${String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP"}`);
-  const montantNum = Number(montant) || 0;
-  const montantFormate = montantNum > 0 ? montantNum.toLocaleString("fr-FR") : "—";
+export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {
+  const ref      = refNumber("REC", `${annee}-${String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP"}`);
+  const verse    = Number(montant) || 0;
+  const attendu  = Number(montantAttendu) || verse;
+  const reste    = Math.max(0, attendu - verse);
+  const partiel  = statut === "partiel" || (verse > 0 && reste > 0);
+  const fmt      = n => n > 0 ? Number(n).toLocaleString("fr-FR") : "—";
+  const listeV   = Array.isArray(versements) && versements.length > 0 ? versements : null;
   const modeFormate = modePaiement
     ? modePaiement.charAt(0).toUpperCase() + modePaiement.slice(1)
     : "Non précisé";
+
+  // ── Tableau des versements (si multi-paiements) ──────────────────────────
+  const versementsHTML = listeV ? `
+    <div style="margin:16px 0 0;">
+      <div style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:8px;">
+        Détail des versements (${listeV.length})
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:9.5pt;">
+        <thead>
+          <tr style="background:#e8f5ee;">
+            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">#</th>
+            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Date</th>
+            <th style="padding:6px 10px;text-align:left;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Mode</th>
+            <th style="padding:6px 10px;text-align:right;font-size:7pt;color:#0a3d28;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${listeV.map((v, i) => `
+          <tr style="background:${i % 2 === 0 ? "#fff" : "#fafafa"};border-bottom:1px solid #eee;">
+            <td style="padding:6px 10px;color:#aaa;font-size:8pt;">${i + 1}</td>
+            <td style="padding:6px 10px;">${formatDate(v.date)}</td>
+            <td style="padding:6px 10px;text-transform:capitalize;">${v.mode || "—"}</td>
+            <td style="padding:6px 10px;text-align:right;font-weight:700;">${Number(v.montant).toLocaleString("fr-FR")} FCFA</td>
+          </tr>`).join("")}
+        </tbody>
+        <tfoot>
+          <tr style="background:#e8f5ee;border-top:2px solid #0a3d28;">
+            <td colspan="3" style="padding:8px 10px;font-weight:700;color:#0a3d28;font-family:'Lato',sans-serif;font-size:8pt;">Total versé à ce jour</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#0a3d28;font-family:'Cormorant Garamond',serif;font-size:12pt;">${fmt(verse)} FCFA</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>` : "";
+
+  // ── Bloc montant : bilan 3 colonnes (partiel) ou highlight vert (soldé) ──
+  const montantHTML = partiel ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0;">
+      <div style="background:#e8f5ee;border-radius:8px;padding:14px 10px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#0a3d28;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Versé</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#0a3d28;">${fmt(verse)}</div>
+        <div style="font-size:7pt;color:#666;margin-top:2px;">FCFA</div>
+      </div>
+      <div style="background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:14px 10px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Attendu</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#444;">${fmt(attendu)}</div>
+        <div style="font-size:7pt;color:#666;margin-top:2px;">FCFA</div>
+      </div>
+      <div style="background:#fff8e8;border:1px solid #f59e0b;border-radius:8px;padding:14px 10px;text-align:center;">
+        <div style="font-family:'Lato',sans-serif;font-size:7pt;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.10em;margin-bottom:6px;">Reste à payer</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16pt;font-weight:700;color:#b45309;">${fmt(reste)}</div>
+        <div style="font-size:7pt;color:#b45309;margin-top:2px;">FCFA</div>
+      </div>
+    </div>` : `
+    <div class="amount-highlight">
+      <div>
+        <div class="amount-label">Montant reçu — cotisation soldée</div>
+        <div style="font-family:'Lato',sans-serif;font-size:8pt;color:rgba(255,255,255,0.55);margin-top:3px;">Exercice ${annee} · Paiement complet</div>
+      </div>
+      <div class="amount-value">${fmt(verse)} FCFA</div>
+    </div>`;
+
+  // ── Notice adaptée ────────────────────────────────────────────────────────
+  const noticeHTML = partiel ? `
+    <div class="notice-box">
+      <p>Ce reçu atteste un <strong style="color:#6b4c00">versement partiel</strong> de <strong style="color:#6b4c00">${fmt(verse)} FCFA</strong>
+      au titre de la cotisation ${annee}. Le solde de <strong style="color:#6b4c00">${fmt(reste)} FCFA</strong> reste dû.
+      Un nouveau reçu sera émis à réception de chaque versement complémentaire.</p>
+    </div>` : `
+    <div class="notice-box">
+      <p>Ce reçu constitue la preuve officielle du règlement <strong style="color:#6b4c00">complet</strong>
+      de la cotisation de l'exercice <strong style="color:#6b4c00">${annee}</strong>.
+      Conservez-le précieusement. Pour toute question, contactez le trésorier de l'association.</p>
+    </div>`;
+
+  // ── Badge statut ──────────────────────────────────────────────────────────
+  const badgeHTML = partiel
+    ? `<span style="display:inline-block;margin-top:8px;background:#fff8e8;border:1px solid #f59e0b;border-radius:4px;padding:3px 12px;font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#b45309;letter-spacing:0.08em;text-transform:uppercase;">PAIEMENT PARTIEL</span>`
+    : `<span style="display:inline-block;margin-top:8px;background:#e8f5ee;border:1px solid #0a3d28;border-radius:4px;padding:3px 12px;font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#0a3d28;letter-spacing:0.08em;text-transform:uppercase;">✓ COTISATION SOLDÉE</span>`;
+
+  const dateLabel = listeV ? "Dernier versement" : "Date de paiement";
+  const modeLabel = listeV ? "Mode (dernier versement)" : "Mode de règlement";
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reçu de cotisation ${annee} — ${member.nom}</title>
+  <title>${partiel ? "Reçu partiel" : "Reçu"} cotisation ${annee} — ${member.nom}</title>
   <style>${MBP_STYLE}</style>
 </head>
 <body>
@@ -470,8 +555,9 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement) 
     <div class="doc-body">
 
       <div class="doc-title-block">
-        <div class="doc-title">Reçu de Cotisation</div>
+        <div class="doc-title">${partiel ? "Reçu de Versement Partiel" : "Reçu de Cotisation"}</div>
         <div class="doc-ref">Réf. : ${ref} · Émis le ${today()}</div>
+        ${badgeHTML}
       </div>
 
       <p class="intro-text">
@@ -495,11 +581,11 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement) 
           <span class="info-value">${annee}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Date de paiement</span>
+          <span class="info-label">${dateLabel}</span>
           <span class="info-value">${formatDate(datePaiement)}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Mode de règlement</span>
+          <span class="info-label">${modeLabel}</span>
           <span class="info-value">${modeFormate}</span>
         </div>
         <div class="info-row">
@@ -508,20 +594,9 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement) 
         </div>
       </div>
 
-      <div class="amount-highlight">
-        <div>
-          <div class="amount-label">Montant reçu</div>
-          <div style="font-family:'Lato',sans-serif;font-size:8pt;color:rgba(255,255,255,0.55);margin-top:3px">Cotisation annuelle — exercice ${annee}</div>
-        </div>
-        <div class="amount-value">${montantFormate} FCFA</div>
-      </div>
-
-      <div class="notice-box">
-        <p>
-          Ce reçu constitue la preuve officielle du règlement de la cotisation de l'exercice <strong style="color:#6b4c00">${annee}</strong>.
-          Conservez-le précieusement. Pour toute question, contactez le trésorier de l'association.
-        </p>
-      </div>
+      ${versementsHTML}
+      ${montantHTML}
+      ${noticeHTML}
 
       <div class="signature-block">
         <div class="signature-col">
