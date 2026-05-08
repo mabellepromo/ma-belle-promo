@@ -408,7 +408,7 @@ export function genererAttestation(member) {
           <span class="sig-label">Signature et cachet</span>
           <div style="height:100px;display:flex;align-items:center;overflow:visible;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-4cm);"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm);"
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
@@ -613,7 +613,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
           <span class="sig-label">Signature et cachet</span>
           <div style="height:100px;display:flex;align-items:center;overflow:visible;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-4cm);"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm);"
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
