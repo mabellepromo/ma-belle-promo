@@ -165,12 +165,48 @@ export default function Credo() {
                 className="group relative h-full"
               >
                 {/* Carte principale */}
-                <div className={`relative h-full bg-gradient-to-br ${v.gradient} border ${v.borderColor} rounded-3xl p-8 overflow-hidden transition-all duration-500 ${v.hoverBg} hover:shadow-2xl hover:border-opacity-60 flex flex-col`}>
+                <div className={`relative h-full bg-gradient-to-br ${v.gradient} border ${v.borderColor} rounded-3xl p-8 overflow-hidden transition-all duration-500 ${v.hoverBg} hover:shadow-2xl hover:border-opacity-60 flex flex-col`}
+                  style={{
+                    perspective: '1200px',
+                  }}>
                   
                   {/* Arrière-plan décoratif */}
                   <div className="absolute top-0 right-0 w-40 h-40 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
                     <div className={`w-full h-full rounded-full ${v.accent}`} />
                   </div>
+
+                  {/* Coin feuille - Haut droit */}
+                  <motion.div 
+                    className="absolute top-0 right-0 w-16 h-16 pointer-events-none"
+                    whileHover={{ 
+                      rotateY: 20,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Triangle principal (coin plié) */}
+                    <div className={`absolute top-0 right-0 w-0 h-0 border-l-16 border-b-16 border-l-transparent ${v.accent} opacity-70 shadow-lg`}
+                      style={{
+                        borderLeft: '40px solid transparent',
+                        borderBottom: '40px solid currentColor',
+                        filter: 'drop-shadow(-2px 2px 3px rgba(0,0,0,0.15))',
+                      }}
+                    />
+                    
+                    {/* Pli intérieur (effet de profondeur) */}
+                    <div className={`absolute top-0 right-0 w-0 h-0 border-l-16 border-b-16 border-l-transparent opacity-50`}
+                      style={{
+                        borderLeft: '35px solid transparent',
+                        borderBottom: '35px solid rgba(255,255,255,0.4)',
+                      }}
+                    />
+
+                    {/* Ombre du pli */}
+                    <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
+                      }}
+                    />
+                  </motion.div>
 
                   {/* Numéro en bas à droite - Transparent */}
                   <div className="absolute bottom-6 right-6 pointer-events-none select-none">
@@ -246,6 +282,12 @@ export default function Credo() {
           </div>
         </motion.div>
       </section>
+
+      <style>{`
+        @supports (clip-path: polygon(0 0, 100% 0, 0 100%)) {
+          /* Support pour le coin plié */
+        }
+      `}</style>
     </div>
   );
 }
