@@ -10,10 +10,18 @@ const tarifs = [
   { type: "Membre bienfaiteur", montant: "Libre", periode: "contribution", detail: "Pour toute personne souhaitant soutenir l'association sans être diplômée de la FDD." },
 ];
 
-const modalites = [
+const autresModalites = [
   { icon: Phone, titre: "Mobile Money", detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92", color: "bg-orange-50 border-orange-200" },
-  { icon: Building, titre: "Virement bancaire", detail: <>Nous contacter pour les coordonnées bancaires via notre <Link to="/informations/contacts" className="text-blue-600 font-medium hover:underline">formulaire de contact</Link></>, color: "bg-blue-50 border-blue-200" },
   { icon: CreditCard, titre: "En personne", detail: "Règlement possible directement au siège : 12 BP 335 Baguida, Togo", color: "bg-green-50 border-green-200" },
+];
+
+const rib = [
+  { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
+  { label: "Banque", value: "ECOBANK Togo" },
+  { label: "IBAN", value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
+  { label: "Swift / BIC", value: "ECOCTGTGXXX", mono: true },
+  { label: "N° de compte", value: "141766388001", mono: true },
+  { label: "Référence", value: "COTISATION MBP — [Votre nom] — [Année]" },
 ];
 
 const inclus = [
@@ -56,8 +64,28 @@ export default function Cotisation() {
         {/* Modalités de paiement */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-16">
           <h2 className="font-heading text-2xl font-bold text-foreground text-center mb-10">Modalités de paiement</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {modalites.map((m) => (
+
+          {/* Virement bancaire — carte pleine largeur */}
+          <div className="border-2 border-blue-200 bg-blue-50 rounded-2xl overflow-hidden mb-6">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-blue-200">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+                <Building className="w-6 h-6 text-foreground" />
+              </div>
+              <h3 className="font-heading font-bold text-foreground text-lg">Virement bancaire</h3>
+            </div>
+            <div className="divide-y divide-blue-100">
+              {rib.map(({ label, value, mono }) => (
+                <div key={label} className="flex items-baseline gap-4 px-6 py-3">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 w-32 flex-shrink-0">{label}</span>
+                  <span className={`text-sm font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Money + En personne */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {autresModalites.map((m) => (
               <div key={m.titre} className={`border-2 rounded-2xl p-6 ${m.color}`}>
                 <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4 shadow-sm">
                   <m.icon className="w-6 h-6 text-foreground" />
