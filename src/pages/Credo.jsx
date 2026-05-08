@@ -82,7 +82,7 @@ const valeurs = [
 
 export default function Credo() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <SEO 
         title="Notre Credo" 
         description="Les valeurs fondatrices de Ma Belle Promo : amitié, solidarité et entraide au service des anciens diplômés de la FDD de l'Université de Lomé." 
@@ -135,7 +135,7 @@ export default function Credo() {
       </div>
 
       {/* ── Grille des valeurs REDESIGNÉE ── */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
+      <section className="max-w-7xl mx-auto px-6 py-24 overflow-x-hidden">
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -172,11 +172,11 @@ export default function Credo() {
                     <div className={`w-full h-full rounded-full ${v.accent}`} />
                   </div>
 
-                  {/* Numéro géant en filigrane - Visible mais transparent */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                    <div className="font-heading text-8xl md:text-9xl font-black leading-none opacity-[0.15] transition-opacity group-hover:opacity-[0.25]">
+                  {/* Numéro en bas à droite - Transparent */}
+                  <div className="absolute bottom-6 right-6 pointer-events-none select-none">
+                    <span className="font-heading text-7xl font-black opacity-[0.15] transition-opacity group-hover:opacity-[0.25]">
                       {v.numero}
-                    </div>
+                    </span>
                   </div>
 
                   {/* Icône et accent bar */}
@@ -188,21 +188,16 @@ export default function Credo() {
                   </div>
 
                   {/* Contenu */}
-                  <div className="relative z-10 flex-1 flex flex-col">
+                  <div className="relative z-10 flex-1 flex flex-col pr-12">
                     <h3 className="font-heading text-2xl font-bold text-foreground mb-3 group-hover:text-transparent group-hover:bg-clip-text transition-all duration-300" 
                         style={{
                           backgroundImage: `linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))`,
                         }}>
                       {v.titre}
                     </h3>
-                    <p className="text-muted-foreground text-base leading-relaxed text-justify group-hover:text-foreground transition-colors duration-300 line-clamp-none">
+                    <p className="text-muted-foreground text-base leading-relaxed text-justify group-hover:text-foreground transition-colors duration-300">
                       {v.texte}
                     </p>
-                  </div>
-
-                  {/* Ligne accent animée au bas */}
-                  <div className="relative z-10 mt-6 pt-6 border-t border-current border-opacity-10">
-                    <div className={`w-0 h-1 ${v.accent} rounded-full group-hover:w-12 transition-all duration-500`} />
                   </div>
                 </div>
 
