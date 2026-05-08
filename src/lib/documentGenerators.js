@@ -313,12 +313,23 @@ function openDoc(html) {
     .replace(/src="\/images\/FDD\.png"/g, `src="${origin}/images/FDD.png"`);
   const win = window.open("", "_blank");
   if (!win) {
-    alert("Le navigateur a bloqué l'ouverture d'un nouvel onglet. Veuillez autoriser les popups pour ce site.");
+    alert("Popups bloqués — autorisez les popups pour mabellepromo.org (icône dans la barre d'adresse) et réessayez.");
     return;
   }
   win.document.write(resolved);
   win.document.close();
   win.focus();
+
+  // Lier le bouton et déclencher l'impression depuis le contexte parent
+  // (window.print() dans un popup est bloqué par Chrome — appel parent requis)
+  const doPrint = () => { try { win.focus(); win.print(); } catch (e) { /* silent */ } };
+  setTimeout(() => {
+    try {
+      const btn = win.document.querySelector(".print-btn");
+      if (btn) btn.onclick = doPrint;
+    } catch (e) { /* silent */ }
+    doPrint();
+  }, 600);
 }
 
 export function genererAttestation(member) {
@@ -342,7 +353,7 @@ export function genererAttestation(member) {
   <style>${MBP_STYLE}</style>
 </head>
 <body>
-  <button class="no-print print-btn" onclick="window.focus();window.print()">
+  <button class="no-print print-btn" type="button">
     🖨 Imprimer / Enregistrer PDF
   </button>
 
@@ -622,7 +633,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
   <style>${MBP_STYLE}</style>
 </head>
 <body>
-  <button class="no-print print-btn" onclick="window.focus();window.print()">
+  <button class="no-print print-btn" type="button">
     🖨 Imprimer / Enregistrer PDF
   </button>
 
