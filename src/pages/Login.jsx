@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { supabase } from "../lib/supabase";
-import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowLeft, Send } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowLeft, Send, Home } from "lucide-react";
 
 export default function Login() {
   const { login } = useLocalAuth();
@@ -108,7 +108,7 @@ export default function Login() {
             alt="Ma Belle Promo"
             className="w-20 h-20 mx-auto mb-4 drop-shadow-lg"
           />
-          <h1 className="text-3xl font-black text-white">Ma Belle Promo</h1>
+          <h1 className="text-3xl font-black text-white">Association Ma Belle Promo</h1>
           <p className="text-emerald-400 text-sm mt-1 font-medium tracking-wide">
             FDD · Université de Lomé · 1994–2000
           </p>
@@ -269,9 +269,17 @@ export default function Login() {
 
         </motion.div>
 
-        <p className="text-center text-gray-600 text-xs mt-6">
-          © 2018–2026 Ma Belle Promo · FDD Université de Lomé
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-1.5 mx-auto text-gray-400 hover:text-emerald-400 text-sm transition-colors"
+          >
+            <Home className="w-3.5 h-3.5" /> Retour à l'accueil
+          </button>
+          <p className="text-gray-600 text-xs">
+            © 2018–2026 Ma Belle Promo · FDD Université de Lomé
+          </p>
+        </div>
       </div>
     </div>
   );
