@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut } from "lucide-react";
+import {
+  Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut,
+  BookOpen, Target, Users, Building2,
+  Calendar, FolderOpen, ListTodo,
+  UserPlus, CreditCard, Heart,
+  Newspaper, Image, Film, FileText, MessageSquare, Mail,
+} from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalAuth } from "@/lib/LocalAuth";
@@ -8,38 +14,38 @@ const navItems = [
   {
     label: "L'Association",
     children: [
-      { label: "Notre Credo", href: "/association/credo" },
-      { label: "Notre Ambition", href: "/association/ambition" },
-      { label: "Notre Équipe", href: "/association/equipe" },
-      { label: "Nos Partenaires", href: "/association/sponsors" },
+      { icon: BookOpen,  label: "Notre Credo",      href: "/association/credo",    desc: "Nos valeurs fondatrices" },
+      { icon: Target,    label: "Notre Ambition",    href: "/association/ambition", desc: "But & objectifs" },
+      { icon: Users,     label: "Notre Équipe",      href: "/association/equipe",   desc: "Le bureau directeur" },
+      { icon: Building2, label: "Nos Partenaires",   href: "/association/sponsors", desc: "Institutions & soutiens" },
     ],
   },
   {
     label: "Activités",
     children: [
-      { label: "Événements", href: "/activites/evenements" },
-      { label: "Projets", href: "/activites/projets" },
-      { label: "Programmes", href: "/activites/programmes" },
+      { icon: Calendar,    label: "Événements", href: "/activites/evenements", desc: "Agenda et compte-rendus" },
+      { icon: FolderOpen,  label: "Projets",    href: "/activites/projets",    desc: "Nos initiatives en cours" },
+      { icon: ListTodo,    label: "Programmes", href: "/activites/programmes", desc: "Plan d'action 2026" },
     ],
   },
   {
     label: "Implications",
     children: [
-      { label: "Adhérents", href: "/annuaire" },
-      { label: "Adhésion", href: "/implications/adhesion" },
-      { label: "Cotisation", href: "/implications/cotisation" },
-      { label: "Nous Soutenir", href: "/implications/soutenir" },
+      { icon: Users,       label: "Adhérents",      href: "/annuaire",                desc: "Annuaire des membres" },
+      { icon: UserPlus,    label: "Adhésion",        href: "/implications/adhesion",   desc: "Rejoindre l'association" },
+      { icon: CreditCard,  label: "Cotisation",      href: "/implications/cotisation", desc: "Gérer sa cotisation" },
+      { icon: Heart,       label: "Nous Soutenir",   href: "/implications/soutenir",   desc: "Faire un don" },
     ],
   },
   {
     label: "Informations",
     children: [
-      { label: "Actualités", href: "/informations/actualites" },
-      { label: "Galeries membres", href: "/galeries", membersOnly: true },
-      { label: "Médiathèque", href: "/informations/mediatheque" },
-      { label: "Documents", href: "/informations/documents" },
-      { label: "Communiqués", href: "/informations/communiques" },
-      { label: "Contact", href: "/informations/contacts" },
+      { icon: Newspaper,       label: "Actualités",       href: "/informations/actualites",  desc: "Dernières nouvelles" },
+      { icon: Image,           label: "Galeries membres",  href: "/galeries", membersOnly: true, desc: "Photos & albums" },
+      { icon: Film,            label: "Médiathèque",       href: "/informations/mediatheque", desc: "Vidéos & ressources" },
+      { icon: FileText,        label: "Documents",         href: "/informations/documents",   desc: "Docs officiels" },
+      { icon: MessageSquare,   label: "Communiqués",       href: "/informations/communiques", desc: "Communiqués officiels" },
+      { icon: Mail,            label: "Contact",           href: "/informations/contacts",    desc: "Nous écrire" },
     ],
   },
 ];
@@ -127,39 +133,49 @@ function DesktopDropdown({ item }) {
 
               {/* Items en cascade */}
               <div className="py-1.5">
-                {item.children.map((child, i) => (
-                  <motion.div
-                    key={child.label}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.10 + i * 0.055, duration: 0.25, ease: "easeOut" }}
-                  >
-                    <Link
-                      to={child.href}
-                      onClick={() => setOpen(false)}
-                      className="group flex items-center gap-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 whitespace-nowrap"
-                      style={{ color: "rgba(255,255,255,0.60)" }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.color = "#ffffff";
-                        e.currentTarget.style.background = "rgba(52,211,153,0.09)";
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.color = "rgba(255,255,255,0.60)";
-                        e.currentTarget.style.background = "transparent";
-                      }}
+                {item.children.map((child, i) => {
+                  const Icon = child.icon;
+                  return (
+                    <motion.div
+                      key={child.label}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.10 + i * 0.055, duration: 0.25, ease: "easeOut" }}
                     >
-                      {/* Point marqueur */}
-                      <span style={{
-                        width: 5, height: 5, borderRadius: "50%", flexShrink: 0,
-                        background: "rgba(52,211,153,0.40)",
-                        transition: "background 0.15s, transform 0.15s",
-                      }}
-                        className="group-hover:!bg-emerald-400 group-hover:scale-125"
-                      />
-                      {child.label}
-                    </Link>
-                  </motion.div>
-                ))}
+                      <Link
+                        to={child.href}
+                        onClick={() => setOpen(false)}
+                        className="group flex items-center gap-3 px-5 py-2.5 transition-all duration-150"
+                        style={{ color: "rgba(255,255,255,0.65)" }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.color = "#ffffff";
+                          e.currentTarget.style.background = "rgba(52,211,153,0.09)";
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.color = "rgba(255,255,255,0.65)";
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        {Icon && (
+                          <div
+                            className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: "rgba(52,211,153,0.08)" }}
+                          >
+                            <Icon className="w-3.5 h-3.5" style={{ color: "rgba(52,211,153,0.65)" }} />
+                          </div>
+                        )}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-medium leading-tight whitespace-nowrap">{child.label}</span>
+                          {child.desc && (
+                            <span className="text-[11px] leading-tight mt-0.5 whitespace-nowrap" style={{ color: "rgba(255,255,255,0.32)" }}>
+                              {child.desc}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
               </div>
 
               {/* Ligne décorative en bas */}

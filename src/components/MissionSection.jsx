@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Users, GraduationCap, Heart, Target } from "lucide-react";
+import { BookOpen, Target, ArrowRight } from "lucide-react";
 
 const MotionLink = motion(Link);
 
@@ -12,21 +12,38 @@ const GLOW_CSS = `
   .btn-glow { animation: glow-pulse 2.4s ease-in-out infinite; }
 `;
 
-const MISSIONS = [
+const TILES = [
   {
-    icon: Users,
-    title: "Créer un réseau vivant et utile",
-    desc: "Favoriser le partage d'expérience, renforcer les liens professionnels et personnels, et offrir à chaque membre un cadre d'échanges constructifs.",
+    icon: BookOpen,
+    color: "primary",
+    title: "Notre Credo",
+    href: "/association/credo",
+    desc: "Les 6 valeurs fondatrices qui définissent l'identité et l'âme de Ma Belle Promo.",
+    tags: ["Amitié", "Solidarité", "Entraide", "Excellence"],
+    cta: "Découvrir nos valeurs",
+    tagStyle: "bg-primary/10 text-primary border-primary/20",
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
+    hoverBorder: "hover:border-primary/40",
+    hoverTitle: "group-hover:text-primary",
+    ctaColor: "text-primary",
+    accentBg: "bg-primary/5 group-hover:bg-primary/10",
   },
   {
-    icon: GraduationCap,
-    title: "Soutenir les étudiants et la Faculté de Droit",
-    desc: "Mentorat, accompagnement, aides diverses, formations, opportunités professionnelles… Nous mettons notre expérience au service de la nouvelle génération.",
-  },
-  {
-    icon: Heart,
-    title: "Agir pour les populations vulnérables",
-    desc: "À travers des actions caritatives et des initiatives citoyennes, nous contribuons à améliorer le quotidien des plus fragiles.",
+    icon: Target,
+    color: "accent",
+    title: "Notre Ambition",
+    href: "/association/ambition",
+    desc: "Notre but, nos objectifs et notre vision à moyen terme pour l'association et ses membres.",
+    tags: ["Réseau", "Mentorat", "Communauté", "Impact"],
+    cta: "Découvrir notre ambition",
+    tagStyle: "bg-accent/10 text-accent border-accent/20",
+    iconBg: "bg-accent/10",
+    iconColor: "text-accent",
+    hoverBorder: "hover:border-accent/40",
+    hoverTitle: "group-hover:text-accent",
+    ctaColor: "text-accent",
+    accentBg: "bg-accent/5 group-hover:bg-accent/10",
   },
 ];
 
@@ -129,41 +146,63 @@ export default function MissionSection() {
           </motion.div>
         </div>
 
-        {/* ── Bloc 2 : Notre mission ── */}
+        {/* ── Bloc 2 : Credo & Ambition — 2 tuiles de navigation ── */}
         <div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
-            <span className="eyebrow text-accent">Notre mission</span>
+            <span className="eyebrow text-accent">L'Association</span>
             <h3 className="mt-3 font-heading text-2xl md:text-4xl font-bold text-foreground">
-              Ce qui nous anime au quotidien
+              En savoir plus sur Ma Belle Promo
             </h3>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {MISSIONS.map(({ icon: Icon, title, desc }, i) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {TILES.map(({ icon: Icon, title, href, desc, tags, cta, tagStyle, iconBg, iconColor, hoverBorder, hoverTitle, ctaColor, accentBg }, i) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.15 }}
-                className="group relative bg-card border border-border rounded-2xl p-7 hover:border-primary/40 hover:shadow-lg transition-all duration-300"
+                whileHover={shouldReduce ? undefined : { y: -4 }}
               >
-                {/* Accent de coin */}
-                <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full rounded-tr-2xl bg-primary/5 group-hover:bg-primary/10 transition-colors" />
+                <Link
+                  to={href}
+                  className={`group relative flex flex-col h-full bg-card border border-border rounded-2xl p-8 overflow-hidden ${hoverBorder} hover:shadow-xl transition-all duration-300`}
+                >
+                  {/* Cercle décoratif en arrière-plan */}
+                  <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full transition-colors duration-300 ${accentBg}`} />
 
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-heading font-bold text-foreground text-lg leading-snug mb-3">
-                  {title}
-                </h4>
-                <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
+                  <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center mb-5 relative z-10`}>
+                    <Icon className={`w-6 h-6 ${iconColor}`} />
+                  </div>
+
+                  <h4 className={`font-heading text-xl font-bold text-foreground mb-2 transition-colors ${hoverTitle} relative z-10`}>
+                    {title}
+                  </h4>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-5 relative z-10">
+                    {desc}
+                  </p>
+
+                  {/* Tags aperçu */}
+                  <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                    {tags.map(tag => (
+                      <span key={tag} className={`px-2.5 py-1 rounded-full text-xs font-medium border ${tagStyle}`}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className={`mt-auto flex items-center gap-1.5 text-sm font-semibold relative z-10 ${ctaColor}`}>
+                    {cta}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -177,7 +216,6 @@ export default function MissionSection() {
           transition={{ duration: 0.7 }}
           className="relative overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 px-8 py-12 md:px-16 md:py-14 text-center"
         >
-          {/* Cercles décoratifs */}
           <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full bg-primary/8 -z-10" />
           <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-accent/8 -z-10" />
 
