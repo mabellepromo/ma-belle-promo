@@ -14,6 +14,22 @@ const GLOW_CSS = `
 
 const TILES = [
   {
+    icon: Scale,
+    color: "blue",
+    title: "Notre Statut",
+    href: "/mentions-legales",
+    desc: "Association à but non lucratif dotée de la personnalité morale, constituée conformément à la législation togolaise. Récépissé N°0920/MATDCL-SG-DLPAP-DOCA, délivré le 03 octobre 2019.",
+    tags: ["ABNL", "Personnalité morale", "FDD · UL", "Depuis 2019"],
+    cta: "Consulter nos mentions légales",
+    tagStyle: "bg-blue-50 text-blue-700 border-blue-200",
+    iconBg: "bg-blue-50",
+    iconColor: "text-blue-600",
+    hoverBorder: "hover:border-blue-300",
+    hoverTitle: "group-hover:text-blue-700",
+    ctaColor: "text-blue-600",
+    accentBg: "bg-blue-50/50 group-hover:bg-blue-50",
+  },
+  {
     icon: BookOpen,
     color: "primary",
     title: "Notre Credo",
@@ -44,22 +60,6 @@ const TILES = [
     hoverTitle: "group-hover:text-accent",
     ctaColor: "text-accent",
     accentBg: "bg-accent/5 group-hover:bg-accent/10",
-  },
-  {
-    icon: Scale,
-    color: "blue",
-    title: "Notre Statut",
-    href: "/mentions-legales",
-    desc: "Association à but non lucratif dotée de la personnalité morale, constituée conformément à la législation togolaise, à fins exclusivement désintéressées.",
-    tags: ["ABNL", "Personnalité morale", "FDD · UL", "Depuis 2019"],
-    cta: "Consulter nos mentions légales",
-    tagStyle: "bg-blue-50 text-blue-700 border-blue-200",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    hoverBorder: "hover:border-blue-300",
-    hoverTitle: "group-hover:text-blue-700",
-    ctaColor: "text-blue-600",
-    accentBg: "bg-blue-50/50 group-hover:bg-blue-50",
   },
 ];
 
