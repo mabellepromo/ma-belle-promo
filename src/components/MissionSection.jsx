@@ -194,13 +194,14 @@ export default function MissionSection() {
                   {/* Cercle décoratif en arrière-plan */}
                   <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full transition-colors duration-300 ${accentBg}`} />
 
-                  <div className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center mb-3 relative z-10`}>
-                    <Icon className={`w-5 h-5 ${iconColor}`} />
+                  <div className="flex items-center gap-3 mb-3 relative z-10">
+                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg ${iconBg} flex items-center justify-center`}>
+                      <Icon className={`w-5 h-5 ${iconColor}`} />
+                    </div>
+                    <h4 className={`font-heading text-lg font-bold text-foreground transition-colors ${hoverTitle}`}>
+                      {title}
+                    </h4>
                   </div>
-
-                  <h4 className={`font-heading text-lg font-bold text-foreground mb-1.5 transition-colors ${hoverTitle} relative z-10`}>
-                    {title}
-                  </h4>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-3 relative z-10">
                     {desc}
                   </p>
