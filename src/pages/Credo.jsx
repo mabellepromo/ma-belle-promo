@@ -44,7 +44,7 @@ const valeurs = [
 ];
 
 const DM_SANS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap";
-const BODY_STYLE = { fontFamily: "'DM Sans', sans-serif", fontSize: "14px", lineHeight: "1.50" };
+const BODY_STYLE = { fontFamily: "'DM Sans', sans-serif", fontSize: "15px", lineHeight: "1.50" };
 
 export default function Credo() {
   useEffect(() => {
