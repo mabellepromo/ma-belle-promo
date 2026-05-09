@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -43,20 +42,7 @@ const valeurs = [
   },
 ];
 
-const FONTS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap";
-const BODY_STYLE     = { fontFamily: "'DM Sans', sans-serif",          fontSize: "15px", lineHeight: "1.50" };
-const BODY_STYLE_PJS = { fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "15px", lineHeight: "1.50" };
-
 export default function Credo() {
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.id = "dm-sans-test";
-    link.rel = "stylesheet";
-    link.href = FONTS_URL;
-    document.head.appendChild(link);
-    return () => document.getElementById("dm-sans-test")?.remove();
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       <SEO title="Notre Credo" description="Les valeurs fondatrices de Ma Belle Promo : amitié, solidarité et entraide au service des anciens diplômés de la FDD de l'Université de Lomé." />
@@ -141,7 +127,7 @@ export default function Credo() {
               <h3 className="font-heading text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {v.titre}
               </h3>
-              <p style={i >= 3 ? BODY_STYLE_PJS : BODY_STYLE} className="text-muted-foreground relative z-10 text-justify flex-1">
+              <p className="text-muted-foreground relative z-10 text-justify flex-1">
                 {v.texte}
               </p>
             </motion.div>
@@ -156,7 +142,7 @@ export default function Credo() {
           transition={{ duration: 0.6 }}
           className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/40 border border-border rounded-2xl"
         >
-          <p style={BODY_STYLE} className="text-muted-foreground text-center sm:text-left">
+          <p className="text-muted-foreground text-center sm:text-left">
             Association officiellement reconnue par les autorités togolaises depuis le{" "}
             <strong className="text-foreground">03 octobre 2019</strong>
             <span className="block text-xs text-primary font-semibold mt-0.5">
