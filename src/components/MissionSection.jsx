@@ -52,7 +52,7 @@ const TILES = [
     href: "/association/ambition",
     desc: "Notre but, nos objectifs et notre vision à moyen terme pour l'association et ses membres.",
     tags: ["Réseau", "Mentorat", "Communauté", "Impact"],
-    cta: "Découvrir notre ambition",
+    cta: "Partager notre ambition",
     tagStyle: "bg-accent/10 text-accent border-accent/20",
     iconBg: "bg-accent/10",
     iconColor: "text-accent",
