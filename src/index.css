@@ -144,9 +144,11 @@
     text-transform: uppercase;
   }
 
-  /* strong sans gras — distinction subtile, pas de lourdeur visuelle */
-  strong {
-    font-weight: 500;
+  /* strong sans gras — couvre aussi les articles rendus via Tailwind Typography (prose) */
+  strong,
+  .prose strong,
+  .prose :where(strong):not(:where([class~="not-prose"] *)) {
+    font-weight: 400;
   }
 
   /* Protection des photos — empêche le glisser-déposer vers le bureau */
