@@ -174,7 +174,7 @@ export default function ArticleDetail() {
           prose-h3:text-lg prose-h3:mt-6
           prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
           prose-li:text-muted-foreground
-          prose-strong:text-foreground
+          prose-strong:text-foreground prose-strong:font-normal
           prose-a:text-primary prose-a:no-underline hover:prose-a:underline
           prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:font-medium
           [&_p]:text-justify [&_li]:text-justify">
