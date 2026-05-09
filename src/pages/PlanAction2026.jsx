@@ -310,7 +310,7 @@ export default function PlanAction2026() {
           <p className="text-muted-foreground max-w-3xl leading-relaxed">
             Ma Belle Promo (MBP) est une association regroupant des ancien·nes étudiant·es de la
             Faculté de Droit de l'Université de Lomé, issus de la promotion 1994 à 2000.
-            Fondée sur des valeurs cardinales de <strong className="text-foreground">solidarité, d'entraide et de fraternité</strong>,
+            Fondée sur des valeurs cardinales de solidarité, d'entraide et de fraternité,
             MBP a conduit un premier cycle d'activités sur la période 2023–2025 et adopte ce plan
             pour 2026 avec une ambition renouvelée de structuration, de professionnalisation
             et d'impact durable.

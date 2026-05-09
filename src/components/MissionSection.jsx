@@ -78,7 +78,7 @@ export default function MissionSection() {
 
             <p className="mt-6 text-muted-foreground leading-relaxed text-lg">
               Ma Belle Promo réunit les anciens étudiants de la{" "}
-              <strong className="text-foreground">Faculté de Droit de l'Université de Lomé</strong>,
+              <span className="text-foreground">Faculté de Droit de l'Université de Lomé</span>,
               promotion <strong className="text-foreground">1994–2000</strong>. Née du désir de préserver
               les liens tissés sur les bancs de l'université, notre association est devenue un espace
               dynamique où l'amitié, la solidarité et l'entraide prennent une dimension collective.
