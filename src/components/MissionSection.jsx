@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { BookOpen, Target, ArrowRight } from "lucide-react";
+import { BookOpen, Target, Scale, ArrowRight } from "lucide-react";
 
 const MotionLink = motion(Link);
 
@@ -44,6 +44,22 @@ const TILES = [
     hoverTitle: "group-hover:text-accent",
     ctaColor: "text-accent",
     accentBg: "bg-accent/5 group-hover:bg-accent/10",
+  },
+  {
+    icon: Scale,
+    color: "blue",
+    title: "Notre Statut",
+    href: "/mentions-legales",
+    desc: "Association à but non lucratif dotée de la personnalité morale, constituée conformément à la législation togolaise, à fins exclusivement désintéressées.",
+    tags: ["ABNL", "Personnalité morale", "FDD · UL", "Depuis 2019"],
+    cta: "Consulter nos mentions légales",
+    tagStyle: "bg-blue-50 text-blue-700 border-blue-200",
+    iconBg: "bg-blue-50",
+    iconColor: "text-blue-600",
+    hoverBorder: "hover:border-blue-300",
+    hoverTitle: "group-hover:text-blue-700",
+    ctaColor: "text-blue-600",
+    accentBg: "bg-blue-50/50 group-hover:bg-blue-50",
   },
 ];
 
@@ -161,7 +177,7 @@ export default function MissionSection() {
             </h3>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {TILES.map(({ icon: Icon, title, href, desc, tags, cta, tagStyle, iconBg, iconColor, hoverBorder, hoverTitle, ctaColor, accentBg }, i) => (
               <motion.div
                 key={title}
@@ -207,30 +223,6 @@ export default function MissionSection() {
             ))}
           </div>
         </div>
-
-        {/* ── Bloc 3 : Notre vision ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="relative overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 px-8 py-12 md:px-16 md:py-14 text-center"
-        >
-          <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full bg-primary/8 -z-10" />
-          <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-accent/8 -z-10" />
-
-          <div className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center mx-auto mb-6">
-            <Target className="w-7 h-7 text-primary" />
-          </div>
-
-          <span className="eyebrow text-accent">Notre vision</span>
-          <p className="mt-4 font-heading text-xl md:text-3xl font-bold text-foreground max-w-3xl mx-auto leading-relaxed">
-            Faire de Ma Belle Promo un{" "}
-            <span className="text-primary">réseau solidaire, influent et utile</span>,
-            capable d'accompagner ses membres, de soutenir les étudiants et de jouer un rôle
-            positif dans la société.
-          </p>
-        </motion.div>
 
       </div>
     </section>
