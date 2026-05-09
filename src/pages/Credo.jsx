@@ -43,15 +43,16 @@ const valeurs = [
   },
 ];
 
-const DM_SANS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap";
-const BODY_STYLE = { fontFamily: "'DM Sans', sans-serif", fontSize: "15px", lineHeight: "1.50" };
+const FONTS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap";
+const BODY_STYLE     = { fontFamily: "'DM Sans', sans-serif",          fontSize: "15px", lineHeight: "1.50" };
+const BODY_STYLE_PJS = { fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "15px", lineHeight: "1.50" };
 
 export default function Credo() {
   useEffect(() => {
     const link = document.createElement("link");
     link.id = "dm-sans-test";
     link.rel = "stylesheet";
-    link.href = DM_SANS_URL;
+    link.href = FONTS_URL;
     document.head.appendChild(link);
     return () => document.getElementById("dm-sans-test")?.remove();
   }, []);
@@ -140,7 +141,7 @@ export default function Credo() {
               <h3 className="font-heading text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {v.titre}
               </h3>
-              <p style={BODY_STYLE} className="text-muted-foreground relative z-10 text-justify flex-1">
+              <p style={i >= 3 ? BODY_STYLE_PJS : BODY_STYLE} className="text-muted-foreground relative z-10 text-justify flex-1">
                 {v.texte}
               </p>
             </motion.div>
