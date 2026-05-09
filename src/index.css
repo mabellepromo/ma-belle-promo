@@ -144,12 +144,6 @@
     text-transform: uppercase;
   }
 
-  /* strong sans gras — couvre aussi les articles rendus via Tailwind Typography (prose) */
-  strong,
-  .prose strong,
-  .prose :where(strong):not(:where([class~="not-prose"] *)) {
-    font-weight: 400;
-  }
 
   /* Protection des photos — empêche le glisser-déposer vers le bureau */
   img {
@@ -157,3 +151,6 @@
     user-drag: none;
   }
 }
+
+/* Hors layer — bat @layer base, components ET utilities */
+strong { font-weight: 400; }
