@@ -189,26 +189,26 @@ export default function MissionSection() {
               >
                 <Link
                   to={href}
-                  className={`group relative flex flex-col h-full bg-card border border-border rounded-2xl p-8 overflow-hidden ${hoverBorder} hover:shadow-xl transition-all duration-300`}
+                  className={`group relative flex flex-col h-full bg-card border border-border rounded-2xl p-5 overflow-hidden ${hoverBorder} hover:shadow-xl transition-all duration-300`}
                 >
                   {/* Cercle décoratif en arrière-plan */}
                   <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full transition-colors duration-300 ${accentBg}`} />
 
-                  <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center mb-5 relative z-10`}>
-                    <Icon className={`w-6 h-6 ${iconColor}`} />
+                  <div className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center mb-3 relative z-10`}>
+                    <Icon className={`w-5 h-5 ${iconColor}`} />
                   </div>
 
-                  <h4 className={`font-heading text-xl font-bold text-foreground mb-2 transition-colors ${hoverTitle} relative z-10`}>
+                  <h4 className={`font-heading text-lg font-bold text-foreground mb-1.5 transition-colors ${hoverTitle} relative z-10`}>
                     {title}
                   </h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-5 relative z-10">
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3 relative z-10">
                     {desc}
                   </p>
 
                   {/* Tags aperçu */}
-                  <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                  <div className="flex flex-wrap gap-1.5 mb-4 relative z-10">
                     {tags.map(tag => (
-                      <span key={tag} className={`px-2.5 py-1 rounded-full text-xs font-medium border ${tagStyle}`}>
+                      <span key={tag} className={`px-2 py-0.5 rounded-full text-xs font-medium border ${tagStyle}`}>
                         {tag}
                       </span>
                     ))}
