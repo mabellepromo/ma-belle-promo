@@ -67,8 +67,8 @@ export default function Contacts() {
 
   return (
     <div>
-      <SEO title="Contacts" description="Contactez Ma Belle Promo : adresse, téléphone, email et formulaire de contact de l'association des anciens diplômés FDD de Lomé." path="/informations/contacts" />
-      <PageHero title="Contacts" subtitle="Informations — Nous joindre" />
+      <SEO title="Contact" description="Contactez Ma Belle Promo : adresse, téléphone, email et formulaire de contact de l'association des anciens diplômés FDD de Lomé." path="/informations/contacts" />
+      <PageHero title="Contact" subtitle="Informations — Nous joindre" />
 
       <section className="py-20 max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-5 gap-12">

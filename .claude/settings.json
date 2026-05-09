@@ -14,7 +14,9 @@
       "Bash(node -e \"const lucide = require\\('lucide-react'\\); const icons = Object.keys\\(lucide\\).filter\\(k => k.match\\(/zoom|grid|image|photo|expand|gallery|layout/i\\)\\); console.log\\(icons.join\\(', '\\)\\);\")",
       "Bash(node -e \"const lucide = require\\('lucide-react'\\); console.log\\(Object.keys\\(lucide\\).filter\\(k => typeof lucide[k] === 'function'\\).slice\\(0,30\\).join\\(', '\\)\\);\")",
       "Bash(git commit -m ' *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npx vercel *)",
+      "Bash(xargs grep -l \"supabase.*messages\\\\|from.*messages\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\maman\\.claude\\projects\\c--Users-maman-Downloads-Clone-Ma-Belle-Promo\\memory"

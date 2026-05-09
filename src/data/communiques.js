@@ -19,7 +19,7 @@ Ce projet s'inscrit dans le cadre du Plan d'Action 2023-2025 de l'association, a
 
 PRÉSENTATION DU PROJET
 
-Vingt-cinq ans après l'obtention de leur diplôme à la Faculté de Droit du Développement de l'Université de Lomé, les membres de la promotion 1994-2000 se mobilisent pour partager leur expérience professionnelle avec les générations actuelles et futures de juristes togolais.
+Vingt-cinq ans après l'obtention de leur diplôme à la Faculté de Droit de l'Université de Lomé, les membres de la promotion 1994-2000 se mobilisent pour partager leur expérience professionnelle avec les générations actuelles et futures de juristes togolais.
 
 L'ouvrage regroupera les témoignages de membres de la promotion exerçant dans des domaines variés : magistrature, barreau, notariat, entreprises privées, administrations publiques, organisations internationales et société civile.
 
@@ -39,7 +39,7 @@ Tous les membres de la promotion sont invités à soumettre leur contribution av
 Pour tout renseignement : contact@mabellepromo.org
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -76,7 +76,7 @@ Ma Belle Promo invite ses membres, leurs familles et l'ensemble des professionne
 Entrée libre sur inscription. Contact : contact@mabellepromo.org
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -125,7 +125,7 @@ INSCRIPTION OBLIGATOIRE
 Merci d'envoyer vos coordonnées (nom, profession, email) à contact@mabellepromo.org avant le 13 décembre 2023. Le lien de connexion sera transmis la veille de l'événement.
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -195,7 +195,7 @@ Le Secrétaire général                    Le Président
 FDD Ma Belle Promo                       FDD Ma Belle Promo
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -238,7 +238,7 @@ Nous restons engagés aux côtés des populations vulnérables et continuerons �
 Le Bureau de l'association FDD Ma Belle Promo
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -255,14 +255,14 @@ Lomé, le 1er décembre 2018
 DÉCLARATION DE CRÉATION DE L'ASSOCIATION
 FDD MA BELLE PROMO
 
-Nous, anciens étudiants de la Faculté de Droit du Développement (FDD) de l'Université de Lomé, membres de la promotion 1994-2000, réunis en Assemblée Générale constitutive le 1er décembre 2018 à Lomé, déclarons solennellement la création de l'association :
+Nous, anciens étudiants de la Faculté de Droit (FDD) de l'Université de Lomé, membres de la promotion 1994-2000, réunis en Assemblée Générale constitutive le 1er décembre 2018 à Lomé, déclarons solennellement la création de l'association :
 
 FDD MA BELLE PROMO
-Association des diplômés de la Faculté de Droit du Développement — Promotion 1994-2000
+Association des diplômés de la Faculté de Droit — Promotion 1994-2000
 
 PRÉAMBULE
 
-Vingt ans après notre entrée à la Faculté de Droit du Développement, nous, membres de la promotion 1994-2000, nous réunissons avec la conviction que notre parcours commun constitue un lien indéfectible et une ressource collective précieuse.
+Vingt ans après notre entrée à la Faculté de Droit, nous, membres de la promotion 1994-2000, nous réunissons avec la conviction que notre parcours commun constitue un lien indéfectible et une ressource collective précieuse.
 
 Juristes, magistrats, avocats, notaires, juristes d'entreprise, professeurs de droit, administrateurs civils, diplomates — nous avons emprunté des chemins divers mais partageons une formation commune, des souvenirs communs et des valeurs communes.
 
@@ -271,7 +271,7 @@ OBJET
 L'association a pour objet :
 - De maintenir et renforcer les liens d'amitié et de fraternité entre les membres de la promotion
 - De valoriser les compétences et les parcours de ses membres
-- De contribuer au rayonnement de la Faculté de Droit du Développement et de l'Université de Lomé
+- De contribuer au rayonnement de la Faculté de Droit et de l'Université de Lomé
 - De mener des actions de solidarité et d'entraide entre membres et envers la communauté
 - D'encourager et soutenir les jeunes générations de juristes togolais
 
@@ -296,7 +296,7 @@ Fait à Lomé, le 1er décembre 2018
 Les membres fondateurs de FDD Ma Belle Promo
 
 ---
-FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit du Développement
+FDD Ma Belle Promo — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
 ];

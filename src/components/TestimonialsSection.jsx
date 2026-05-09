@@ -26,8 +26,8 @@ const testimonials = [
   },
   {
     name: "Olga AKAKPOVI",
-    role: "Associate Director",
-    titre: "Ernst & Young · Dakar, Sénégal",
+    role: "Associée, Cabinet FFA",
+    titre: "Réseau ELYOS · Dakar, Sénégal",
     photo: "/images/membres/olga.webp",
     quote: "Le droit m'a ouvert des portes insoupçonnées. Aujourd'hui fiscaliste dans un cabinet international, je mesure combien la rigueur acquise à la FDD de Lomé est mon socle. Partager cela avec les étudiants via les webinaires MBP est une fierté immense.",
   },

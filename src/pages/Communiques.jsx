@@ -121,7 +121,7 @@ export default function Communiques() {
 
   return (
     <div>
-      <SEO title="Communiqués" description="Les communiqués officiels de Ma Belle Promo, association des anciens diplômés de la Faculté de Droit du Développement de Lomé." path="/informations/communiques" />
+      <SEO title="Communiqués" description="Les communiqués officiels de Ma Belle Promo, association des anciens diplômés de la Faculté de Droit de Lomé." path="/informations/communiques" />
       <PageHero title="Communiqués" subtitle="Informations — Communications officielles" />
 
       <section className="py-20 max-w-4xl mx-auto px-6">

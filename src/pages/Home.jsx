@@ -17,7 +17,7 @@ const jsonLd = {
   "alternateName": "FDD-MBP",
   "url": "https://www.mabellepromo.org",
   "logo": "https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png",
-  "description": "Association des anciens diplômés de la Faculté de Droit du Développement de l'Université de Lomé (promotion 1994-2000).",
+  "description": "Association des anciens diplômés de la Faculté de Droit de l'Université de Lomé (promotion 1994-2000).",
   "foundingDate": "2018-12-01",
   "address": { "@type": "PostalAddress", "addressLocality": "Lomé", "addressCountry": "TG" },
   "sameAs": [

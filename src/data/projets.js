@@ -64,7 +64,7 @@ export const projets = [
     titre: "Don d'un vidéoprojecteur au décanat FDD",
     extrait: "Un équipement offert à la Faculté de Droit pour améliorer les conditions d'enseignement.",
     description: "Remise de vidéoprojecteur pour le besoin des étudiants et du décanat de la Faculté de Droit. Une contribution directe à l'amélioration des conditions d'enseignement à l'Université de Lomé.",
-    contenu: "<p>Fidèle à ses racines académiques, Ma Belle Promo a souhaité contribuer concrètement à l'amélioration des conditions d'enseignement à la Faculté de Droit du Développement (FDD) de l'Université de Lomé, berceau de la promotion.</p><p>Un vidéoprojecteur a été remis au décanat de la faculté, équipement qui permettra d'améliorer la qualité des enseignements dispensés aux étudiants.</p><p>Ce geste symbolise le lien fort que Ma Belle Promo entend maintenir avec son alma mater.</p>",
+    contenu: "<p>Fidèle à ses racines académiques, Ma Belle Promo a souhaité contribuer concrètement à l'amélioration des conditions d'enseignement à la Faculté de Droit (FDD) de l'Université de Lomé, berceau de la promotion.</p><p>Un vidéoprojecteur a été remis au décanat de la faculté, équipement qui permettra d'améliorer la qualité des enseignements dispensés aux étudiants.</p><p>Ce geste symbolise le lien fort que Ma Belle Promo entend maintenir avec son alma mater.</p>",
     date: "2020",
     categorie: "Éducation",
     image: "/images/gala.jpg",

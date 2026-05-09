@@ -58,7 +58,7 @@ export default function Sponsors() {
             style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
           >
             FDD Ma Belle Promo n'est pas une association comme les autres. Née en 2018 de la rencontre
-            de juristes, cadres et entrepreneurs formés à la Faculté de Droit du Développement de
+            de juristes, cadres et entrepreneurs formés à la Faculté de Droit de
             l'Université de Lomé — promotion 1994–2000 —, elle a très vite choisi de ne pas se replier
             sur elle-même. Certes, nous cultivons l'excellence qui fut notre socle commun : séminaires
             de haut niveau, conférences thématiques,{" "}

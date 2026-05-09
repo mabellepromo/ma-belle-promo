@@ -659,7 +659,7 @@ export function genererAttestation(member) {
            onerror="this.style.display='none'" />
       <div class="doc-header-asso">
         <p class="asso-name">FDD Ma Belle Promo</p>
-        <p class="asso-sub">Faculté de Droit du Développement — Université de Lomé</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
     </div>
@@ -680,7 +680,7 @@ export function genererAttestation(member) {
         </div>
         <p class="intro-text" style="flex:1;">
           L'Association <strong>FDD Ma Belle Promo (MBP)</strong>, association des diplômés
-          de la Faculté de Droit du Développement de l'Université de Lomé, promotion 1994–2000,
+          de la Faculté de Droit de l'Université de Lomé, promotion 1994–2000,
           atteste par le présent document que
           <strong>${member.nom}</strong> est <strong>${titre}</strong> en règle de ladite association.
         </p>
@@ -781,7 +781,7 @@ export function genererAttestation(member) {
     <div class="doc-footer">
       <div class="footer-text">
         FDD Ma Belle Promo · www.mabellepromo.org<br/>
-        Faculté de Droit du Développement — Université de Lomé, Togo
+        Faculté de Droit — Université de Lomé, Togo
       </div>
       <div class="footer-text" style="text-align:right">
         Ce document est officiel et authentique.<br/>
@@ -895,7 +895,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
            onerror="this.style.display='none'" />
       <div class="doc-header-asso">
         <p class="asso-name">FDD Ma Belle Promo</p>
-        <p class="asso-sub">Faculté de Droit du Développement — Université de Lomé</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
     </div>

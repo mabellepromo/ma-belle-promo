@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 const SITE_NAME = "Ma Belle Promo";
 const SITE_URL  = "https://www.mabellepromo.org";
 const DEFAULT_IMAGE = "https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png";
-const DEFAULT_DESC  = "Association des anciens diplômés de la Faculté de Droit du Développement de l'Université de Lomé (promotion 1994-2000). Amitié, solidarité et entraide au Togo et dans la diaspora.";
+const DEFAULT_DESC  = "Association des anciens diplômés de la Faculté de Droit de l'Université de Lomé (promotion 1994-2000). Amitié, solidarité et entraide au Togo et dans la diaspora.";
 
 export default function SEO({ title, description, image = null, path = "", article = false }) {
   const fullTitle  = title ? `${title} — ${SITE_NAME}` : SITE_NAME;

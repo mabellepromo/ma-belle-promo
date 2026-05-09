@@ -2,7 +2,7 @@
 
 ## Contexte du projet
 Site web de l'association FDD Ma Belle Promo, association des
-diplômés de la Faculté de Droit du Développement de l'Université
+diplômés de la Faculté de Droit de l'Université
 de Lomé au Togo, promotion 1994-2000. Le projet remplace un
 ancien site Wix par une application React moderne et autogérable.
 

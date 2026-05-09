@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-// ── Mettre à false quand le site est prêt à être public ──
-export const MAINTENANCE_MODE = true;
+// ── Contrôlé par la variable Vercel VITE_MAINTENANCE_MODE ──
+// Pour activer : passer à "true" dans Vercel > Settings > Environment Variables, puis Redeploy
+export const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === "true";
 const ACCESS_CODE = "mbp2026";
 const STORAGE_KEY = "mbp_access_granted";
 

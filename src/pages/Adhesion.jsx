@@ -143,7 +143,7 @@ export default function Adhesion() {
 
   return (
     <div>
-      <SEO title="Adhésion" description="Rejoignez Ma Belle Promo, l'association des anciens diplômés de la Faculté de Droit du Développement de l'Université de Lomé (1994-2000)." path="/implications/adhesion" />
+      <SEO title="Adhésion" description="Rejoignez Ma Belle Promo, l'association des anciens diplômés de la Faculté de Droit de l'Université de Lomé (1994-2000)." path="/implications/adhesion" />
       <PageHero title="Adhésion" subtitle="Implications — Rejoignez-nous" />
 
       <section className="py-20 max-w-5xl mx-auto px-6">
