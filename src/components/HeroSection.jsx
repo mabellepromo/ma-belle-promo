@@ -328,7 +328,7 @@ export default function HeroSection() {
                 {...hoverTap}
                 transition={springTransition}
                 onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
-                className="group flex items-center gap-2 justify-center font-bold text-sm rounded-full"
+                className="group flex items-center gap-2 justify-center font-bold text-base rounded-full"
                 style={{
                   padding: "14px 28px",
                   background: "linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.18))",
