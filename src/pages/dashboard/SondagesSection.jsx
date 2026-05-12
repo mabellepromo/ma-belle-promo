@@ -1,23 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
   ChevronUp, ChevronDown, Send, Check, Clock, UserPlus, Download,
-  RefreshCw,
+  RefreshCw, Copy, Palette, Image, GitBranch, Columns,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
   useSondages, getSondageResults, getInvitationStats,
-  createInvitations, markInvitationsSent,
+  createInvitations, markInvitationsSent, SONDAGE_THEMES,
 } from "../../hooks/useSondages";
 import { inp, Field } from "./shared";
 
 const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-blue-500", "bg-violet-500", "bg-rose-500", "bg-cyan-500"];
+const COLOR_HEX = ["#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#f43f5e", "#06b6d4"];
 
 const Q_TYPES = [
   { value: "single",   label: "Choix unique" },
   { value: "multiple", label: "Choix multiple" },
-  { value: "dropdown", label: "Liste déroulante" },
+  { value: "dropdown", label: "Déroulante" },
   { value: "ouinon",   label: "Oui / Non" },
   { value: "texte",    label: "Texte libre" },
   { value: "date",     label: "Date" },
@@ -39,45 +40,30 @@ const VALIDATIONS = [
 // ── Export CSV ─────────────────────────────────────────────────────────────
 async function exportCSV(sondage) {
   const { data: soumissions } = await supabase
-    .from("sondage_soumissions")
-    .select("*")
-    .eq("sondage_id", sondage.id)
-    .order("created_at");
-
+    .from("sondage_soumissions").select("*").eq("sondage_id", sondage.id).order("created_at");
   if (!soumissions?.length) { toast.info("Aucune réponse à exporter."); return; }
 
   const ids = soumissions.map(s => s.id);
-  const { data: reponses } = await supabase
-    .from("sondage_reponses").select("*").in("soumission_id", ids);
+  const { data: reponses } = await supabase.from("sondage_reponses").select("*").in("soumission_id", ids);
 
   const questions = sondage.questions || [];
   const headers = ["Date", "Nom", "Email", ...questions.map(q => q.libelle)];
-
   const rows = soumissions.map(s => {
     const nom   = s.repondant_nom   || "Anonyme";
     const email = s.repondant_email || "";
     const date  = new Date(s.created_at).toLocaleDateString("fr-FR");
-
     const vals = questions.map(q => {
       const rep = (reponses || []).find(r => r.soumission_id === s.id && r.question_id === q.id);
       if (!rep) return "";
       if (q.type === "texte" || q.type === "date") return rep.valeur_texte || "";
       if (q.type === "note") return rep.valeur_note ?? "";
-      if (q.type === "ouinon") {
-        if (rep.valeur_options?.includes(0)) return "Oui";
-        if (rep.valeur_options?.includes(1)) return "Non";
-        return "";
-      }
+      if (q.type === "ouinon") return rep.valeur_options?.includes(0) ? "Oui" : rep.valeur_options?.includes(1) ? "Non" : "";
       if (q.type === "single" || q.type === "dropdown") {
-        const idx = rep.valeur_options?.[0];
-        return idx != null ? (q.options?.[idx] || "") : "";
+        const idx = rep.valeur_options?.[0]; return idx != null ? (q.options?.[idx] || "") : "";
       }
-      if (q.type === "multiple") {
-        return (rep.valeur_options || []).map(i => q.options?.[i]).filter(Boolean).join("; ");
-      }
+      if (q.type === "multiple") return (rep.valeur_options || []).map(i => q.options?.[i]).filter(Boolean).join("; ");
       return "";
     });
-
     return [date, nom, email, ...vals];
   });
 
@@ -93,8 +79,8 @@ async function exportCSV(sondage) {
   toast.success(`${soumissions.length} réponse${soumissions.length !== 1 ? "s" : ""} exportée${soumissions.length !== 1 ? "s" : ""}.`);
 }
 
-// ── Résultats par question (admin) ─────────────────────────────────────────
-function QuestionResults({ question, reponses, total }) {
+// ── Résultats par question (dashboard) ────────────────────────────────────
+function QuestionResults({ question, reponses }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
   if (question.type === "texte") {
@@ -150,11 +136,9 @@ function QuestionResults({ question, reponses, total }) {
     );
   }
 
-  // ouinon, single, multiple, dropdown
   const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
   const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
   const qTotal = qr.length;
-
   return (
     <div className="space-y-1.5">
       <p className="text-xs text-muted-foreground mb-1">{qTotal} réponse{qTotal !== 1 ? "s" : ""}</p>
@@ -167,7 +151,7 @@ function QuestionResults({ question, reponses, total }) {
               <span className="font-bold text-foreground">{pct}% ({counts[i]})</span>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all ${COLORS[i % COLORS.length]}`} style={{ width: `${pct}%` }} />
+              <div className={`h-full rounded-full ${COLORS[i % COLORS.length]}`} style={{ width: `${pct}%` }} />
             </div>
           </div>
         );
@@ -176,25 +160,120 @@ function QuestionResults({ question, reponses, total }) {
   );
 }
 
+// ── Thème picker ───────────────────────────────────────────────────────────
+function ThemePicker({ value, onChange }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+        <Palette className="w-3.5 h-3.5" /> Thème visuel
+      </p>
+      <div className="flex gap-2 flex-wrap">
+        {Object.entries(SONDAGE_THEMES).map(([key, theme]) => (
+          <button key={key} type="button" title={theme.label}
+            onClick={() => onChange({ preset: key })}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border-2 text-xs font-medium transition-all ${
+              value?.preset === key || (!value?.preset && key === "mbp")
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/40"
+            }`}>
+            <span className="w-3.5 h-3.5 rounded-full flex-shrink-0" style={{ background: theme.primary }} />
+            {theme.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Logique conditionnelle par question ────────────────────────────────────
+function LogicBuilder({ q, onChange, sectionItems }) {
+  const [open, setOpen] = useState(false);
+  const hasLogic = (q.logic?.rules || []).length > 0;
+  const isChoiceType = ["single", "multiple", "ouinon", "dropdown"].includes(q.type);
+  if (!isChoiceType || sectionItems.length === 0) return null;
+
+  const options = q.type === "ouinon" ? ["Oui", "Non"] : (q.options || []).filter(o => o.trim());
+  if (options.length === 0) return null;
+
+  function setRule(optIdx, targetId) {
+    const rules = (q.logic?.rules || []).filter(r => r.option_index !== optIdx);
+    if (targetId) rules.push({ option_index: optIdx, goto_section_id: targetId });
+    onChange({ ...q, logic: rules.length ? { rules } : {} });
+  }
+
+  return (
+    <div className="mt-2 border-t border-dashed border-border pt-2">
+      <button type="button" onClick={() => setOpen(!open)}
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasLogic ? "text-violet-600" : "text-muted-foreground hover:text-violet-600"}`}>
+        <GitBranch className="w-3 h-3" />
+        Logique conditionnelle
+        {hasLogic && <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-full">{q.logic.rules.length} règle{q.logic.rules.length !== 1 ? "s" : ""}</span>}
+        <span className="ml-auto">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="mt-2 space-y-1.5 pl-2">
+          <p className="text-xs text-muted-foreground">Rediriger le répondant selon sa réponse :</p>
+          {options.map((opt, i) => {
+            const rule = (q.logic?.rules || []).find(r => r.option_index === i);
+            return (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLOR_HEX[i % COLOR_HEX.length] }} />
+                <span className="text-xs text-foreground flex-1 truncate min-w-0">{opt}</span>
+                <select value={rule?.goto_section_id || ""}
+                  onChange={e => setRule(i, e.target.value || null)}
+                  className="text-xs border border-border rounded-lg px-2 py-1 bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-violet-300">
+                  <option value="">→ Section suivante</option>
+                  {sectionItems.map(sec => (
+                    <option key={sec._id} value={sec._id}>{sec.titre || "Section sans titre"}</option>
+                  ))}
+                  <option value="__end__">→ Terminer le sondage</option>
+                </select>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Constructeur de question ───────────────────────────────────────────────
-function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
+function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionItems }) {
+  const [showImageInputs, setShowImageInputs] = useState({});
   const needsOptions = q.type === "single" || q.type === "multiple" || q.type === "dropdown";
 
   function setOptVal(i, val) {
     const opts = [...(q.options || [])]; opts[i] = val;
     onChange({ ...q, options: opts });
   }
+  function setOptImage(i, url) {
+    onChange({ ...q, options_images: { ...(q.options_images || {}), [i]: url } });
+  }
   function addOpt() { onChange({ ...q, options: [...(q.options || []), ""] }); }
-  function removeOpt(i) { onChange({ ...q, options: (q.options || []).filter((_, j) => j !== i) }); }
+  function removeOpt(i) {
+    const opts = (q.options || []).filter((_, j) => j !== i);
+    const imgs = { ...(q.options_images || {}) };
+    delete imgs[i];
+    // Re-key images after removal
+    const reKeyed = {};
+    opts.forEach((_, newIdx) => {
+      const oldIdx = newIdx >= i ? newIdx + 1 : newIdx;
+      if (imgs[oldIdx]) reKeyed[newIdx] = imgs[oldIdx];
+    });
+    onChange({ ...q, options: opts, options_images: reKeyed });
+  }
   function moveOpt(i, dir) {
     const opts = [...(q.options || [])]; const j = i + dir;
     if (j < 0 || j >= opts.length) return;
     [opts[i], opts[j]] = [opts[j], opts[i]];
-    onChange({ ...q, options: opts });
+    const imgs = { ...(q.options_images || {}) };
+    const tmp = imgs[i]; imgs[i] = imgs[j]; imgs[j] = tmp;
+    if (!imgs[i]) delete imgs[i]; if (!imgs[j]) delete imgs[j];
+    onChange({ ...q, options: opts, options_images: imgs });
   }
   function changeType(newType) {
     const needsOpts = newType === "single" || newType === "multiple" || newType === "dropdown";
-    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [], config: {} });
+    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [], config: {}, logic: {} });
   }
 
   return (
@@ -213,7 +292,6 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
         <span className="text-xs font-bold text-muted-foreground pt-1.5 w-5 text-center">{idx + 1}</span>
 
         <div className="flex-1 space-y-2 min-w-0">
-          {/* Sélecteur de type */}
           <div className="flex gap-1 flex-wrap">
             {Q_TYPES.map(t => (
               <button key={t.value} type="button" onClick={() => changeType(t.value)}
@@ -227,37 +305,55 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
             ))}
           </div>
 
-          {/* Libellé */}
           <input className={inp} value={q.libelle}
             onChange={e => onChange({ ...q, libelle: e.target.value })}
             placeholder="Libellé de la question…" />
 
-          {/* Options pour single / multiple / dropdown */}
           {needsOptions && (
             <div className="space-y-1.5 pl-1">
               {(q.options || []).map((opt, i) => (
-                <div key={i} className="flex items-center gap-1.5">
-                  <div className="flex flex-col gap-0">
-                    <button type="button" onClick={() => moveOpt(i, -1)} disabled={i === 0}
-                      className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
-                      <ChevronUp className="w-2.5 h-2.5" />
+                <div key={i} className="space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex flex-col gap-0">
+                      <button type="button" onClick={() => moveOpt(i, -1)} disabled={i === 0}
+                        className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                        <ChevronUp className="w-2.5 h-2.5" />
+                      </button>
+                      <button type="button" onClick={() => moveOpt(i, 1)} disabled={i === (q.options?.length || 0) - 1}
+                        className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                        <ChevronDown className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLOR_HEX[i % COLOR_HEX.length] }} />
+                    <input className={`${inp} flex-1 text-sm`} value={opt}
+                      onChange={e => setOptVal(i, e.target.value)}
+                      placeholder={`Option ${i + 1}`}
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addOpt(); } }}
+                    />
+                    <button type="button" title="Image"
+                      onClick={() => setShowImageInputs(p => ({ ...p, [i]: !p[i] }))}
+                      className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${q.options_images?.[i] ? "text-emerald-600 bg-emerald-50" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}>
+                      <Image className="w-3 h-3" />
                     </button>
-                    <button type="button" onClick={() => moveOpt(i, 1)} disabled={i === (q.options?.length || 0) - 1}
-                      className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
-                      <ChevronDown className="w-2.5 h-2.5" />
+                    <button type="button" onClick={() => removeOpt(i)}
+                      disabled={(q.options?.length || 0) <= 2}
+                      className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20">
+                      <X className="w-3 h-3" />
                     </button>
                   </div>
-                  <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${COLORS[i % COLORS.length]}`} />
-                  <input className={`${inp} flex-1 text-sm`} value={opt}
-                    onChange={e => setOptVal(i, e.target.value)}
-                    placeholder={`Option ${i + 1}`}
-                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addOpt(); } }}
-                  />
-                  <button type="button" onClick={() => removeOpt(i)}
-                    disabled={(q.options?.length || 0) <= 2}
-                    className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20">
-                    <X className="w-3 h-3" />
-                  </button>
+                  {showImageInputs[i] && (
+                    <div className="pl-8 flex items-center gap-2">
+                      <input
+                        className={`${inp} flex-1 text-xs`}
+                        value={q.options_images?.[i] || ""}
+                        onChange={e => setOptImage(i, e.target.value)}
+                        placeholder="URL de l'image (https://…)"
+                      />
+                      {q.options_images?.[i] && (
+                        <img src={q.options_images[i]} alt="" className="w-8 h-8 object-cover rounded border border-border" onError={e => e.target.style.display = "none"} />
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
               <button type="button" onClick={addOpt}
@@ -267,7 +363,6 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
             </div>
           )}
 
-          {/* Validation pour texte libre */}
           {q.type === "texte" && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground flex-shrink-0">Format :</span>
@@ -287,7 +382,6 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
             </div>
           )}
 
-          {/* Aperçu types sans options */}
           {q.type === "ouinon" && (
             <div className="flex gap-2">
               <span className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">Oui</span>
@@ -315,14 +409,8 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
               <span className="text-xs text-muted-foreground ml-1">de 1 à 5</span>
             </div>
           )}
-          {q.type === "dropdown" && (q.options || []).filter(o => o.trim()).length > 0 && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2">
-              <select className="text-xs text-muted-foreground w-full bg-transparent outline-none" disabled>
-                <option>— Choisir une option —</option>
-                {(q.options || []).filter(o => o.trim()).map((o, i) => <option key={i}>{o}</option>)}
-              </select>
-            </div>
-          )}
+
+          <LogicBuilder q={q} onChange={onChange} sectionItems={sectionItems} />
         </div>
 
         <button type="button" onClick={onRemove} disabled={total <= 1}
@@ -342,8 +430,33 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
   );
 }
 
+// ── Constructeur de section ────────────────────────────────────────────────
+function SectionBuilder({ sec, onChangeSec, onRemoveSec }) {
+  return (
+    <div className="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3">
+      <Columns className="w-4 h-4 text-violet-500 flex-shrink-0" />
+      <input
+        className="flex-1 text-sm font-semibold text-violet-800 bg-transparent border-none outline-none placeholder:text-violet-400"
+        value={sec.titre}
+        onChange={e => onChangeSec({ ...sec, titre: e.target.value })}
+        placeholder="Titre de la section…"
+      />
+      <input
+        className="flex-1 text-xs text-violet-600 bg-transparent border-none outline-none placeholder:text-violet-400"
+        value={sec.description || ""}
+        onChange={e => onChangeSec({ ...sec, description: e.target.value })}
+        placeholder="Description optionnelle…"
+      />
+      <button type="button" onClick={onRemoveSec}
+        className="w-6 h-6 rounded hover:bg-violet-100 flex items-center justify-center text-violet-400 hover:text-violet-600">
+        <X className="w-3 h-3" />
+      </button>
+    </div>
+  );
+}
+
 // ── Modal d'invitation ─────────────────────────────────────────────────────
-function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInvitations = [] }) {
+function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
   const [members, setMembers] = useState(null);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -352,19 +465,17 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
   const [newEmail, setNewEmail] = useState("");
   const [newNom, setNewNom] = useState("");
   const [sending, setSending] = useState(false);
-  const [tab, setTab] = useState(pendingOnly ? "relance" : "membres");
+  const [tab, setTab] = useState(pendingInvitations.length > 0 ? "relance" : "membres");
 
   useState(() => {
     supabase.from("members").select("id, prenom, nom, email, photo_url").order("nom").then(({ data }) => {
-      setMembers(data || []);
-      setLoadingMembers(false);
+      setMembers(data || []); setLoadingMembers(false);
     });
   });
 
-  const filtered = (members || []).filter(m => {
-    if (!search) return true;
-    return `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(search.toLowerCase());
-  });
+  const filtered = (members || []).filter(m =>
+    !search || `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(search.toLowerCase())
+  );
 
   function toggleMember(id) {
     setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -378,17 +489,13 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
     setNewEmail(""); setNewNom("");
   }
 
-  const totalCount = tab === "relance"
-    ? pendingInvitations.length
-    : selectedIds.size + extraEmails.length;
+  const totalCount = tab === "relance" ? pendingInvitations.length : selectedIds.size + extraEmails.length;
 
   async function handleSend() {
     if (!totalCount) { toast.error("Aucun destinataire."); return; }
+    setSending(true);
 
-    let recipients;
     if (tab === "relance") {
-      // Relance : réutiliser les tokens existants
-      setSending(true);
       const payload = {
         type: "sondage_invitation",
         sondageTitre: `[Rappel] ${sondage.titre}`,
@@ -403,12 +510,10 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
         const result = await res.json();
         toast.success(`${result.sent} rappel${result.sent !== 1 ? "s" : ""} envoyé${result.sent !== 1 ? "s" : ""} !`);
       } catch (e) { toast.error("Erreur : " + e.message); }
-      setSending(false);
-      onClose();
-      return;
+      setSending(false); onClose(); return;
     }
 
-    recipients = [
+    const recipients = [
       ...Array.from(selectedIds).map(id => {
         const m = members.find(m => m.id === id);
         return { email: m.email, nom: `${m.prenom} ${m.nom}`.trim() };
@@ -416,7 +521,6 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
       ...extraEmails,
     ];
 
-    setSending(true);
     const { data: invitations, error } = await createInvitations(sondage.id, recipients);
     if (error) { toast.error("Erreur : " + error.message); setSending(false); return; }
 
@@ -438,12 +542,11 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
       else toast.success(`${result.sent} invitation${result.sent !== 1 ? "s" : ""} envoyée${result.sent !== 1 ? "s" : ""} !`);
     } catch (e) { toast.error("Erreur : " + e.message); }
 
-    setSending(false);
-    onClose();
+    setSending(false); onClose();
   }
 
   const tabs = [
-    { key: "membres", label: "Membres MBP" },
+    { key: "membres",  label: "Membres MBP" },
     { key: "externes", label: "Emails libres" },
     ...(pendingInvitations.length ? [{ key: "relance", label: `Relancer (${pendingInvitations.length})` }] : []),
   ];
@@ -498,10 +601,10 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{filtered.length} membre{filtered.length !== 1 ? "s" : ""}</span>
                     <button onClick={() => {
-                      const allSelected = filtered.filter(m => m.email).every(m => selectedIds.has(m.id));
+                      const allSel = filtered.filter(m => m.email).every(m => selectedIds.has(m.id));
                       setSelectedIds(prev => {
                         const next = new Set(prev);
-                        filtered.filter(m => m.email).forEach(m => allSelected ? next.delete(m.id) : next.add(m.id));
+                        filtered.filter(m => m.email).forEach(m => allSel ? next.delete(m.id) : next.add(m.id));
                         return next;
                       });
                     }} className="text-primary hover:underline">
@@ -567,9 +670,7 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
         </div>
 
         <div className="flex items-center justify-between px-5 py-4 border-t border-border bg-muted/30 flex-shrink-0">
-          <span className="text-sm text-muted-foreground">
-            {totalCount} destinataire{totalCount !== 1 ? "s" : ""}
-          </span>
+          <span className="text-sm text-muted-foreground">{totalCount} destinataire{totalCount !== 1 ? "s" : ""}</span>
           <div className="flex gap-2">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
             <button onClick={handleSend} disabled={sending || totalCount === 0}
@@ -584,14 +685,23 @@ function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInv
   );
 }
 
-// ── Composant principal ────────────────────────────────────────────────────
-const emptyQ = () => ({ _id: Date.now() + Math.random(), type: "single", libelle: "", options: ["", ""], obligatoire: true, config: {} });
-const emptyForm = { titre: "", description: "", actif: true, expires_at: "" };
+// ── Factories ─────────────────────────────────────────────────────────────
+const emptyQ = () => ({
+  _id: Date.now() + Math.random(), _type: "question",
+  type: "single", libelle: "", options: ["", ""],
+  obligatoire: true, config: {}, logic: {}, options_images: {},
+});
+const emptySection = () => ({
+  _id: Date.now() + Math.random(), _type: "section",
+  titre: "Nouvelle section", description: "",
+});
+const emptyForm = { titre: "", description: "", actif: true, expires_at: "", theme: { preset: "mbp" } };
 
+// ── Composant principal ────────────────────────────────────────────────────
 export default function SondagesSection() {
-  const { sondages, loading, createSondage, updateSondage, deleteSondage } = useSondages({ adminMode: true });
+  const { sondages, loading, createSondage, updateSondage, deleteSondage, duplicateSondage } = useSondages({ adminMode: true });
   const [form, setForm] = useState(null);
-  const [questions, setQuestions] = useState([emptyQ()]);
+  const [items, setItems] = useState([emptyQ()]); // flat list: questions + section breaks
   const [expanded, setExpanded] = useState({});
   const [results, setResults] = useState({});
   const [saving, setSaving] = useState(false);
@@ -599,31 +709,69 @@ export default function SondagesSection() {
 
   const origin = window.location.origin;
 
-  function openForm() { setForm({ ...emptyForm }); setQuestions([emptyQ()]); }
-  function updateQ(i, q) { setQuestions(qs => qs.map((x, j) => j === i ? q : x)); }
-  function addQ() { setQuestions(qs => [...qs, emptyQ()]); }
-  function removeQ(i) { if (questions.length <= 1) return; setQuestions(qs => qs.filter((_, j) => j !== i)); }
-  function moveQ(i, dir) {
-    setQuestions(qs => {
-      const arr = [...qs]; const j = i + dir;
-      if (j < 0 || j >= arr.length) return qs;
-      [arr[i], arr[j]] = [arr[j], arr[i]]; return arr;
+  const sectionItems = useMemo(() => items.filter(i => i._type === "section"), [items]);
+  const questionItems = useMemo(() => items.filter(i => i._type === "question"), [items]);
+
+  function openForm() { setForm({ ...emptyForm }); setItems([emptyQ()]); }
+
+  function updateItem(id, updated) {
+    setItems(prev => prev.map(it => it._id === id ? updated : it));
+  }
+  function removeItem(id) {
+    setItems(prev => {
+      const next = prev.filter(it => it._id !== id);
+      return next.filter(it => it._type === "question").length >= 1 ? next : prev;
     });
   }
+  function moveItem(id, dir) {
+    setItems(prev => {
+      const idx = prev.findIndex(it => it._id === id);
+      if (idx < 0) return prev;
+      const j = idx + dir;
+      if (j < 0 || j >= prev.length) return prev;
+      const arr = [...prev];
+      [arr[idx], arr[j]] = [arr[j], arr[idx]];
+      return arr;
+    });
+  }
+  function addQ() { setItems(prev => [...prev, emptyQ()]); }
+  function addSectionBreak() { setItems(prev => [...prev, emptySection()]); }
 
   async function handleSubmit() {
     if (!form.titre?.trim()) { toast.error("Le titre est obligatoire."); return; }
-    const validQ = questions.filter(q => q.libelle.trim());
-    if (!validQ.length) { toast.error("Au moins une question requise."); return; }
-    for (const q of validQ) {
+    const questions = questionItems.filter(q => q.libelle.trim());
+    if (!questions.length) { toast.error("Au moins une question requise."); return; }
+    for (const q of questions) {
       if (["single", "multiple", "dropdown"].includes(q.type)) {
-        if ((q.options || []).filter(o => o.trim()).length < 2) { toast.error(`"${q.libelle}" : au moins 2 options requises.`); return; }
+        if ((q.options || []).filter(o => o.trim()).length < 2) {
+          toast.error(`"${q.libelle}" : au moins 2 options requises.`); return;
+        }
       }
     }
+
+    // Assign section temp IDs from position
+    let currentSectionTempId = null;
+    const questionsWithSection = [];
+    items.forEach(item => {
+      if (item._type === "section") { currentSectionTempId = item._id; }
+      else if (item._type === "question" && item.libelle.trim()) {
+        questionsWithSection.push({ ...item, _sectionTempId: currentSectionTempId });
+      }
+    });
+
+    const sections = sectionItems.map(sec => ({
+      _tempId: sec._id, titre: sec.titre || "Section", description: sec.description || "",
+    }));
+
     setSaving(true);
     const error = await createSondage({
-      titre: form.titre.trim(), description: form.description?.trim() || null,
-      actif: form.actif, expires_at: form.expires_at || null, questions: validQ,
+      titre: form.titre.trim(),
+      description: form.description?.trim() || null,
+      actif: form.actif,
+      expires_at: form.expires_at || null,
+      theme: form.theme || {},
+      sections,
+      questions: questionsWithSection,
     });
     setSaving(false);
     if (error) { toast.error("Erreur : " + error.message); return; }
@@ -655,13 +803,18 @@ export default function SondagesSection() {
     await deleteSondage(s.id); toast.success("Sondage supprimé.");
   }
 
+  async function handleDuplicate(s) {
+    const err = await duplicateSondage(s);
+    if (err) toast.error("Erreur : " + err.message);
+    else toast.success(`Copie de « ${s.titre} » créée.`);
+  }
+
   return (
     <div className="space-y-5">
       {inviteModal && (
         <InviteModal
           sondage={inviteModal.sondage}
           origin={origin}
-          pendingOnly={inviteModal.pendingOnly}
           pendingInvitations={inviteModal.pending || []}
           onClose={() => setInviteModal(null)}
         />
@@ -670,7 +823,7 @@ export default function SondagesSection() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Sondages & formulaires</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">7 types de questions · invitations email · export CSV · suivi des réponses</p>
+          <p className="text-xs text-muted-foreground mt-0.5">7 types · sections · logique · thèmes · images · CSV · invitations</p>
         </div>
         <button onClick={openForm}
           className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
@@ -699,27 +852,68 @@ export default function SondagesSection() {
                   <span className="text-sm text-foreground">Publier immédiatement</span>
                 </label>
               </div>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Questions ({questions.length})</p>
-              <div className="space-y-3">
-                {questions.map((q, i) => (
-                  <QuestionBuilder key={q._id} q={q} idx={i} total={questions.length}
-                    onChange={updated => updateQ(i, updated)}
-                    onRemove={() => removeQ(i)}
-                    onMove={(_, dir) => moveQ(i, dir)} />
-                ))}
+              <div className="md:col-span-2">
+                <ThemePicker value={form.theme} onChange={theme => setForm(p => ({ ...p, theme }))} />
               </div>
-              <button type="button" onClick={addQ} className="mt-3 flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
-                <Plus className="w-4 h-4" /> Ajouter une question
-              </button>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Questions & sections ({questionItems.length} question{questionItems.length !== 1 ? "s" : ""}{sectionItems.length > 0 ? `, ${sectionItems.length} section${sectionItems.length !== 1 ? "s" : ""}` : ""})
+              </p>
+              <div className="space-y-2">
+                {items.map((item, globalIdx) => {
+                  if (item._type === "section") {
+                    return (
+                      <div key={item._id} className="flex items-start gap-1">
+                        <div className="flex flex-col gap-0 pt-3">
+                          <button type="button" onClick={() => moveItem(item._id, -1)} disabled={globalIdx === 0}
+                            className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                            <ChevronUp className="w-3 h-3" />
+                          </button>
+                          <button type="button" onClick={() => moveItem(item._id, 1)} disabled={globalIdx === items.length - 1}
+                            className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                            <ChevronDown className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <div className="flex-1">
+                          <SectionBuilder
+                            sec={item}
+                            onChangeSec={updated => updateItem(item._id, updated)}
+                            onRemoveSec={() => removeItem(item._id)}
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+                  // Question item
+                  const qIdx = items.slice(0, globalIdx + 1).filter(i => i._type === "question").length - 1;
+                  return (
+                    <QuestionBuilder key={item._id}
+                      q={item} idx={qIdx} total={questionItems.length}
+                      onChange={updated => updateItem(item._id, updated)}
+                      onRemove={() => removeItem(item._id)}
+                      onMove={(_, dir) => moveItem(item._id, dir)}
+                      sectionItems={sectionItems}
+                    />
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex items-center gap-3">
+                <button type="button" onClick={addQ} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
+                  <Plus className="w-4 h-4" /> Ajouter une question
+                </button>
+                <button type="button" onClick={addSectionBreak} className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 font-medium">
+                  <Columns className="w-4 h-4" /> Ajouter une section
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex justify-end gap-2 px-5 pb-5">
             <button onClick={() => setForm(null)} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
             <button onClick={handleSubmit} disabled={saving}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
-              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Créer
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Créer le sondage
             </button>
           </div>
         </div>
@@ -735,12 +929,13 @@ export default function SondagesSection() {
       ) : (
         <div className="space-y-4">
           {sondages.map(s => {
+            const theme = SONDAGE_THEMES[s.theme?.preset] || SONDAGE_THEMES.mbp;
             const isExpired = s.expires_at && new Date(s.expires_at) < new Date();
             const res = results[s.id];
             const pendingInv = (res?.invitations || []).filter(i => !i.a_repondu);
             return (
               <div key={s.id} className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
-                <div className={`h-1 w-full ${s.actif && !isExpired ? "bg-emerald-500" : "bg-slate-300"}`} />
+                <div className="h-1 w-full" style={{ background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})` }} />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
@@ -749,19 +944,14 @@ export default function SondagesSection() {
                           {isExpired ? "Clôturé" : s.actif ? "En cours" : "Désactivé"}
                         </span>
                         <span className="text-xs text-muted-foreground">{s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}</span>
+                        {s.sections?.length > 0 && <span className="text-xs text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded-full">{s.sections.length} section{s.sections.length !== 1 ? "s" : ""}</span>}
                         {s.expires_at && <span className="text-xs text-muted-foreground">· Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}</span>}
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ background: theme.primary }} title={theme.label} />
                       </div>
                       <h3 className="font-semibold text-foreground leading-tight">{s.titre}</h3>
                       {s.description && <p className="text-sm text-muted-foreground mt-0.5">{s.description}</p>}
-                      <div className="mt-2 flex gap-1 flex-wrap">
-                        {(s.questions || []).map((q, i) => (
-                          <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
-                            {Q_TYPE_LABELS[q.type]} · {q.libelle.length > 25 ? q.libelle.slice(0, 25) + "…" : q.libelle}
-                          </span>
-                        ))}
-                      </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
                       <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv })} title="Envoyer invitations"
                         className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center text-muted-foreground hover:text-blue-600 transition-colors">
                         <Send className="w-3.5 h-3.5" />
@@ -777,6 +967,10 @@ export default function SondagesSection() {
                       <button onClick={() => toggleResults(s.id)} title="Résultats"
                         className="w-8 h-8 rounded-lg hover:bg-indigo-50 flex items-center justify-center text-muted-foreground hover:text-indigo-600 transition-colors">
                         {expanded[s.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                      <button onClick={() => handleDuplicate(s)} title="Dupliquer"
+                        className="w-8 h-8 rounded-lg hover:bg-sky-50 flex items-center justify-center text-muted-foreground hover:text-sky-600 transition-colors">
+                        <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => toggleActif(s)} title={s.actif ? "Désactiver" : "Activer"}
                         className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-bold ${s.actif ? "hover:bg-amber-50 text-amber-500" : "hover:bg-emerald-50 text-muted-foreground hover:text-emerald-600"}`}>
@@ -805,7 +999,7 @@ export default function SondagesSection() {
                                   {res.invitations.filter(i => i.a_repondu).length}/{res.invitations.length} invités ont répondu
                                 </p>
                                 {pendingInv.length > 0 && (
-                                  <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv, pendingOnly: true })}
+                                  <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv })}
                                     className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors flex items-center gap-1">
                                     <RefreshCw className="w-2.5 h-2.5" /> Relancer ({pendingInv.length})
                                   </button>

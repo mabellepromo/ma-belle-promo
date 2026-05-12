@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import {
   getSondageWithQuestions, hasVoted, submitSondage,
-  getSondageResults, getFingerprint, getInvitationByToken,
+  getSondageResults, getFingerprint, getInvitationByToken, getTheme,
 } from "../hooks/useSondages";
-import { Check, ChevronLeft, Loader2 } from "lucide-react";
-
-const COLORS = ["#0a3d28", "#1a7a4e", "#b8861a", "#1e40af", "#7c3aed", "#0e7490"];
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 // ── Résultats après vote ───────────────────────────────────────────────────
-function PublicQuestionResults({ question, reponses }) {
+function PublicQuestionResults({ question, reponses, theme }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
   if (question.type === "texte" || question.type === "date") {
@@ -61,7 +59,7 @@ function PublicQuestionResults({ question, reponses }) {
             </div>
             <div className="h-2.5 bg-muted rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                style={{ width: `${pct}%`, background: theme.primary }} />
             </div>
           </div>
         );
@@ -71,7 +69,7 @@ function PublicQuestionResults({ question, reponses }) {
 }
 
 // ── Saisie par type ────────────────────────────────────────────────────────
-function QuestionInput({ question, answer, onChange }) {
+function QuestionInput({ question, answer, onChange, theme }) {
   const val = answer || {};
 
   if (question.type === "ouinon") {
@@ -94,23 +92,24 @@ function QuestionInput({ question, answer, onChange }) {
   if (question.type === "single") {
     return (
       <div className="space-y-2">
-        {(question.options || []).map((opt, i) => (
-          <button key={i} type="button" onClick={() => onChange({ valeur_options: [i] })}
-            className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
-              val.valeur_options?.includes(i)
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
-            }`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                val.valeur_options?.includes(i) ? "border-primary bg-primary" : "border-border"
+        {(question.options || []).map((opt, i) => {
+          const img = question.options_images?.[i];
+          const selected = val.valeur_options?.includes(i);
+          return (
+            <button key={i} type="button" onClick={() => onChange({ valeur_options: [i] })}
+              className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                selected ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
               }`}>
-                {val.valeur_options?.includes(i) && <Check className="w-3 h-3 text-white" />}
+              <div className="flex items-center gap-3">
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
+                  {selected && <Check className="w-3 h-3 text-white" />}
+                </div>
+                {img && <img src={img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
+                {opt}
               </div>
-              {opt}
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     );
   }
@@ -122,23 +121,24 @@ function QuestionInput({ question, answer, onChange }) {
     }
     return (
       <div className="space-y-2">
-        {(question.options || []).map((opt, i) => (
-          <button key={i} type="button" onClick={() => toggle(i)}
-            className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
-              val.valeur_options?.includes(i)
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
-            }`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${
-                val.valeur_options?.includes(i) ? "border-primary bg-primary" : "border-border"
+        {(question.options || []).map((opt, i) => {
+          const img = question.options_images?.[i];
+          const selected = val.valeur_options?.includes(i);
+          return (
+            <button key={i} type="button" onClick={() => toggle(i)}
+              className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                selected ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
               }`}>
-                {val.valeur_options?.includes(i) && <Check className="w-3 h-3 text-white" />}
+              <div className="flex items-center gap-3">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
+                  {selected && <Check className="w-3 h-3 text-white" />}
+                </div>
+                {img && <img src={img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
+                {opt}
               </div>
-              {opt}
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     );
   }
@@ -151,7 +151,8 @@ function QuestionInput({ question, answer, onChange }) {
           const v = e.target.value;
           onChange(v === "" ? {} : { valeur_options: [Number(v)] });
         }}
-        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
+        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:border-primary bg-background"
+        style={{ "--tw-ring-color": theme.primary + "4d" }}
       >
         <option value="">— Sélectionner —</option>
         {(question.options || []).map((opt, i) => (
@@ -209,13 +210,32 @@ function QuestionInput({ question, answer, onChange }) {
             {n}
           </button>
         ))}
-        {val.valeur_note && (
-          <span className="self-center text-sm text-muted-foreground ml-1">{val.valeur_note} / 5</span>
-        )}
+        {val.valeur_note && <span className="self-center text-sm text-muted-foreground ml-1">{val.valeur_note} / 5</span>}
       </div>
     );
   }
 
+  return null;
+}
+
+// ── Validation d'une réponse ───────────────────────────────────────────────
+function validateAnswer(q, a) {
+  if (!q.obligatoire) return null;
+  const missing =
+    ((q.type === "single" || q.type === "multiple" || q.type === "ouinon" || q.type === "dropdown") && (!a?.valeur_options?.length)) ||
+    ((q.type === "texte" || q.type === "date") && !a?.valeur_texte?.trim()) ||
+    (q.type === "note" && !a?.valeur_note);
+  if (missing) return `La question "${q.libelle}" est obligatoire.`;
+
+  if (q.type === "texte" && a?.valeur_texte?.trim()) {
+    const v = a.valeur_texte.trim();
+    if (q.config?.validation === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
+      return `La question "${q.libelle}" requiert une adresse email valide.`;
+    if (q.config?.validation === "nombre" && isNaN(Number(v)))
+      return `La question "${q.libelle}" requiert un nombre valide.`;
+    if (q.config?.validation === "telephone" && !/^[\d\s+\-()]{6,}$/.test(v))
+      return `La question "${q.libelle}" requiert un numéro de téléphone valide.`;
+  }
   return null;
 }
 
@@ -226,11 +246,43 @@ export default function Sondage() {
   const token = searchParams.get("token");
 
   const [sondage, setSondage] = useState(null);
-  const [invitation, setInvitation] = useState(null); // set si réponse via token
+  const [invitation, setInvitation] = useState(null);
   const [status, setStatus] = useState("loading");
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [results, setResults] = useState(null);
+  const [currentPageIdx, setCurrentPageIdx] = useState(0);
+
+  // Regrouper les questions par section pour la navigation
+  const pages = useMemo(() => {
+    if (!sondage) return [];
+    const allSections = sondage.sections || [];
+    if (allSections.length === 0) return []; // single-page mode
+
+    const result = [];
+    const ungrouped = sondage.questions.filter(q => !q.section_id);
+    if (ungrouped.length > 0) {
+      result.push({ id: "__ungrouped__", titre: null, description: null, questions: ungrouped });
+    }
+    allSections.forEach(sec => {
+      const qs = sondage.questions.filter(q => q.section_id === sec.id);
+      if (qs.length > 0) result.push({ id: sec.id, titre: sec.titre, description: sec.description, questions: qs });
+    });
+    return result;
+  }, [sondage]);
+
+  const useSections = pages.length > 0;
+  const currentPage = useSections ? pages[currentPageIdx] : null;
+  const visibleQuestions = useSections ? (currentPage?.questions || []) : (sondage?.questions || []);
+
+  const theme = useMemo(() => getTheme(sondage), [sondage]);
+
+  // Progression
+  const progressPct = useSections
+    ? Math.round(((currentPageIdx) / pages.length) * 100)
+    : sondage?.questions?.length > 0
+      ? Math.round((Object.values(answers).filter(a => a?.valeur_options?.length || a?.valeur_texte?.trim() || a?.valeur_note).length / sondage.questions.length) * 100)
+      : 0;
 
   useEffect(() => {
     async function load() {
@@ -238,28 +290,20 @@ export default function Sondage() {
       if (!data) { setStatus("notfound"); return; }
       setSondage(data);
 
-      // Vérification anti-doublon selon le mode (token ou fingerprint)
       if (token) {
         const inv = await getInvitationByToken(token);
-        if (!inv || inv.sondage_id !== id) {
-          // Token invalide ou ne correspond pas à ce sondage → mode anonyme
-        } else {
+        if (inv && inv.sondage_id === id) {
           setInvitation(inv);
           if (inv.a_repondu) {
             const res = await getSondageResults(id);
-            setResults(res);
-            setStatus("voted");
-            return;
+            setResults(res); setStatus("voted"); return;
           }
         }
       } else {
         const fp = getFingerprint();
-        const voted = await hasVoted(id, fp);
-        if (voted) {
+        if (await hasVoted(id, fp)) {
           const res = await getSondageResults(id);
-          setResults(res);
-          setStatus("voted");
-          return;
+          setResults(res); setStatus("voted"); return;
         }
       }
 
@@ -278,31 +322,54 @@ export default function Sondage() {
     setAnswers(p => ({ ...p, [questionId]: val }));
   }
 
-  async function handleSubmit() {
-    for (const q of (sondage.questions || [])) {
+  // Évaluer la logique conditionnelle d'une page
+  function evaluateLogic(pageQuestions) {
+    for (const q of pageQuestions) {
+      if (!q.logic?.rules?.length) continue;
       const a = answers[q.id] || {};
-      if (q.obligatoire) {
-        const missing =
-          ((q.type === "single" || q.type === "multiple" || q.type === "ouinon" || q.type === "dropdown") && (!a.valeur_options || !a.valeur_options.length)) ||
-          ((q.type === "texte" || q.type === "date") && !a.valeur_texte?.trim()) ||
-          (q.type === "note" && !a.valeur_note);
-        if (missing) { alert(`La question "${q.libelle}" est obligatoire.`); return; }
-      }
-      // Validation de format pour les champs texte
-      if (q.type === "texte" && a.valeur_texte?.trim()) {
-        const v = a.valeur_texte.trim();
-        if (q.config?.validation === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
-          alert(`La question "${q.libelle}" requiert une adresse email valide.`); return;
-        }
-        if (q.config?.validation === "nombre" && isNaN(Number(v))) {
-          alert(`La question "${q.libelle}" requiert un nombre valide.`); return;
-        }
-        if (q.config?.validation === "telephone" && !/^[\d\s+\-()]{6,}$/.test(v)) {
-          alert(`La question "${q.libelle}" requiert un numéro de téléphone valide.`); return;
+      for (const rule of q.logic.rules) {
+        if (a.valeur_options?.includes(rule.option_index)) {
+          return rule.goto_section_id; // "__end__" ou section UUID
         }
       }
     }
+    return null;
+  }
 
+  async function handleNext() {
+    // Valider les questions de la page actuelle
+    for (const q of visibleQuestions) {
+      const err = validateAnswer(q, answers[q.id]);
+      if (err) { alert(err); return; }
+    }
+
+    if (!useSections) {
+      // Single-page : soumettre directement
+      await doSubmit();
+      return;
+    }
+
+    // Évaluer la logique conditionnelle
+    const logicTarget = evaluateLogic(currentPage.questions);
+    if (logicTarget === "__end__") {
+      await doSubmit(); return;
+    }
+
+    let nextIdx = currentPageIdx + 1;
+    if (logicTarget) {
+      const targetIdx = pages.findIndex(p => p.id === logicTarget);
+      if (targetIdx !== -1) nextIdx = targetIdx;
+    }
+
+    if (nextIdx >= pages.length) {
+      await doSubmit();
+    } else {
+      setCurrentPageIdx(nextIdx);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  async function doSubmit() {
     setSubmitting(true);
     const fp = invitation ? null : getFingerprint();
     const error = await submitSondage(
@@ -313,21 +380,19 @@ export default function Sondage() {
     );
 
     if (error) {
-      if (error.code === "23505") {
-        setStatus("voted");
-      } else {
-        alert("Erreur : " + error.message);
-      }
+      if (error.code === "23505") { setStatus("voted"); }
+      else { alert("Erreur : " + error.message); }
     } else {
       const res = await getSondageResults(id);
-      setResults(res);
-      setStatus("voted");
+      setResults(res); setStatus("voted");
     }
     setSubmitting(false);
   }
 
+  const isLastPage = !useSections || currentPageIdx === pages.length - 1;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30 flex flex-col">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex flex-col`}>
 
       <header className="bg-white border-b border-border shadow-sm px-6 py-4 flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -335,7 +400,7 @@ export default function Sondage() {
         </Link>
         <div className="h-4 w-px bg-border" />
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "#0a3d28" }}>
+          <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: theme.primary }}>
             <span className="text-white text-xs font-bold">S</span>
           </div>
           <span className="text-sm font-semibold text-foreground">Sondage MBP</span>
@@ -346,6 +411,13 @@ export default function Sondage() {
           </span>
         )}
       </header>
+
+      {/* Barre de progression */}
+      {status === "active" && (
+        <div className="h-1 bg-muted">
+          <div className="h-full transition-all duration-500" style={{ width: `${progressPct}%`, background: theme.primary }} />
+        </div>
+      )}
 
       <main className="flex-1 flex items-start justify-center p-6 pt-10">
         <div className="w-full max-w-2xl space-y-4">
@@ -378,7 +450,7 @@ export default function Sondage() {
 
           {status === "voted" && sondage && results && (
             <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="h-1.5 w-full" style={{ background: "linear-gradient(to right, #0a3d28, #b8861a)" }} />
+              <div className="h-1.5 w-full" style={{ background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})` }} />
               <div className="p-6">
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -393,7 +465,7 @@ export default function Sondage() {
                   {(sondage.questions || []).map((q, i) => (
                     <div key={q.id}>
                       <p className="text-sm font-semibold text-foreground mb-3">{i + 1}. {q.libelle}</p>
-                      <PublicQuestionResults question={q} reponses={results.reponses} />
+                      <PublicQuestionResults question={q} reponses={results.reponses} theme={theme} />
                     </div>
                   ))}
                 </div>
@@ -403,33 +475,70 @@ export default function Sondage() {
 
           {status === "active" && sondage && (
             <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="h-1.5 w-full" style={{ background: "linear-gradient(to right, #0a3d28, #b8861a)" }} />
+              <div className="h-1.5 w-full" style={{ background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})` }} />
               <div className="p-6">
-                <div className="mb-6">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">En cours</span>
-                  <h2 className="font-heading text-xl font-bold text-foreground leading-tight mt-2">{sondage.titre}</h2>
-                  {sondage.description && <p className="text-sm text-muted-foreground mt-1">{sondage.description}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {sondage.questions?.length} question{sondage.questions?.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
+                {/* En-tête sondage */}
+                {(!useSections || currentPageIdx === 0) && (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">En cours</span>
+                      {useSections && (
+                        <span className="text-xs text-muted-foreground">
+                          Étape {currentPageIdx + 1} / {pages.length}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="font-heading text-xl font-bold text-foreground leading-tight">{sondage.titre}</h2>
+                    {sondage.description && <p className="text-sm text-muted-foreground mt-1">{sondage.description}</p>}
+                    {!useSections && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {sondage.questions?.length} question{sondage.questions?.length !== 1 ? "s" : ""}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* En-tête de section */}
+                {useSections && currentPage?.titre && (
+                  <div className="mb-5">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs text-muted-foreground">Étape {currentPageIdx + 1} / {pages.length}</p>
+                    </div>
+                    <h3 className="font-heading text-lg font-bold text-foreground">{currentPage.titre}</h3>
+                    {currentPage.description && <p className="text-sm text-muted-foreground mt-0.5">{currentPage.description}</p>}
+                  </div>
+                )}
+
+                {/* Questions */}
                 <div className="space-y-8">
-                  {(sondage.questions || []).map((q, i) => (
+                  {visibleQuestions.map((q, i) => (
                     <div key={q.id}>
                       <p className="text-sm font-semibold text-foreground mb-3">
                         {i + 1}. {q.libelle}
                         {!q.obligatoire && <span className="ml-1.5 text-xs font-normal text-muted-foreground">(optionnel)</span>}
                       </p>
-                      <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} />
+                      <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme} />
                     </div>
                   ))}
                 </div>
-                <button onClick={handleSubmit} disabled={submitting}
-                  className="mt-8 w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: "#0a3d28", color: "#fff" }}>
-                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {submitting ? "Envoi en cours…" : "Envoyer mes réponses"}
-                </button>
+
+                {/* Navigation */}
+                <div className="mt-8 flex items-center gap-3">
+                  {useSections && currentPageIdx > 0 && (
+                    <button onClick={() => { setCurrentPageIdx(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      className="flex items-center gap-1.5 px-5 py-3 rounded-xl border border-border font-medium text-sm text-foreground hover:bg-muted transition-all">
+                      <ChevronLeft className="w-4 h-4" /> Précédent
+                    </button>
+                  )}
+                  <button onClick={handleNext} disabled={submitting}
+                    className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
+                    style={{ background: theme.primary }}>
+                    {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {submitting ? "Envoi en cours…"
+                      : isLastPage ? "Envoyer mes réponses"
+                      : <><span>Suivant</span><ChevronRight className="w-4 h-4" /></>}
+                  </button>
+                </div>
               </div>
             </div>
           )}
