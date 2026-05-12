@@ -191,6 +191,39 @@ export default function Dashboard() {
     });
   }, [allMembers, search]);
 
+  async function exportBackup() {
+    toast("Préparation du backup…");
+    try {
+      const [members_, cotisations_, articles_, evenements_, sondages_] = await Promise.all([
+        supabase.from("members").select("*"),
+        supabase.from("cotisations").select("*"),
+        supabase.from("articles").select("*"),
+        supabase.from("evenements").select("*"),
+        supabase.from("sondages").select("*"),
+      ]);
+      const backup = {
+        exportedAt: new Date().toISOString(),
+        version: "1.0",
+        project: "FDD Ma Belle Promo",
+        data: {
+          members:     members_.data     ?? [],
+          cotisations: cotisations_.data ?? [],
+          articles:    articles_.data    ?? [],
+          evenements:  evenements_.data  ?? [],
+          sondages:    sondages_.data    ?? [],
+        },
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8;" });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement("a"), { href: url, download: `mbp-backup-${new Date().toISOString().slice(0, 10)}.json` });
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Backup téléchargé !");
+    } catch (err) {
+      toast.error("Erreur backup : " + err.message);
+    }
+  }
+
   async function handleSaveEditMember() {
     if (!editingMember) return;
     await updateMember(editingMember, editingMember);
@@ -820,6 +853,13 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground mt-3">
                     Pour gérer les comptes : ouvrir le dashboard Supabase → Authentication → Users. Le champ <code className="text-primary font-mono">role</code> dans les métadonnées détermine les droits.
                   </p>
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Administration</p>
+                    <button onClick={exportBackup}
+                      className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors py-1">
+                      <Download className="w-3 h-3" /> Backup JSON complet
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

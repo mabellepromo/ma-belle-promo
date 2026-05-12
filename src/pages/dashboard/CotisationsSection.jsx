@@ -2,7 +2,7 @@ import { useState, useMemo, Fragment } from "react";
 import { toast } from "sonner";
 import {
   Check, Clock, X, Download, Search, Banknote, Users, ShieldOff,
-  Mail, Send, AlertTriangle, Plus, CreditCard, FileText, BarChart2,
+  Mail, Send, AlertTriangle, Plus, CreditCard, FileText, BarChart2, TrendingUp,
 } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";
 import { useMultiYearCotisations } from "../../hooks/useMultiYearCotisations";
@@ -184,6 +184,23 @@ export default function CotisationsSection({ members }) {
     URL.revokeObjectURL(url);
   }
 
+  const evolutionData = useMemo(() => {
+    const total = (members ?? []).length || 1;
+    return MULTI_YEARS.map(yr => {
+      let payes = 0, partiels = 0, exemptes = 0, collecte = 0;
+      (members ?? []).forEach(m => {
+        const d = multiData[String(m.id)]?.[yr];
+        if (!d) return;
+        if (d.statut === "payé")    { payes++;   collecte += d.montant || 0; }
+        if (d.statut === "partiel") { partiels++; collecte += d.montant || 0; }
+        if (d.statut === "exempté") exemptes++;
+      });
+      const effectif = total - exemptes;
+      const taux = effectif > 0 ? Math.round((payes / effectif) * 100) : 0;
+      return { annee: yr, payes, partiels, exemptes, total, collecte, taux, enAttente: total - payes - partiels - exemptes };
+    });
+  }, [members, multiData]);
+
   const STAT_CARDS = [
     { label: "Payés (complet)", value: `${stats.payes} / ${stats.total_membres}`, icon: Check,       bg: "bg-emerald-50", text: "text-emerald-600", bar: "bg-emerald-500" },
     { label: "Paiement partiel",  value: stats.partiels,                           icon: CreditCard,  bg: "bg-blue-50",    text: "text-blue-600",    bar: "bg-blue-500"    },
@@ -220,6 +237,10 @@ export default function CotisationsSection({ members }) {
             <button onClick={() => setVue("historique")}
               className={`px-3 h-9 text-sm font-medium transition-colors flex items-center gap-1.5 ${vue === "historique" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"}`}>
               <BarChart2 className="w-3.5 h-3.5" /> Historique
+            </button>
+            <button onClick={() => setVue("evolution")}
+              className={`px-3 h-9 text-sm font-medium transition-colors flex items-center gap-1.5 ${vue === "evolution" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"}`}>
+              <TrendingUp className="w-3.5 h-3.5" /> Évolution
             </button>
           </div>
           {relancables.length > 0 && (
@@ -418,6 +439,78 @@ export default function CotisationsSection({ members }) {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {/* ── Vue évolution year-over-year ── */}
+      {vue === "evolution" && (
+        <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <span className="text-sm font-bold text-foreground">Évolution {MULTI_YEARS[0]}–{MULTI_YEARS.at(-1)}</span>
+            <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Payé</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Partiel</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-300 inline-block" /> En attente</span>
+            </div>
+          </div>
+          <div className="p-6">
+            {multiLoading ? (
+              <div className="text-center text-sm text-muted-foreground py-8">Chargement…</div>
+            ) : (
+              <>
+                {/* Barres empilées */}
+                <div className="flex items-end gap-4 mb-5" style={{ height: "140px" }}>
+                  {evolutionData.map(d => {
+                    const base = d.total || 1;
+                    const isCurrent = d.annee === currentYear;
+                    const payePct    = (d.payes     / base) * 100;
+                    const partielPct = (d.partiels  / base) * 100;
+                    const attentePct = (d.enAttente / base) * 100;
+                    return (
+                      <div key={d.annee} className="flex-1 flex flex-col items-center gap-1.5">
+                        <span className={`text-xs font-bold ${isCurrent ? "text-primary" : "text-foreground"}`}>{d.taux}%</span>
+                        <div className="w-full flex flex-col-reverse rounded-lg overflow-hidden border border-border/30" style={{ height: "100px" }}>
+                          {attentePct > 0 && <div className="bg-amber-300 w-full transition-all duration-700 flex-shrink-0" style={{ height: `${attentePct}%` }} title={`En attente : ${d.enAttente}`} />}
+                          {partielPct > 0 && <div className="bg-blue-400  w-full transition-all duration-700 flex-shrink-0" style={{ height: `${partielPct}%` }} title={`Partiels : ${d.partiels}`} />}
+                          {payePct    > 0 && <div className="bg-emerald-500 w-full transition-all duration-700 flex-shrink-0" style={{ height: `${payePct}%` }} title={`Payés : ${d.payes}`} />}
+                        </div>
+                        <span className={`text-xs font-semibold ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>{d.annee}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Tableau récapitulatif */}
+                <table className="w-full text-xs border-t border-border pt-4">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 font-semibold text-muted-foreground">Année</th>
+                      <th className="text-center py-2 font-semibold text-emerald-600">Payés</th>
+                      <th className="text-center py-2 font-semibold text-blue-600">Partiels</th>
+                      <th className="text-center py-2 font-semibold text-amber-600">En attente</th>
+                      <th className="text-center py-2 font-semibold text-muted-foreground">Taux</th>
+                      <th className="text-right py-2 font-semibold text-violet-600">Collecté</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50">
+                    {evolutionData.map(d => (
+                      <tr key={d.annee} className={d.annee === currentYear ? "bg-primary/5" : ""}>
+                        <td className="py-2 font-semibold text-foreground">{d.annee}</td>
+                        <td className="py-2 text-center text-emerald-700 font-semibold">{d.payes}</td>
+                        <td className="py-2 text-center text-blue-700">{d.partiels}</td>
+                        <td className="py-2 text-center text-amber-700">{d.enAttente}</td>
+                        <td className="py-2 text-center">
+                          <span className={`font-bold ${d.taux >= 80 ? "text-emerald-600" : d.taux >= 50 ? "text-amber-600" : "text-red-500"}`}>{d.taux}%</span>
+                        </td>
+                        <td className="py-2 text-right font-mono text-violet-700">{d.collecte.toLocaleString("fr-FR")} FCFA</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
         </div>
       )}
 
