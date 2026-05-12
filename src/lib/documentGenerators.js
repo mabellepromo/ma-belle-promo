@@ -1037,6 +1037,67 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
   openDoc(html, `Recu-MBP-${annee}-${member.nom.replace(/\s+/g, "-")}.html`);
 }
 
+export function genererTrombinoscope(members) {
+  const ref = refNumber("TRB", "MBP");
+  const actifs = (members ?? []).filter(m => m.status !== "pending");
+
+  const cartes = actifs.map(m => {
+    const initiale = (m.nom || "M").charAt(0).toUpperCase();
+    const photoHtml = m.photo
+      ? `<img src="${m.photo}" alt="${m.nom}" style="width:100%;height:100%;object-fit:cover;object-position:top center;border-radius:50%;display:block;" onerror="this.style.display='none'" />`
+      : `<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#0a3d28,#1a7a4e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22pt;font-family:'Cormorant Garamond',serif;font-weight:700;">${initiale}</div>`;
+    return `
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 10px;border:1px solid #e2e8f0;border-radius:10px;break-inside:avoid;">
+        <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:2.5px solid #b8861a;padding:2px;background:linear-gradient(135deg,#f9f3e3,#fff);flex-shrink:0;margin-bottom:8px;">
+          ${photoHtml}
+        </div>
+        <p style="font-family:'Lato',sans-serif;font-size:8.5pt;font-weight:700;color:#0f172a;line-height:1.2;margin:0 0 2px;">${m.nom}</p>
+        ${m.profession ? `<p style="font-family:'Lato',sans-serif;font-size:7pt;color:#64748b;line-height:1.2;margin:0 0 3px;">${m.profession}</p>` : ""}
+        ${m.bureau ? `<span style="font-size:6.5pt;font-weight:700;color:#b8861a;background:#fffbeb;border:1px solid #fde68a;padding:1px 6px;border-radius:99px;">Bureau</span>` : ""}
+        ${(m.ville || m.pays) ? `<p style="font-family:'Lato',sans-serif;font-size:6.5pt;color:#94a3b8;margin-top:3px;">${[m.ville,m.pays].filter(Boolean).join(", ")}</p>` : ""}
+      </div>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trombinoscope — FDD Ma Belle Promo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Lato:wght@400;700&display=swap');
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page { size:A4 portrait; margin:15mm 12mm; }
+    body { font-family:'Lato',sans-serif; background:#f0f0f0; padding:20px 0 40px; }
+    @media print { body { background:#fff; padding:0; } .no-print { display:none!important; } }
+    .header { background:linear-gradient(135deg,#0a3d28,#1a7a4e); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; border-radius:8px 8px 0 0; margin-bottom:0; }
+    .gold-bar { height:3px; background:linear-gradient(to right,#b8861a,#e6b84a,#b8861a); margin-bottom:16px; }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .footer { margin-top:16px; display:flex; justify-content:space-between; font-size:7pt; color:#94a3b8; border-top:1px solid #e2e8f0; padding-top:8px; }
+    .print-btn { position:fixed; bottom:24px; right:24px; background:#0a3d28; color:#fff; border:none; border-radius:50px; padding:12px 24px; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(10,61,40,.4); z-index:999; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="header">
+    <img src="/Logo%20Redesign1.png" alt="MBP" style="height:40px;width:auto;" onerror="this.style.display='none'" />
+    <div style="text-align:right;">
+      <p style="font-family:'Cormorant Garamond',serif;font-size:14pt;font-weight:700;color:#fff;line-height:1.2;">FDD Ma Belle Promo</p>
+      <p style="font-size:8pt;color:rgba(255,255,255,0.65);">Trombinoscope — ${actifs.length} membres · Promotion 1994–2000</p>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="grid">${cartes}</div>
+  <div class="footer">
+    <span>FDD Ma Belle Promo · www.mabellepromo.org</span>
+    <span>Réf. ${ref} · Généré le ${today()}</span>
+  </div>
+</body>
+</html>`;
+
+  openDoc(html, `Trombinoscope-MBP-${new Date().getFullYear()}.html`);
+}
+
 export function genererRapportFinancier(annee, rows, montantDefaut, stats) {
   const ref = refNumber("RAP", String(annee));
   const totalAttendu = (stats.total_membres - (stats.exemptes ?? 0)) * Number(montantDefaut);

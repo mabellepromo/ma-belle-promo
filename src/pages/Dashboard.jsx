@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { compressImage } from "../lib/imageUtils";
-import { genererAttestation, openDocUrl } from "../lib/documentGenerators";
+import { genererAttestation, openDocUrl, genererTrombinoscope } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
@@ -56,6 +56,7 @@ export default function Dashboard() {
   const [addingMember,  setAddingMember]  = useState(null);
   const [confirmDialog,     setConfirmDialog]     = useState(null);
   const [attestationDialog, setAttestationDialog] = useState(null);
+  const [memberDetail,      setMemberDetail]      = useState(null);
   const [renewDialog,       setRenewDialog]       = useState(false);
   const [renewDate,         setRenewDate]         = useState(`${new Date().getFullYear()}-12-31`);
   const [renewLoading,      setRenewLoading]      = useState(false);
@@ -819,6 +820,10 @@ export default function Dashboard() {
                   className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium hover:bg-emerald-100 transition-colors text-emerald-700">
                   <Download className="w-4 h-4" /> Exporter Excel
                 </button>
+                <button onClick={() => genererTrombinoscope(allMembers)}
+                  className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-indigo-200 bg-indigo-50 text-sm font-medium hover:bg-indigo-100 transition-colors text-indigo-700">
+                  <Images className="w-4 h-4" /> Trombinoscope
+                </button>
                 <button onClick={() => setRenewDialog(true)}
                   className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium hover:bg-amber-100 transition-colors text-amber-700"
                   title="Renouveler la date de validité de toutes les attestations">
@@ -893,19 +898,29 @@ export default function Dashboard() {
               )}
 
               <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
-                <div className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border px-5 py-3 grid grid-cols-[2fr_2fr_1fr_1fr_auto] gap-4 items-center">
+                <div className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border px-5 py-3 grid grid-cols-[2fr_2fr_1fr_1fr_auto_auto] gap-4 items-center">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Membre</span>
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider hidden md:block">Profession</span>
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider hidden lg:block">Localisation</span>
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Statut</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider hidden xl:block">Cotis. {currentYear}</span>
                   <span></span>
                 </div>
                 <div className="divide-y divide-border/60">
-                  {filteredMembers.map((m, i) => (
+                  {filteredMembers.map((m, i) => {
+                    const cot = cotisationsAnnee.find(c => String(c.member_id) === String(m.id));
+                    const cotStatut = cot?.statut ?? "en_attente";
+                    const COT_CFG = {
+                      "payé":       { label: "Payé",       cls: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+                      "partiel":    { label: "Partiel",    cls: "bg-blue-100 text-blue-700 border-blue-200" },
+                      "en_attente": { label: "En attente", cls: "bg-amber-100 text-amber-700 border-amber-200" },
+                      "exempté":    { label: "Exempté",    cls: "bg-slate-100 text-slate-600 border-slate-200" },
+                    }[cotStatut] ?? { label: cotStatut, cls: "bg-muted text-muted-foreground border-border" };
+                    return (
                     <motion.div key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                      className="group grid grid-cols-[2fr_2fr_1fr_1fr_auto] gap-4 items-center px-5 py-3.5 hover:bg-primary/[0.03] transition-all relative">
+                      className="group grid grid-cols-[2fr_2fr_1fr_1fr_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-primary/[0.03] transition-all relative">
                       <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-primary rounded-r scale-y-0 group-hover:scale-y-100 transition-transform" />
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0 cursor-pointer" onClick={() => setMemberDetail(m)}>
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-border group-hover:ring-primary/20 transition-all">
                           <img
                             src={m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=40`}
@@ -932,6 +947,11 @@ export default function Dashboard() {
                           {m.bureau ? "Bureau" : m.status === "validated" ? "Validé" : "Actif"}
                         </span>
                       </div>
+                      <div className="hidden xl:block">
+                        <span className={`inline-flex text-xs font-semibold px-2 py-0.5 rounded-full border ${COT_CFG.cls}`}>
+                          {COT_CFG.label}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => setAttestationDialog(m)} title="Attestation de membre"
                           className="w-7 h-7 rounded-lg hover:bg-amber-50 flex items-center justify-center text-muted-foreground hover:text-amber-600 transition-colors">
@@ -941,7 +961,8 @@ export default function Dashboard() {
                         <button onClick={() => setConfirmDialog({ title: `Supprimer ${m.nom} ?`, message: "Cette action est irréversible.", onConfirm: () => { deleteMember(m.id); setConfirmDialog(null); } })} className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </motion.div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1096,6 +1117,130 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── Fiche détail membre ── */}
+      {memberDetail && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={() => setMemberDetail(null)} />
+          <motion.div
+            initial={{ x: 400, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+            className="w-96 bg-background shadow-2xl h-full overflow-y-auto flex flex-col border-l border-border">
+
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-background z-10">
+              <p className="font-heading font-bold text-foreground text-sm">Fiche membre</p>
+              <button onClick={() => setMemberDetail(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 border-b border-border">
+              <div className="flex items-start gap-4">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 ring-2 ring-border">
+                  <img
+                    src={memberDetail.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDetail.nom)}&background=064e3b&color=6ee7b7&size=80`}
+                    alt={memberDetail.nom} className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }}
+                    onError={e => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDetail.nom)}&background=064e3b&color=6ee7b7&size=80`; }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-heading font-bold text-foreground text-base leading-tight">{memberDetail.nom}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">{memberDetail.profession || "—"}</p>
+                  <div className="flex gap-2 mt-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${memberDetail.bureau ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${memberDetail.bureau ? "bg-amber-500" : "bg-green-500"}`} />
+                      {memberDetail.bureau ? "Bureau" : "Membre actif"}
+                    </span>
+                    {memberDetail.anneeObtention && (
+                      <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+                        Promo {memberDetail.anneeObtention}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 border-b border-border space-y-2.5">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Contacts</p>
+              {memberDetail.email && (
+                <div className="flex items-center gap-2.5">
+                  <Mail className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <a href={`mailto:${memberDetail.email}`} className="text-sm text-foreground hover:text-primary truncate">{memberDetail.email}</a>
+                </div>
+              )}
+              {(memberDetail.telephone || memberDetail.tel) && (
+                <div className="flex items-center gap-2.5">
+                  <span className="w-3.5 text-center text-xs flex-shrink-0">📞</span>
+                  <span className="text-sm text-foreground">{memberDetail.telephone || memberDetail.tel}</span>
+                </div>
+              )}
+              {(memberDetail.ville || memberDetail.pays) && (
+                <div className="flex items-center gap-2.5">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span className="text-sm text-foreground">{[memberDetail.ville, memberDetail.pays].filter(Boolean).join(", ")}</span>
+                </div>
+              )}
+              {memberDetail.linkedin && (
+                <div className="flex items-center gap-2.5">
+                  <Link2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <a href={memberDetail.linkedin} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline truncate">LinkedIn</a>
+                </div>
+              )}
+              {memberDetail.anniversaire && (
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs flex-shrink-0">🎂</span>
+                  <span className="text-sm text-foreground">{memberDetail.anniversaire}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-5 border-b border-border">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Cotisations récentes</p>
+              <div className="space-y-2">
+                {YEARS_3.map(yr => {
+                  const cot = multiYearData[String(memberDetail.id)]?.[yr];
+                  const s = cot?.statut ?? "en_attente";
+                  const cfg = {
+                    "payé":       { bg: "bg-emerald-100", text: "text-emerald-700", label: "Payé" },
+                    "partiel":    { bg: "bg-blue-100",    text: "text-blue-700",    label: "Partiel" },
+                    "en_attente": { bg: "bg-amber-100",   text: "text-amber-700",   label: "En attente" },
+                    "exempté":    { bg: "bg-slate-100",   text: "text-slate-600",   label: "Exempté" },
+                  }[s] ?? { bg: "bg-muted", text: "text-muted-foreground", label: s };
+                  return (
+                    <div key={yr} className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">{yr}</span>
+                      <div className="flex items-center gap-2">
+                        {cot?.montant > 0 && (
+                          <span className="text-xs text-muted-foreground">{Number(cot.montant).toLocaleString("fr-FR")} F</span>
+                        )}
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${cfg.bg} ${cfg.text}`}>{cfg.label}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {memberDetail.notes_internes && (
+              <div className="p-5 border-b border-border">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Notes internes</p>
+                <p className="text-sm text-foreground bg-amber-50 border border-amber-200 rounded-xl p-3 whitespace-pre-wrap">{memberDetail.notes_internes}</p>
+              </div>
+            )}
+
+            <div className="p-5 flex gap-2 mt-auto sticky bottom-0 bg-background border-t border-border">
+              <button onClick={() => { setAttestationDialog(memberDetail); setMemberDetail(null); }}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-sm font-semibold hover:bg-amber-100 transition-colors">
+                <FileText className="w-3.5 h-3.5" /> Attestation
+              </button>
+              <button onClick={() => { setEditingMember({ ...memberDetail }); setMemberDetail(null); }}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border bg-background text-sm font-semibold hover:bg-muted transition-colors">
+                <Edit2 className="w-3.5 h-3.5" /> Modifier
+              </button>
+            </div>
+
+          </motion.div>
         </div>
       )}
 
