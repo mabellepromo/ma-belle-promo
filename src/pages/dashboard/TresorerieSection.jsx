@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { Plus, Trash2, Download, TrendingUp, TrendingDown, Wallet, X, Loader2 } from "lucide-react";
+import { Plus, Trash2, Download, TrendingUp, TrendingDown, Wallet, X, Loader2, RefreshCw, Lock } from "lucide-react";
 import { inp, Field } from "./shared";
 
 const CATEGORIES_RECETTES = ["Cotisations", "Dons", "Subventions", "Sponsoring", "Événements", "Autres"];
@@ -154,6 +154,12 @@ export default function TresorerieSection() {
         </div>
       </div>
 
+      {/* Bannière sync */}
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700">
+        <RefreshCw className="w-3.5 h-3.5 flex-shrink-0" />
+        Les cotisations validées apparaissent automatiquement ici. Pour les modifier, allez dans <strong className="mx-0.5">Cotisations</strong>.
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Recettes" value={stats.recettes} icon={TrendingUp} color="bg-emerald-50 text-emerald-600"
@@ -271,34 +277,51 @@ export default function TresorerieSection() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {filtered.map(t => (
-                <tr key={t.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                    {new Date(t.date).toLocaleDateString("fr-FR")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-foreground">{t.libelle}</p>
-                    {t.description && <p className="text-xs text-muted-foreground">{t.description}</p>}
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <button onClick={() => setCatFilter(t.categorie)}
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80 ${CAT_COLORS[t.categorie] || "bg-gray-100 text-gray-600"}`}>
-                      {t.categorie}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">
-                    <span className={t.type === "recette" ? "text-emerald-600" : "text-red-500"}>
-                      {t.type === "recette" ? "+" : "−"}{fmt(t.montant)}
-                    </span>
-                  </td>
-                  <td className="px-2 py-3">
-                    <button onClick={() => handleDelete(t.id)}
-                      className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map(t => {
+                const isAuto = !!t.source_ref;
+                return (
+                  <tr key={t.id} className={`hover:bg-muted/20 transition-colors ${isAuto ? "bg-emerald-50/30" : ""}`}>
+                    <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
+                      {new Date(t.date).toLocaleDateString("fr-FR")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium text-foreground">{t.libelle}</p>
+                        {isAuto && (
+                          <span title="Synchronisé depuis les cotisations"
+                            className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex-shrink-0">
+                            <RefreshCw className="w-2.5 h-2.5" /> sync
+                          </span>
+                        )}
+                      </div>
+                      {t.description && <p className="text-xs text-muted-foreground">{t.description}</p>}
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <button onClick={() => setCatFilter(t.categorie)}
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80 ${CAT_COLORS[t.categorie] || "bg-gray-100 text-gray-600"}`}>
+                        {t.categorie}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">
+                      <span className={t.type === "recette" ? "text-emerald-600" : "text-red-500"}>
+                        {t.type === "recette" ? "+" : "−"}{fmt(t.montant)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-3">
+                      {isAuto ? (
+                        <div className="w-7 h-7 flex items-center justify-center text-muted-foreground/40" title="Géré automatiquement — modifier depuis Cotisations">
+                          <Lock className="w-3 h-3" />
+                        </div>
+                      ) : (
+                        <button onClick={() => handleDelete(t.id)}
+                          className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-border bg-muted/30">
