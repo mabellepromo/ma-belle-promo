@@ -1,72 +1,132 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+
+export function getFingerprint() {
+  let fp = localStorage.getItem("mbp_voter_fp");
+  if (!fp) {
+    fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("mbp_voter_fp", fp);
+  }
+  return fp;
+}
 
 export function useSondages({ adminMode = false } = {}) {
   const [sondages, setSondages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rev, setRev] = useState(0);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
     setLoading(true);
-    let q = supabase.from("sondages").select("*").order("created_at", { ascending: false });
+    let q = supabase
+      .from("sondages")
+      .select("*, sondage_questions(*)")
+      .order("created_at", { ascending: false });
     if (!adminMode) q = q.eq("actif", true);
-    const { data } = await q;
-    setSondages(data ?? []);
-    setLoading(false);
-  }, [adminMode]);
-
-  useEffect(() => { load(); }, [load]);
-
-  async function createSondage(data) {
-    const { error } = await supabase.from("sondages").insert({
-      titre: data.titre,
-      description: data.description || null,
-      options: data.options,
-      actif: data.actif ?? true,
-      multiple_choix: data.multiple_choix ?? false,
-      expires_at: data.expires_at || null,
+    q.then(({ data }) => {
+      setSondages((data || []).map(s => ({
+        ...s,
+        questions: (s.sondage_questions || []).sort((a, b) => a.ordre - b.ordre),
+      })));
+      setLoading(false);
     });
-    if (!error) await load();
-    return error;
+  }, [adminMode, rev]);
+
+  function refresh() { setRev(v => v + 1); }
+
+  async function createSondage({ questions = [], ...sondageData }) {
+    const { data: s, error } = await supabase.from("sondages").insert(sondageData).select().single();
+    if (error) return error;
+    if (questions.length) {
+      const rows = questions.map((q, i) => ({
+        sondage_id: s.id,
+        ordre: i,
+        type: q.type,
+        libelle: q.libelle.trim(),
+        options: (q.options || []).filter(o => o.trim()),
+        obligatoire: q.obligatoire ?? true,
+      }));
+      const { error: qErr } = await supabase.from("sondage_questions").insert(rows);
+      if (qErr) return qErr;
+    }
+    refresh();
+    return null;
   }
 
   async function updateSondage(id, data) {
-    const { error } = await supabase.from("sondages").update(data).eq("id", id);
-    if (!error) await load();
-    return error;
+    await supabase.from("sondages").update(data).eq("id", id);
+    refresh();
   }
 
   async function deleteSondage(id) {
-    const { error } = await supabase.from("sondages").delete().eq("id", id);
-    if (!error) await load();
-    return error;
+    await supabase.from("sondages").delete().eq("id", id);
+    refresh();
   }
 
-  return { sondages, loading, createSondage, updateSondage, deleteSondage, reload: load };
+  return { sondages, loading, createSondage, updateSondage, deleteSondage };
 }
 
-export async function getVotes(sondageId) {
+export async function getSondageWithQuestions(id) {
   const { data } = await supabase
-    .from("votes")
-    .select("options_choisies")
-    .eq("sondage_id", sondageId);
-  return data ?? [];
+    .from("sondages")
+    .select("*, sondage_questions(*)")
+    .eq("id", id)
+    .single();
+  if (!data) return null;
+  return {
+    ...data,
+    questions: (data.sondage_questions || []).sort((a, b) => a.ordre - b.ordre),
+  };
 }
 
-export async function submitVote(sondageId, optionsChoisies, fingerprint) {
-  const { error } = await supabase.from("votes").insert({
-    sondage_id: sondageId,
-    options_choisies: optionsChoisies,
-    fingerprint,
-  });
-  return error;
+export async function hasVoted(sondageId, fingerprint) {
+  const { data } = await supabase
+    .from("sondage_soumissions")
+    .select("id")
+    .eq("sondage_id", sondageId)
+    .eq("fingerprint", fingerprint)
+    .maybeSingle();
+  return !!data;
 }
 
-export function getFingerprint() {
-  const key = "mbp_voter_fp";
-  let fp = localStorage.getItem(key);
-  if (!fp) {
-    fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem(key, fp);
+export async function submitSondage(sondageId, answers, fingerprint) {
+  const { data: soumission, error } = await supabase
+    .from("sondage_soumissions")
+    .insert({ sondage_id: sondageId, fingerprint })
+    .select()
+    .single();
+  if (error) return error;
+
+  const rows = Object.entries(answers)
+    .filter(([, v]) => v.valeur_texte != null || v.valeur_options != null || v.valeur_note != null)
+    .map(([question_id, v]) => ({
+      soumission_id: soumission.id,
+      question_id,
+      valeur_texte: v.valeur_texte ?? null,
+      valeur_options: v.valeur_options ?? null,
+      valeur_note: v.valeur_note ?? null,
+    }));
+
+  if (rows.length) {
+    const { error: rErr } = await supabase.from("sondage_reponses").insert(rows);
+    if (rErr) return rErr;
   }
-  return fp;
+  return null;
+}
+
+export async function getSondageResults(sondageId) {
+  const { data: soumissions } = await supabase
+    .from("sondage_soumissions")
+    .select("id")
+    .eq("sondage_id", sondageId);
+
+  const total = soumissions?.length || 0;
+  if (!total) return { total: 0, reponses: [] };
+
+  const ids = soumissions.map(s => s.id);
+  const { data: reponses } = await supabase
+    .from("sondage_reponses")
+    .select("*")
+    .in("soumission_id", ids);
+
+  return { total, reponses: reponses || [] };
 }

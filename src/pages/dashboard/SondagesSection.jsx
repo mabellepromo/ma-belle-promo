@@ -1,46 +1,86 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X, ChevronUp, ChevronDown } from "lucide-react";
-import { useSondages, getVotes } from "../../hooks/useSondages";
+import { useSondages, getSondageResults } from "../../hooks/useSondages";
 import { inp, Field } from "./shared";
 
 const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-blue-500", "bg-violet-500", "bg-rose-500", "bg-cyan-500"];
 
-const PRESETS = [
-  { label: "Oui / Non", options: ["Oui", "Non"] },
-  { label: "Oui / Non / Abstention", options: ["Oui", "Non", "Abstention"] },
-  { label: "Pour / Contre / Neutre", options: ["Pour", "Contre", "Neutre"] },
-  { label: "Satisfaction 1→5", options: ["1 - Très insatisfait", "2 - Insatisfait", "3 - Neutre", "4 - Satisfait", "5 - Très satisfait"] },
-  { label: "Accord / Désaccord", options: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt en désaccord", "Pas du tout d'accord"] },
+const Q_TYPES = [
+  { value: "single",   label: "Choix unique" },
+  { value: "multiple", label: "Choix multiple" },
+  { value: "ouinon",   label: "Oui / Non" },
+  { value: "texte",    label: "Texte libre" },
+  { value: "note",     label: "Note /5" },
 ];
 
-function VoteResults({ sondage }) {
-  const [votes, setVotes] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Q_TYPE_LABELS = {
+  ouinon: "Oui/Non", single: "Choix unique",
+  multiple: "Choix multiple", texte: "Texte libre", note: "Note /5",
+};
 
-  useEffect(() => {
-    getVotes(sondage.id).then(v => { setVotes(v); setLoading(false); });
-  }, [sondage.id]);
+// ── Résultats par question (vue admin) ─────────────────────────────────────
+function QuestionResults({ question, reponses, total }) {
+  const qr = reponses.filter(r => r.question_id === question.id);
 
-  const total = votes.length;
-  const counts = sondage.options.map((_, i) =>
-    votes.filter(v => v.options_choisies.includes(i)).length
-  );
+  if (question.type === "texte") {
+    const textes = qr.map(r => r.valeur_texte).filter(Boolean);
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-1">{textes.length} réponse{textes.length !== 1 ? "s" : ""}</p>
+        <div className="space-y-1 max-h-36 overflow-y-auto">
+          {textes.length === 0
+            ? <p className="text-xs text-muted-foreground italic">Aucune réponse.</p>
+            : textes.map((t, i) => (
+              <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5 text-foreground">{t}</div>
+            ))}
+        </div>
+      </div>
+    );
+  }
 
-  if (loading) return <div className="flex items-center gap-2 py-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Chargement…</div>;
+  if (question.type === "note") {
+    const notes = qr.map(r => r.valeur_note).filter(v => v != null);
+    const avg = notes.length ? (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1) : "—";
+    const counts = [1, 2, 3, 4, 5].map(n => notes.filter(v => v === n).length);
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-2">
+          Moyenne : <strong className="text-foreground">{avg} / 5</strong> · {notes.length} réponse{notes.length !== 1 ? "s" : ""}
+        </p>
+        {[1, 2, 3, 4, 5].map(n => {
+          const pct = notes.length ? Math.round((counts[n - 1] / notes.length) * 100) : 0;
+          return (
+            <div key={n} className="flex items-center gap-2 mb-1">
+              <span className="text-xs w-5 text-center text-muted-foreground">{n}★</span>
+              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-amber-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
+              </div>
+              <span className="text-xs w-5 text-right text-muted-foreground">{counts[n - 1]}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ouinon, single, multiple
+  const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
+  const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
+  const qTotal = qr.length;
 
   return (
-    <div className="mt-3 space-y-2">
-      <p className="text-xs text-muted-foreground">{total} vote{total !== 1 ? "s" : ""}</p>
-      {sondage.options.map((opt, i) => {
-        const pct = total > 0 ? Math.round((counts[i] / total) * 100) : 0;
+    <div className="space-y-1.5">
+      <p className="text-xs text-muted-foreground mb-1">{qTotal} réponse{qTotal !== 1 ? "s" : ""}</p>
+      {options.map((opt, i) => {
+        const pct = qTotal > 0 ? Math.round((counts[i] / qTotal) * 100) : 0;
         return (
           <div key={i}>
             <div className="flex justify-between text-xs mb-0.5">
-              <span className="text-foreground truncate flex-1 mr-2">{opt}</span>
+              <span className="truncate flex-1 mr-2 text-foreground">{opt}</span>
               <span className="font-bold text-foreground flex-shrink-0">{pct}% ({counts[i]})</span>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div className={`h-full rounded-full transition-all duration-700 ${COLORS[i % COLORS.length]}`}
                 style={{ width: `${pct}%` }} />
             </div>
@@ -51,75 +91,224 @@ function VoteResults({ sondage }) {
   );
 }
 
-const emptyForm = {
-  titre: "", description: "",
-  options: ["", ""],
-  multiple_choix: false, expires_at: "", actif: true,
-};
+// ── Constructeur de question ───────────────────────────────────────────────
+function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
+  const needsOptions = q.type === "single" || q.type === "multiple";
+
+  function setOptVal(i, val) {
+    const opts = [...(q.options || [])];
+    opts[i] = val;
+    onChange({ ...q, options: opts });
+  }
+  function addOpt() { onChange({ ...q, options: [...(q.options || []), ""] }); }
+  function removeOpt(i) { onChange({ ...q, options: (q.options || []).filter((_, j) => j !== i) }); }
+  function moveOpt(i, dir) {
+    const opts = [...(q.options || [])];
+    const j = i + dir;
+    if (j < 0 || j >= opts.length) return;
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+    onChange({ ...q, options: opts });
+  }
+  function changeType(newType) {
+    const keepOptions = newType === "single" || newType === "multiple";
+    onChange({
+      ...q,
+      type: newType,
+      options: keepOptions ? ((q.options?.length >= 2 ? q.options : ["", ""])) : [],
+    });
+  }
+
+  return (
+    <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+      <div className="flex items-start gap-2">
+        {/* Réordonner */}
+        <div className="flex flex-col gap-0 pt-1">
+          <button type="button" onClick={() => onMove(idx, -1)} disabled={idx === 0}
+            className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+            <ChevronUp className="w-3 h-3" />
+          </button>
+          <button type="button" onClick={() => onMove(idx, 1)} disabled={idx === total - 1}
+            className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+            <ChevronDown className="w-3 h-3" />
+          </button>
+        </div>
+
+        <span className="text-xs font-bold text-muted-foreground pt-1.5 w-5 text-center">{idx + 1}</span>
+
+        <div className="flex-1 space-y-2 min-w-0">
+          {/* Sélecteur de type */}
+          <div className="flex gap-1 flex-wrap">
+            {Q_TYPES.map(t => (
+              <button key={t.value} type="button" onClick={() => changeType(t.value)}
+                className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
+                  q.type === t.value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border text-muted-foreground hover:border-primary hover:text-primary bg-white"
+                }`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Libellé */}
+          <input className={inp} value={q.libelle}
+            onChange={e => onChange({ ...q, libelle: e.target.value })}
+            placeholder="Libellé de la question…" />
+
+          {/* Options pour single / multiple */}
+          {needsOptions && (
+            <div className="space-y-1.5 pl-1">
+              {(q.options || []).map((opt, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="flex flex-col gap-0">
+                    <button type="button" onClick={() => moveOpt(i, -1)} disabled={i === 0}
+                      className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                      <ChevronUp className="w-2.5 h-2.5" />
+                    </button>
+                    <button type="button" onClick={() => moveOpt(i, 1)} disabled={i === (q.options?.length || 0) - 1}
+                      className="w-4 h-3.5 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20">
+                      <ChevronDown className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                  <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${COLORS[i % COLORS.length]}`} />
+                  <input className={`${inp} flex-1 text-sm`} value={opt}
+                    onChange={e => setOptVal(i, e.target.value)}
+                    placeholder={`Option ${i + 1}`}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addOpt(); } }}
+                  />
+                  <button type="button" onClick={() => removeOpt(i)}
+                    disabled={(q.options?.length || 0) <= 2}
+                    className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20 transition-colors">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={addOpt}
+                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium transition-colors">
+                <Plus className="w-3.5 h-3.5" /> Ajouter une option
+              </button>
+            </div>
+          )}
+
+          {/* Aperçu des types sans options */}
+          {q.type === "ouinon" && (
+            <div className="flex gap-2">
+              <span className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">Oui</span>
+              <span className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">Non</span>
+            </div>
+          )}
+          {q.type === "texte" && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">
+              Zone de texte libre pour le répondant…
+            </div>
+          )}
+          {q.type === "note" && (
+            <div className="flex gap-1 items-center">
+              {[1, 2, 3, 4, 5].map(n => (
+                <span key={n} className="text-amber-300 text-lg">★</span>
+              ))}
+              <span className="text-xs text-muted-foreground ml-1">de 1 à 5</span>
+            </div>
+          )}
+        </div>
+
+        {/* Supprimer question */}
+        <button type="button" onClick={onRemove} disabled={total <= 1}
+          className="w-7 h-7 mt-0.5 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20 flex-shrink-0 transition-colors">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Obligatoire */}
+      <div className="pl-12">
+        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+          <input type="checkbox" checked={q.obligatoire}
+            onChange={e => onChange({ ...q, obligatoire: e.target.checked })}
+            className="w-3.5 h-3.5 rounded accent-primary" />
+          <span className="text-xs text-muted-foreground">Obligatoire</span>
+        </label>
+      </div>
+    </div>
+  );
+}
+
+// ── Composant principal ────────────────────────────────────────────────────
+const emptyQ = () => ({
+  _id: Date.now() + Math.random(),
+  type: "single", libelle: "", options: ["", ""], obligatoire: true,
+});
+
+const emptyForm = { titre: "", description: "", actif: true, expires_at: "" };
 
 export default function SondagesSection() {
   const { sondages, loading, createSondage, updateSondage, deleteSondage } = useSondages({ adminMode: true });
   const [form, setForm] = useState(null);
+  const [questions, setQuestions] = useState([emptyQ()]);
   const [expanded, setExpanded] = useState({});
+  const [results, setResults] = useState({});
   const [saving, setSaving] = useState(false);
 
   const origin = window.location.origin;
 
-  function setOption(i, val) {
-    setForm(p => {
-      const opts = [...p.options];
-      opts[i] = val;
-      return { ...p, options: opts };
-    });
-  }
+  function openForm() { setForm({ ...emptyForm }); setQuestions([emptyQ()]); }
 
-  function addOption() {
-    setForm(p => ({ ...p, options: [...p.options, ""] }));
-  }
-
-  function removeOption(i) {
-    if (form.options.length <= 2) return;
-    setForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i) }));
-  }
-
-  function moveOption(i, dir) {
-    setForm(p => {
-      const opts = [...p.options];
+  function updateQ(i, q) { setQuestions(qs => qs.map((x, j) => j === i ? q : x)); }
+  function addQ() { setQuestions(qs => [...qs, emptyQ()]); }
+  function removeQ(i) { if (questions.length <= 1) return; setQuestions(qs => qs.filter((_, j) => j !== i)); }
+  function moveQ(i, dir) {
+    setQuestions(qs => {
+      const arr = [...qs];
       const j = i + dir;
-      if (j < 0 || j >= opts.length) return p;
-      [opts[i], opts[j]] = [opts[j], opts[i]];
-      return { ...p, options: opts };
+      if (j < 0 || j >= arr.length) return qs;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      return arr;
     });
-  }
-
-  function applyPreset(preset) {
-    setForm(p => ({ ...p, options: [...preset.options] }));
   }
 
   async function handleSubmit() {
     if (!form.titre?.trim()) { toast.error("Le titre est obligatoire."); return; }
-    const options = form.options.map(s => s.trim()).filter(Boolean);
-    if (options.length < 2) { toast.error("Au moins 2 options non vides requises."); return; }
+    const validQ = questions.filter(q => q.libelle.trim());
+    if (!validQ.length) { toast.error("Au moins une question avec un libellé est requise."); return; }
+
+    for (const q of validQ) {
+      if (q.type === "single" || q.type === "multiple") {
+        const opts = (q.options || []).filter(o => o.trim());
+        if (opts.length < 2) { toast.error(`"${q.libelle}" : au moins 2 options requises.`); return; }
+      }
+    }
 
     setSaving(true);
     const error = await createSondage({
       titre: form.titre.trim(),
       description: form.description?.trim() || null,
-      options,
-      multiple_choix: form.multiple_choix,
-      expires_at: form.expires_at || null,
       actif: form.actif,
+      expires_at: form.expires_at || null,
+      questions: validQ,
     });
     setSaving(false);
-
     if (error) { toast.error("Erreur : " + error.message); return; }
     toast.success("Sondage créé !");
     setForm(null);
   }
 
+  async function loadResults(sondageId) {
+    const data = await getSondageResults(sondageId);
+    setResults(p => ({ ...p, [sondageId]: data }));
+    setExpanded(p => ({ ...p, [sondageId]: true }));
+  }
+
+  function toggleResults(sondageId) {
+    if (expanded[sondageId]) {
+      setExpanded(p => ({ ...p, [sondageId]: false }));
+    } else {
+      loadResults(sondageId);
+    }
+  }
+
   function copyLink(id) {
-    const url = `${origin}/sondage/${id}`;
-    navigator.clipboard.writeText(url).then(() => toast.success("Lien copié !")).catch(() => toast.error("Copie impossible."));
+    navigator.clipboard.writeText(`${origin}/sondage/${id}`)
+      .then(() => toast.success("Lien copié !"))
+      .catch(() => toast.error("Copie impossible."));
   }
 
   async function toggleActif(s) {
@@ -128,7 +317,7 @@ export default function SondagesSection() {
   }
 
   async function handleDelete(s) {
-    if (!window.confirm(`Supprimer « ${s.titre} » et tous ses votes ?`)) return;
+    if (!window.confirm(`Supprimer « ${s.titre} » et toutes ses réponses ?`)) return;
     await deleteSondage(s.id);
     toast.success("Sondage supprimé.");
   }
@@ -139,116 +328,78 @@ export default function SondagesSection() {
       {/* En-tête */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Sondages & votes</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Posez des questions à vos membres, visualisez les résultats en temps réel.</p>
+          <h2 className="font-heading text-xl font-bold text-foreground">Sondages & formulaires</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Créez des questionnaires multi-questions et analysez les réponses.</p>
         </div>
-        <button onClick={() => setForm({ ...emptyForm, options: ["", ""] })}
+        <button onClick={openForm}
           className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
           <Plus className="w-4 h-4" /> Nouveau sondage
         </button>
       </div>
 
-      {/* Formulaire nouveau sondage */}
+      {/* Formulaire de création */}
       {form && (
         <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <p className="font-semibold text-foreground text-sm">Nouveau sondage</p>
-            <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+            <p className="font-semibold text-foreground text-sm">Nouveau sondage / formulaire</p>
+            <button onClick={() => setForm(null)}
+              className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="p-5 space-y-4">
-            <Field label="Question / Titre *">
-              <input className={inp} value={form.titre}
-                onChange={e => setForm(p => ({ ...p, titre: e.target.value }))}
-                placeholder="Ex : Quel lieu préférez-vous pour l'AG ?" />
-            </Field>
-
-            <Field label="Description (optionnelle)">
-              <textarea className={inp} rows={2} value={form.description}
-                onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                placeholder="Contexte ou précisions…" />
-            </Field>
-
-            {/* Options dynamiques */}
-            <div>
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-0.5">
-                  Options de réponse
-                </label>
-                <div className="flex gap-1 flex-wrap justify-end">
-                  {PRESETS.map(preset => (
-                    <button key={preset.label} type="button" onClick={() => applyPreset(preset)}
-                      className="text-xs px-2 py-0.5 rounded-full border border-border hover:border-primary hover:text-primary text-muted-foreground transition-colors whitespace-nowrap">
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
+          <div className="p-5 space-y-5">
+            {/* Infos générales */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Field label="Titre du sondage *">
+                  <input className={inp} value={form.titre}
+                    onChange={e => setForm(p => ({ ...p, titre: e.target.value }))}
+                    placeholder="Ex : Satisfaction AG 2025, Vote du thème soirée…" />
+                </Field>
               </div>
-
-              <div className="space-y-2">
-                {form.options.map((opt, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    {/* Boutons haut/bas */}
-                    <div className="flex flex-col gap-0">
-                      <button type="button" onClick={() => moveOption(i, -1)} disabled={i === 0}
-                        className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors">
-                        <ChevronUp className="w-3 h-3" />
-                      </button>
-                      <button type="button" onClick={() => moveOption(i, 1)} disabled={i === form.options.length - 1}
-                        className="w-5 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors">
-                        <ChevronDown className="w-3 h-3" />
-                      </button>
-                    </div>
-                    {/* Pastille couleur */}
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${COLORS[i % COLORS.length]}`} />
-                    {/* Champ texte */}
-                    <input
-                      className={`${inp} flex-1`}
-                      value={opt}
-                      onChange={e => setOption(i, e.target.value)}
-                      placeholder={`Option ${i + 1}`}
-                      onKeyDown={e => {
-                        if (e.key === "Enter") { e.preventDefault(); addOption(); }
-                      }}
-                    />
-                    {/* Supprimer option */}
-                    <button type="button" onClick={() => removeOption(i)}
-                      disabled={form.options.length <= 2}
-                      className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-20">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
+              <div className="md:col-span-2">
+                <Field label="Description (optionnelle)">
+                  <textarea className={inp} rows={2} value={form.description}
+                    onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                    placeholder="Instructions ou contexte pour les répondants…" />
+                </Field>
               </div>
-
-              <button type="button" onClick={addOption}
-                className="mt-3 flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium transition-colors">
-                <Plus className="w-4 h-4" /> Ajouter une option
-              </button>
-            </div>
-
-            {/* Paramètres */}
-            <div className="grid md:grid-cols-2 gap-4 pt-1 border-t border-border/50">
               <Field label="Date de clôture (optionnelle)">
                 <input type="date" className={inp} value={form.expires_at}
                   onChange={e => setForm(p => ({ ...p, expires_at: e.target.value }))} />
               </Field>
-              <div className="flex flex-col gap-3 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" checked={form.multiple_choix}
-                    onChange={e => setForm(p => ({ ...p, multiple_choix: e.target.checked }))}
-                    className="w-4 h-4 rounded accent-primary" />
-                  <span className="text-sm text-foreground">Choix multiple autorisé</span>
-                </label>
+              <div className="flex items-center pt-5">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input type="checkbox" checked={form.actif}
                     onChange={e => setForm(p => ({ ...p, actif: e.target.checked }))}
                     className="w-4 h-4 rounded accent-primary" />
-                  <span className="text-sm text-foreground">Actif immédiatement</span>
+                  <span className="text-sm text-foreground">Publier immédiatement</span>
                 </label>
               </div>
+            </div>
+
+            {/* Questions */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Questions ({questions.length})
+                </p>
+              </div>
+              <div className="space-y-3">
+                {questions.map((q, i) => (
+                  <QuestionBuilder key={q._id}
+                    q={q} idx={i} total={questions.length}
+                    onChange={updated => updateQ(i, updated)}
+                    onRemove={() => removeQ(i)}
+                    onMove={(_, dir) => moveQ(i, dir)}
+                  />
+                ))}
+              </div>
+              <button type="button" onClick={addQ}
+                className="mt-3 flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium transition-colors">
+                <Plus className="w-4 h-4" /> Ajouter une question
+              </button>
             </div>
           </div>
 
@@ -274,12 +425,13 @@ export default function SondagesSection() {
         <div className="text-center py-20 bg-white border border-border rounded-2xl text-muted-foreground">
           <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-25" />
           <p className="font-medium">Aucun sondage pour l'instant.</p>
-          <p className="text-sm mt-1">Créez un sondage pour consulter vos membres.</p>
+          <p className="text-sm mt-1">Créez votre premier formulaire pour consulter vos membres.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {sondages.map(s => {
             const isExpired = s.expires_at && new Date(s.expires_at) < new Date();
+            const res = results[s.id];
             return (
               <div key={s.id} className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
                 <div className={`h-1 w-full ${s.actif && !isExpired ? "bg-emerald-500" : "bg-slate-300"}`} />
@@ -290,23 +442,32 @@ export default function SondagesSection() {
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.actif && !isExpired ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
                           {isExpired ? "Clôturé" : s.actif ? "En cours" : "Désactivé"}
                         </span>
-                        {s.multiple_choix && <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Choix multiple</span>}
-                        {s.expires_at && <span className="text-xs text-muted-foreground">Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}</span>}
+                        <span className="text-xs text-muted-foreground">
+                          {s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}
+                        </span>
+                        {s.expires_at && (
+                          <span className="text-xs text-muted-foreground">
+                            · Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}
+                          </span>
+                        )}
                       </div>
                       <h3 className="font-semibold text-foreground leading-tight">{s.titre}</h3>
                       {s.description && <p className="text-sm text-muted-foreground mt-0.5">{s.description}</p>}
-                      <div className="flex gap-1 flex-wrap mt-2">
-                        {s.options.map((opt, i) => (
-                          <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">{opt}</span>
+                      <div className="mt-2 flex gap-1 flex-wrap">
+                        {(s.questions || []).map((q, i) => (
+                          <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
+                            {Q_TYPE_LABELS[q.type]} · {q.libelle.length > 28 ? q.libelle.slice(0, 28) + "…" : q.libelle}
+                          </span>
                         ))}
                       </div>
                     </div>
+
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button onClick={() => copyLink(s.id)} title="Copier le lien de vote"
+                      <button onClick={() => copyLink(s.id)} title="Copier le lien"
                         className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
                         <Link2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => setExpanded(p => ({ ...p, [s.id]: !p[s.id] }))} title="Voir les résultats"
+                      <button onClick={() => toggleResults(s.id)} title="Voir les résultats"
                         className="w-8 h-8 rounded-lg hover:bg-indigo-50 flex items-center justify-center text-muted-foreground hover:text-indigo-600 transition-colors">
                         {expanded[s.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
@@ -321,7 +482,28 @@ export default function SondagesSection() {
                     </div>
                   </div>
 
-                  {expanded[s.id] && <VoteResults sondage={s} />}
+                  {/* Résultats par question */}
+                  {expanded[s.id] && (
+                    <div className="mt-4 pt-4 border-t border-border/60 space-y-4">
+                      {!res ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Chargement des résultats…
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            {res.total} réponse{res.total !== 1 ? "s" : ""} complète{res.total !== 1 ? "s" : ""}
+                          </p>
+                          {(s.questions || []).map((q, i) => (
+                            <div key={q.id} className="bg-muted/30 rounded-xl p-3">
+                              <p className="text-xs font-semibold text-foreground mb-2">{i + 1}. {q.libelle}</p>
+                              <QuestionResults question={q} reponses={res.reponses} total={res.total} />
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   <div className="mt-3 pt-3 border-t border-border/60">
                     <p className="text-xs text-muted-foreground font-mono break-all select-all">
