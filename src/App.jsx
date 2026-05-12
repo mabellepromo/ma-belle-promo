@@ -38,6 +38,7 @@ const PAGE_TITLES = {
   "/dashboard":                  "Tableau de Bord",
   "/verifier":                   "Vérification d'attestation",
   "/galeries":                   "Galeries photos",
+  "/sondage":                    "Sondage MBP",
 };
 
 function PageTitleUpdater() {
@@ -95,6 +96,7 @@ const Confidentialite    = lazy(() => import('./pages/Confidentialite'));
 const NewsletterConfirm  = lazy(() => import('./pages/NewsletterConfirm'));
 const PaiementRetour     = lazy(() => import('./pages/PaiementRetour'));
 const Verifier           = lazy(() => import('./pages/Verifier'));
+const Sondage            = lazy(() => import('./pages/Sondage'));
 
 function PageLoader() {
   return (
@@ -174,6 +176,7 @@ const AuthenticatedApp = () => {
         <Route path="/paiement/retour" element={<PaiementRetour />} />
       </Route>
       <Route path="/verifier" element={<Verifier />} />
+      <Route path="/sondage/:id" element={<Sondage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

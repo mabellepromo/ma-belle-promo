@@ -14,7 +14,8 @@ import {
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
-  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2
+  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
+  Bell, Vote
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -25,6 +26,8 @@ import CotisationsSection from "./dashboard/CotisationsSection.jsx";
 import RapportAnnuel from "./dashboard/RapportAnnuel.jsx";
 import { useCotisations } from "../hooks/useCotisations";
 import { useMultiYearCotisations } from "../hooks/useMultiYearCotisations";
+import { useNotifications, requestNotificationPermission } from "../hooks/useNotifications";
+import SondagesSection from "./dashboard/SondagesSection";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -57,6 +60,9 @@ export default function Dashboard() {
   const [confirmDialog,     setConfirmDialog]     = useState(null);
   const [attestationDialog, setAttestationDialog] = useState(null);
   const [memberDetail,      setMemberDetail]      = useState(null);
+  const [notifPermission,   setNotifPermission]   = useState(() =>
+    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
+  );
   const [renewDialog,       setRenewDialog]       = useState(false);
   const [renewDate,         setRenewDate]         = useState(`${new Date().getFullYear()}-12-31`);
   const [renewLoading,      setRenewLoading]      = useState(false);
@@ -258,6 +264,8 @@ export default function Dashboard() {
     e.target.value = "";
   }
 
+  useNotifications(allMembers, pendingMembers);
+
   if (!session || session.role !== "admin") {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -331,6 +339,7 @@ export default function Dashboard() {
         { key: "projets",     label: "Projets",     icon: Star },
         { key: "programmes",  label: "Programmes",  icon: Tag },
         { key: "communiques", label: "Communiqués", icon: Mail },
+        { key: "sondages",    label: "Sondages",    icon: Vote },
       ],
     },
     {
@@ -503,6 +512,28 @@ export default function Dashboard() {
                   <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>FDD — Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
                 </div>
               </div>
+
+              {/* Notifications navigateur */}
+              {notifPermission !== "granted" && notifPermission !== "unsupported" && (
+                <div className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-2xl px-5 py-3.5">
+                  <Bell className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                  <p className="text-sm text-violet-800 flex-1">
+                    {notifPermission === "denied"
+                      ? "Notifications bloquées — autorisez-les dans les paramètres de votre navigateur."
+                      : "Activez les notifications pour recevoir les alertes anniversaires et nouvelles demandes."}
+                  </p>
+                  {notifPermission === "default" && (
+                    <button
+                      onClick={async () => {
+                        const result = await requestNotificationPermission();
+                        setNotifPermission(result);
+                      }}
+                      className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors">
+                      Activer
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1029,6 +1060,7 @@ export default function Dashboard() {
           {tab === "documents"   && <DocumentsSection />}
           {tab === "galeries"    && <GaleriesSection />}
           {tab === "ressources"  && <RessourcesSection />}
+          {tab === "sondages"    && <SondagesSection />}
           {tab === "cotisations" && <CotisationsSection members={allMembers} />}
           {tab === "rapport"     && <RapportAnnuel members={allMembers} />}
           {tab === "acces"       && <AccesSection />}
