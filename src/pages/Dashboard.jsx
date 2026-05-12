@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote
+  Bell, Vote, Wallet, Building2
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -28,6 +28,8 @@ import { useCotisations } from "../hooks/useCotisations";
 import { useMultiYearCotisations } from "../hooks/useMultiYearCotisations";
 import { useNotifications, requestNotificationPermission } from "../hooks/useNotifications";
 import SondagesSection from "./dashboard/SondagesSection";
+import TresorerieSection from "./dashboard/TresorerieSection";
+import AssembleesSection from "./dashboard/AssembleesSection";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -387,8 +389,10 @@ export default function Dashboard() {
     {
       label: "Organisation",
       items: [
-        { key: "equipe",   label: "Équipe",   icon: UserCheck },
-        { key: "sponsors", label: "Partenaires", icon: Globe },
+        { key: "equipe",      label: "Équipe",       icon: UserCheck },
+        { key: "sponsors",    label: "Partenaires",  icon: Globe },
+        { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
+        { key: "assemblees",  label: "Assemblées",   icon: Building2 },
       ],
     },
   ];
@@ -1095,6 +1099,8 @@ export default function Dashboard() {
           {tab === "programmes"  && <ProgrammesSection />}
           {tab === "equipe"      && <EquipeSection />}
           {tab === "sponsors"    && <SponsorsSection />}
+          {tab === "tresorerie"  && <TresorerieSection />}
+          {tab === "assemblees"  && <AssembleesSection />}
           {tab === "communiques" && <CommuniquesSection />}
           {tab === "mediatheque" && <MediathequeSection />}
           {tab === "documents"   && <DocumentsSection />}
