@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
+import AttestationDialog from "../components/AttestationDialog";
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
 import AccesSection from "./dashboard/AccesSection.jsx";
 import CotisationsSection from "./dashboard/CotisationsSection.jsx";
 import RapportAnnuel from "./dashboard/RapportAnnuel.jsx";
 import { useCotisations } from "../hooks/useCotisations";
+import { useMultiYearCotisations } from "../hooks/useMultiYearCotisations";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -36,7 +38,9 @@ export default function Dashboard() {
   const { articles } = useArticles();
   const { evenements } = useEvenements();
   const currentYear = new Date().getFullYear();
+  const YEARS_3 = [currentYear - 2, currentYear - 1, currentYear];
   const { cotisations: cotisationsAnnee } = useCotisations(currentYear);
+  const { data: multiYearData } = useMultiYearCotisations(YEARS_3);
 
   const {
     allMembers, pendingMembers,
@@ -50,7 +54,11 @@ export default function Dashboard() {
   const [pendingAttachment,  setPendingAttachment] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember,  setAddingMember]  = useState(null);
-  const [confirmDialog,  setConfirmDialog]  = useState(null);
+  const [confirmDialog,     setConfirmDialog]     = useState(null);
+  const [attestationDialog, setAttestationDialog] = useState(null);
+  const [renewDialog,       setRenewDialog]       = useState(false);
+  const [renewDate,         setRenewDate]         = useState(`${new Date().getFullYear()}-12-31`);
+  const [renewLoading,      setRenewLoading]      = useState(false);
   const [unreadCount,    setUnreadCount]    = useState(0);
   const csvInputRef = useRef(null);
 
@@ -98,6 +106,75 @@ export default function Dashboard() {
     evenements.filter(e => e.statut?.toLowerCase() !== "passé")[0] ?? null,
     [evenements]
   );
+
+  const prochainsAnniversaires = useMemo(() => {
+    const MOIS_FR = {
+      "janvier": 0, "février": 1, "mars": 2, "avril": 3, "mai": 4, "juin": 5,
+      "juillet": 6, "août": 7, "septembre": 8, "octobre": 9, "novembre": 10, "décembre": 11
+    };
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return (allMembers ?? [])
+      .map(m => {
+        if (!m.anniversaire) return null;
+        const parts = m.anniversaire.trim().split(" ");
+        const jour = parseInt(parts[0]);
+        const mois = MOIS_FR[parts.slice(1).join(" ").toLowerCase()];
+        if (isNaN(jour) || mois === undefined) return null;
+        let date = new Date(today.getFullYear(), mois, jour);
+        if (date < today) date = new Date(today.getFullYear() + 1, mois, jour);
+        const jours = Math.ceil((date - today) / 86400000);
+        return { ...m, joursAvant: jours, dateStr: m.anniversaire };
+      })
+      .filter(Boolean)
+      .filter(m => m.joursAvant <= 30)
+      .sort((a, b) => a.joursAvant - b.joursAvant);
+  }, [allMembers]);
+
+  const membresDormants = useMemo(() => {
+    if (!multiYearData || Object.keys(multiYearData).length === 0) return [];
+    const yr3 = [currentYear - 2, currentYear - 1, currentYear];
+    return (allMembers ?? []).filter(m => {
+      const md = multiYearData[String(m.id)] ?? {};
+      return !yr3.some(yr => {
+        const s = md[yr]?.statut;
+        return s === "payé" || s === "partiel";
+      });
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allMembers, multiYearData]);
+
+  const repartitionGeo = useMemo(() => {
+    const counts = {};
+    (allMembers ?? []).forEach(m => {
+      const key = m.pays?.trim() || "Non renseigné";
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    const total = allMembers.length || 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([pays, count]) => ({ pays, count, pct: Math.round((count / total) * 100) }));
+  }, [allMembers]);
+
+  const agendaCombine = useMemo(() => {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const items = [];
+    (evenements ?? []).filter(e => e.statut?.toLowerCase() !== "passé").forEach(e => {
+      let joursAvant = null;
+      try { const d = new Date(e.date); if (!isNaN(d)) joursAvant = Math.ceil((d - now) / 86400000); } catch {}
+      items.push({ type: "event", titre: e.titre, dateStr: e.date, lieu: e.lieu ?? null, joursAvant });
+    });
+    prochainsAnniversaires.forEach(m => {
+      items.push({ type: "anniv", titre: m.nom, dateStr: m.dateStr, joursAvant: m.joursAvant });
+    });
+    items.sort((a, b) => {
+      if (a.joursAvant === null && b.joursAvant === null) return 0;
+      if (a.joursAvant === null) return 1;
+      if (b.joursAvant === null) return -1;
+      return a.joursAvant - b.joursAvant;
+    });
+    return items.slice(0, 8);
+  }, [evenements, prochainsAnniversaires]);
 
   const filteredMembers = useMemo(() => {
     const q = search.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -553,6 +630,142 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Widget anniversaires prochains */}
+              {prochainsAnniversaires.length > 0 && (
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-pink-400" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+                        <span className="text-base">🎂</span>
+                      </div>
+                      <p className="text-sm font-bold text-foreground">
+                        Anniversaires — 30 prochains jours
+                        <span className="ml-2 text-xs font-semibold bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full">{prochainsAnniversaires.length}</span>
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      {prochainsAnniversaires.slice(0, 4).map(m => (
+                        <div key={m.id} className="flex items-center gap-3">
+                          <img
+                            src={m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=32`}
+                            alt={m.nom} className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground truncate">{m.nom}</p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-xs font-bold text-pink-600">{m.dateStr}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {m.joursAvant === 0 ? "Aujourd'hui !" : m.joursAvant === 1 ? "Demain" : `dans ${m.joursAvant}j`}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Widget membres dormants */}
+              {membresDormants.length > 0 && (
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-slate-400" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 text-slate-500" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground">
+                        Membres dormants — {currentYear - 2} à {currentYear}
+                        <span className="ml-2 text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{membresDormants.length}</span>
+                      </p>
+                      <button onClick={() => setTab("cotisations")} className="ml-auto text-xs font-semibold text-slate-600 hover:underline">Gérer →</button>
+                    </div>
+                    <div className="space-y-2">
+                      {membresDormants.slice(0, 5).map(m => (
+                        <div key={m.id} className="flex items-center gap-3">
+                          <img
+                            src={m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=475569&color=fff&size=32`}
+                            alt={m.nom} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground truncate">{m.nom}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground truncate flex-shrink-0">{m.profession || "—"}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {membresDormants.length > 5 && (
+                      <p className="text-xs text-muted-foreground mt-2">+{membresDormants.length - 5} autres membres dormants</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Répartition géo + Agenda combiné */}
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-cyan-500" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
+                        <Globe className="w-4 h-4 text-cyan-600" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground">Répartition géographique</p>
+                    </div>
+                    <div className="space-y-2.5">
+                      {repartitionGeo.map(({ pays, count, pct }) => (
+                        <div key={pays}>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="font-medium text-foreground truncate">{pays}</span>
+                            <span className="text-muted-foreground ml-2 flex-shrink-0">{count} ({pct}%)</span>
+                          </div>
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-cyan-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-violet-500" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-violet-600" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground">Agenda</p>
+                    </div>
+                    {agendaCombine.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">Aucune échéance à venir.</p>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {agendaCombine.map((item, i) => (
+                          <div key={i} className="flex items-center gap-3">
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.type === "event" ? "bg-indigo-50" : "bg-pink-50"}`}>
+                              {item.type === "event"
+                                ? <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                                : <span className="text-xs">🎂</span>}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{item.titre}</p>
+                              <p className="text-xs text-muted-foreground truncate">{item.dateStr}{item.lieu ? ` · ${item.lieu}` : ""}</p>
+                            </div>
+                            {item.joursAvant !== null && (
+                              <span className={`text-xs font-bold flex-shrink-0 ${item.joursAvant === 0 ? "text-red-500" : item.joursAvant <= 7 ? "text-amber-600" : "text-muted-foreground"}`}>
+                                {item.joursAvant === 0 ? "Auj." : `J-${item.joursAvant}`}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div className="grid lg:grid-cols-2 gap-6">
                 <div className="bg-background border border-border rounded-2xl p-5">
                   <h3 className="font-heading font-bold text-foreground mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-primary" /> Pages privées</h3>
@@ -594,7 +807,7 @@ export default function Dashboard() {
                   <span className="text-sm font-semibold text-primary">{filteredMembers.length}</span>
                   <span className="text-xs text-primary/70">membre{filteredMembers.length !== 1 ? "s" : ""}</span>
                 </div>
-                <button onClick={() => setAddingMember({ nom: "", profession: "", ville: "", pays: "", email: "", telephone: "", linkedin: "", anneeObtention: "", photo: "" })}
+                <button onClick={() => setAddingMember({ nom: "", profession: "", ville: "", pays: "", email: "", telephone: "", linkedin: "", anneeObtention: "", photo: "", notes_internes: "" })}
                   className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
                   <Plus className="w-4 h-4" /> Ajouter
                 </button>
@@ -605,6 +818,11 @@ export default function Dashboard() {
                 <button onClick={exportMembresExcel}
                   className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium hover:bg-emerald-100 transition-colors text-emerald-700">
                   <Download className="w-4 h-4" /> Exporter Excel
+                </button>
+                <button onClick={() => setRenewDialog(true)}
+                  className="flex items-center gap-1.5 px-4 h-10 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium hover:bg-amber-100 transition-colors text-amber-700"
+                  title="Renouveler la date de validité de toutes les attestations">
+                  <FileText className="w-4 h-4" /> Attestations
                 </button>
                 <input ref={csvInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={handleCsvUpload} />
                 {!isSeeded && (
@@ -635,6 +853,13 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="md:col-span-2"><ImgField label="Photo" value={addingMember.photo} onChange={v => setAddingMember(p => ({ ...p, photo: v }))} /></div>
+                    <div className="md:col-span-2">
+                      <Field label="Notes internes (admin uniquement)">
+                        <textarea className={inp} rows={2} placeholder="Notes confidentielles, visibles uniquement par l'admin…"
+                          value={addingMember.notes_internes || ""}
+                          onChange={e => setAddingMember(p => ({ ...p, notes_internes: e.target.value }))} />
+                      </Field>
+                    </div>
                   </div>
                 </FormPanel>
               )}
@@ -656,6 +881,13 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="md:col-span-2"><ImgField label="Photo" value={editingMember.photo} onChange={v => setEditingMember(p => ({ ...p, photo: v }))} /></div>
+                    <div className="md:col-span-2">
+                      <Field label="Notes internes (admin uniquement)">
+                        <textarea className={inp} rows={2} placeholder="Notes confidentielles, visibles uniquement par l'admin…"
+                          value={editingMember.notes_internes || ""}
+                          onChange={e => setEditingMember(p => ({ ...p, notes_internes: e.target.value }))} />
+                      </Field>
+                    </div>
                   </div>
                 </FormPanel>
               )}
@@ -701,7 +933,7 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => genererAttestation(m)} title="Attestation de membre"
+                        <button onClick={() => setAttestationDialog(m)} title="Attestation de membre"
                           className="w-7 h-7 rounded-lg hover:bg-amber-50 flex items-center justify-center text-muted-foreground hover:text-amber-600 transition-colors">
                           <FileText className="w-3.5 h-3.5" />
                         </button>
@@ -802,6 +1034,70 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <AttestationDialog
+        member={attestationDialog}
+        onConfirm={(validUntil) => { genererAttestation(attestationDialog, validUntil); setAttestationDialog(null); }}
+        onCancel={() => setAttestationDialog(null)}
+      />
+
+      {/* Modale renouvellement attestations en masse */}
+      {renewDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-start gap-3 mb-5">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Renouveler toutes les attestations</h3>
+                <p className="text-muted-foreground text-sm mt-0.5">{allMembers.length} membres · QR codes inchangés</p>
+              </div>
+            </div>
+            <div className="mb-5">
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+                Nouvelle date de validité
+              </label>
+              <input type="date" value={renewDate}
+                min={new Date().toISOString().slice(0, 10)}
+                onChange={e => setRenewDate(e.target.value)}
+                className="w-full border border-border rounded-xl px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40" />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setRenewDialog(false)} disabled={renewLoading}
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-xl hover:bg-muted transition-colors disabled:opacity-50">
+                Annuler
+              </button>
+              <button disabled={renewLoading} onClick={async () => {
+                setRenewLoading(true);
+                try {
+                  const records = (allMembers ?? []).map(m => ({
+                    ref: `ATT-${String(m.id).toUpperCase()}`,
+                    member_id: String(m.id),
+                    nom: m.nom,
+                    statut: m.bureau ? "Membre du Bureau Exécutif" : "Membre actif",
+                    profession: m.profession ?? null,
+                    valid_until: renewDate,
+                  }));
+                  const { error } = await supabase.from("attestations").upsert(records, { onConflict: "ref" });
+                  if (error) throw error;
+                  toast.success(`${records.length} attestations renouvelées jusqu'au ${new Date(renewDate + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}`);
+                  setRenewDialog(false);
+                } catch (err) {
+                  toast.error("Erreur : " + err.message);
+                } finally {
+                  setRenewLoading(false);
+                }
+              }}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-colors disabled:opacity-50">
+                {renewLoading
+                  ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Renouvellement…</>
+                  : `Renouveler ${allMembers.length} attestations`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!confirmDialog}

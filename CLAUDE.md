@@ -85,6 +85,21 @@ Suivi par membre et par année de qui a payé sa cotisation.
 Session D : migration articles vers table relationnelle dédiée.
 Réduction de la dette mbp_store.
 
+## Gestion de session et optimisation des crédits
+
+Rappels à appliquer systématiquement :
+
+- Taper /compact dès qu'une session dépasse ~20 échanges ou
+  aborde un second sujet distinct. Cela compresse le contexte
+  et réduit la consommation sur les messages suivants.
+- Taper /clear entre deux sujets sans lien (ex : après un déploiement,
+  avant de démarrer un nouveau chantier).
+- Pour les retouches simples (CSS, texte, couleur, typo), basculer
+  sur Haiku via /model — suffisant et ~10× moins coûteux que Sonnet.
+  Revenir sur Sonnet pour Supabase, debug, architecture, nouveau module.
+- Formuler les demandes avec le fichier cible et l'objectif précis
+  dès le premier message pour éviter les allers-retours de clarification.
+
 ## Contraintes de production
 Budget limité association. Privilégier solutions gratuites. Respect
 de l'accessibilité WCAG AA. Performance mobile prioritaire car une

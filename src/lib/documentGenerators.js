@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+
 const MBP_STYLE = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
 
@@ -307,6 +309,7 @@ const MBP_STYLE = `
     display: block;
   }
 
+  /* ── Mini Carte — Option B Professionnelle ── */
   .mini-card {
     width: 86mm;
     height: 54mm;
@@ -319,129 +322,165 @@ const MBP_STYLE = `
     flex-shrink: 0;
   }
 
-  .mini-card-header {
-    background: linear-gradient(135deg, #0a3d28 0%, #1a7a4e 100%);
-    padding: 6px 10px 5px;
+  .mini-card-inner {
     display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .mini-card-left {
+    width: 28mm;
+    background: #0a3d28;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.028) 2px,
+      rgba(255,255,255,0.028) 3px
+    );
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
+    padding: 5px 4px 4px;
+    gap: 3px;
     flex-shrink: 0;
+  }
+
+  .mini-card-divider {
+    width: 2px;
+    background: linear-gradient(180deg, transparent, #b8861a 12%, #e6c46a 50%, #b8861a 88%, transparent);
+    flex-shrink: 0;
+  }
+
+  .mini-card-right {
+    flex: 1;
+    background: #fff;
+    padding: 6px 8px 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
   }
 
   .mini-card-logo {
-    height: 20px;
+    height: 15px;
     width: auto;
-    opacity: 0.92;
-  }
-
-  .mini-card-org {
-    font-size: 6.5pt;
-    font-weight: 700;
-    color: rgba(255,255,255,0.85);
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    flex: 1;
-  }
-
-  .mini-card-chip {
-    width: 22px;
-    height: 16px;
-    background: linear-gradient(135deg, #e6b84a, #b8861a);
-    border-radius: 3px;
+    opacity: 0.80;
     flex-shrink: 0;
-  }
-
-  .mini-card-body {
-    background: #fff;
-    flex: 1;
-    padding: 5px 10px 4px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
   }
 
   .mini-card-photo {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
+    width: 100%;
+    flex: 1;
     object-fit: cover;
     object-position: top;
-    border: 2px solid #b8861a;
-    flex-shrink: 0;
+    border-radius: 3px;
+    border: 1.5px solid rgba(184,134,26,0.55);
+    display: block;
+    min-height: 0;
   }
 
   .mini-card-initiale {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #0a3d28, #1a7a4e);
+    width: 100%;
+    flex: 1;
+    border-radius: 3px;
+    background: linear-gradient(160deg, #0f5c3a, #1a7a4e);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 14pt;
+    font-size: 18pt;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 700;
-    flex-shrink: 0;
-    border: 2px solid #b8861a;
+    border: 1.5px solid rgba(184,134,26,0.55);
+    min-height: 0;
   }
 
-  .mini-card-info { flex: 1; min-width: 0; }
+  .mini-card-qr {
+    flex-shrink: 0;
+    width: 18mm;
+    height: 18mm;
+    background: #fff;
+    border-radius: 2px;
+    padding: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  .mini-card-name {
-    font-size: 9pt;
+  .mini-card-qr img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mini-card-type {
+    font-size: 5.5pt;
+    font-weight: 700;
+    color: #b8861a;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .mini-card-asso {
+    font-size: 6pt;
     font-weight: 700;
     color: #0a3d28;
-    line-height: 1.2;
+    line-height: 1.25;
+    margin-top: 1px;
+  }
+
+  .mini-card-name {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0a3d28;
+    line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .mini-card-detail {
-    font-size: 6.5pt;
-    color: #555;
-    line-height: 1.4;
-    margin-top: 2px;
-  }
-
-  .mini-card-id {
     font-size: 6pt;
-    font-family: monospace;
-    color: #888;
-    margin-top: 3px;
-    letter-spacing: 0.05em;
+    color: #555;
+    line-height: 1.35;
+    margin-top: 1px;
   }
 
-  .mini-card-footer {
-    background: linear-gradient(135deg, #0a3d28 0%, #1a7a4e 100%);
-    padding: 4px 10px;
+  .mini-card-validity {
+    font-size: 5.5pt;
+    color: #888;
+    letter-spacing: 0.04em;
+  }
+
+  .mini-card-validity strong {
+    color: #c0392b;
+    font-weight: 700;
+  }
+
+  .mini-card-stripe {
+    height: 7mm;
+    background: #1a1a1a;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    padding: 0 8px 0 9px;
     flex-shrink: 0;
   }
 
-  .mini-card-footer-text {
-    font-size: 5.5pt;
-    color: rgba(255,255,255,0.65);
-    letter-spacing: 0.05em;
+  .mini-card-stripe-number {
+    font-size: 6.5pt;
+    font-family: monospace;
+    color: #e6b84a;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    flex: 1;
   }
 
-  .mini-card-dots {
-    display: flex;
-    gap: 3px;
-  }
-
-  .mini-card-dots span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.30);
-  }
-
-  .mini-card-dots span:last-child {
-    background: #b8861a;
+  .mini-card-stripe-site {
+    font-size: 5pt;
+    color: rgba(255,255,255,0.40);
+    letter-spacing: 0.08em;
   }
 
   .print-btn {
@@ -627,8 +666,23 @@ export function openDocUrl(url, filename) {
   });
 }
 
-export function genererAttestation(member) {
-  const ref = refNumber("ATT", String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP");
+export function genererAttestation(member, validUntil) {
+  // Ref stable par membre — même QR code pour toujours
+  const ref = `ATT-${String(member.id ?? "MBP").toUpperCase()}`;
+  const validite = validUntil || `${new Date().getFullYear()}-12-31`;
+
+  // Upsert : crée ou met à jour la validité si l'attestation existe déjà
+  supabase.from("attestations").upsert({
+    ref,
+    member_id: String(member.id ?? ""),
+    nom: member.nom,
+    statut: member.bureau ? "Membre du Bureau Exécutif" : "Membre actif",
+    profession: member.profession ?? null,
+    valid_until: validite,
+  }, { onConflict: "ref" }).then(({ error }) => {
+    if (error) console.error("[attestation save]", error.message);
+  });
+
   const titre = member.bureau ? "membre du Bureau" : "membre actif";
   const localisation = [member.ville, member.pays].filter(Boolean).join(", ");
   const initiale = (member.nom || "M").charAt(0).toUpperCase();
@@ -737,7 +791,7 @@ export function genererAttestation(member) {
             <span class="sig-label">Signature et cachet</span>
             <div style="height:80px;display:flex;align-items:center;overflow:visible;">
               <img src="/images/FDD.png" alt="Cachet"
-                   style="max-height:100px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.5cm);"
+                   style="max-height:100px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.2cm);"
                    onerror="this.style.display='none'" />
             </div>
             <span class="sig-name" style="margin-top:18px;">Fabienne SENAYA-ATAYI</span>
@@ -745,32 +799,39 @@ export function genererAttestation(member) {
           </div>
         </div>
 
-        <!-- Mini carte membre -->
+        <!-- Mini carte membre — Option B Professionnelle -->
         <div class="mini-card">
-          <div class="mini-card-header">
-            <img class="mini-card-logo" src="/Logo%20Redesign1.png" alt="MBP"
-                 onerror="this.style.display='none'" />
-            <span class="mini-card-org">FDD Ma Belle Promo<br/>Lomé · 1994–2000</span>
-            <div class="mini-card-chip"></div>
-          </div>
-          <div class="mini-card-body">
-            ${member.photo
-              ? `<img class="mini-card-photo" src="${member.photo}" alt="${member.nom}"
-                      onerror="this.style.display='none'" />`
-              : `<div class="mini-card-initiale">${initiale}</div>`
-            }
-            <div class="mini-card-info">
-              <div class="mini-card-name">${member.nom}</div>
-              <div class="mini-card-detail">
-                ${member.profession ? `${member.profession}<br/>` : ""}
-                ${member.bureau ? "Membre du Bureau Exécutif" : "Membre actif"}
+          <div class="mini-card-inner">
+            <div class="mini-card-left">
+              <img class="mini-card-logo" src="/Logo%20Redesign1.png" alt="MBP"
+                   onerror="this.style.display='none'" />
+              ${member.photo
+                ? `<img class="mini-card-photo" src="${member.photo}" alt="${member.nom}"
+                        onerror="this.style.display='none'" />`
+                : `<div class="mini-card-initiale">${initiale}</div>`
+              }
+              <div class="mini-card-qr">
+                <img src="${'https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=' + encodeURIComponent('https://mabellepromo.org/verifier?id=' + ref) + '&bgcolor=ffffff&color=0a3d28&margin=1'}" alt="QR" onerror="this.style.display='none'" />
               </div>
-              <div class="mini-card-id">ID · ${ref}</div>
+            </div>
+            <div class="mini-card-divider"></div>
+            <div class="mini-card-right">
+              <div>
+                <div class="mini-card-type">Carte de Membre</div>
+                <div class="mini-card-asso">FDD Ma Belle Promo<br/>Lomé · 1994–2000</div>
+              </div>
+              <div>
+                <div class="mini-card-name">${member.nom}</div>
+                <div class="mini-card-detail">
+                  ${member.profession ? `${member.profession}<br/>` : ""}
+                  ${member.bureau ? "Membre du Bureau Exécutif" : "Membre actif"}
+                </div>
+              </div>
             </div>
           </div>
-          <div class="mini-card-footer">
-            <span class="mini-card-footer-text">mabellepromo.org</span>
-            <div class="mini-card-dots"><span></span><span></span><span></span></div>
+          <div class="mini-card-stripe">
+            <span class="mini-card-stripe-number">${ref}</span>
+            <span class="mini-card-stripe-site">mabellepromo.org</span>
           </div>
         </div>
 
@@ -948,7 +1009,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
           <span class="sig-label">Signature et cachet</span>
           <div style="height:100px;display:flex;align-items:center;overflow:visible;">
             <img src="/images/FDD.png" alt="Signature et cachet"
-                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.5cm);"
+                 style="max-height:120px;max-width:100%;object-fit:contain;display:block;transform:translateX(-1cm) translateY(0.2cm);"
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
@@ -974,4 +1035,142 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
 </html>`;
 
   openDoc(html, `Recu-MBP-${annee}-${member.nom.replace(/\s+/g, "-")}.html`);
+}
+
+export function genererRapportFinancier(annee, rows, montantDefaut, stats) {
+  const ref = refNumber("RAP", String(annee));
+  const totalAttendu = (stats.total_membres - (stats.exemptes ?? 0)) * Number(montantDefaut);
+  const taux = totalAttendu > 0 ? Math.round(((stats.total || 0) / totalAttendu) * 100) : 0;
+
+  const STATUT_COLOR = {
+    "payé":       { bg: "#d1fae5", color: "#065f46", label: "Payé" },
+    "partiel":    { bg: "#dbeafe", color: "#1e40af", label: "Partiel" },
+    "en_attente": { bg: "#fef3c7", color: "#92400e", label: "En attente" },
+    "exempté":    { bg: "#f1f5f9", color: "#475569", label: "Exempté" },
+  };
+
+  const lignes = (rows ?? []).map((m, i) => {
+    const cfg = STATUT_COLOR[m.statut] ?? STATUT_COLOR["en_attente"];
+    const montant = m.cotisation?.montant ? Number(m.cotisation.montant).toLocaleString("fr-FR") + " F" : "—";
+    return `<tr style="background:${i % 2 === 0 ? "#fff" : "#f8fafc"};">
+      <td style="padding:6px 10px;font-size:8.5pt;border-bottom:1px solid #e2e8f0;">${i + 1}</td>
+      <td style="padding:6px 10px;font-size:8.5pt;font-weight:600;color:#0f172a;border-bottom:1px solid #e2e8f0;">${m.nom || "—"}</td>
+      <td style="padding:6px 10px;font-size:8pt;color:#64748b;border-bottom:1px solid #e2e8f0;">${m.profession || "—"}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;text-align:center;">
+        <span style="background:${cfg.bg};color:${cfg.color};font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:99px;">${cfg.label}</span>
+      </td>
+      <td style="padding:6px 10px;font-size:8.5pt;font-weight:600;color:#0a3d28;border-bottom:1px solid #e2e8f0;text-align:right;">${montant}</td>
+    </tr>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rapport Financier ${annee} — FDD MBP</title>
+  <style>${MBP_STYLE}</style>
+  <style>
+    .stat-card { background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:14px 18px;text-align:center; }
+    .stat-card .val { font-family:'Cormorant Garamond',serif;font-size:20pt;font-weight:700;color:#0a3d28;line-height:1; }
+    .stat-card .lbl { font-size:7.5pt;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-top:4px; }
+    table { width:100%;border-collapse:collapse; }
+    thead th { background:#0a3d28;color:#fff;font-family:'Lato',sans-serif;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 10px;text-align:left; }
+    thead th:last-child { text-align:right; }
+    @media print { .a4 { height:297mm; } }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Rapport Financier ${annee}</div>
+        <div class="doc-ref">Réf. ${ref} · Généré le ${today()}</div>
+      </div>
+
+      <!-- Stats synthèse -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+        <div class="stat-card">
+          <div class="val" style="color:#065f46;">${stats.payes ?? 0}</div>
+          <div class="lbl">Payés</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#1e40af;">${stats.partiels ?? 0}</div>
+          <div class="lbl">Partiels</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#92400e;">${stats.enAttente ?? 0}</div>
+          <div class="lbl">En attente</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#475569;">${stats.exemptes ?? 0}</div>
+          <div class="lbl">Exemptés</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#b8861a;">${taux}%</div>
+          <div class="lbl">Taux</div>
+        </div>
+      </div>
+
+      <!-- Montant collecté -->
+      <div style="background:linear-gradient(135deg,#0a3d28,#1a7a4e);border-radius:8px;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <p style="font-family:'Lato',sans-serif;font-size:7.5pt;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Total collecté</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:22pt;font-weight:700;color:#e6b84a;line-height:1;">
+            ${(stats.total || 0).toLocaleString("fr-FR")} F CFA
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <p style="font-family:'Lato',sans-serif;font-size:7pt;color:rgba(255,255,255,0.55);margin-bottom:2px;">Cotisation par membre</p>
+          <p style="font-family:'Lato',sans-serif;font-size:9pt;color:rgba(255,255,255,0.80);">${Number(montantDefaut).toLocaleString("fr-FR")} F CFA</p>
+          <p style="font-family:'Lato',sans-serif;font-size:7pt;color:rgba(255,255,255,0.45);margin-top:2px;">Attendu : ${totalAttendu.toLocaleString("fr-FR")} F CFA</p>
+        </div>
+      </div>
+
+      <!-- Table membres -->
+      <div style="overflow:hidden;border-radius:8px;border:1px solid #e2e8f0;flex:1;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px;">#</th>
+              <th>Nom</th>
+              <th>Profession</th>
+              <th style="text-align:center;">Statut</th>
+              <th style="text-align:right;">Montant</th>
+            </tr>
+          </thead>
+          <tbody>${lignes}</tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <div class="footer-text">
+        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right;">
+        Document interne — confidentiel<br/>
+        Généré le ${today()} · Réf. ${ref}
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  openDoc(html, `Rapport-Financier-MBP-${annee}.html`);
 }

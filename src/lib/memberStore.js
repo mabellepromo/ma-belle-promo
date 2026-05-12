@@ -9,20 +9,21 @@ function rowToMember(row) {
 
 function memberToRow(m) {
   return {
-    id:           String(m.id),
-    nom:          m.nom,
-    profession:   m.profession   || null,
-    ville:        m.ville        || null,
-    pays:         m.pays         || null,
-    email:        m.email        || null,
-    telephone:    m.telephone    || null,
-    anniversaire: m.anniversaire || null,
-    role:         m.role         || null,
-    bureau:       m.bureau       || false,
-    photo:        m.photo        || null,
-    photo_position: m.photoPosition || m.photo_position || null,
-    status:       m.status       || "validated",
-    submitted_at: m.submittedAt  || m.submitted_at || new Date().toISOString(),
+    id:             String(m.id),
+    nom:            m.nom,
+    profession:     m.profession     || null,
+    ville:          m.ville          || null,
+    pays:           m.pays           || null,
+    email:          m.email          || null,
+    telephone:      m.telephone      || null,
+    anniversaire:   m.anniversaire   || null,
+    role:           m.role           || null,
+    bureau:         m.bureau         || false,
+    photo:          m.photo          || null,
+    photo_position: m.photoPosition  || m.photo_position || null,
+    status:         m.status         || "validated",
+    submitted_at:   m.submittedAt    || m.submitted_at || new Date().toISOString(),
+    notes_internes: m.notes_internes || null,
   };
 }
 

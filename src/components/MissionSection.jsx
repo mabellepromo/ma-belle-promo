@@ -92,18 +92,18 @@ export default function MissionSection() {
               Une communauté, une histoire, un engagement.
             </p>
 
-            <p className="mt-6 text-muted-foreground leading-relaxed text-lg">
+            <p className="mt-6 text-muted-foreground leading-relaxed font-dm-serif text-[14px]">
               Ma Belle Promo réunit les anciens étudiants de la{" "}
               <span className="text-foreground">Faculté de Droit de l'Université de Lomé</span>,
-              promotion <strong className="text-foreground">1994–2000</strong>. Née du désir de préserver
+              promotion <span className="text-foreground">1994–2000</span>. Née du désir de préserver
               les liens tissés sur les bancs de l'université, notre association est devenue un espace
               dynamique où l'amitié, la solidarité et l'entraide prennent une dimension collective.
             </p>
 
-            <p className="mt-4 text-muted-foreground leading-relaxed">
-              Depuis le <strong className="text-foreground">1er décembre 2018</strong>, nous avons choisi
+            <p className="mt-4 text-muted-foreground leading-relaxed font-dm-serif text-[14px]">
+              Depuis le <span className="text-foreground">1er décembre 2018</span>, nous avons choisi
               de transformer notre cohésion en force d'action. Officiellement reconnue le{" "}
-              <strong className="text-foreground">03 octobre 2019</strong>, Ma Belle Promo s'engage
+              <span className="text-foreground">03 octobre 2019</span>, Ma Belle Promo s'engage
               aujourd'hui au service de ses membres et de sa communauté.
             </p>
 

@@ -36,6 +36,7 @@ const PAGE_TITLES = {
   "/ressources":                 "Ressources Juridiques",
   "/login":                      "Connexion",
   "/dashboard":                  "Tableau de Bord",
+  "/verifier":                   "Vérification d'attestation",
   "/galeries":                   "Galeries photos",
 };
 
@@ -93,6 +94,7 @@ const MentionsLegales    = lazy(() => import('./pages/MentionsLegales'));
 const Confidentialite    = lazy(() => import('./pages/Confidentialite'));
 const NewsletterConfirm  = lazy(() => import('./pages/NewsletterConfirm'));
 const PaiementRetour     = lazy(() => import('./pages/PaiementRetour'));
+const Verifier           = lazy(() => import('./pages/Verifier'));
 
 function PageLoader() {
   return (
@@ -171,6 +173,7 @@ const AuthenticatedApp = () => {
         <Route path="/newsletter/confirmer" element={<NewsletterConfirm />} />
         <Route path="/paiement/retour" element={<PaiementRetour />} />
       </Route>
+      <Route path="/verifier" element={<Verifier />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

@@ -17,7 +17,6 @@ const NAV = [
   { label: "Adhésion",      href: "/implications/adhesion" },
   { label: "Actualités",    href: "/informations/actualites" },
   { label: "Nous soutenir", href: "/implications/soutenir" },
-  { label: "Contact",       href: "/informations/contacts" },
 ];
 
 export default function FooterSection() {
@@ -57,7 +56,7 @@ export default function FooterSection() {
           <div className="flex items-center gap-4 shrink-0">
             <img
               loading="lazy"
-              src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
+              src="/Logo Redesign1.webp"
               alt="Logo Ma Belle Promo"
               className="w-14 h-14 rounded-full opacity-90 shadow-lg"
               style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
@@ -124,7 +123,7 @@ export default function FooterSection() {
         {/* ── Barre du bas ── */}
         <div className="mt-6 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo · Amitié · Solidarité · Entraide</p>
+            <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo</p>
             <div className="flex items-center gap-3">
               <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">Mentions légales</Link>
               <span className="text-background/20">·</span>
