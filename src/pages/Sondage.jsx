@@ -12,7 +12,7 @@ const COLORS = ["#0a3d28", "#1a7a4e", "#b8861a", "#1e40af", "#7c3aed", "#0e7490"
 function PublicQuestionResults({ question, reponses }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
-  if (question.type === "texte") {
+  if (question.type === "texte" || question.type === "date") {
     return (
       <p className="text-sm text-muted-foreground italic">
         {qr.length} réponse{qr.length !== 1 ? "s" : ""} reçue{qr.length !== 1 ? "s" : ""}.
@@ -143,7 +143,37 @@ function QuestionInput({ question, answer, onChange }) {
     );
   }
 
+  if (question.type === "dropdown") {
+    return (
+      <select
+        value={val.valeur_options?.[0] ?? ""}
+        onChange={e => {
+          const v = e.target.value;
+          onChange(v === "" ? {} : { valeur_options: [Number(v)] });
+        }}
+        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
+      >
+        <option value="">— Sélectionner —</option>
+        {(question.options || []).map((opt, i) => (
+          <option key={i} value={i}>{opt}</option>
+        ))}
+      </select>
+    );
+  }
+
   if (question.type === "texte") {
+    const hasValidation = !!question.config?.validation;
+    if (hasValidation) {
+      return (
+        <input
+          type={question.config.validation === "email" ? "email" : question.config.validation === "nombre" ? "number" : "text"}
+          className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
+          value={val.valeur_texte || ""}
+          onChange={e => onChange({ valeur_texte: e.target.value })}
+          placeholder={question.config.validation === "email" ? "votre@email.com" : question.config.validation === "nombre" ? "0" : "Votre réponse…"}
+        />
+      );
+    }
     return (
       <textarea
         className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
@@ -151,6 +181,17 @@ function QuestionInput({ question, answer, onChange }) {
         value={val.valeur_texte || ""}
         onChange={e => onChange({ valeur_texte: e.target.value })}
         placeholder="Votre réponse…"
+      />
+    );
+  }
+
+  if (question.type === "date") {
+    return (
+      <input
+        type="date"
+        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
+        value={val.valeur_texte || ""}
+        onChange={e => onChange({ valeur_texte: e.target.value })}
       />
     );
   }
@@ -239,13 +280,27 @@ export default function Sondage() {
 
   async function handleSubmit() {
     for (const q of (sondage.questions || [])) {
-      if (!q.obligatoire) continue;
       const a = answers[q.id] || {};
-      const missing =
-        ((q.type === "single" || q.type === "multiple" || q.type === "ouinon") && (!a.valeur_options || !a.valeur_options.length)) ||
-        (q.type === "texte" && !a.valeur_texte?.trim()) ||
-        (q.type === "note" && !a.valeur_note);
-      if (missing) { alert(`La question "${q.libelle}" est obligatoire.`); return; }
+      if (q.obligatoire) {
+        const missing =
+          ((q.type === "single" || q.type === "multiple" || q.type === "ouinon" || q.type === "dropdown") && (!a.valeur_options || !a.valeur_options.length)) ||
+          ((q.type === "texte" || q.type === "date") && !a.valeur_texte?.trim()) ||
+          (q.type === "note" && !a.valeur_note);
+        if (missing) { alert(`La question "${q.libelle}" est obligatoire.`); return; }
+      }
+      // Validation de format pour les champs texte
+      if (q.type === "texte" && a.valeur_texte?.trim()) {
+        const v = a.valeur_texte.trim();
+        if (q.config?.validation === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+          alert(`La question "${q.libelle}" requiert une adresse email valide.`); return;
+        }
+        if (q.config?.validation === "nombre" && isNaN(Number(v))) {
+          alert(`La question "${q.libelle}" requiert un nombre valide.`); return;
+        }
+        if (q.config?.validation === "telephone" && !/^[\d\s+\-()]{6,}$/.test(v)) {
+          alert(`La question "${q.libelle}" requiert un numéro de téléphone valide.`); return;
+        }
+      }
     }
 
     setSubmitting(true);

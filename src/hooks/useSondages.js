@@ -46,6 +46,7 @@ export function useSondages({ adminMode = false } = {}) {
         libelle: q.libelle.trim(),
         options: (q.options || []).filter(o => o.trim()),
         obligatoire: q.obligatoire ?? true,
+        config: q.config || {},
       }));
       const { error: qErr } = await supabase.from("sondage_questions").insert(rows);
       if (qErr) return qErr;

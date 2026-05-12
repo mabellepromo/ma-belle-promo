@@ -2,7 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
-  ChevronUp, ChevronDown, Send, Check, Clock, UserPlus,
+  ChevronUp, ChevronDown, Send, Check, Clock, UserPlus, Download,
+  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -16,17 +17,83 @@ const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-blue-500", "bg-violet-500"
 const Q_TYPES = [
   { value: "single",   label: "Choix unique" },
   { value: "multiple", label: "Choix multiple" },
+  { value: "dropdown", label: "Liste déroulante" },
   { value: "ouinon",   label: "Oui / Non" },
   { value: "texte",    label: "Texte libre" },
+  { value: "date",     label: "Date" },
   { value: "note",     label: "Note /5" },
 ];
 
 const Q_TYPE_LABELS = {
-  ouinon: "Oui/Non", single: "Choix unique",
-  multiple: "Choix multiple", texte: "Texte libre", note: "Note /5",
+  ouinon: "Oui/Non", single: "Choix unique", multiple: "Choix multiple",
+  dropdown: "Déroulante", texte: "Texte libre", date: "Date", note: "Note /5",
 };
 
-// ── Résultats par question (vue admin) ─────────────────────────────────────
+const VALIDATIONS = [
+  { value: "",          label: "Texte libre" },
+  { value: "email",     label: "Email" },
+  { value: "nombre",    label: "Nombre" },
+  { value: "telephone", label: "Téléphone" },
+];
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+async function exportCSV(sondage) {
+  const { data: soumissions } = await supabase
+    .from("sondage_soumissions")
+    .select("*")
+    .eq("sondage_id", sondage.id)
+    .order("created_at");
+
+  if (!soumissions?.length) { toast.info("Aucune réponse à exporter."); return; }
+
+  const ids = soumissions.map(s => s.id);
+  const { data: reponses } = await supabase
+    .from("sondage_reponses").select("*").in("soumission_id", ids);
+
+  const questions = sondage.questions || [];
+  const headers = ["Date", "Nom", "Email", ...questions.map(q => q.libelle)];
+
+  const rows = soumissions.map(s => {
+    const nom   = s.repondant_nom   || "Anonyme";
+    const email = s.repondant_email || "";
+    const date  = new Date(s.created_at).toLocaleDateString("fr-FR");
+
+    const vals = questions.map(q => {
+      const rep = (reponses || []).find(r => r.soumission_id === s.id && r.question_id === q.id);
+      if (!rep) return "";
+      if (q.type === "texte" || q.type === "date") return rep.valeur_texte || "";
+      if (q.type === "note") return rep.valeur_note ?? "";
+      if (q.type === "ouinon") {
+        if (rep.valeur_options?.includes(0)) return "Oui";
+        if (rep.valeur_options?.includes(1)) return "Non";
+        return "";
+      }
+      if (q.type === "single" || q.type === "dropdown") {
+        const idx = rep.valeur_options?.[0];
+        return idx != null ? (q.options?.[idx] || "") : "";
+      }
+      if (q.type === "multiple") {
+        return (rep.valeur_options || []).map(i => q.options?.[i]).filter(Boolean).join("; ");
+      }
+      return "";
+    });
+
+    return [date, nom, email, ...vals];
+  });
+
+  const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csv = [headers, ...rows].map(r => r.map(esc).join(",")).join("\n");
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sondage-${sondage.titre.replace(/[^a-z0-9]/gi, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast.success(`${soumissions.length} réponse${soumissions.length !== 1 ? "s" : ""} exportée${soumissions.length !== 1 ? "s" : ""}.`);
+}
+
+// ── Résultats par question (admin) ─────────────────────────────────────────
 function QuestionResults({ question, reponses, total }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
@@ -37,10 +104,24 @@ function QuestionResults({ question, reponses, total }) {
         <p className="text-xs text-muted-foreground mb-1">{textes.length} réponse{textes.length !== 1 ? "s" : ""}</p>
         <div className="space-y-1 max-h-36 overflow-y-auto">
           {textes.length === 0
-            ? <p className="text-xs text-muted-foreground italic">Aucune réponse.</p>
-            : textes.map((t, i) => (
-              <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5 text-foreground">{t}</div>
-            ))}
+            ? <p className="text-xs italic text-muted-foreground">Aucune réponse.</p>
+            : textes.map((t, i) => <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5">{t}</div>)}
+        </div>
+      </div>
+    );
+  }
+
+  if (question.type === "date") {
+    const dates = qr.map(r => r.valeur_texte).filter(Boolean);
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-1">{dates.length} réponse{dates.length !== 1 ? "s" : ""}</p>
+        <div className="flex flex-wrap gap-1">
+          {dates.map((d, i) => (
+            <span key={i} className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5">
+              {new Date(d).toLocaleDateString("fr-FR")}
+            </span>
+          ))}
         </div>
       </div>
     );
@@ -52,16 +133,14 @@ function QuestionResults({ question, reponses, total }) {
     const counts = [1, 2, 3, 4, 5].map(n => notes.filter(v => v === n).length);
     return (
       <div>
-        <p className="text-xs text-muted-foreground mb-2">
-          Moyenne : <strong className="text-foreground">{avg} / 5</strong> · {notes.length} réponse{notes.length !== 1 ? "s" : ""}
-        </p>
+        <p className="text-xs text-muted-foreground mb-2">Moyenne : <strong className="text-foreground">{avg}/5</strong> · {notes.length} réponse{notes.length !== 1 ? "s" : ""}</p>
         {[1, 2, 3, 4, 5].map(n => {
           const pct = notes.length ? Math.round((counts[n - 1] / notes.length) * 100) : 0;
           return (
             <div key={n} className="flex items-center gap-2 mb-1">
               <span className="text-xs w-5 text-center text-muted-foreground">{n}★</span>
               <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-amber-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
               </div>
               <span className="text-xs w-5 text-right text-muted-foreground">{counts[n - 1]}</span>
             </div>
@@ -71,6 +150,7 @@ function QuestionResults({ question, reponses, total }) {
     );
   }
 
+  // ouinon, single, multiple, dropdown
   const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
   const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
   const qTotal = qr.length;
@@ -84,11 +164,10 @@ function QuestionResults({ question, reponses, total }) {
           <div key={i}>
             <div className="flex justify-between text-xs mb-0.5">
               <span className="truncate flex-1 mr-2 text-foreground">{opt}</span>
-              <span className="font-bold text-foreground flex-shrink-0">{pct}% ({counts[i]})</span>
+              <span className="font-bold text-foreground">{pct}% ({counts[i]})</span>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${COLORS[i % COLORS.length]}`}
-                style={{ width: `${pct}%` }} />
+              <div className={`h-full rounded-full transition-all ${COLORS[i % COLORS.length]}`} style={{ width: `${pct}%` }} />
             </div>
           </div>
         );
@@ -99,7 +178,7 @@ function QuestionResults({ question, reponses, total }) {
 
 // ── Constructeur de question ───────────────────────────────────────────────
 function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
-  const needsOptions = q.type === "single" || q.type === "multiple";
+  const needsOptions = q.type === "single" || q.type === "multiple" || q.type === "dropdown";
 
   function setOptVal(i, val) {
     const opts = [...(q.options || [])]; opts[i] = val;
@@ -108,15 +187,14 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
   function addOpt() { onChange({ ...q, options: [...(q.options || []), ""] }); }
   function removeOpt(i) { onChange({ ...q, options: (q.options || []).filter((_, j) => j !== i) }); }
   function moveOpt(i, dir) {
-    const opts = [...(q.options || [])];
-    const j = i + dir;
+    const opts = [...(q.options || [])]; const j = i + dir;
     if (j < 0 || j >= opts.length) return;
     [opts[i], opts[j]] = [opts[j], opts[i]];
     onChange({ ...q, options: opts });
   }
   function changeType(newType) {
-    const needsOpts = newType === "single" || newType === "multiple";
-    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [] });
+    const needsOpts = newType === "single" || newType === "multiple" || newType === "dropdown";
+    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [], config: {} });
   }
 
   return (
@@ -133,7 +211,9 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
           </button>
         </div>
         <span className="text-xs font-bold text-muted-foreground pt-1.5 w-5 text-center">{idx + 1}</span>
+
         <div className="flex-1 space-y-2 min-w-0">
+          {/* Sélecteur de type */}
           <div className="flex gap-1 flex-wrap">
             {Q_TYPES.map(t => (
               <button key={t.value} type="button" onClick={() => changeType(t.value)}
@@ -146,9 +226,13 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
               </button>
             ))}
           </div>
+
+          {/* Libellé */}
           <input className={inp} value={q.libelle}
             onChange={e => onChange({ ...q, libelle: e.target.value })}
             placeholder="Libellé de la question…" />
+
+          {/* Options pour single / multiple / dropdown */}
           {needsOptions && (
             <div className="space-y-1.5 pl-1">
               {(q.options || []).map((opt, i) => (
@@ -182,14 +266,48 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
               </button>
             </div>
           )}
+
+          {/* Validation pour texte libre */}
+          {q.type === "texte" && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground flex-shrink-0">Format :</span>
+              <div className="flex gap-1 flex-wrap">
+                {VALIDATIONS.map(v => (
+                  <button key={v.value} type="button"
+                    onClick={() => onChange({ ...q, config: { ...q.config, validation: v.value || undefined } })}
+                    className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                      (q.config?.validation || "") === v.value
+                        ? "bg-indigo-100 text-indigo-700 border-indigo-300"
+                        : "border-border text-muted-foreground hover:border-indigo-300 bg-white"
+                    }`}>
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Aperçu types sans options */}
           {q.type === "ouinon" && (
             <div className="flex gap-2">
               <span className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">Oui</span>
               <span className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">Non</span>
             </div>
           )}
-          {q.type === "texte" && (
+          {q.type === "texte" && !q.config?.validation && (
             <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">Zone de texte libre…</div>
+          )}
+          {q.type === "texte" && q.config?.validation === "email" && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">ex@email.com</div>
+          )}
+          {q.type === "texte" && q.config?.validation === "nombre" && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">0 — 9999</div>
+          )}
+          {q.type === "texte" && q.config?.validation === "telephone" && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">+228 XX XX XX XX</div>
+          )}
+          {q.type === "date" && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">📅 Sélection de date</div>
           )}
           {q.type === "note" && (
             <div className="flex gap-1 items-center">
@@ -197,7 +315,16 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
               <span className="text-xs text-muted-foreground ml-1">de 1 à 5</span>
             </div>
           )}
+          {q.type === "dropdown" && (q.options || []).filter(o => o.trim()).length > 0 && (
+            <div className="bg-white border border-border rounded-lg px-3 py-2">
+              <select className="text-xs text-muted-foreground w-full bg-transparent outline-none" disabled>
+                <option>— Choisir une option —</option>
+                {(q.options || []).filter(o => o.trim()).map((o, i) => <option key={i}>{o}</option>)}
+              </select>
+            </div>
+          )}
         </div>
+
         <button type="button" onClick={onRemove} disabled={total <= 1}
           className="w-7 h-7 mt-0.5 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20 flex-shrink-0">
           <Trash2 className="w-3.5 h-3.5" />
@@ -216,8 +343,8 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove }) {
 }
 
 // ── Modal d'invitation ─────────────────────────────────────────────────────
-function InviteModal({ sondage, onClose, origin }) {
-  const [members, setMembers] = useState(null); // null = pas encore chargé
+function InviteModal({ sondage, onClose, origin, pendingOnly = false, pendingInvitations = [] }) {
+  const [members, setMembers] = useState(null);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [search, setSearch] = useState("");
@@ -225,9 +352,8 @@ function InviteModal({ sondage, onClose, origin }) {
   const [newEmail, setNewEmail] = useState("");
   const [newNom, setNewNom] = useState("");
   const [sending, setSending] = useState(false);
-  const [tab, setTab] = useState("membres"); // membres | externes
+  const [tab, setTab] = useState(pendingOnly ? "relance" : "membres");
 
-  // Charger les membres au montage
   useState(() => {
     supabase.from("members").select("id, prenom, nom, email, photo_url").order("nom").then(({ data }) => {
       setMembers(data || []);
@@ -237,36 +363,52 @@ function InviteModal({ sondage, onClose, origin }) {
 
   const filtered = (members || []).filter(m => {
     if (!search) return true;
-    const s = search.toLowerCase();
-    return `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(s);
+    return `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(search.toLowerCase());
   });
 
   function toggleMember(id) {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
 
   function addExtraEmail() {
     const email = newEmail.trim().toLowerCase();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Email invalide."); return;
-    }
-    if (extraEmails.some(e => e.email === email)) {
-      toast.error("Cet email est déjà dans la liste."); return;
-    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Email invalide."); return; }
+    if (extraEmails.some(e => e.email === email)) { toast.error("Déjà dans la liste."); return; }
     setExtraEmails(p => [...p, { email, nom: newNom.trim() || null }]);
     setNewEmail(""); setNewNom("");
   }
 
-  const totalCount = selectedIds.size + extraEmails.length;
+  const totalCount = tab === "relance"
+    ? pendingInvitations.length
+    : selectedIds.size + extraEmails.length;
 
   async function handleSend() {
-    if (!totalCount) { toast.error("Aucun destinataire sélectionné."); return; }
+    if (!totalCount) { toast.error("Aucun destinataire."); return; }
 
-    const recipients = [
+    let recipients;
+    if (tab === "relance") {
+      // Relance : réutiliser les tokens existants
+      setSending(true);
+      const payload = {
+        type: "sondage_invitation",
+        sondageTitre: `[Rappel] ${sondage.titre}`,
+        sondageDescription: sondage.description || null,
+        invitations: pendingInvitations.map(inv => ({
+          id: inv.id, email: inv.email, nom: inv.nom,
+          lien: `${origin}/sondage/${sondage.id}?token=${inv.token}`,
+        })),
+      };
+      try {
+        const res = await fetch("/api/send-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const result = await res.json();
+        toast.success(`${result.sent} rappel${result.sent !== 1 ? "s" : ""} envoyé${result.sent !== 1 ? "s" : ""} !`);
+      } catch (e) { toast.error("Erreur : " + e.message); }
+      setSending(false);
+      onClose();
+      return;
+    }
+
+    recipients = [
       ...Array.from(selectedIds).map(id => {
         const m = members.find(m => m.id === id);
         return { email: m.email, nom: `${m.prenom} ${m.nom}`.trim() };
@@ -275,129 +417,109 @@ function InviteModal({ sondage, onClose, origin }) {
     ];
 
     setSending(true);
-
-    // 1. Créer les invitations dans Supabase (admin JWT)
     const { data: invitations, error } = await createInvitations(sondage.id, recipients);
-    if (error) {
-      toast.error("Erreur : " + error.message);
-      setSending(false);
-      return;
-    }
+    if (error) { toast.error("Erreur : " + error.message); setSending(false); return; }
 
-    // 2. Envoyer les emails via Brevo
     const payload = {
       type: "sondage_invitation",
       sondageTitre: sondage.titre,
       sondageDescription: sondage.description || null,
       invitations: invitations.map(inv => ({
-        id: inv.id,
-        email: inv.email,
-        nom: inv.nom,
+        id: inv.id, email: inv.email, nom: inv.nom,
         lien: `${origin}/sondage/${sondage.id}?token=${inv.token}`,
       })),
     };
 
     try {
-      const res = await fetch("/api/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch("/api/send-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const result = await res.json();
-
-      // 3. Marquer les invitations envoyées
-      if (result.sentIds?.length) {
-        await markInvitationsSent(result.sentIds);
-      }
-
-      if (result.errors?.length) {
-        toast.warning(`${result.sent} envoyée${result.sent !== 1 ? "s" : ""}, ${result.errors.length} échec(s).`);
-      } else {
-        toast.success(`${result.sent} invitation${result.sent !== 1 ? "s" : ""} envoyée${result.sent !== 1 ? "s" : ""} !`);
-      }
-    } catch (e) {
-      toast.error("Erreur d'envoi : " + e.message);
-    }
+      if (result.sentIds?.length) await markInvitationsSent(result.sentIds);
+      if (result.errors?.length) toast.warning(`${result.sent} envoyée${result.sent !== 1 ? "s" : ""}, ${result.errors.length} échec(s).`);
+      else toast.success(`${result.sent} invitation${result.sent !== 1 ? "s" : ""} envoyée${result.sent !== 1 ? "s" : ""} !`);
+    } catch (e) { toast.error("Erreur : " + e.message); }
 
     setSending(false);
     onClose();
   }
 
+  const tabs = [
+    { key: "membres", label: "Membres MBP" },
+    { key: "externes", label: "Emails libres" },
+    ...(pendingInvitations.length ? [{ key: "relance", label: `Relancer (${pendingInvitations.length})` }] : []),
+  ];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
-        {/* En-tête */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
           <div>
-            <p className="font-semibold text-foreground text-sm">Envoyer les invitations</p>
-            <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">« {sondage.titre} »</p>
+            <p className="font-semibold text-foreground text-sm">Envoyer des invitations</p>
+            <p className="text-xs text-muted-foreground truncate max-w-xs">« {sondage.titre} »</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
-            <X className="w-4 h-4" />
-          </button>
+          <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
         </div>
 
-        {/* Onglets */}
         <div className="flex border-b border-border flex-shrink-0">
-          {[
-            { key: "membres", label: "Membres MBP" },
-            { key: "externes", label: "Emails libres" },
-          ].map(t => (
+          {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                tab === t.key ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"
-              }`}>
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${tab === t.key ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* Contenu */}
         <div className="flex-1 overflow-y-auto">
+          {tab === "relance" && (
+            <div className="p-4 space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Un rappel sera envoyé aux <strong>{pendingInvitations.length}</strong> invité{pendingInvitations.length !== 1 ? "s" : ""} qui n'ont pas encore répondu.
+              </p>
+              <div className="space-y-1.5">
+                {pendingInvitations.map(inv => (
+                  <div key={inv.id} className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
+                    <Clock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      {inv.nom && <p className="text-sm font-medium text-foreground truncate">{inv.nom}</p>}
+                      <p className="text-xs text-muted-foreground truncate">{inv.email}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {tab === "membres" && (
             <div className="p-4 space-y-3">
-              <input className={inp} placeholder="Rechercher un membre…" value={search}
-                onChange={e => setSearch(e.target.value)} />
+              <input className={inp} placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
               {loadingMembers ? (
-                <div className="flex items-center gap-2 py-4 text-muted-foreground text-sm">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Chargement…
-                </div>
+                <div className="flex items-center gap-2 py-4 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Chargement…</div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{filtered.length} membre{filtered.length !== 1 ? "s" : ""}</span>
                     <button onClick={() => {
-                      const allIds = new Set(filtered.map(m => m.id));
-                      const allSelected = filtered.every(m => selectedIds.has(m.id));
+                      const allSelected = filtered.filter(m => m.email).every(m => selectedIds.has(m.id));
                       setSelectedIds(prev => {
                         const next = new Set(prev);
-                        filtered.forEach(m => allSelected ? next.delete(m.id) : next.add(m.id));
+                        filtered.filter(m => m.email).forEach(m => allSelected ? next.delete(m.id) : next.add(m.id));
                         return next;
                       });
                     }} className="text-primary hover:underline">
-                      {filtered.every(m => selectedIds.has(m.id)) ? "Tout désélectionner" : "Tout sélectionner"}
+                      {filtered.filter(m => m.email).every(m => selectedIds.has(m.id)) ? "Tout désélectionner" : "Tout sélectionner"}
                     </button>
                   </div>
                   <div className="space-y-1">
                     {filtered.map(m => {
                       const selected = selectedIds.has(m.id);
-                      const hasEmail = !!m.email;
                       return (
-                        <button key={m.id} onClick={() => hasEmail && toggleMember(m.id)}
-                          disabled={!hasEmail}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors ${
-                            selected ? "bg-primary/8 border border-primary/20" : "hover:bg-muted/60 border border-transparent"
-                          } ${!hasEmail ? "opacity-40 cursor-not-allowed" : ""}`}>
-                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                            selected ? "border-primary bg-primary" : "border-border"
-                          }`}>
+                        <button key={m.id} onClick={() => m.email && toggleMember(m.id)} disabled={!m.email}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors ${selected ? "bg-primary/8 border border-primary/20" : "hover:bg-muted/60 border border-transparent"} ${!m.email ? "opacity-40 cursor-not-allowed" : ""}`}>
+                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                             {selected && <Check className="w-3 h-3 text-white" />}
                           </div>
-                          {m.photo_url ? (
-                            <img src={m.photo_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />
-                          )}
+                          {m.photo_url
+                            ? <img src={m.photo_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                            : <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />}
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-foreground truncate">{m.prenom} {m.nom}</p>
                             <p className="text-xs text-muted-foreground truncate">{m.email || "Pas d'email"}</p>
@@ -415,62 +537,45 @@ function InviteModal({ sondage, onClose, origin }) {
             <div className="p-4 space-y-4">
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <Field label="Email *">
-                    <input className={inp} type="email" value={newEmail}
-                      onChange={e => setNewEmail(e.target.value)}
-                      placeholder="ex@email.com"
-                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addExtraEmail(); } }}
-                    />
-                  </Field>
-                  <Field label="Nom (optionnel)">
-                    <input className={inp} value={newNom}
-                      onChange={e => setNewNom(e.target.value)}
-                      placeholder="Prénom Nom"
-                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addExtraEmail(); } }}
-                    />
-                  </Field>
+                  <Field label="Email *"><input className={inp} type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="ex@email.com" onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addExtraEmail(); } }} /></Field>
+                  <Field label="Nom (optionnel)"><input className={inp} value={newNom} onChange={e => setNewNom(e.target.value)} placeholder="Prénom Nom" onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addExtraEmail(); } }} /></Field>
                 </div>
-                <button onClick={addExtraEmail}
-                  className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
+                <button onClick={addExtraEmail} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
                   <UserPlus className="w-3.5 h-3.5" /> Ajouter
                 </button>
               </div>
-              {extraEmails.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">Aucun email externe ajouté.</p>
-              ) : (
-                <div className="space-y-1.5">
-                  {extraEmails.map((e, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2">
-                      <div className="flex-1 min-w-0">
-                        {e.nom && <p className="text-sm font-medium text-foreground truncate">{e.nom}</p>}
-                        <p className="text-xs text-muted-foreground truncate">{e.email}</p>
+              {extraEmails.length === 0
+                ? <p className="text-sm text-muted-foreground text-center py-4">Aucun email externe ajouté.</p>
+                : (
+                  <div className="space-y-1.5">
+                    {extraEmails.map((e, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2">
+                        <div className="flex-1 min-w-0">
+                          {e.nom && <p className="text-sm font-medium text-foreground truncate">{e.nom}</p>}
+                          <p className="text-xs text-muted-foreground truncate">{e.email}</p>
+                        </div>
+                        <button onClick={() => setExtraEmails(p => p.filter((_, j) => j !== i))}
+                          className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                          <X className="w-3 h-3" />
+                        </button>
                       </div>
-                      <button onClick={() => setExtraEmails(p => p.filter((_, j) => j !== i))}
-                        className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
             </div>
           )}
         </div>
 
-        {/* Pied */}
         <div className="flex items-center justify-between px-5 py-4 border-t border-border bg-muted/30 flex-shrink-0">
           <span className="text-sm text-muted-foreground">
-            {totalCount} destinataire{totalCount !== 1 ? "s" : ""} sélectionné{totalCount !== 1 ? "s" : ""}
+            {totalCount} destinataire{totalCount !== 1 ? "s" : ""}
           </span>
           <div className="flex gap-2">
-            <button onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">
-              Annuler
-            </button>
+            <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
             <button onClick={handleSend} disabled={sending || totalCount === 0}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
-              {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              Envoyer {totalCount > 0 ? `(${totalCount})` : ""}
+              {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : tab === "relance" ? <RefreshCw className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
+              {tab === "relance" ? "Envoyer les rappels" : `Envoyer${totalCount > 0 ? ` (${totalCount})` : ""}`}
             </button>
           </div>
         </div>
@@ -480,10 +585,7 @@ function InviteModal({ sondage, onClose, origin }) {
 }
 
 // ── Composant principal ────────────────────────────────────────────────────
-const emptyQ = () => ({
-  _id: Date.now() + Math.random(),
-  type: "single", libelle: "", options: ["", ""], obligatoire: true,
-});
+const emptyQ = () => ({ _id: Date.now() + Math.random(), type: "single", libelle: "", options: ["", ""], obligatoire: true, config: {} });
 const emptyForm = { titre: "", description: "", actif: true, expires_at: "" };
 
 export default function SondagesSection() {
@@ -514,10 +616,8 @@ export default function SondagesSection() {
     const validQ = questions.filter(q => q.libelle.trim());
     if (!validQ.length) { toast.error("Au moins une question requise."); return; }
     for (const q of validQ) {
-      if (q.type === "single" || q.type === "multiple") {
-        if ((q.options || []).filter(o => o.trim()).length < 2) {
-          toast.error(`"${q.libelle}" : au moins 2 options requises.`); return;
-        }
+      if (["single", "multiple", "dropdown"].includes(q.type)) {
+        if ((q.options || []).filter(o => o.trim()).length < 2) { toast.error(`"${q.libelle}" : au moins 2 options requises.`); return; }
       }
     }
     setSaving(true);
@@ -527,57 +627,50 @@ export default function SondagesSection() {
     });
     setSaving(false);
     if (error) { toast.error("Erreur : " + error.message); return; }
-    toast.success("Sondage créé !");
-    setForm(null);
+    toast.success("Sondage créé !"); setForm(null);
   }
 
   async function loadResults(sondageId) {
-    const [data, invStats] = await Promise.all([
-      getSondageResults(sondageId),
-      getInvitationStats(sondageId),
-    ]);
+    const [data, invStats] = await Promise.all([getSondageResults(sondageId), getInvitationStats(sondageId)]);
     setResults(p => ({ ...p, [sondageId]: { ...data, invitations: invStats } }));
     setExpanded(p => ({ ...p, [sondageId]: true }));
   }
 
-  function toggleResults(sondageId) {
-    if (expanded[sondageId]) { setExpanded(p => ({ ...p, [sondageId]: false })); }
-    else { loadResults(sondageId); }
+  function toggleResults(id) {
+    if (expanded[id]) setExpanded(p => ({ ...p, [id]: false })); else loadResults(id);
   }
 
   function copyLink(id) {
     navigator.clipboard.writeText(`${origin}/sondage/${id}`)
-      .then(() => toast.success("Lien copié !"))
-      .catch(() => toast.error("Copie impossible."));
+      .then(() => toast.success("Lien copié !")).catch(() => toast.error("Copie impossible."));
   }
 
   async function toggleActif(s) {
     await updateSondage(s.id, { actif: !s.actif });
-    toast.success(s.actif ? "Sondage désactivé." : "Sondage activé.");
+    toast.success(s.actif ? "Désactivé." : "Activé.");
   }
 
   async function handleDelete(s) {
     if (!window.confirm(`Supprimer « ${s.titre} » et toutes ses réponses ?`)) return;
-    await deleteSondage(s.id);
-    toast.success("Sondage supprimé.");
+    await deleteSondage(s.id); toast.success("Sondage supprimé.");
   }
 
   return (
     <div className="space-y-5">
-
       {inviteModal && (
         <InviteModal
-          sondage={inviteModal}
+          sondage={inviteModal.sondage}
           origin={origin}
+          pendingOnly={inviteModal.pendingOnly}
+          pendingInvitations={inviteModal.pending || []}
           onClose={() => setInviteModal(null)}
         />
       )}
 
-      {/* En-tête */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Sondages & formulaires</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Créez des questionnaires multi-questions et envoyez-les à vos membres ou à n'importe qui.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">7 types de questions · invitations email · export CSV · suivi des réponses</p>
         </div>
         <button onClick={openForm}
           className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
@@ -585,7 +678,6 @@ export default function SondagesSection() {
         </button>
       </div>
 
-      {/* Formulaire de création */}
       {form && (
         <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
@@ -595,36 +687,21 @@ export default function SondagesSection() {
           <div className="p-5 space-y-5">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <Field label="Titre *">
-                  <input className={inp} value={form.titre}
-                    onChange={e => setForm(p => ({ ...p, titre: e.target.value }))}
-                    placeholder="Ex : Satisfaction AG 2025, Vote du thème soirée…" />
-                </Field>
+                <Field label="Titre *"><input className={inp} value={form.titre} onChange={e => setForm(p => ({ ...p, titre: e.target.value }))} placeholder="Ex : Satisfaction AG 2025…" /></Field>
               </div>
               <div className="md:col-span-2">
-                <Field label="Description (optionnelle)">
-                  <textarea className={inp} rows={2} value={form.description}
-                    onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                    placeholder="Instructions pour les répondants…" />
-                </Field>
+                <Field label="Description (optionnelle)"><textarea className={inp} rows={2} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Instructions…" /></Field>
               </div>
-              <Field label="Date de clôture (optionnelle)">
-                <input type="date" className={inp} value={form.expires_at}
-                  onChange={e => setForm(p => ({ ...p, expires_at: e.target.value }))} />
-              </Field>
+              <Field label="Date de clôture (optionnelle)"><input type="date" className={inp} value={form.expires_at} onChange={e => setForm(p => ({ ...p, expires_at: e.target.value }))} /></Field>
               <div className="flex items-center pt-5">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" checked={form.actif}
-                    onChange={e => setForm(p => ({ ...p, actif: e.target.checked }))}
-                    className="w-4 h-4 rounded accent-primary" />
+                  <input type="checkbox" checked={form.actif} onChange={e => setForm(p => ({ ...p, actif: e.target.checked }))} className="w-4 h-4 rounded accent-primary" />
                   <span className="text-sm text-foreground">Publier immédiatement</span>
                 </label>
               </div>
             </div>
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                Questions ({questions.length})
-              </p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Questions ({questions.length})</p>
               <div className="space-y-3">
                 {questions.map((q, i) => (
                   <QuestionBuilder key={q._id} q={q} idx={i} total={questions.length}
@@ -633,41 +710,34 @@ export default function SondagesSection() {
                     onMove={(_, dir) => moveQ(i, dir)} />
                 ))}
               </div>
-              <button type="button" onClick={addQ}
-                className="mt-3 flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
+              <button type="button" onClick={addQ} className="mt-3 flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
                 <Plus className="w-4 h-4" /> Ajouter une question
               </button>
             </div>
           </div>
           <div className="flex justify-end gap-2 px-5 pb-5">
-            <button onClick={() => setForm(null)}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">
-              Annuler
-            </button>
+            <button onClick={() => setForm(null)} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
             <button onClick={handleSubmit} disabled={saving}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
-              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Créer le sondage
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Créer
             </button>
           </div>
         </div>
       )}
 
-      {/* Liste */}
       {loading ? (
-        <div className="flex items-center gap-3 py-10 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin" /> Chargement…
-        </div>
+        <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
       ) : sondages.length === 0 ? (
         <div className="text-center py-20 bg-white border border-border rounded-2xl text-muted-foreground">
           <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-25" />
           <p className="font-medium">Aucun sondage pour l'instant.</p>
-          <p className="text-sm mt-1">Créez votre premier formulaire pour consulter vos membres.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {sondages.map(s => {
             const isExpired = s.expires_at && new Date(s.expires_at) < new Date();
             const res = results[s.id];
+            const pendingInv = (res?.invitations || []).filter(i => !i.a_repondu);
             return (
               <div key={s.id} className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
                 <div className={`h-1 w-full ${s.actif && !isExpired ? "bg-emerald-500" : "bg-slate-300"}`} />
@@ -678,31 +748,29 @@ export default function SondagesSection() {
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.actif && !isExpired ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
                           {isExpired ? "Clôturé" : s.actif ? "En cours" : "Désactivé"}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          {s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}
-                        </span>
-                        {s.expires_at && (
-                          <span className="text-xs text-muted-foreground">
-                            · Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}
-                          </span>
-                        )}
+                        <span className="text-xs text-muted-foreground">{s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}</span>
+                        {s.expires_at && <span className="text-xs text-muted-foreground">· Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}</span>}
                       </div>
                       <h3 className="font-semibold text-foreground leading-tight">{s.titre}</h3>
                       {s.description && <p className="text-sm text-muted-foreground mt-0.5">{s.description}</p>}
                       <div className="mt-2 flex gap-1 flex-wrap">
                         {(s.questions || []).map((q, i) => (
                           <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
-                            {Q_TYPE_LABELS[q.type]} · {q.libelle.length > 28 ? q.libelle.slice(0, 28) + "…" : q.libelle}
+                            {Q_TYPE_LABELS[q.type]} · {q.libelle.length > 25 ? q.libelle.slice(0, 25) + "…" : q.libelle}
                           </span>
                         ))}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button onClick={() => setInviteModal(s)} title="Envoyer des invitations"
+                      <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv })} title="Envoyer invitations"
                         className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center text-muted-foreground hover:text-blue-600 transition-colors">
                         <Send className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => copyLink(s.id)} title="Copier le lien public"
+                      <button onClick={() => exportCSV(s)} title="Exporter CSV"
+                        className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center text-muted-foreground hover:text-emerald-600 transition-colors">
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => copyLink(s.id)} title="Copier le lien"
                         className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
                         <Link2 className="w-3.5 h-3.5" />
                       </button>
@@ -711,7 +779,7 @@ export default function SondagesSection() {
                         {expanded[s.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                       <button onClick={() => toggleActif(s)} title={s.actif ? "Désactiver" : "Activer"}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-bold ${s.actif ? "hover:bg-amber-50 text-amber-500 hover:text-amber-700" : "hover:bg-emerald-50 text-muted-foreground hover:text-emerald-600"}`}>
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-bold ${s.actif ? "hover:bg-amber-50 text-amber-500" : "hover:bg-emerald-50 text-muted-foreground hover:text-emerald-600"}`}>
                         {s.actif ? "⏸" : "▶"}
                       </button>
                       <button onClick={() => handleDelete(s)} title="Supprimer"
@@ -721,46 +789,42 @@ export default function SondagesSection() {
                     </div>
                   </div>
 
-                  {/* Résultats */}
                   {expanded[s.id] && (
                     <div className="mt-4 pt-4 border-t border-border/60 space-y-4">
                       {!res ? (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Chargement…
-                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Chargement…</div>
                       ) : (
                         <>
                           <div className="flex items-center gap-4 flex-wrap">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                              {res.total} réponse{res.total !== 1 ? "s" : ""} complète{res.total !== 1 ? "s" : ""}
+                              {res.total} réponse{res.total !== 1 ? "s" : ""}
                             </p>
                             {res.invitations?.length > 0 && (
-                              <p className="text-xs text-muted-foreground">
-                                {res.invitations.filter(i => i.a_repondu).length}/{res.invitations.length} invités ont répondu
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs text-muted-foreground">
+                                  {res.invitations.filter(i => i.a_repondu).length}/{res.invitations.length} invités ont répondu
+                                </p>
+                                {pendingInv.length > 0 && (
+                                  <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv, pendingOnly: true })}
+                                    className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors flex items-center gap-1">
+                                    <RefreshCw className="w-2.5 h-2.5" /> Relancer ({pendingInv.length})
+                                  </button>
+                                )}
+                              </div>
                             )}
                           </div>
 
-                          {/* Suivi des invités */}
                           {res.invitations?.length > 0 && (
                             <div className="flex flex-wrap gap-1.5">
                               {res.invitations.map(inv => (
-                                <span key={inv.id}
-                                  className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                                    inv.a_repondu
-                                      ? "bg-emerald-50 text-emerald-700"
-                                      : "bg-amber-50 text-amber-700"
-                                  }`}>
-                                  {inv.a_repondu
-                                    ? <Check className="w-2.5 h-2.5" />
-                                    : <Clock className="w-2.5 h-2.5" />}
+                                <span key={inv.id} className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${inv.a_repondu ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                  {inv.a_repondu ? <Check className="w-2.5 h-2.5" /> : <Clock className="w-2.5 h-2.5" />}
                                   {inv.nom || inv.email}
                                 </span>
                               ))}
                             </div>
                           )}
 
-                          {/* Résultats par question */}
                           {(s.questions || []).map((q, i) => (
                             <div key={q.id} className="bg-muted/30 rounded-xl p-3">
                               <p className="text-xs font-semibold text-foreground mb-2">{i + 1}. {q.libelle}</p>
@@ -773,9 +837,7 @@ export default function SondagesSection() {
                   )}
 
                   <div className="mt-3 pt-3 border-t border-border/60">
-                    <p className="text-xs text-muted-foreground font-mono break-all select-all">
-                      {origin}/sondage/{s.id}
-                    </p>
+                    <p className="text-xs text-muted-foreground font-mono break-all select-all">{origin}/sondage/{s.id}</p>
                   </div>
                 </div>
               </div>
