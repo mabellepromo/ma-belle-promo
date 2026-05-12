@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getSondageWithQuestions, hasVoted, submitSondage, getSondageResults, getFingerprint } from "../hooks/useSondages";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import {
+  getSondageWithQuestions, hasVoted, submitSondage,
+  getSondageResults, getFingerprint, getInvitationByToken,
+} from "../hooks/useSondages";
 import { Check, ChevronLeft, Loader2 } from "lucide-react";
 
 const COLORS = ["#0a3d28", "#1a7a4e", "#b8861a", "#1e40af", "#7c3aed", "#0e7490"];
 
-// ── Résultats après vote (vue publique) ────────────────────────────────────
+// ── Résultats après vote ───────────────────────────────────────────────────
 function PublicQuestionResults({ question, reponses }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
   if (question.type === "texte") {
     return (
-      <p className="text-sm text-muted-foreground italic">{qr.length} réponse{qr.length !== 1 ? "s" : ""} reçue{qr.length !== 1 ? "s" : ""}.</p>
+      <p className="text-sm text-muted-foreground italic">
+        {qr.length} réponse{qr.length !== 1 ? "s" : ""} reçue{qr.length !== 1 ? "s" : ""}.
+      </p>
     );
   }
 
@@ -38,7 +43,6 @@ function PublicQuestionResults({ question, reponses }) {
     );
   }
 
-  // ouinon, single, multiple
   const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
   const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
   const qTotal = qr.length;
@@ -66,7 +70,7 @@ function PublicQuestionResults({ question, reponses }) {
   );
 }
 
-// ── Input par type de question ─────────────────────────────────────────────
+// ── Saisie par type ────────────────────────────────────────────────────────
 function QuestionInput({ question, answer, onChange }) {
   const val = answer || {};
 
@@ -98,7 +102,7 @@ function QuestionInput({ question, answer, onChange }) {
                 : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
             }`}>
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                 val.valeur_options?.includes(i) ? "border-primary bg-primary" : "border-border"
               }`}>
                 {val.valeur_options?.includes(i) && <Check className="w-3 h-3 text-white" />}
@@ -126,7 +130,7 @@ function QuestionInput({ question, answer, onChange }) {
                 : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
             }`}>
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${
                 val.valeur_options?.includes(i) ? "border-primary bg-primary" : "border-border"
               }`}>
                 {val.valeur_options?.includes(i) && <Check className="w-3 h-3 text-white" />}
@@ -177,7 +181,11 @@ function QuestionInput({ question, answer, onChange }) {
 // ── Page principale ────────────────────────────────────────────────────────
 export default function Sondage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
   const [sondage, setSondage] = useState(null);
+  const [invitation, setInvitation] = useState(null); // set si réponse via token
   const [status, setStatus] = useState("loading");
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -189,13 +197,29 @@ export default function Sondage() {
       if (!data) { setStatus("notfound"); return; }
       setSondage(data);
 
-      const fp = getFingerprint();
-      const voted = await hasVoted(id, fp);
-      if (voted) {
-        const res = await getSondageResults(id);
-        setResults(res);
-        setStatus("voted");
-        return;
+      // Vérification anti-doublon selon le mode (token ou fingerprint)
+      if (token) {
+        const inv = await getInvitationByToken(token);
+        if (!inv || inv.sondage_id !== id) {
+          // Token invalide ou ne correspond pas à ce sondage → mode anonyme
+        } else {
+          setInvitation(inv);
+          if (inv.a_repondu) {
+            const res = await getSondageResults(id);
+            setResults(res);
+            setStatus("voted");
+            return;
+          }
+        }
+      } else {
+        const fp = getFingerprint();
+        const voted = await hasVoted(id, fp);
+        if (voted) {
+          const res = await getSondageResults(id);
+          setResults(res);
+          setStatus("voted");
+          return;
+        }
       }
 
       if (data.expires_at && new Date(data.expires_at) < new Date()) { setStatus("expired"); return; }
@@ -207,7 +231,7 @@ export default function Sondage() {
       setStatus("active");
     }
     load();
-  }, [id]);
+  }, [id, token]);
 
   function setAnswer(questionId, val) {
     setAnswers(p => ({ ...p, [questionId]: val }));
@@ -221,20 +245,23 @@ export default function Sondage() {
         ((q.type === "single" || q.type === "multiple" || q.type === "ouinon") && (!a.valeur_options || !a.valeur_options.length)) ||
         (q.type === "texte" && !a.valeur_texte?.trim()) ||
         (q.type === "note" && !a.valeur_note);
-      if (missing) {
-        alert(`La question "${q.libelle}" est obligatoire.`);
-        return;
-      }
+      if (missing) { alert(`La question "${q.libelle}" est obligatoire.`); return; }
     }
 
     setSubmitting(true);
-    const fp = getFingerprint();
-    const error = await submitSondage(id, answers, fp);
+    const fp = invitation ? null : getFingerprint();
+    const error = await submitSondage(
+      id, answers, fp,
+      invitation?.id || null,
+      invitation?.nom || null,
+      invitation?.email || null,
+    );
+
     if (error) {
       if (error.code === "23505") {
         setStatus("voted");
       } else {
-        alert("Erreur lors de l'envoi : " + error.message);
+        alert("Erreur : " + error.message);
       }
     } else {
       const res = await getSondageResults(id);
@@ -258,6 +285,11 @@ export default function Sondage() {
           </div>
           <span className="text-sm font-semibold text-foreground">Sondage MBP</span>
         </div>
+        {invitation?.nom && (
+          <span className="ml-auto text-sm text-muted-foreground">
+            Bonjour <strong className="text-foreground">{invitation.nom}</strong>
+          </span>
+        )}
       </header>
 
       <main className="flex-1 flex items-start justify-center p-6 pt-10">
@@ -299,11 +331,9 @@ export default function Sondage() {
                   </div>
                   <p className="text-sm font-semibold text-emerald-800">Votre réponse a bien été enregistrée.</p>
                 </div>
-
                 <h2 className="font-heading text-xl font-bold text-foreground mb-1">{sondage.titre}</h2>
                 {sondage.description && <p className="text-sm text-muted-foreground mb-4">{sondage.description}</p>}
                 <p className="text-xs text-muted-foreground mb-6">{results.total} réponse{results.total !== 1 ? "s" : ""} au total</p>
-
                 <div className="space-y-6">
                   {(sondage.questions || []).map((q, i) => (
                     <div key={q.id}>
@@ -321,16 +351,13 @@ export default function Sondage() {
               <div className="h-1.5 w-full" style={{ background: "linear-gradient(to right, #0a3d28, #b8861a)" }} />
               <div className="p-6">
                 <div className="mb-6">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${sondage.actif ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
-                    En cours
-                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">En cours</span>
                   <h2 className="font-heading text-xl font-bold text-foreground leading-tight mt-2">{sondage.titre}</h2>
                   {sondage.description && <p className="text-sm text-muted-foreground mt-1">{sondage.description}</p>}
                   <p className="text-xs text-muted-foreground mt-1">
                     {sondage.questions?.length} question{sondage.questions?.length !== 1 ? "s" : ""}
                   </p>
                 </div>
-
                 <div className="space-y-8">
                   {(sondage.questions || []).map((q, i) => (
                     <div key={q.id}>
@@ -342,11 +369,11 @@ export default function Sondage() {
                     </div>
                   ))}
                 </div>
-
                 <button onClick={handleSubmit} disabled={submitting}
-                  className="mt-8 w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+                  className="mt-8 w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{ background: "#0a3d28", color: "#fff" }}>
-                  {submitting ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours…</span> : "Envoyer mes réponses"}
+                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submitting ? "Envoi en cours…" : "Envoyer mes réponses"}
                 </button>
               </div>
             </div>

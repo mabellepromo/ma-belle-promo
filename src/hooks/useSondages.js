@@ -10,6 +10,8 @@ export function getFingerprint() {
   return fp;
 }
 
+// ── CRUD sondages ──────────────────────────────────────────────────────────
+
 export function useSondages({ adminMode = false } = {}) {
   const [sondages, setSondages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +67,8 @@ export function useSondages({ adminMode = false } = {}) {
   return { sondages, loading, createSondage, updateSondage, deleteSondage };
 }
 
+// ── Page publique ──────────────────────────────────────────────────────────
+
 export async function getSondageWithQuestions(id) {
   const { data } = await supabase
     .from("sondages")
@@ -88,10 +92,17 @@ export async function hasVoted(sondageId, fingerprint) {
   return !!data;
 }
 
-export async function submitSondage(sondageId, answers, fingerprint) {
+export async function submitSondage(sondageId, answers, fingerprint, invitationId = null, nom = null, email = null) {
   const { data: soumission, error } = await supabase
     .from("sondage_soumissions")
-    .insert({ sondage_id: sondageId, fingerprint })
+    .insert({
+      sondage_id: sondageId,
+      // Pas de fingerprint quand on répond via token (l'invitation garantit l'unicité)
+      fingerprint: invitationId ? null : fingerprint,
+      invitation_id: invitationId || null,
+      repondant_nom: nom || null,
+      repondant_email: email || null,
+    })
     .select()
     .single();
   if (error) return error;
@@ -129,4 +140,53 @@ export async function getSondageResults(sondageId) {
     .in("soumission_id", ids);
 
   return { total, reponses: reponses || [] };
+}
+
+// ── Invitations ────────────────────────────────────────────────────────────
+
+export async function createInvitations(sondageId, recipients) {
+  // recipients: [{email, nom}]
+  const rows = recipients.map(r => ({
+    sondage_id: sondageId,
+    email: r.email.trim().toLowerCase(),
+    nom: r.nom?.trim() || null,
+  }));
+  const { data, error } = await supabase
+    .from("sondage_invitations")
+    .insert(rows)
+    .select();
+  return { data, error };
+}
+
+export async function markInvitationsSent(ids) {
+  if (!ids?.length) return;
+  await supabase
+    .from("sondage_invitations")
+    .update({ envoye_at: new Date().toISOString() })
+    .in("id", ids);
+}
+
+export async function getInvitationStats(sondageId) {
+  const { data } = await supabase
+    .from("sondage_invitations")
+    .select("*, sondage_soumissions(id)")
+    .eq("sondage_id", sondageId)
+    .order("created_at", { ascending: true });
+  return (data || []).map(inv => ({
+    ...inv,
+    a_repondu: (inv.sondage_soumissions || []).length > 0,
+  }));
+}
+
+export async function getInvitationByToken(token) {
+  const { data } = await supabase
+    .from("sondage_invitations")
+    .select("*, sondage_soumissions(id)")
+    .eq("token", token)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    ...data,
+    a_repondu: (data.sondage_soumissions || []).length > 0,
+  };
 }

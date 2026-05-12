@@ -254,6 +254,35 @@ function buildRelanceCotisationPayload({ to_email, to_name, annee, message }) {
   };
 }
 
+function buildInvitationPayload({ to_name, titre, description, lien }) {
+  const greeting = to_name ? `Bonjour <strong>${escHtml(to_name)}</strong>,` : "Bonjour,";
+  const content = `
+    <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+    <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.7;">
+      L'Association Ma Belle Promo vous invite à répondre au sondage suivant :
+    </p>
+    <div style="background:#f0fdf4;border-left:4px solid #14532d;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:28px;">
+      <p style="margin:0 0 4px;font-size:17px;font-weight:bold;color:#14532d;">${escHtml(titre)}</p>
+      ${description ? `<p style="margin:10px 0 0;font-size:13px;color:#374151;line-height:1.6;">${escHtml(description)}</p>` : ""}
+    </div>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${lien}"
+        style="display:inline-block;padding:14px 40px;background:#14532d;color:#fff;font-weight:bold;font-size:15px;text-decoration:none;border-radius:9999px;letter-spacing:0.3px;">
+        Répondre au sondage →
+      </a>
+    </div>
+    <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;line-height:1.7;">
+      Ce lien vous est personnel et vous permet de répondre une seule fois.<br>
+      Si vous ne souhaitez pas participer, ignorez simplement cet email.
+    </p>`;
+  return {
+    sender: SENDER,
+    to: null, // défini par l'appelant
+    subject: `Sondage MBP : ${escHtml(titre)}`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
 function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
     deletion_request:    { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
@@ -311,7 +340,7 @@ export default async function handler(req, res) {
 
   const { type, ...data } = req.body;
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
   }
@@ -361,6 +390,51 @@ export default async function handler(req, res) {
 
     console.log(`Relance cotisation ${annee}: ${sent} envoyés, ${errors.length} erreurs`);
     return res.status(200).json({ success: true, sent, total: membres.length, errors });
+  }
+
+  // ── Invitations sondage (envoi en masse, lien personnalisé) ──
+  if (type === "sondage_invitation") {
+    const { invitations, sondageTitre, sondageDescription } = data;
+    if (!Array.isArray(invitations) || invitations.length === 0) {
+      return res.status(400).json({ error: "Aucune invitation à envoyer." });
+    }
+    if (invitations.length > 200) {
+      return res.status(400).json({ error: "Maximum 200 invitations par envoi." });
+    }
+
+    const valides = invitations.filter(i => isValidEmail(i.email));
+
+    const results = await Promise.allSettled(
+      valides.map(async (inv) => {
+        const base = buildInvitationPayload({
+          to_name: inv.nom || null,
+          titre: sondageTitre || "Sondage",
+          description: sondageDescription || null,
+          lien: inv.lien,
+        });
+        const payload = { ...base, to: [{ email: inv.email, name: inv.nom || inv.email }] };
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.message || "Erreur Brevo");
+        }
+        return inv.id;
+      })
+    );
+
+    const sentIds = results
+      .map((r, i) => r.status === "fulfilled" ? valides[i].id : null)
+      .filter(Boolean);
+    const errors = results
+      .map((r, i) => r.status === "rejected" ? { email: valides[i].email, reason: r.reason?.message } : null)
+      .filter(Boolean);
+
+    console.log(`Invitations sondage "${sondageTitre}": ${sentIds.length} envoyées, ${errors.length} erreurs`);
+    return res.status(200).json({ success: true, sent: sentIds.length, sentIds, errors });
   }
 
   // Validation des champs selon le type
