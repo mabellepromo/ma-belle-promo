@@ -1,8 +1,9 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const RichEditor = lazy(() => import("../../components/RichEditor.jsx"));
-import { useArticles } from "../../hooks/useArticles";
+import { useArticles, formatDateFr } from "../../hooks/useArticles";
 import { useEvenements } from "../../hooks/useEvenements";
 import { useProjets } from "../../hooks/useProjets";
 import { useEquipe } from "../../hooks/useEquipe";
@@ -16,7 +17,7 @@ import { useProgrammes } from "../../hooks/useProgrammes";
 import { useSponsors } from "../../hooks/useSponsors";
 import { articles as articlesStatic } from "../../data/articles.js";
 import { slugify } from "../../lib/localStore";
-import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus } from "lucide-react";
+import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus, Eye, EyeOff, Tag, Users, X, Loader2 } from "lucide-react";
 import {
   inp, ta, sel,
   Field, ImgField, GalerieField, VideoField, FileField,
@@ -24,72 +25,158 @@ import {
 } from "./shared.jsx";
 
 /* ─── Articles ─── */
+const ARTICLE_CATS = ["Webinaire", "Conférence", "Gala", "Solidarité", "Événement", "Juridique", "Association", "Partenariat", "Histoire", "Hommage", "Médias", "Prix"];
+
 export function ArticlesSection() {
   const { articles: items, add, update, remove, loading, isSeeded, seedFromStatic } = useArticles();
   const [form, setForm] = useState(null);
   const [seeding, setSeeding] = useState(false);
-  const empty = { id: "", titre: "", extrait: "", date: "", categorie: "Événement", image: "", photo_position: "center", videos: [], contenu: "", photos: [] };
+  const [statutFilter, setStatutFilter] = useState("tous");
+
+  const emptyArticle = {
+    id: "", titre: "", extrait: "", date: "", date_iso: "", categorie: "Événement",
+    image: "", photo_position: "center", videos: [], contenu: "", photos: [],
+    statut: "publie", auteur: "", tags: [],
+  };
+
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
-  const CATS = ["Webinaire", "Conférence", "Gala", "Solidarité", "Événement", "Juridique"];
+
+  function handleDateIso(iso) {
+    setForm(p => ({ ...p, date_iso: iso, date: formatDateFr(iso) }));
+  }
 
   async function doSave() {
-    if (!form.titre || !form.extrait || !form.date) { toast.error("Titre, extrait et date obligatoires"); return; }
-    if (form._editing) await update(form._editing, { ...form, _editing: undefined });
-    else await add({ ...form });
+    if (!form.titre || !form.extrait) { toast.error("Titre et extrait obligatoires"); return; }
+    if (!form.date_iso && !form.date)  { toast.error("La date est obligatoire"); return; }
+    const payload = { ...form, _editing: undefined };
+    if (form._editing) await update(form._editing, payload);
+    else await add(payload);
     setForm(null);
   }
 
   async function handleSeed() {
-    if (!confirm(`Importer les ${articlesStatic.length} articles statiques dans Supabase ? Les articles existants avec le même ID seront mis à jour.`)) return;
+    if (!confirm(`Importer les ${articlesStatic.length} articles statiques ? Les articles existants seront mis à jour.`)) return;
     setSeeding(true);
     await seedFromStatic();
     setSeeding(false);
   }
 
+  const filtered = useMemo(() => {
+    if (statutFilter === "tous") return items;
+    return items.filter(a => (a.statut || "publie") === statutFilter);
+  }, [items, statutFilter]);
+
+  const counts = useMemo(() => ({
+    tous: items.length,
+    publie: items.filter(a => (a.statut || "publie") === "publie").length,
+    brouillon: items.filter(a => a.statut === "brouillon").length,
+  }), [items]);
+
   if (loading) return <SectionLoader />;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Articles & Actualités</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">{items.length} élément{items.length !== 1 ? "s" : ""}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{items.length} article{items.length !== 1 ? "s" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
           {!isSeeded && (
             <button onClick={handleSeed} disabled={seeding}
               className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
-              {seeding
-                ? <><div className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /> Migration…</>
-                : <>☁️ Migrer les données initiales</>}
+              {seeding ? <><div className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /> Migration…</> : <>☁️ Migrer les données initiales</>}
             </button>
           )}
-          <button onClick={() => setForm({ ...empty })}
+          <button onClick={() => setForm({ ...emptyArticle })}
             className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
             <Plus className="w-4 h-4" /> Ajouter
           </button>
         </div>
       </div>
+
+      {/* Filtres statut */}
+      <div className="flex gap-1.5 mb-5">
+        {[
+          { key: "tous",     label: "Tous",      count: counts.tous },
+          { key: "publie",   label: "Publiés",   count: counts.publie },
+          { key: "brouillon",label: "Brouillons",count: counts.brouillon },
+        ].map(({ key, label, count }) => (
+          <button key={key} onClick={() => setStatutFilter(key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+              statutFilter === key ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/40"
+            }`}>
+            {label} <span className="opacity-60 ml-0.5">({count})</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Formulaire */}
       {form && (
         <FormPanel title={form._editing ? "Modifier l'article" : "Nouvel article"} onClose={() => setForm(null)} onSave={doSave}>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="md:col-span-2"><Field label="Titre" required><input className={inp} value={form.titre} onChange={f("titre")} /></Field></div>
-            <Field label="Date" required><input className={inp} placeholder="ex: 15 Jan 2025" value={form.date} onChange={f("date")} /></Field>
-            <Field label="Catégorie"><select className={sel} value={form.categorie} onChange={f("categorie")}>{CATS.map(c => <option key={c}>{c}</option>)}</select></Field>
-            <div className="md:col-span-2"><Field label="Extrait" required><textarea className={ta} rows={2} value={form.extrait} onChange={f("extrait")} /></Field></div>
+
+            {/* Statut toggle */}
+            <div className="md:col-span-2 flex gap-2">
+              {[
+                { key: "publie",    label: "Publié",    icon: Eye,    cls: "border-emerald-500 bg-emerald-50 text-emerald-700" },
+                { key: "brouillon", label: "Brouillon", icon: EyeOff, cls: "border-amber-400 bg-amber-50 text-amber-700" },
+              ].map(({ key, label, icon: Icon, cls }) => (
+                <button key={key} type="button" onClick={() => setForm(p => ({ ...p, statut: key }))}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all ${form.statut === key ? cls : "border-border text-muted-foreground hover:border-muted-foreground"}`}>
+                  <Icon className="w-3.5 h-3.5" /> {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="md:col-span-2">
+              <Field label="Titre" required><input className={inp} value={form.titre} onChange={f("titre")} placeholder="Titre de l'article" /></Field>
+            </div>
+
+            {/* Date ISO → auto-génère date texte */}
+            <Field label="Date de publication" required>
+              <input className={inp} type="date" value={form.date_iso || ""} onChange={e => handleDateIso(e.target.value)} />
+              {form.date && <p className="text-xs text-muted-foreground mt-1">{form.date}</p>}
+            </Field>
+
+            <Field label="Catégorie">
+              <select className={sel} value={form.categorie} onChange={f("categorie")}>
+                {ARTICLE_CATS.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </Field>
+
+            <Field label="Auteur">
+              <input className={inp} value={form.auteur || ""} onChange={f("auteur")} placeholder="Nom de l'auteur" />
+            </Field>
+
+            <Field label="Tags (séparés par des virgules)">
+              <input className={inp}
+                value={(form.tags || []).join(", ")}
+                onChange={e => setForm(p => ({ ...p, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) }))}
+                placeholder="Droit, Numérique, Togo…" />
+            </Field>
+
+            <div className="md:col-span-2">
+              <Field label="Extrait" required><textarea className={ta} rows={2} value={form.extrait} onChange={f("extrait")} placeholder="Résumé de l'article (affiché dans la liste)" /></Field>
+            </div>
+
             <div className="md:col-span-2"><ImgField label="Image de couverture" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
+
             <div className="md:col-span-2">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input type="checkbox" className="w-4 h-4 rounded accent-primary"
                   checked={form.photo_position === "top"}
                   onChange={e => setForm(p => ({ ...p, photo_position: e.target.checked ? "top" : "center" }))} />
-                <span className="text-sm text-foreground">Photo portrait — cadrer depuis le haut (pour ne pas couper les têtes)</span>
+                <span className="text-sm text-foreground">Photo portrait — cadrer depuis le haut</span>
               </label>
             </div>
+
             <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
             <div className="md:col-span-2"><VideoField videos={Array.isArray(form.videos) ? form.videos : (form.youtube ? [form.youtube] : [])} onChange={v => setForm(p => ({ ...p, videos: v, youtube: "" }))} /></div>
+
             <div className="md:col-span-2">
-              <Field label="Contenu" required>
+              <Field label="Contenu">
                 <Suspense fallback={<div className="min-h-[180px] flex items-center justify-center text-xs text-muted-foreground">Chargement éditeur…</div>}>
                   <RichEditor value={form.contenu || ""} onChange={v => setForm(p => ({ ...p, contenu: v }))} />
                 </Suspense>
@@ -98,13 +185,34 @@ export function ArticlesSection() {
           </div>
         </FormPanel>
       )}
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun article.</p>}
+
+      {/* Liste */}
+      {filtered.length === 0 && (
+        <p className="text-center py-16 text-muted-foreground text-sm">
+          {statutFilter === "brouillon" ? "Aucun brouillon." : "Aucun article."}
+        </p>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {items.map(a => (
-          <ItemRow key={a.id} img={a.image} title={a.titre} subtitle={`${a.date} · ${a.categorie}`}
-            extraLink={`/actualites/${a.id}`}
-            onEdit={() => setForm({ ...a, _editing: a.id })}
-            onDelete={() => remove(a.id)} />
+        {filtered.map(a => (
+          <div key={a.id} className="relative">
+            {a.statut === "brouillon" && (
+              <span className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                <EyeOff className="w-3 h-3" /> Brouillon
+              </span>
+            )}
+            {a.tags?.length > 0 && (
+              <div className="absolute top-2 right-10 z-10 flex gap-1">
+                {a.tags.slice(0, 2).map(t => (
+                  <span key={t} className="px-1.5 py-0.5 rounded-full text-xs bg-black/50 text-white">{t}</span>
+                ))}
+              </div>
+            )}
+            <ItemRow img={a.image} title={a.titre}
+              subtitle={[a.date || (a.date_iso ? formatDateFr(a.date_iso) : ""), a.categorie, a.auteur].filter(Boolean).join(" · ")}
+              extraLink={`/actualites/${a.id}`}
+              onEdit={() => setForm({ ...a, tags: a.tags || [], _editing: a.id })}
+              onDelete={() => remove(a.id)} />
+          </div>
         ))}
       </div>
     </div>
@@ -116,10 +224,38 @@ export function EvenementsSection() {
   const { evenements: items, add, update, remove, loading, isSeeded, seedFromStatic } = useEvenements();
   const [form, setForm] = useState(null);
   const [seeding, setSeeding] = useState(false);
+  const [regCounts, setRegCounts] = useState({});
+  const [viewParts, setViewParts] = useState(null);
+  const [partsList, setPartsList] = useState([]);
+  const [loadingParts, setLoadingParts] = useState(false);
+
   const empty = { titre: "", date: "", heures: "", lieu: "", type: "Conférence", statut: "À venir", description: "", image: "" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES = ["Webinaire", "Conférence", "Gala", "Projet éditorial", "Autre"];
   const STATUTS = ["À venir", "En cours", "Passé"];
+
+  useEffect(() => {
+    if (!items.length) return;
+    supabase.from("event_registrations").select("event_id")
+      .then(({ data }) => {
+        const counts = {};
+        (data || []).forEach(r => { counts[r.event_id] = (counts[r.event_id] || 0) + 1; });
+        setRegCounts(counts);
+      });
+  }, [items]);
+
+  async function toggleParticipants(evt) {
+    if (viewParts === evt.id) { setViewParts(null); return; }
+    setLoadingParts(true);
+    setViewParts(evt.id);
+    const { data } = await supabase
+      .from("event_registrations")
+      .select("registered_at, members(nom, photo, email)")
+      .eq("event_id", evt.id)
+      .order("registered_at");
+    setPartsList(data || []);
+    setLoadingParts(false);
+  }
 
   async function doSave() {
     if (!form.titre || !form.date || !form.lieu) { toast.error("Titre, date et lieu obligatoires"); return; }
@@ -138,7 +274,7 @@ export function EvenementsSection() {
   if (loading) return <SectionLoader />;
 
   return (
-    <div>
+    <div className="space-y-4">
       <CrudHeader title="Événements" count={items.length} onAdd={() => setForm({ ...empty })} seedBtn={!isSeeded && { loading: seeding, onClick: handleSeed }} />
       {form && (
         <FormPanel title={form._editing ? "Modifier l'événement" : "Nouvel événement"} onClose={() => setForm(null)} onSave={doSave}>
@@ -154,17 +290,95 @@ export function EvenementsSection() {
           </div>
         </FormPanel>
       )}
+
       {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun événement.</p>}
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {items.map(e => (
-          <ItemRow key={e.id} img={e.image} title={e.titre}
-            subtitle={`${e.date}${e.heures ? " · " + e.heures : ""} · ${e.lieu}`}
-            badge={e.statut}
-            badgeColor={e.statut === "À venir" ? "bg-green-100 text-green-700" : e.statut === "En cours" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}
-            onEdit={() => setForm({ ...e, _editing: e.id })}
-            onDelete={() => remove(e.id)} />
-        ))}
+        {items.map(e => {
+          const nb = regCounts[e.id] || 0;
+          return (
+            <div key={e.id} className="bg-background border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-200 flex flex-col">
+              {e.image && (
+                <div className="h-28 overflow-hidden flex-shrink-0">
+                  <img src={e.image} alt="" className="w-full h-full object-cover" onError={ev => ev.target.style.display = "none"} />
+                </div>
+              )}
+              <div className="p-4 flex-1">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <p className="font-bold text-foreground line-clamp-2 leading-snug">{e.titre}</p>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                    e.statut === "À venir" ? "bg-green-100 text-green-700" : e.statut === "En cours" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"
+                  }`}>{e.statut}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">{e.date}{e.heures ? ` · ${e.heures}` : ""} · {e.lieu}</p>
+              </div>
+              <div className="px-4 pb-3 pt-2 flex items-center gap-1 border-t border-border/60">
+                <button onClick={() => toggleParticipants(e)}
+                  className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                    viewParts === e.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  }`}>
+                  <Users className="w-3.5 h-3.5" />
+                  {nb} inscrit{nb !== 1 ? "s" : ""}
+                </button>
+                <div className="ml-auto flex items-center gap-1">
+                  <button onClick={() => setForm({ ...e, _editing: e.id })}
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors">
+                    <Edit2 className="w-3.5 h-3.5" /> Modifier
+                  </button>
+                  <button onClick={() => remove(e.id)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" /> Supprimer
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+      {/* Panneau participants */}
+      {viewParts && (
+        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-muted/10 flex items-center justify-between">
+            <p className="font-semibold text-sm text-foreground flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" />
+              Inscrits — {items.find(e => e.id === viewParts)?.titre}
+            </p>
+            <button onClick={() => setViewParts(null)}
+              className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          {loadingParts ? (
+            <div className="flex items-center gap-2 p-5 text-muted-foreground text-sm">
+              <Loader2 className="w-4 h-4 animate-spin" /> Chargement…
+            </div>
+          ) : partsList.length === 0 ? (
+            <p className="p-5 text-sm text-muted-foreground text-center py-10">Aucun inscrit pour cet événement.</p>
+          ) : (
+            <div className="divide-y divide-border/60">
+              {partsList.map((r, i) => (
+                <div key={i} className="px-5 py-3 flex items-center gap-3">
+                  {r.members?.photo ? (
+                    <img src={r.members.photo} alt="" className="w-8 h-8 rounded-full object-cover object-top flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-primary">{(r.members?.nom || "?")[0]}</span>
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">{r.members?.nom || "—"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {r.members?.email || ""}
+                      {r.registered_at && ` · ${new Date(r.registered_at).toLocaleDateString("fr-FR")}`}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -33,7 +33,7 @@ export default function ArticleDetail() {
       setLoading(true);
       const [{ data: art }, { data: aut }] = await Promise.all([
         supabase.from("articles").select("*").eq("id", id).single(),
-        supabase.from("articles").select("id,titre,date,categorie,image").neq("id", id).limit(3),
+        supabase.from("articles").select("id,titre,date,categorie,image").neq("id", id).eq("statut", "publie").limit(3),
       ]);
       setArticle(art ?? null);
       setAutres(aut ?? []);
@@ -135,9 +135,24 @@ export default function ArticleDetail() {
                   </p>
                 )}
 
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground pt-4 border-t border-border/40">
-                  <Calendar className="w-4 h-4" /> {article.date}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground pt-4 border-t border-border/40">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4" /> {article.date}
+                  </span>
+                  {article.auteur && (
+                    <span className="flex items-center gap-1 text-xs">
+                      Par <strong className="text-foreground ml-1">{article.auteur}</strong>
+                    </span>
+                  )}
                 </div>
+
+                {article.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {article.tags.map(t => (
+                      <span key={t} className="px-2.5 py-0.5 rounded-full text-xs border border-border bg-muted text-muted-foreground">{t}</span>
+                    ))}
+                  </div>
+                )}
 
                 <ShareButtons title={article.titre} description={article.extrait} />
               </div>

@@ -340,9 +340,57 @@ export default async function handler(req, res) {
 
   const { type, ...data } = req.body;
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
+  }
+
+  // ── Circulaire : email groupé à une liste de membres ──
+  if (type === "circulaire") {
+    const { destinataires, sujet, corps, expediteur } = data;
+    if (!Array.isArray(destinataires) || destinataires.length === 0)
+      return res.status(400).json({ error: "Aucun destinataire." });
+    if (destinataires.length > 200)
+      return res.status(400).json({ error: "Maximum 200 destinataires par envoi." });
+    if (!sujet || !corps)
+      return res.status(400).json({ error: "Sujet et corps obligatoires." });
+    if (!checkRelanceRateLimit(ip))
+      return res.status(429).json({ error: "Un envoi groupé a déjà été effectué dans la dernière heure." });
+
+    const valides = destinataires.filter(d => isValidEmail(d.email));
+    const corps_html = escHtml(corps).replace(/\n/g, "<br>");
+    const sender_label = escHtml(expediteur || "Le Bureau Exécutif");
+
+    const results = await Promise.allSettled(
+      valides.map(async d => {
+        const greeting = d.nom ? `Bonjour <strong>${escHtml(d.nom)}</strong>,` : "Bonjour,";
+        const content = `
+          <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+          <div style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:28px;">${corps_html}</div>
+          <div style="border-top:1px solid #e5e7eb;padding-top:16px;">
+            <p style="margin:0;font-size:13px;font-weight:700;color:#111827;">${sender_label}</p>
+            <p style="margin:4px 0 0;font-size:12px;color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</p>
+            <p style="margin:2px 0 0;font-size:12px;color:#9ca3af;">contact@mabellepromo.org</p>
+          </div>`;
+        const payload = {
+          sender: SENDER,
+          to: [{ email: d.email, name: d.nom || d.email }],
+          replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+          subject: escHtml(sujet),
+          htmlContent: wrapHtml(content),
+        };
+        const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || "Brevo error"); }
+        return d.nom;
+      })
+    );
+    const sent   = results.filter(r => r.status === "fulfilled").length;
+    const errors = results.map((r, i) => r.status === "rejected" ? { nom: valides[i].nom, reason: r.reason?.message } : null).filter(Boolean);
+    return res.status(200).json({ success: true, sent, total: valides.length, errors });
   }
 
   // ── Relance cotisations : envoi en masse, rate limit propre ──

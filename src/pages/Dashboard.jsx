@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2
+  Bell, Vote, Wallet, Building2, Send, TrendingUp
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -30,6 +30,10 @@ import { useNotifications, requestNotificationPermission } from "../hooks/useNot
 import SondagesSection from "./dashboard/SondagesSection";
 import TresorerieSection from "./dashboard/TresorerieSection";
 import AssembleesSection from "./dashboard/AssembleesSection";
+import CirculaireSection from "./dashboard/CirculaireSection";
+import StatsSection from "./dashboard/StatsSection";
+import ElectionsSection from "./dashboard/ElectionsSection";
+import MandatsSection from "./dashboard/MandatsSection";
 import {
   ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
@@ -69,6 +73,8 @@ export default function Dashboard() {
   const [renewDate,         setRenewDate]         = useState(`${new Date().getFullYear()}-12-31`);
   const [renewLoading,      setRenewLoading]      = useState(false);
   const [unreadCount,    setUnreadCount]    = useState(0);
+  const [tresoWidget,    setTresoWidget]    = useState(null);
+  const [prochaineAG,   setProchaineAG]   = useState(null);
   const csvInputRef = useRef(null);
 
   useEffect(() => {
@@ -97,6 +103,32 @@ export default function Dashboard() {
     }
     window.addEventListener("mbp:compose-with-attachment", onAttachment);
     return () => window.removeEventListener("mbp:compose-with-attachment", onAttachment);
+  }, []);
+
+  useEffect(() => {
+    async function fetchWidgets() {
+      const yr = new Date().getFullYear();
+      const [tresoRes, agRes] = await Promise.all([
+        supabase
+          .from("tresorerie_transactions")
+          .select("type, montant")
+          .eq("annee", yr),
+        supabase
+          .from("assemblees")
+          .select("id, titre, date, lieu")
+          .eq("statut", "planifiee")
+          .gte("date", new Date().toISOString().slice(0, 10))
+          .order("date", { ascending: true })
+          .limit(1),
+      ]);
+      if (tresoRes.data) {
+        const recettes = tresoRes.data.filter(r => r.type === "recette").reduce((s, r) => s + (r.montant || 0), 0);
+        const depenses = tresoRes.data.filter(r => r.type === "depense").reduce((s, r) => s + (r.montant || 0), 0);
+        setTresoWidget({ recettes, depenses, solde: recettes - depenses, annee: yr });
+      }
+      setProchaineAG(agRes.data?.[0] ?? null);
+    }
+    fetchWidgets();
   }, []);
 
   const cotStats = useMemo(() => {
@@ -196,23 +228,36 @@ export default function Dashboard() {
   async function exportBackup() {
     toast("Préparation du backup…");
     try {
-      const [members_, cotisations_, articles_, evenements_, sondages_] = await Promise.all([
+      const [members_, cotisations_, articles_, evenements_, sondages_,
+             tresoTx_, tresoBudget_, elections_, candidats_, mandats_, assemblees_] = await Promise.all([
         supabase.from("members").select("*"),
         supabase.from("cotisations").select("*"),
         supabase.from("articles").select("*"),
         supabase.from("evenements").select("*"),
         supabase.from("sondages").select("*"),
+        supabase.from("tresorerie_transactions").select("*"),
+        supabase.from("tresorerie_budget").select("*"),
+        supabase.from("elections").select("*"),
+        supabase.from("election_candidats").select("*"),
+        supabase.from("mandats").select("*"),
+        supabase.from("assemblees").select("*"),
       ]);
       const backup = {
         exportedAt: new Date().toISOString(),
-        version: "1.0",
+        version: "2.0",
         project: "FDD Ma Belle Promo",
         data: {
-          members:     members_.data     ?? [],
-          cotisations: cotisations_.data ?? [],
-          articles:    articles_.data    ?? [],
-          evenements:  evenements_.data  ?? [],
-          sondages:    sondages_.data    ?? [],
+          members:                  members_.data          ?? [],
+          cotisations:              cotisations_.data      ?? [],
+          articles:                 articles_.data         ?? [],
+          evenements:               evenements_.data       ?? [],
+          sondages:                 sondages_.data         ?? [],
+          tresorerie_transactions:  tresoTx_.data          ?? [],
+          tresorerie_budget:        tresoBudget_.data      ?? [],
+          elections:                elections_.data        ?? [],
+          election_candidats:       candidats_.data        ?? [],
+          mandats:                  mandats_.data          ?? [],
+          assemblees:               assemblees_.data       ?? [],
         },
       };
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8;" });
@@ -319,24 +364,6 @@ export default function Dashboard() {
     );
   }
 
-  const TABS = [
-    { key: "overview",    label: "Vue d'ensemble",  icon: LayoutDashboard },
-    { key: "membres",     label: `Membres (${allMembers.length})`, icon: Users },
-    { key: "pending",     label: `En attente${pendingMembers.length > 0 ? ` (${pendingMembers.length})` : ""}`, icon: Clock, alert: pendingMembers.length > 0 },
-    { key: "messages",    label: unreadCount > 0 ? `Messages (${unreadCount})` : "Messages", icon: MessageSquare, alert: unreadCount > 0 },
-    { key: "articles",    label: "Articles",    icon: FileText },
-    { key: "evenements",  label: "Événements",  icon: Calendar },
-    { key: "projets",     label: "Projets",     icon: Star },
-    { key: "programmes",  label: "Programmes",  icon: Tag },
-    { key: "equipe",      label: "Équipe",      icon: UserCheck },
-    { key: "sponsors",    label: "Partenaires",  icon: Globe },
-    { key: "communiques", label: "Communiqués", icon: Mail },
-    { key: "mediatheque", label: "Médiathèque", icon: Image },
-    { key: "documents",   label: "Documents",   icon: Download },
-    { key: "galeries",    label: "Galeries",    icon: Images },
-    { key: "ressources",  label: "Ressources",  icon: BookOpen },
-  ];
-
   const stats = [
     { label: "Membres",    value: allMembers.length,     icon: Users,        color: "bg-blue-50 text-blue-600",   sub: `${allMembers.filter(m => m.bureau).length} au bureau`, onClick: () => setTab("membres") },
     { label: "En attente", value: pendingMembers.length, icon: Clock,        color: "bg-amber-50 text-amber-600", sub: "à valider", alert: pendingMembers.length > 0, onClick: () => setTab("pending") },
@@ -393,6 +420,15 @@ export default function Dashboard() {
         { key: "sponsors",    label: "Partenaires",  icon: Globe },
         { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
         { key: "assemblees",  label: "Assemblées",   icon: Building2 },
+        { key: "elections",   label: "Élections",    icon: Vote },
+        { key: "mandats",     label: "Mandats",      icon: Shield },
+      ],
+    },
+    {
+      label: "Communication",
+      items: [
+        { key: "circulaire",  label: "Circulaire",   icon: Send },
+        { key: "stats",       label: "Statistiques", icon: TrendingUp },
       ],
     },
   ];
@@ -402,14 +438,14 @@ export default function Dashboard() {
   const CurrentIcon = currentNavItem?.icon || LayoutDashboard;
 
   const STAT_COLORS = [
-    { border: "#3b82f6", bg: "#eff6ff", text: "#2563eb" },
-    { border: "#f59e0b", bg: "#fffbeb", text: "#d97706" },
-    { border: "#10b981", bg: "#ecfdf5", text: "#059669" },
-    { border: "#6366f1", bg: "#eef2ff", text: "#4f46e5" },
+    { bar: "bg-blue-500",    iconBg: "bg-blue-500/15",    iconCl: "text-blue-400" },
+    { bar: "bg-amber-500",   iconBg: "bg-amber-500/15",   iconCl: "text-amber-400" },
+    { bar: "bg-emerald-500", iconBg: "bg-emerald-500/15", iconCl: "text-emerald-400" },
+    { bar: "bg-indigo-500",  iconBg: "bg-indigo-500/15",  iconCl: "text-indigo-400" },
   ];
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ background: "#f1f5f9" }}>
+    <div className="dark h-screen flex overflow-hidden bg-background">
 
       {compose && (
         <ComposeModal
@@ -419,93 +455,86 @@ export default function Dashboard() {
       )}
 
       {/* ── SIDEBAR ── */}
-      <aside className="w-64 flex-shrink-0 h-screen flex flex-col"
-        style={{ background: "var(--brand-dark)", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+      <aside className="w-60 flex-shrink-0 h-screen flex flex-col bg-card border-r border-border">
 
-        {/* En-tête */}
-        <div className="px-6 py-5 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-          <p className="font-heading font-bold text-white text-base leading-tight tracking-tight">Ma Belle Promo</p>
-          <div className="flex items-center gap-1.5 mt-1">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--primary))" }} />
-            <p className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.30)" }}>Tableau de bord</p>
+        {/* Logo */}
+        <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary">
+              <span className="text-[10px] font-black text-primary-foreground tracking-tight">MBP</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-heading font-bold text-sm text-foreground leading-tight">Ma Belle Promo</p>
+              <p className="text-[10px] text-muted-foreground">Admin · FDD Lomé</p>
+            </div>
           </div>
         </div>
 
         {/* Composer */}
-        <div className="px-4 py-4 flex-shrink-0">
+        <div className="px-3 py-3 flex-shrink-0">
           <button onClick={() => setCompose(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 active:scale-95"
-            style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}>
-            <PenSquare className="w-4 h-4" /> Composer
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98]">
+            <PenSquare className="w-3.5 h-3.5" /> Composer
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 space-y-4 pb-4">
-          {NAV_GROUPS.map((group, gi) => (
-            <div key={gi}>
-              {group.label && (
-                <div className="flex items-center gap-2 px-3 mb-1">
-                  <span className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: "rgba(255,255,255,0.20)" }}>{group.label}</span>
-                  <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
+        <nav className="flex-1 overflow-y-auto px-2 pb-4">
+          {NAV_GROUPS.map((group, gi) => {
+            const groupColors = [null, "text-blue-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
+            const gc = groupColors[gi] || "text-muted-foreground";
+            return (
+              <div key={gi} className={gi > 0 ? "mt-5" : ""}>
+                {group.label && (
+                  <p className={`px-3 pb-1.5 text-[9px] font-black uppercase tracking-[0.18em] ${gc}`}>
+                    {group.label}
+                  </p>
+                )}
+                <div className="space-y-0.5">
+                  {group.items.map(({ key, label, icon: Icon, badge, badgeAlert }) => {
+                    const active = tab === key;
+                    return (
+                      <button key={key} onClick={() => setTab(key)}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all text-left relative ${
+                          active
+                            ? "bg-primary/15 text-primary font-semibold"
+                            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground font-normal"
+                        }`}>
+                        {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-primary rounded-r-full" />}
+                        <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-primary" : "opacity-50"}`} />
+                        <span className="flex-1 truncate">{label}</span>
+                        {badge != null && badge > 0 && (
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                            badgeAlert ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground"
+                          }`}>{badge}</span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-              <div className="space-y-0.5">
-                {group.items.map(({ key, label, icon: Icon, badge, badgeAlert }) => {
-                  const active = tab === key;
-                  return (
-                    <button key={key} onClick={() => setTab(key)}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-left"
-                      style={{
-                        background: active ? "hsl(var(--primary))" : "transparent",
-                        color: active ? "#fff" : "rgba(255,255,255,0.50)",
-                        fontWeight: active ? 600 : 400,
-                      }}
-                      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}}
-                      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.50)"; }}}
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" style={{ opacity: active ? 1 : 0.7 }} />
-                      <span className="flex-1 truncate">{label}</span>
-                      {badge != null && badge > 0 && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                          style={badgeAlert
-                            ? { background: "#f59e0b", color: "#fff" }
-                            : { background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}>
-                          {badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </nav>
 
-        {/* Profil + actions */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-2" style={{ background: "rgba(255,255,255,0.05)" }}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(var(--primary))" }}>
-              <Shield className="w-3.5 h-3.5 text-white" />
+        {/* Profil */}
+        <div className="flex-shrink-0 px-3 pb-4 pt-3 border-t border-border">
+          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-muted/30 mb-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/15">
+              <Shield className="w-3.5 h-3.5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold leading-tight truncate" style={{ color: "rgba(255,255,255,0.80)" }}>{session?.email?.split("@")[0]}</p>
-              <p className="text-[9px] uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.30)" }}>{session?.role || "admin"}</p>
+              <p className="text-xs font-semibold text-foreground truncate leading-tight">{session?.email?.split("@")[0]}</p>
+              <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{session?.role || "admin"}</p>
             </div>
           </div>
           <div className="flex gap-1">
             <Link to="/" target="_blank"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-medium transition-all"
-              style={{ color: "rgba(255,255,255,0.40)", background: "rgba(255,255,255,0.04)" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.80)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.40)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all">
               <Globe className="w-3 h-3" /> Site
             </Link>
             <button onClick={() => { logout(); navigate("/login"); }}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-medium transition-all"
-              style={{ color: "rgba(255,255,255,0.40)", background: "rgba(255,255,255,0.04)" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#fca5a5"; e.currentTarget.style.background = "rgba(239,68,68,0.10)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.40)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all">
               <LogOut className="w-3 h-3" /> Quitter
             </button>
           </div>
@@ -513,25 +542,37 @@ export default function Dashboard() {
       </aside>
 
       {/* ── CONTENU ── */}
-      <div className="flex-1 min-w-0 overflow-hidden" style={{ display: "grid", gridTemplateRows: "3.5rem 1fr auto" }}>
+      <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
 
         {/* Topbar */}
-        <div className="flex items-center justify-between px-8"
-          style={{ background: "var(--brand-dark)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="flex-shrink-0 h-14 flex items-center justify-between px-8 bg-card border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-              <CurrentIcon className="w-3.5 h-3.5 text-white/70" />
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10">
+              <CurrentIcon className="w-3.5 h-3.5 text-primary" />
             </div>
-            <h2 className="font-heading font-bold text-white text-sm tracking-wide">
+            <h2 className="font-heading font-bold text-foreground text-sm tracking-wide">
               {currentNavItem?.label || "Vue d'ensemble"}
             </h2>
+            {pendingMembers.length > 0 && tab !== "pending" && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">
+                {pendingMembers.length}
+              </span>
+            )}
           </div>
-          <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.30)" }}>
-            {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-          </p>
+          <div className="flex items-center gap-4">
+            {unreadCount > 0 && tab !== "messages" && (
+              <button onClick={() => setTab("messages")}
+                className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors">
+                <MessageSquare className="w-3.5 h-3.5" /> {unreadCount} non lu{unreadCount > 1 ? "s" : ""}
+              </button>
+            )}
+            <p className="text-[11px] text-muted-foreground">
+              {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </p>
+          </div>
         </div>
 
-        <div className="p-6 md:p-8 overflow-y-auto" style={{ paddingBottom: "6rem" }}>
+        <div className="flex-1 p-6 md:p-8 overflow-y-auto pb-24">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
@@ -552,9 +593,9 @@ export default function Dashboard() {
 
               {/* Notifications navigateur */}
               {notifPermission !== "granted" && notifPermission !== "unsupported" && (
-                <div className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-2xl px-5 py-3.5">
-                  <Bell className="w-4 h-4 text-violet-600 flex-shrink-0" />
-                  <p className="text-sm text-violet-800 flex-1">
+                <div className="flex items-center gap-3 bg-violet-500/10 border border-violet-500/20 rounded-2xl px-5 py-3.5">
+                  <Bell className="w-4 h-4 text-violet-400 flex-shrink-0" />
+                  <p className="text-sm text-violet-300 flex-1">
                     {notifPermission === "denied"
                       ? "Notifications bloquées — autorisez-les dans les paramètres de votre navigateur."
                       : "Activez les notifications pour recevoir les alertes anniversaires et nouvelles demandes."}
@@ -565,7 +606,7 @@ export default function Dashboard() {
                         const result = await requestNotificationPermission();
                         setNotifPermission(result);
                       }}
-                      className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors">
+                      className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors">
                       Activer
                     </button>
                   )}
@@ -577,34 +618,34 @@ export default function Dashboard() {
                 {stats.map(({ label, value, icon: Icon, sub, alert, onClick }, i) => (
                   <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                     onClick={onClick}
-                    className={`bg-white rounded-2xl overflow-hidden shadow-sm group ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
-                    <div className="h-1 w-full" style={{ background: STAT_COLORS[i].border }} />
+                    className={`bg-card rounded-2xl overflow-hidden border border-border shadow-sm group ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
+                    <div className={`h-1 w-full ${STAT_COLORS[i].bar}`} />
                     <div className="p-5">
                       {alert && <span className="float-right w-2 h-2 rounded-full bg-amber-500 animate-pulse mt-1" />}
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: STAT_COLORS[i].bg }}>
-                        <Icon className="w-4 h-4" style={{ color: STAT_COLORS[i].text }} />
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${STAT_COLORS[i].iconBg}`}>
+                        <Icon className={`w-4 h-4 ${STAT_COLORS[i].iconCl}`} />
                       </div>
-                      <div className="font-heading text-3xl font-black tracking-tight" style={{ color: "#0f172a" }}>{value}</div>
-                      <div className="text-sm font-semibold mt-0.5" style={{ color: "#1e293b" }}>{label}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>{sub}</div>
+                      <div className="font-heading text-3xl font-black tracking-tight text-foreground">{value}</div>
+                      <div className="text-sm font-semibold mt-0.5 text-foreground">{label}</div>
+                      <div className="text-xs mt-0.5 text-muted-foreground">{sub}</div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
               {pendingMembers.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <AlertTriangle className="w-5 h-5 text-amber-600" />
-                    <h3 className="font-semibold text-amber-800">{pendingMembers.length} demande{pendingMembers.length > 1 ? "s" : ""} en attente</h3>
-                    <button onClick={() => setTab("pending")} className="ml-auto text-sm text-amber-700 font-semibold hover:underline">Voir tout →</button>
+                    <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    <h3 className="font-semibold text-amber-300">{pendingMembers.length} demande{pendingMembers.length > 1 ? "s" : ""} en attente</h3>
+                    <button onClick={() => setTab("pending")} className="ml-auto text-sm text-amber-400 font-semibold hover:underline">Voir tout →</button>
                   </div>
                   {pendingMembers.slice(0, 2).map(m => (
-                    <div key={m.id} className="flex items-center justify-between bg-white rounded-xl p-3 border border-amber-100 mb-2">
-                      <div><p className="font-semibold text-sm">{m.nom}</p><p className="text-xs text-muted-foreground">{m.profession} · {m.ville}</p></div>
+                    <div key={m.id} className="flex items-center justify-between bg-card rounded-xl p-3 border border-border mb-2">
+                      <div><p className="font-semibold text-sm text-foreground">{m.nom}</p><p className="text-xs text-muted-foreground">{m.profession} · {m.ville}</p></div>
                       <div className="flex gap-2">
-                        <button onClick={() => rejectMember(m.id)} className="w-7 h-7 rounded-full bg-red-50 border border-red-200 text-red-500 flex items-center justify-center hover:bg-red-100"><X className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => validateMember(m)} className="w-7 h-7 rounded-full bg-green-50 border border-green-200 text-green-600 flex items-center justify-center hover:bg-green-100"><Check className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => rejectMember(m.id)} className="w-7 h-7 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/20"><X className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => validateMember(m)} className="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/20"><Check className="w-3.5 h-3.5" /></button>
                       </div>
                     </div>
                   ))}
@@ -614,38 +655,38 @@ export default function Dashboard() {
               {/* Cotisations + Prochain événement */}
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Taux de cotisation */}
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-emerald-500" />
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                          <Banknote className="w-4 h-4 text-emerald-600" />
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                          <Banknote className="w-4 h-4 text-emerald-400" />
                         </div>
                         <div>
                           <p className="text-sm font-bold text-foreground">Cotisations {currentYear}</p>
                           <p className="text-xs text-muted-foreground">{cotStats.payes} / {cotStats.total} membres</p>
                         </div>
                       </div>
-                      <span className="font-heading text-2xl font-black text-emerald-600">{cotStats.taux}%</span>
+                      <span className="font-heading text-2xl font-black text-emerald-400">{cotStats.taux}%</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${cotStats.taux}%` }} />
                     </div>
                     <button onClick={() => setTab("cotisations")}
-                      className="mt-3 text-xs font-semibold text-emerald-600 hover:underline">
+                      className="mt-3 text-xs font-semibold text-emerald-400 hover:underline">
                       Gérer les cotisations →
                     </button>
                   </div>
                 </div>
 
                 {/* Prochain événement */}
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-indigo-500" />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                        <Calendar className="w-4 h-4 text-indigo-600" />
+                      <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-indigo-400" />
                       </div>
                       <p className="text-sm font-bold text-foreground">Prochain événement</p>
                     </div>
@@ -660,20 +701,95 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground italic">Aucun événement à venir.</p>
                     )}
                     <button onClick={() => setTab("evenements")}
-                      className="mt-3 text-xs font-semibold text-indigo-600 hover:underline">
+                      className="mt-3 text-xs font-semibold text-indigo-400 hover:underline">
                       Gérer les événements →
                     </button>
                   </div>
                 </div>
               </div>
 
+              {/* Trésorerie + Prochaine AG */}
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Solde trésorerie */}
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-amber-500" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                        <Wallet className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">Trésorerie {tresoWidget?.annee ?? currentYear}</p>
+                        <p className="text-xs text-muted-foreground">Recettes · Dépenses</p>
+                      </div>
+                    </div>
+                    {tresoWidget ? (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Recettes</span>
+                          <span className="text-emerald-400 font-semibold">
+                            +{new Intl.NumberFormat("fr-FR").format(tresoWidget.recettes)} FCFA
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Dépenses</span>
+                          <span className="text-red-400 font-semibold">
+                            −{new Intl.NumberFormat("fr-FR").format(tresoWidget.depenses)} FCFA
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold border-t border-border pt-1 mt-1">
+                          <span>Solde</span>
+                          <span className={tresoWidget.solde >= 0 ? "text-emerald-400" : "text-red-400"}>
+                            {new Intl.NumberFormat("fr-FR").format(tresoWidget.solde)} FCFA
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">Aucune transaction enregistrée.</p>
+                    )}
+                    <button onClick={() => setTab("tresorerie")}
+                      className="mt-3 text-xs font-semibold text-amber-400 hover:underline">
+                      Gérer la trésorerie →
+                    </button>
+                  </div>
+                </div>
+
+                {/* Prochaine AG */}
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="h-1 w-full bg-violet-500" />
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center">
+                        <Building2 className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground">Prochaine Assemblée</p>
+                    </div>
+                    {prochaineAG ? (
+                      <>
+                        <p className="font-semibold text-foreground text-sm leading-snug">{prochaineAG.titre}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(prochaineAG.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                          {prochaineAG.lieu ? ` · ${prochaineAG.lieu}` : ""}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">Aucune assemblée planifiée.</p>
+                    )}
+                    <button onClick={() => setTab("assemblees")}
+                      className="mt-3 text-xs font-semibold text-violet-400 hover:underline">
+                      Gérer les assemblées →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Convention de partenariat */}
-              <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                 <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #1b6b45, #9a7118)" }} />
                 <div className="p-5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#e8f5ee" }}>
-                      <FileText className="w-4 h-4" style={{ color: "#1b6b45" }} />
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary/15">
+                      <FileText className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground">Convention de Partenariat</p>
@@ -701,11 +817,11 @@ export default function Dashboard() {
 
               {/* Widget anniversaires prochains */}
               {prochainsAnniversaires.length > 0 && (
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-pink-400" />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-pink-500/15 flex items-center justify-center">
                         <span className="text-base">🎂</span>
                       </div>
                       <p className="text-sm font-bold text-foreground">
@@ -738,18 +854,18 @@ export default function Dashboard() {
 
               {/* Widget membres dormants */}
               {membresDormants.length > 0 && (
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-slate-400" />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                        <AlertTriangle className="w-4 h-4 text-slate-500" />
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 text-muted-foreground" />
                       </div>
                       <p className="text-sm font-bold text-foreground">
                         Membres dormants — {currentYear - 2} à {currentYear}
                         <span className="ml-2 text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{membresDormants.length}</span>
                       </p>
-                      <button onClick={() => setTab("cotisations")} className="ml-auto text-xs font-semibold text-slate-600 hover:underline">Gérer →</button>
+                      <button onClick={() => setTab("cotisations")} className="ml-auto text-xs font-semibold text-muted-foreground hover:text-foreground hover:underline">Gérer →</button>
                     </div>
                     <div className="space-y-2">
                       {membresDormants.slice(0, 5).map(m => (
@@ -773,12 +889,12 @@ export default function Dashboard() {
 
               {/* Répartition géo + Agenda combiné */}
               <div className="grid lg:grid-cols-2 gap-4">
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-cyan-500" />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
-                        <Globe className="w-4 h-4 text-cyan-600" />
+                      <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                        <Globe className="w-4 h-4 text-cyan-400" />
                       </div>
                       <p className="text-sm font-bold text-foreground">Répartition géographique</p>
                     </div>
@@ -798,12 +914,12 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                   <div className="h-1 w-full bg-violet-500" />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-                        <Calendar className="w-4 h-4 text-violet-600" />
+                      <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-violet-400" />
                       </div>
                       <p className="text-sm font-bold text-foreground">Agenda</p>
                     </div>
@@ -813,9 +929,9 @@ export default function Dashboard() {
                       <div className="space-y-2.5">
                         {agendaCombine.map((item, i) => (
                           <div key={i} className="flex items-center gap-3">
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.type === "event" ? "bg-indigo-50" : "bg-pink-50"}`}>
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.type === "event" ? "bg-indigo-500/15" : "bg-pink-500/15"}`}>
                               {item.type === "event"
-                                ? <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                                ? <Calendar className="w-3.5 h-3.5 text-indigo-400" />
                                 : <span className="text-xs">🎂</span>}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -823,7 +939,7 @@ export default function Dashboard() {
                               <p className="text-xs text-muted-foreground truncate">{item.dateStr}{item.lieu ? ` · ${item.lieu}` : ""}</p>
                             </div>
                             {item.joursAvant !== null && (
-                              <span className={`text-xs font-bold flex-shrink-0 ${item.joursAvant === 0 ? "text-red-500" : item.joursAvant <= 7 ? "text-amber-600" : "text-muted-foreground"}`}>
+                              <span className={`text-xs font-bold flex-shrink-0 ${item.joursAvant === 0 ? "text-red-400" : item.joursAvant <= 7 ? "text-amber-400" : "text-muted-foreground"}`}>
                                 {item.joursAvant === 0 ? "Auj." : `J-${item.joursAvant}`}
                               </span>
                             )}
@@ -1101,6 +1217,10 @@ export default function Dashboard() {
           {tab === "sponsors"    && <SponsorsSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
           {tab === "assemblees"  && <AssembleesSection />}
+          {tab === "elections"   && <ElectionsSection />}
+          {tab === "mandats"     && <MandatsSection />}
+          {tab === "circulaire"  && <CirculaireSection />}
+          {tab === "stats"       && <StatsSection />}
           {tab === "communiques" && <CommuniquesSection />}
           {tab === "mediatheque" && <MediathequeSection />}
           {tab === "documents"   && <DocumentsSection />}
@@ -1225,8 +1345,8 @@ export default function Dashboard() {
                   <h3 className="font-heading font-bold text-foreground text-base leading-tight">{memberDetail.nom}</h3>
                   <p className="text-sm text-muted-foreground mt-0.5">{memberDetail.profession || "—"}</p>
                   <div className="flex gap-2 mt-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${memberDetail.bureau ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${memberDetail.bureau ? "bg-amber-500" : "bg-green-500"}`} />
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${memberDetail.bureau ? "bg-amber-500/15 text-amber-400" : "bg-emerald-500/15 text-emerald-400"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${memberDetail.bureau ? "bg-amber-500" : "bg-emerald-500"}`} />
                       {memberDetail.bureau ? "Bureau" : "Membre actif"}
                     </span>
                     {memberDetail.anneeObtention && (
@@ -1280,10 +1400,10 @@ export default function Dashboard() {
                   const cot = multiYearData[String(memberDetail.id)]?.[yr];
                   const s = cot?.statut ?? "en_attente";
                   const cfg = {
-                    "payé":       { bg: "bg-emerald-100", text: "text-emerald-700", label: "Payé" },
-                    "partiel":    { bg: "bg-blue-100",    text: "text-blue-700",    label: "Partiel" },
-                    "en_attente": { bg: "bg-amber-100",   text: "text-amber-700",   label: "En attente" },
-                    "exempté":    { bg: "bg-slate-100",   text: "text-slate-600",   label: "Exempté" },
+                    "payé":       { bg: "bg-emerald-500/15", text: "text-emerald-400", label: "Payé" },
+                    "partiel":    { bg: "bg-blue-500/15",    text: "text-blue-400",    label: "Partiel" },
+                    "en_attente": { bg: "bg-amber-500/15",   text: "text-amber-400",   label: "En attente" },
+                    "exempté":    { bg: "bg-muted/50",       text: "text-muted-foreground", label: "Exempté" },
                   }[s] ?? { bg: "bg-muted", text: "text-muted-foreground", label: s };
                   return (
                     <div key={yr} className="flex items-center justify-between">
@@ -1303,13 +1423,13 @@ export default function Dashboard() {
             {memberDetail.notes_internes && (
               <div className="p-5 border-b border-border">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Notes internes</p>
-                <p className="text-sm text-foreground bg-amber-50 border border-amber-200 rounded-xl p-3 whitespace-pre-wrap">{memberDetail.notes_internes}</p>
+                <p className="text-sm text-foreground bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 whitespace-pre-wrap">{memberDetail.notes_internes}</p>
               </div>
             )}
 
             <div className="p-5 flex gap-2 mt-auto sticky bottom-0 bg-background border-t border-border">
               <button onClick={() => { setAttestationDialog(memberDetail); setMemberDetail(null); }}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-sm font-semibold hover:bg-amber-100 transition-colors">
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400 text-sm font-semibold hover:bg-amber-500/20 transition-colors">
                 <FileText className="w-3.5 h-3.5" /> Attestation
               </button>
               <button onClick={() => { setEditingMember({ ...memberDetail }); setMemberDetail(null); }}

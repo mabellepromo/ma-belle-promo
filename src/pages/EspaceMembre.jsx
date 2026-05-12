@@ -6,7 +6,7 @@ import {
   User, Mail, Phone, MapPin, FileText, Lock, Edit2, Save, X,
   Download, Shield, Clock, CheckCircle, AlertCircle, Trash2,
   ShieldCheck, Linkedin, BookOpen, ChevronDown, ChevronRight,
-  CreditCard,
+  CreditCard, Vote, Calendar, UserPlus, UserMinus, CalendarCheck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ const documentsExclusifs = [
 const tabs = [
   { id: "profil",       label: "Mon Profil",   icon: User      },
   { id: "cotisations",  label: "Cotisations",  icon: Clock     },
+  { id: "evenements",   label: "Événements",   icon: Calendar  },
+  { id: "elections",    label: "Élections",    icon: Vote      },
   { id: "documents",    label: "Documents",    icon: FileText  },
   { id: "donnees",      label: "Mes données",  icon: ShieldCheck },
 ];
@@ -53,6 +55,13 @@ export default function EspaceMembre() {
   const [deletionRequested, setDeletionRequested] = useState(false);
   const [paymentModal,    setPaymentModal]    = useState(false);
   const [expandedCot,     setExpandedCot]     = useState(null);
+  const [evenements,      setEvenements]      = useState([]);
+  const [myRegistrations, setMyRegistrations] = useState(new Set());
+  const [openElections,   setOpenElections]   = useState([]);
+  const [electionCandidats, setElectionCandidats] = useState({});
+  const [myVotes,         setMyVotes]         = useState({});
+  const [rsvpLoading,     setRsvpLoading]     = useState(null);
+  const [voteLoading,     setVoteLoading]     = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,6 +97,49 @@ export default function EspaceMembre() {
         setCotisations(cots ?? []);
       }
 
+      // Événements à venir / en cours
+      const { data: evts } = await supabase
+        .from("evenements")
+        .select("id, titre, date, heures, lieu, type, statut, image")
+        .neq("statut", "Passé")
+        .order("created_at", { ascending: false });
+      setEvenements(evts || []);
+
+      if (m?.id) {
+        const { data: regs } = await supabase
+          .from("event_registrations")
+          .select("event_id")
+          .eq("member_id", m.id);
+        setMyRegistrations(new Set((regs || []).map(r => r.event_id)));
+      }
+
+      // Élections ouvertes
+      const { data: elections } = await supabase
+        .from("elections")
+        .select("*")
+        .eq("statut", "ouverte")
+        .order("created_at", { ascending: false });
+
+      if (elections?.length) {
+        const ids = elections.map(e => e.id);
+        const [cRes, vRes] = await Promise.all([
+          supabase.from("election_candidats").select("*, members(nom, photo)").in("election_id", ids),
+          m?.id
+            ? supabase.from("election_votes").select("election_id, candidat_id").in("election_id", ids).eq("voter_id", m.id)
+            : Promise.resolve({ data: [] }),
+        ]);
+        const candsMap = {};
+        (cRes.data || []).forEach(c => {
+          if (!candsMap[c.election_id]) candsMap[c.election_id] = [];
+          candsMap[c.election_id].push(c);
+        });
+        const votesMap = {};
+        (vRes.data || []).forEach(v => { votesMap[v.election_id] = v.candidat_id; });
+        setOpenElections(elections);
+        setElectionCandidats(candsMap);
+        setMyVotes(votesMap);
+      }
+
       setLoading(false);
     }
     load();
@@ -120,6 +172,31 @@ export default function EspaceMembre() {
     setEditing(false);
     setSaving(false);
     toast.success("Profil mis à jour — les changements sont visibles partout sur le site.");
+  }
+
+  async function toggleRegistration(eventId) {
+    if (!member?.id) { toast.error("Vous devez être un membre enregistré pour vous inscrire."); return; }
+    setRsvpLoading(eventId);
+    if (myRegistrations.has(eventId)) {
+      await supabase.from("event_registrations").delete().eq("event_id", eventId).eq("member_id", member.id);
+      setMyRegistrations(prev => { const s = new Set(prev); s.delete(eventId); return s; });
+      toast.success("Inscription annulée.");
+    } else {
+      const { error } = await supabase.from("event_registrations").insert({ event_id: eventId, member_id: member.id });
+      if (error) toast.error("Erreur : " + error.message);
+      else { setMyRegistrations(prev => new Set([...prev, eventId])); toast.success("Inscription confirmée !"); }
+    }
+    setRsvpLoading(null);
+  }
+
+  async function castVote(electionId, candidatId) {
+    if (!member?.id) { toast.error("Vous devez être un membre enregistré pour voter."); return; }
+    if (myVotes[electionId]) { toast.error("Vous avez déjà voté pour cette élection."); return; }
+    setVoteLoading(electionId);
+    const { error } = await supabase.from("election_votes").insert({ election_id: electionId, voter_id: member.id, candidat_id: candidatId });
+    if (error) toast.error("Erreur : " + error.message);
+    else { setMyVotes(prev => ({ ...prev, [electionId]: candidatId })); toast.success("Vote enregistré ! Merci pour votre participation."); }
+    setVoteLoading(null);
   }
 
   const handleExport = async () => {
@@ -496,6 +573,139 @@ export default function EspaceMembre() {
               Pour toute question ou signaler un paiement non enregistré, contactez le trésorier à{" "}
               <a href="mailto:contact@mabellepromo.org" className="text-primary hover:underline">contact@mabellepromo.org</a>
             </p>
+          </motion.div>
+        )}
+
+        {/* ── ÉVÉNEMENTS ── */}
+        {tab === "evenements" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            {evenements.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Calendar className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <p className="font-medium">Aucun événement à venir</p>
+                <p className="text-sm mt-1">Revenez bientôt pour les prochains événements MBP.</p>
+              </div>
+            ) : evenements.map(e => {
+              const isReg = myRegistrations.has(e.id);
+              const busy = rsvpLoading === e.id;
+              return (
+                <div key={e.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  {e.image && (
+                    <div className="h-36 overflow-hidden">
+                      <img src={e.image} alt={e.titre} className="w-full h-full object-cover object-top" />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-1.5">
+                      <h3 className="font-heading font-bold text-foreground">{e.titre}</h3>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        e.statut === "À venir" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
+                      }`}>{e.statut}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {e.date}{e.heures ? ` · ${e.heures}` : ""}{e.lieu ? ` · ${e.lieu}` : ""}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      {isReg ? (
+                        <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                          <CalendarCheck className="w-3.5 h-3.5" /> Inscrit(e)
+                        </span>
+                      ) : <span />}
+                      <button onClick={() => toggleRegistration(e.id)} disabled={busy}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 ${
+                          isReg
+                            ? "border border-border text-muted-foreground hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                            : "bg-primary text-primary-foreground hover:bg-primary/90"
+                        }`}>
+                        {busy
+                          ? <div className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin" />
+                          : isReg
+                            ? <><UserMinus className="w-4 h-4" /> Se désinscrire</>
+                            : <><UserPlus className="w-4 h-4" /> Je participe</>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </motion.div>
+        )}
+
+        {/* ── ÉLECTIONS ── */}
+        {tab === "elections" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            {openElections.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Vote className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <p className="font-medium">Aucune élection en cours</p>
+                <p className="text-sm mt-1">Les élections ouvertes apparaîtront ici.</p>
+              </div>
+            ) : openElections.map(el => {
+              const cands = electionCandidats[el.id] || [];
+              const myVote = myVotes[el.id];
+              const busy = voteLoading === el.id;
+              return (
+                <div key={el.id} className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-border bg-muted/10 flex items-center justify-between gap-3">
+                    <div>
+                      <h3 className="font-heading font-bold text-foreground">{el.titre}</h3>
+                      {el.description && <p className="text-xs text-muted-foreground mt-0.5">{el.description}</p>}
+                      {el.date_fin && <p className="text-xs text-muted-foreground mt-0.5">Clôture : {new Date(el.date_fin).toLocaleDateString("fr-FR")}</p>}
+                    </div>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex-shrink-0">Ouverte</span>
+                  </div>
+
+                  {myVote && (
+                    <div className="mx-5 mt-4 flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5 text-sm text-emerald-700">
+                      <CheckCircle className="w-4 h-4 flex-shrink-0" /> Vote enregistré — merci pour votre participation.
+                    </div>
+                  )}
+                  {!member?.id && (
+                    <div className="mx-5 mt-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-700">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" /> Votre profil n'est pas encore associé à un compte membre.
+                    </div>
+                  )}
+
+                  <div className="p-5 space-y-3">
+                    {cands.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-6">Aucun candidat déclaré.</p>
+                    ) : cands.map(c => {
+                      const isMyVote = myVote === c.id;
+                      return (
+                        <div key={c.id} className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                          isMyVote ? "border-primary bg-primary/5" : "border-border bg-muted/10"
+                        }`}>
+                          {c.members?.photo ? (
+                            <img src={c.members.photo} alt="" className="w-10 h-10 rounded-full object-cover object-top flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <span className="text-sm font-bold text-primary">{(c.members?.nom || "?")[0]}</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm text-foreground">{c.members?.nom || "—"}</p>
+                            <p className="text-xs text-muted-foreground">{c.poste}</p>
+                            {c.bio && <p className="text-xs text-muted-foreground italic mt-0.5">{c.bio}</p>}
+                          </div>
+                          {isMyVote ? (
+                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                          ) : !myVote && member?.id ? (
+                            <button onClick={() => castVote(el.id, c.id)} disabled={busy}
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 flex-shrink-0">
+                              {busy
+                                ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                                : <Vote className="w-3.5 h-3.5" />}
+                              Voter
+                            </button>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </motion.div>
         )}
 

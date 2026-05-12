@@ -1,0 +1,14 @@
+# Dossiers de build et dépendances — jamais utiles à lire
+node_modules/
+dist/
+.git/
+
+# Archives et scripts ponctuels
+emailjs_templates/
+scripts/
+
+# PDFs et documents administratifs — lire uniquement si demandé explicitement
+*.pdf
+
+# Fichiers de lock — trop lourds, non pertinents
+package-lock.json

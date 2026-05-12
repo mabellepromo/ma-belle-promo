@@ -4,7 +4,15 @@ import { supabase } from "@/lib/supabase";
 import { articles as articlesStatic } from "@/data/articles";
 import { slugify } from "@/lib/localStore";
 
-export function useArticles() {
+// Convertit date ISO (2025-01-15) en texte FR (15 Janvier 2025)
+export function formatDateFr(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  const mois = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+  return `${d} ${mois[m - 1]} ${y}`;
+}
+
+export function useArticles({ publicOnly = false } = {}) {
   const [articles, setArticles] = useState(articlesStatic);
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
@@ -12,10 +20,15 @@ export function useArticles() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    let q = supabase
       .from("articles")
       .select("*")
+      .order("date_iso", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
+
+    if (publicOnly) q = q.eq("statut", "publie");
+
+    const { data, error } = await q;
 
     if (error) {
       setArticles(articlesStatic);
@@ -25,7 +38,7 @@ export function useArticles() {
       setIsSeeded(true);
     }
     setLoading(false);
-  }, []);
+  }, [publicOnly]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -35,16 +48,10 @@ export function useArticles() {
       const id = item.id || slugify(item.titre);
       const { error } = await supabase
         .from("articles")
-        .insert({ ...item, id, photos: item.photos ?? [] });
-      if (error) {
-        toast.error("Erreur ajout : " + error.message);
-      } else {
-        toast.success("Article ajouté !");
-        await load();
-      }
-    } finally {
-      setSaving(false);
-    }
+        .insert({ ...item, id, photos: item.photos ?? [], tags: item.tags ?? [] });
+      if (error) toast.error("Erreur ajout : " + error.message);
+      else { toast.success("Article ajouté !"); await load(); }
+    } finally { setSaving(false); }
   }
 
   async function update(id, item) {
@@ -54,15 +61,9 @@ export function useArticles() {
         .from("articles")
         .update({ ...item, updated_at: new Date().toISOString() })
         .eq("id", id);
-      if (error) {
-        toast.error("Erreur mise à jour : " + error.message);
-      } else {
-        toast.success("Article mis à jour !");
-        await load();
-      }
-    } finally {
-      setSaving(false);
-    }
+      if (error) toast.error("Erreur mise à jour : " + error.message);
+      else { toast.success("Article mis à jour !"); await load(); }
+    } finally { setSaving(false); }
   }
 
   async function remove(id) {
@@ -70,15 +71,9 @@ export function useArticles() {
     setSaving(true);
     try {
       const { error } = await supabase.from("articles").delete().eq("id", id);
-      if (error) {
-        toast.error("Erreur suppression : " + error.message);
-      } else {
-        toast.success("Article supprimé.");
-        await load();
-      }
-    } finally {
-      setSaving(false);
-    }
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Article supprimé."); await load(); }
+    } finally { setSaving(false); }
   }
 
   async function seedFromStatic() {
@@ -87,18 +82,12 @@ export function useArticles() {
       const { error } = await supabase
         .from("articles")
         .upsert(
-          articlesStatic.map(a => ({ ...a, photos: a.photos ?? [] })),
+          articlesStatic.map(a => ({ ...a, photos: a.photos ?? [], tags: [], statut: "publie" })),
           { onConflict: "id" }
         );
-      if (error) {
-        toast.error("Erreur migration : " + error.message);
-      } else {
-        toast.success(`${articlesStatic.length} articles migrés avec succès !`);
-        await load();
-      }
-    } finally {
-      setSaving(false);
-    }
+      if (error) toast.error("Erreur migration : " + error.message);
+      else { toast.success(`${articlesStatic.length} articles migrés !`); await load(); }
+    } finally { setSaving(false); }
   }
 
   return { articles, loading, saving, isSeeded, add, update, remove, seedFromStatic, reload: load };

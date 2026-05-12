@@ -1235,3 +1235,180 @@ export function genererRapportFinancier(annee, rows, montantDefaut, stats) {
 
   openDoc(html, `Rapport-Financier-MBP-${annee}.html`);
 }
+
+export function genererRapportTresorerie(annee, transactions, budget = []) {
+  const ref = refNumber("TRE", String(annee));
+  const fmt = n => new Intl.NumberFormat("fr-FR").format(Math.abs(n)) + " F CFA";
+
+  const recettes = transactions.filter(t => t.type === "recette");
+  const depenses = transactions.filter(t => t.type === "depense");
+  const totalRec = recettes.reduce((s, t) => s + Number(t.montant), 0);
+  const totalDep = depenses.reduce((s, t) => s + Number(t.montant), 0);
+  const solde = totalRec - totalDep;
+
+  const byCategorie = (list) => {
+    const map = {};
+    list.forEach(t => {
+      map[t.categorie] = (map[t.categorie] || 0) + Number(t.montant);
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+  };
+
+  const lignesRecettes = byCategorie(recettes).map(([cat, montant]) => {
+    const bud = budget.find(b => b.categorie === cat && b.type === "recette");
+    const prevu = bud ? Number(bud.montant_prevu) : null;
+    const ecart = prevu !== null ? montant - prevu : null;
+    return `<tr>
+      <td style="padding:5px 10px;font-size:8.5pt;color:#0f172a;">${cat}</td>
+      <td style="padding:5px 10px;font-size:8.5pt;text-align:right;font-weight:600;color:#065f46;">${fmt(montant)}</td>
+      <td style="padding:5px 10px;font-size:8pt;text-align:right;color:#94a3b8;">${prevu !== null ? fmt(prevu) : "—"}</td>
+      <td style="padding:5px 10px;font-size:8pt;text-align:right;color:${ecart === null ? "#94a3b8" : ecart >= 0 ? "#059669" : "#dc2626"};">
+        ${ecart === null ? "—" : (ecart >= 0 ? "+" : "−") + fmt(ecart)}
+      </td>
+    </tr>`;
+  }).join("");
+
+  const lignesDepenses = byCategorie(depenses).map(([cat, montant]) => {
+    const bud = budget.find(b => b.categorie === cat && b.type === "depense");
+    const prevu = bud ? Number(bud.montant_prevu) : null;
+    const ecart = prevu !== null ? prevu - montant : null;
+    return `<tr>
+      <td style="padding:5px 10px;font-size:8.5pt;color:#0f172a;">${cat}</td>
+      <td style="padding:5px 10px;font-size:8.5pt;text-align:right;font-weight:600;color:#dc2626;">${fmt(montant)}</td>
+      <td style="padding:5px 10px;font-size:8pt;text-align:right;color:#94a3b8;">${prevu !== null ? fmt(prevu) : "—"}</td>
+      <td style="padding:5px 10px;font-size:8pt;text-align:right;color:${ecart === null ? "#94a3b8" : ecart >= 0 ? "#059669" : "#dc2626"};">
+        ${ecart === null ? "—" : (ecart >= 0 ? "+" : "−") + fmt(ecart)}
+      </td>
+    </tr>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rapport de Trésorerie ${annee} — FDD MBP</title>
+  <style>${MBP_STYLE}</style>
+  <style>
+    table { width:100%;border-collapse:collapse; }
+    thead th { background:#0a3d28;color:#fff;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px; }
+    thead th:not(:first-child) { text-align:right; }
+    tbody tr:nth-child(even) { background:#f8fafc; }
+    tbody tr:last-child td { border-top:2px solid #cbd5e1;font-weight:700; }
+    .section-title { font-family:'Cormorant Garamond',serif;font-size:11pt;font-weight:700;color:#0a3d28;margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid #e2e8f0; }
+    .stat-card { background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:12px 16px;text-align:center; }
+    .stat-card .val { font-family:'Cormorant Garamond',serif;font-size:18pt;font-weight:700;line-height:1; }
+    .stat-card .lbl { font-size:7pt;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-top:3px; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Rapport de Trésorerie ${annee}</div>
+        <div class="doc-ref">Réf. ${ref} · Généré le ${today()}</div>
+      </div>
+
+      <!-- Synthèse -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        <div class="stat-card">
+          <div class="val" style="color:#065f46;">${fmt(totalRec)}</div>
+          <div class="lbl">Total Recettes</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#dc2626;">${fmt(totalDep)}</div>
+          <div class="lbl">Total Dépenses</div>
+        </div>
+        <div class="stat-card" style="background:${solde >= 0 ? "#d1fae5" : "#fee2e2"};border-color:${solde >= 0 ? "#6ee7b7" : "#fca5a5"};">
+          <div class="val" style="color:${solde >= 0 ? "#065f46" : "#b91c1c"};">${solde >= 0 ? "+" : "−"}${fmt(solde)}</div>
+          <div class="lbl">Solde ${solde >= 0 ? "(Excédent)" : "(Déficit)"}</div>
+        </div>
+      </div>
+
+      <!-- Recettes par catégorie -->
+      <div class="section-title">Recettes par catégorie</div>
+      <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:12px;">
+        <table>
+          <thead><tr>
+            <th style="text-align:left;">Catégorie</th>
+            <th>Réalisé</th>
+            <th>Prévu</th>
+            <th>Écart</th>
+          </tr></thead>
+          <tbody>
+            ${lignesRecettes || '<tr><td colspan="4" style="padding:10px;color:#94a3b8;text-align:center;font-size:8pt;">Aucune recette enregistrée</td></tr>'}
+            <tr>
+              <td style="padding:6px 10px;font-size:8.5pt;font-weight:700;">Total</td>
+              <td style="padding:6px 10px;font-size:8.5pt;text-align:right;font-weight:700;color:#065f46;">${fmt(totalRec)}</td>
+              <td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Dépenses par catégorie -->
+      <div class="section-title">Dépenses par catégorie</div>
+      <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:12px;">
+        <table>
+          <thead><tr>
+            <th style="text-align:left;">Catégorie</th>
+            <th>Réalisé</th>
+            <th>Prévu</th>
+            <th>Écart</th>
+          </tr></thead>
+          <tbody>
+            ${lignesDepenses || '<tr><td colspan="4" style="padding:10px;color:#94a3b8;text-align:center;font-size:8pt;">Aucune dépense enregistrée</td></tr>'}
+            <tr>
+              <td style="padding:6px 10px;font-size:8.5pt;font-weight:700;">Total</td>
+              <td style="padding:6px 10px;font-size:8.5pt;text-align:right;font-weight:700;color:#dc2626;">${fmt(totalDep)}</td>
+              <td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Résultat final -->
+      <div style="background:linear-gradient(135deg,#0a3d28,#1a7a4e);border-radius:8px;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <p style="font-size:7.5pt;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Résultat de l'exercice ${annee}</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:22pt;font-weight:700;color:#e6b84a;line-height:1;">
+            ${solde >= 0 ? "+" : "−"}${fmt(solde)}
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <p style="font-size:7pt;color:rgba(255,255,255,0.55);margin-bottom:2px;">${recettes.length + depenses.length} opérations au total</p>
+          <p style="font-size:9pt;color:rgba(255,255,255,0.80);">${solde >= 0 ? "Excédent budgétaire" : "Déficit budgétaire"}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <div class="footer-text">
+        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right;">
+        Document interne — confidentiel<br/>
+        Généré le ${today()} · Réf. ${ref}
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  openDoc(html, `Rapport-Tresorerie-MBP-${annee}.html`);
+}
