@@ -48,7 +48,7 @@ export default function EspaceMembre() {
   const [loading,         setLoading]         = useState(true);
   const [editing,         setEditing]         = useState(false);
   const [profile,         setProfile]         = useState({
-    phone: "", city: "", country: "Togo", profession: "", linkedin: "", anneeObtention: "",
+    phone: "", city: "", country: "Togo", profession: "",
   });
   const [saving,          setSaving]          = useState(false);
   const [tab,             setTab]             = useState("profil");
@@ -71,25 +71,19 @@ export default function EspaceMembre() {
 
       const meta = u.user_metadata || {};
 
-      const { data: m, error: memberError } = await supabase
+      const { data: m } = await supabase
         .from("members")
-        .select("id, nom, telephone, ville, pays, profession, photo, linkedin, anneeObtention, bureau")
+        .select("id, nom, telephone, ville, pays, profession, photo, bureau")
         .eq("email", u.email)
         .maybeSingle();
-
-      console.log("[EspaceMembre] auth email:", u.email);
-      console.log("[EspaceMembre] member data:", m);
-      console.log("[EspaceMembre] member error:", memberError);
 
       setMember(m ?? null);
       setUser({ ...u, ...meta, full_name: meta.nom || meta.full_name || m?.nom || u.email });
       setProfile({
-        phone:           meta.phone          || m?.telephone      || "",
-        city:            meta.city           || m?.ville          || "",
-        country:         meta.country        || m?.pays           || "Togo",
-        profession:      meta.profession     || m?.profession     || "",
-        linkedin:        meta.linkedin       || m?.linkedin       || "",
-        anneeObtention:  meta.anneeObtention || m?.anneeObtention || "",
+        phone:      meta.phone      || m?.telephone || "",
+        city:       meta.city       || m?.ville     || "",
+        country:    meta.country    || m?.pays      || "Togo",
+        profession: meta.profession || m?.profession || "",
       });
 
       if (m?.id) {
@@ -163,12 +157,10 @@ export default function EspaceMembre() {
     // 2. Répercuter dans la table members (annuaire, dashboard, tout est synchronisé)
     if (member?.id) {
       await supabase.from("members").update({
-        telephone:      profile.phone,
-        ville:          profile.city,
-        pays:           profile.country,
-        profession:     profile.profession,
-        linkedin:       profile.linkedin,
-        anneeObtention: profile.anneeObtention,
+        telephone:  profile.phone,
+        ville:      profile.city,
+        pays:       profile.country,
+        profession: profile.profession,
       }).eq("id", member.id);
       setMember(p => ({ ...p, ...profile, telephone: profile.phone, ville: profile.city, pays: profile.country }));
     }
