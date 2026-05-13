@@ -379,12 +379,18 @@ export default function Navbar() {
                   <LayoutDashboard className="w-4 h-4" />
                 </button>
               )}
-              <div className="flex items-center gap-1 px-2 py-1.5 rounded-full text-[10px]"
+              <div className="flex items-center gap-1 rounded-full text-[10px]"
                 style={{ border: "1px solid rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.55)" }}>
-                <User className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="max-w-[70px] truncate">{session.nom.split(" ")[0]}</span>
+                <button
+                  onClick={() => navigate("/espace-membre")}
+                  title="Mon espace membre"
+                  className="flex items-center gap-1 pl-2 pr-1 py-1.5 hover:text-white transition-colors rounded-l-full"
+                >
+                  <User className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="max-w-[70px] truncate">{session.nom.split(" ")[0]}</span>
+                </button>
                 <button onClick={() => { logout(); navigate("/"); }} title="Se déconnecter"
-                  className="ml-0.5 hover:text-white transition-colors">
+                  className="pr-2 pl-1 py-1.5 hover:text-white transition-colors rounded-r-full">
                   <LogOut className="w-3 h-3" />
                 </button>
               </div>
@@ -457,13 +463,19 @@ export default function Navbar() {
             {session ? (
               <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#fecaca", background: "#fef2f2" }}>
                 <div className="flex items-center gap-3 px-4 py-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{session.nom}</p>
-                    <p className="text-xs text-muted-foreground">{isAdmin ? "Administrateur" : "Membre"}</p>
-                  </div>
+                  <button
+                    onClick={() => { setOpen(false); navigate("/espace-membre"); }}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    title="Mon espace membre"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{session.nom}</p>
+                      <p className="text-xs text-muted-foreground">{isAdmin ? "Administrateur" : "Membre"}</p>
+                    </div>
+                  </button>
                   <button
                     onClick={() => { setOpen(false); logout(); navigate("/"); }}
                     className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
