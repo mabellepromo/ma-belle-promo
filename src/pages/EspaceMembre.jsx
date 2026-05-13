@@ -260,6 +260,11 @@ export default function EspaceMembre() {
 
       <section className="py-12 max-w-5xl mx-auto px-6">
 
+        {/* DEBUG TEMPORAIRE — à supprimer */}
+        <div style={{ background: "#fef3c7", border: "2px solid #f59e0b", borderRadius: 8, padding: "8px 12px", marginBottom: 16, fontSize: 12, fontFamily: "monospace" }}>
+          <b>DEBUG:</b> member={JSON.stringify(member ? { id: member.id, photo: member.photo } : null)} | email={user?.email}
+        </div>
+
         {/* ── Carte identité ── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card border border-border rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-5">
