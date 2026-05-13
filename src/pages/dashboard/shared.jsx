@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+﻿import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { uploadImage, uploadVideo, uploadFile } from "../../lib/supabase";
 import { motion } from "framer-motion";
@@ -280,7 +280,7 @@ export function CrudHeader({ title, count, onAdd, seedBtn }) {
       <div className="flex items-center gap-2">
         {seedBtn && (
           <button onClick={seedBtn.onClick} disabled={seedBtn.loading}
-            className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
             {seedBtn.loading
               ? <><div className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /> Migration…</>
               : <>☁️ Migrer les données initiales</>}
@@ -366,7 +366,7 @@ export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDel
             <Edit2 className="w-3.5 h-3.5" /> Modifier
           </button>
           <button onClick={onDelete}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-500/15 transition-colors">
             <Trash2 className="w-3.5 h-3.5" /> Supprimer
           </button>
         </div>

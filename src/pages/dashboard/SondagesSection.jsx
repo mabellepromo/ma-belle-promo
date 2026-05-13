@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
@@ -104,7 +104,7 @@ function QuestionResults({ question, reponses }) {
         <p className="text-xs text-muted-foreground mb-1">{dates.length} réponse{dates.length !== 1 ? "s" : ""}</p>
         <div className="flex flex-wrap gap-1">
           {dates.map((d, i) => (
-            <span key={i} className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5">
+            <span key={i} className="text-xs bg-blue-500/15 text-blue-400 rounded-full px-2 py-0.5">
               {new Date(d).toLocaleDateString("fr-FR")}
             </span>
           ))}
@@ -204,10 +204,10 @@ function LogicBuilder({ q, onChange, sectionItems }) {
   return (
     <div className="mt-2 border-t border-dashed border-border pt-2">
       <button type="button" onClick={() => setOpen(!open)}
-        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasLogic ? "text-violet-600" : "text-muted-foreground hover:text-violet-600"}`}>
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${hasLogic ? "text-violet-400" : "text-muted-foreground hover:text-violet-400"}`}>
         <GitBranch className="w-3 h-3" />
         Logique conditionnelle
-        {hasLogic && <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-full">{q.logic.rules.length} règle{q.logic.rules.length !== 1 ? "s" : ""}</span>}
+        {hasLogic && <span className="px-1.5 py-0.5 bg-violet-500/15 text-violet-400 rounded-full">{q.logic.rules.length} règle{q.logic.rules.length !== 1 ? "s" : ""}</span>}
         <span className="ml-auto">{open ? "▲" : "▼"}</span>
       </button>
       {open && (
@@ -221,7 +221,7 @@ function LogicBuilder({ q, onChange, sectionItems }) {
                 <span className="text-xs text-foreground flex-1 truncate min-w-0">{opt}</span>
                 <select value={rule?.goto_section_id || ""}
                   onChange={e => setRule(i, e.target.value || null)}
-                  className="text-xs border border-border rounded-lg px-2 py-1 bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-violet-300">
+                  className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-violet-300">
                   <option value="">→ Section suivante</option>
                   {sectionItems.map(sec => (
                     <option key={sec._id} value={sec._id}>{sec.titre || "Section sans titre"}</option>
@@ -298,7 +298,7 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                 className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
                   q.type === t.value
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "border-border text-muted-foreground hover:border-primary hover:text-primary bg-white"
+                    : "border-border text-muted-foreground hover:border-primary hover:text-primary bg-card"
                 }`}>
                 {t.label}
               </button>
@@ -332,12 +332,12 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                     />
                     <button type="button" title="Image"
                       onClick={() => setShowImageInputs(p => ({ ...p, [i]: !p[i] }))}
-                      className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${q.options_images?.[i] ? "text-emerald-600 bg-emerald-50" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}>
+                      className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${q.options_images?.[i] ? "text-emerald-400 bg-emerald-500/15" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}>
                       <Image className="w-3 h-3" />
                     </button>
                     <button type="button" onClick={() => removeOpt(i)}
                       disabled={(q.options?.length || 0) <= 2}
-                      className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20">
+                      className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -372,8 +372,8 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                     onClick={() => onChange({ ...q, config: { ...q.config, validation: v.value || undefined } })}
                     className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
                       (q.config?.validation || "") === v.value
-                        ? "bg-indigo-100 text-indigo-700 border-indigo-300"
-                        : "border-border text-muted-foreground hover:border-indigo-300 bg-white"
+                        ? "bg-indigo-500/15 text-indigo-400 border-indigo-300"
+                        : "border-border text-muted-foreground hover:border-indigo-300 bg-card"
                     }`}>
                     {v.label}
                   </button>
@@ -384,24 +384,24 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
 
           {q.type === "ouinon" && (
             <div className="flex gap-2">
-              <span className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">Oui</span>
-              <span className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">Non</span>
+              <span className="text-xs px-3 py-1 bg-emerald-500/15 text-emerald-400 rounded-full font-medium">Oui</span>
+              <span className="text-xs px-3 py-1 bg-red-500/15 text-red-400 rounded-full font-medium">Non</span>
             </div>
           )}
           {q.type === "texte" && !q.config?.validation && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">Zone de texte libre…</div>
+            <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">Zone de texte libre…</div>
           )}
           {q.type === "texte" && q.config?.validation === "email" && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">ex@email.com</div>
+            <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">ex@email.com</div>
           )}
           {q.type === "texte" && q.config?.validation === "nombre" && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">0 — 9999</div>
+            <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">0 — 9999</div>
           )}
           {q.type === "texte" && q.config?.validation === "telephone" && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">+228 XX XX XX XX</div>
+            <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">+228 XX XX XX XX</div>
           )}
           {q.type === "date" && (
-            <div className="bg-white border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">📅 Sélection de date</div>
+            <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground italic">📅 Sélection de date</div>
           )}
           {q.type === "note" && (
             <div className="flex gap-1 items-center">
@@ -414,7 +414,7 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
         </div>
 
         <button type="button" onClick={onRemove} disabled={total <= 1}
-          className="w-7 h-7 mt-0.5 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20 flex-shrink-0">
+          className="w-7 h-7 mt-0.5 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 disabled:opacity-20 flex-shrink-0">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -433,7 +433,7 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
 // ── Constructeur de section ────────────────────────────────────────────────
 function SectionBuilder({ sec, onChangeSec, onRemoveSec }) {
   return (
-    <div className="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3">
+    <div className="flex items-center gap-2 bg-violet-500/15 border border-violet-500/25 rounded-xl px-4 py-3">
       <Columns className="w-4 h-4 text-violet-500 flex-shrink-0" />
       <input
         className="flex-1 text-sm font-semibold text-violet-800 bg-transparent border-none outline-none placeholder:text-violet-400"
@@ -442,13 +442,13 @@ function SectionBuilder({ sec, onChangeSec, onRemoveSec }) {
         placeholder="Titre de la section…"
       />
       <input
-        className="flex-1 text-xs text-violet-600 bg-transparent border-none outline-none placeholder:text-violet-400"
+        className="flex-1 text-xs text-violet-400 bg-transparent border-none outline-none placeholder:text-violet-400"
         value={sec.description || ""}
         onChange={e => onChangeSec({ ...sec, description: e.target.value })}
         placeholder="Description optionnelle…"
       />
       <button type="button" onClick={onRemoveSec}
-        className="w-6 h-6 rounded hover:bg-violet-100 flex items-center justify-center text-violet-400 hover:text-violet-600">
+        className="w-6 h-6 rounded hover:bg-violet-100 flex items-center justify-center text-violet-400 hover:text-violet-400">
         <X className="w-3 h-3" />
       </button>
     </div>
@@ -553,7 +553,7 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
           <div>
             <p className="font-semibold text-foreground text-sm">Envoyer des invitations</p>
@@ -579,7 +579,7 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
               </p>
               <div className="space-y-1.5">
                 {pendingInvitations.map(inv => (
-                  <div key={inv.id} className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
+                  <div key={inv.id} className="flex items-center gap-2 bg-amber-500/15 border border-amber-100 rounded-xl px-3 py-2">
                     <Clock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
                       {inv.nom && <p className="text-sm font-medium text-foreground truncate">{inv.nom}</p>}
@@ -658,7 +658,7 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
                           <p className="text-xs text-muted-foreground truncate">{e.email}</p>
                         </div>
                         <button onClick={() => setExtraEmails(p => p.filter((_, j) => j !== i))}
-                          className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                          className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                           <X className="w-3 h-3" />
                         </button>
                       </div>
@@ -832,7 +832,7 @@ export default function SondagesSection() {
       </div>
 
       {form && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <p className="font-semibold text-foreground text-sm">Nouveau sondage / formulaire</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
@@ -903,7 +903,7 @@ export default function SondagesSection() {
                 <button type="button" onClick={addQ} className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium">
                   <Plus className="w-4 h-4" /> Ajouter une question
                 </button>
-                <button type="button" onClick={addSectionBreak} className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 font-medium">
+                <button type="button" onClick={addSectionBreak} className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-400 font-medium">
                   <Columns className="w-4 h-4" /> Ajouter une section
                 </button>
               </div>
@@ -922,7 +922,7 @@ export default function SondagesSection() {
       {loading ? (
         <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
       ) : sondages.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-border rounded-2xl text-muted-foreground">
+        <div className="text-center py-20 bg-card border border-border rounded-2xl text-muted-foreground">
           <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-25" />
           <p className="font-medium">Aucun sondage pour l'instant.</p>
         </div>
@@ -934,17 +934,17 @@ export default function SondagesSection() {
             const res = results[s.id];
             const pendingInv = (res?.invitations || []).filter(i => !i.a_repondu);
             return (
-              <div key={s.id} className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+              <div key={s.id} className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
                 <div className="h-1 w-full" style={{ background: `linear-gradient(to right, ${theme.primary}, ${theme.accent})` }} />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.actif && !isExpired ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.actif && !isExpired ? "bg-emerald-500/15 text-emerald-400" : "bg-muted/60 text-muted-foreground"}`}>
                           {isExpired ? "Clôturé" : s.actif ? "En cours" : "Désactivé"}
                         </span>
                         <span className="text-xs text-muted-foreground">{s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}</span>
-                        {s.sections?.length > 0 && <span className="text-xs text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded-full">{s.sections.length} section{s.sections.length !== 1 ? "s" : ""}</span>}
+                        {s.sections?.length > 0 && <span className="text-xs text-violet-400 bg-violet-500/15 px-1.5 py-0.5 rounded-full">{s.sections.length} section{s.sections.length !== 1 ? "s" : ""}</span>}
                         {s.expires_at && <span className="text-xs text-muted-foreground">· Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}</span>}
                         <span className="w-2.5 h-2.5 rounded-full" style={{ background: theme.primary }} title={theme.label} />
                       </div>
@@ -953,11 +953,11 @@ export default function SondagesSection() {
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
                       <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv })} title="Envoyer invitations"
-                        className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center text-muted-foreground hover:text-blue-600 transition-colors">
+                        className="w-8 h-8 rounded-lg hover:bg-blue-500/15 flex items-center justify-center text-muted-foreground hover:text-blue-400 transition-colors">
                         <Send className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => exportCSV(s)} title="Exporter CSV"
-                        className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center text-muted-foreground hover:text-emerald-600 transition-colors">
+                        className="w-8 h-8 rounded-lg hover:bg-emerald-500/15 flex items-center justify-center text-muted-foreground hover:text-emerald-400 transition-colors">
                         <Download className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => copyLink(s.id)} title="Copier le lien"
@@ -965,7 +965,7 @@ export default function SondagesSection() {
                         <Link2 className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => toggleResults(s.id)} title="Résultats"
-                        className="w-8 h-8 rounded-lg hover:bg-indigo-50 flex items-center justify-center text-muted-foreground hover:text-indigo-600 transition-colors">
+                        className="w-8 h-8 rounded-lg hover:bg-indigo-500/15 flex items-center justify-center text-muted-foreground hover:text-indigo-400 transition-colors">
                         {expanded[s.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                       <button onClick={() => handleDuplicate(s)} title="Dupliquer"
@@ -973,11 +973,11 @@ export default function SondagesSection() {
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => toggleActif(s)} title={s.actif ? "Désactiver" : "Activer"}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-bold ${s.actif ? "hover:bg-amber-50 text-amber-500" : "hover:bg-emerald-50 text-muted-foreground hover:text-emerald-600"}`}>
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs font-bold ${s.actif ? "hover:bg-amber-500/15 text-amber-500" : "hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400"}`}>
                         {s.actif ? "⏸" : "▶"}
                       </button>
                       <button onClick={() => handleDelete(s)} title="Supprimer"
-                        className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                        className="w-8 h-8 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -1000,7 +1000,7 @@ export default function SondagesSection() {
                                 </p>
                                 {pendingInv.length > 0 && (
                                   <button onClick={() => setInviteModal({ sondage: s, pending: pendingInv })}
-                                    className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors flex items-center gap-1">
+                                    className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 hover:bg-amber-100 transition-colors flex items-center gap-1">
                                     <RefreshCw className="w-2.5 h-2.5" /> Relancer ({pendingInv.length})
                                   </button>
                                 )}
@@ -1011,7 +1011,7 @@ export default function SondagesSection() {
                           {res.invitations?.length > 0 && (
                             <div className="flex flex-wrap gap-1.5">
                               {res.invitations.map(inv => (
-                                <span key={inv.id} className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${inv.a_repondu ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                <span key={inv.id} className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${inv.a_repondu ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}`}>
                                   {inv.a_repondu ? <Check className="w-2.5 h-2.5" /> : <Clock className="w-2.5 h-2.5" />}
                                   {inv.nom || inv.email}
                                 </span>

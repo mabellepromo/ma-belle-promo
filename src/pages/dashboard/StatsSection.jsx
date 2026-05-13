@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { useMemberStore } from "@/lib/memberStore";
 import { useMultiYearCotisations } from "@/hooks/useMultiYearCotisations";
 import { useEvenements } from "@/hooks/useEvenements";
@@ -16,7 +16,7 @@ const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
 
 function ChartCard({ title, icon: Icon, children }) {
   return (
-    <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-border bg-muted/10 flex items-center gap-2">
         <Icon className="w-4 h-4 text-primary" />
         <p className="font-semibold text-sm text-foreground">{title}</p>
@@ -100,12 +100,12 @@ export default function StatsSection() {
       {/* KPI rapides */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Membres", value: total, icon: Users, color: "bg-emerald-50 text-emerald-600" },
-          { label: "Avec email", value: withEmail, icon: TrendingUp, color: "bg-blue-50 text-blue-600", sub: `${total > 0 ? Math.round(withEmail/total*100) : 0}%` },
-          { label: "Pays représentés", value: geoData.length, icon: Globe, color: "bg-violet-50 text-violet-600" },
-          { label: "Articles publiés", value: articles?.length || 0, icon: Banknote, color: "bg-amber-50 text-amber-600" },
+          { label: "Membres", value: total, icon: Users, color: "bg-emerald-500/15 text-emerald-400" },
+          { label: "Avec email", value: withEmail, icon: TrendingUp, color: "bg-blue-500/15 text-blue-400", sub: `${total > 0 ? Math.round(withEmail/total*100) : 0}%` },
+          { label: "Pays représentés", value: geoData.length, icon: Globe, color: "bg-violet-500/15 text-violet-400" },
+          { label: "Articles publiés", value: articles?.length || 0, icon: Banknote, color: "bg-amber-500/15 text-amber-400" },
         ].map(({ label, value, icon: Icon, color, sub }) => (
-          <div key={label} className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+          <div key={label} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>

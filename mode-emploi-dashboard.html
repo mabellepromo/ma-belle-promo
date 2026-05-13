@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mode d'emploi — Dashboard Ma Belle Promo</title>
+<style>
+  /* ── Typographie ── */
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --or:      #C9A84C;
+    --sombre:  #1A1F2E;
+    --texte:   #1A1F2E;
+    --gris:    #6B7280;
+    --fond:    #F9F8F6;
+    --vert:    #16A34A;
+    --rouge:   #DC2626;
+    --bleu:    #2563EB;
+  }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    font-size: 10.5pt;
+    color: var(--texte);
+    background: white;
+    line-height: 1.55;
+  }
+
+  /* ── COUVERTURE ── */
+  .cover {
+    page-break-after: always;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: var(--sombre);
+    color: white;
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .cover-logo {
+    width: 80px; height: 80px;
+    border: 3px solid var(--or);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin-bottom: 32px;
+  }
+  .cover h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36pt; font-weight: 700;
+    color: var(--or); margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .cover h2 {
+    font-family: 'Lato', sans-serif;
+    font-size: 14pt; font-weight: 300;
+    color: #CBD5E1; margin-bottom: 8px;
+  }
+  .cover .subtitle {
+    font-size: 11pt; color: #94A3B8; margin-bottom: 48px;
+  }
+  .cover .meta {
+    border-top: 1px solid #334155;
+    padding-top: 24px; width: 300px;
+    font-size: 9pt; color: #64748B;
+    line-height: 2;
+  }
+  .cover .meta strong { color: #94A3B8; }
+
+  /* ── TABLE DES MATIÈRES ── */
+  .toc {
+    page-break-after: always;
+    padding: 48px 60px;
+  }
+  .toc h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22pt; color: var(--sombre);
+    border-bottom: 2px solid var(--or);
+    padding-bottom: 8px; margin-bottom: 28px;
+  }
+  .toc-section { margin-bottom: 20px; }
+  .toc-section h3 {
+    font-size: 9pt; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--or); margin-bottom: 6px;
+  }
+  .toc-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    padding: 3px 0;
+    border-bottom: 1px dotted #D1D5DB;
+  }
+  .toc-row span:first-child { color: var(--texte); }
+  .toc-row span:last-child { color: var(--gris); font-size: 9.5pt; white-space: nowrap; margin-left: 8px; }
+
+  /* ── PAGES CONTENU ── */
+  .page {
+    padding: 44px 56px;
+    page-break-after: always;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ── EN-TÊTES SECTION ── */
+  .section-header {
+    display: flex; align-items: flex-start;
+    gap: 14px; margin-bottom: 24px;
+    border-bottom: 2px solid var(--or);
+    padding-bottom: 14px;
+  }
+  .section-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    border-radius: 10px; background: var(--sombre);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20pt; color: var(--sombre);
+    line-height: 1.1;
+  }
+  .section-header p {
+    font-size: 9.5pt; color: var(--gris); margin-top: 3px;
+  }
+
+  /* ── SOUS-SECTIONS ── */
+  h3 {
+    font-size: 12pt; font-weight: 700;
+    color: var(--sombre); margin: 20px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3::before {
+    content: '';
+    display: block; width: 4px; height: 16px;
+    background: var(--or); border-radius: 2px; flex-shrink: 0;
+  }
+  h4 {
+    font-size: 10.5pt; font-weight: 700;
+    color: var(--gris); margin: 14px 0 6px;
+    text-transform: uppercase; letter-spacing: 0.5px; font-size: 9pt;
+  }
+
+  p { margin-bottom: 8px; }
+
+  /* ── LISTES ÉTAPES ── */
+  .steps { list-style: none; margin: 8px 0 16px; }
+  .steps li {
+    display: flex; gap: 10px;
+    padding: 7px 10px 7px 0;
+    border-bottom: 1px solid #F1F5F9;
+    align-items: flex-start;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .step-num {
+    min-width: 22px; height: 22px;
+    background: var(--or); color: white;
+    border-radius: 50%; font-size: 9pt;
+    font-weight: 700; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .steps li span { line-height: 1.45; }
+
+  /* ── LISTES PUCES ── */
+  ul.bullets { list-style: none; margin: 6px 0 14px; padding-left: 4px; }
+  ul.bullets li { padding: 3px 0 3px 18px; position: relative; }
+  ul.bullets li::before {
+    content: '•'; color: var(--or);
+    position: absolute; left: 0; font-weight: 700;
+  }
+
+  /* ── TABLEAUX ── */
+  table {
+    width: 100%; border-collapse: collapse;
+    margin: 10px 0 18px; font-size: 9.5pt;
+  }
+  th {
+    background: var(--sombre); color: white;
+    padding: 8px 10px; text-align: left;
+    font-size: 9pt; font-weight: 700;
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #E5E7EB;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #F9FAFB; }
+  td strong { color: var(--sombre); }
+  td.req { color: var(--rouge); font-weight: 700; font-size: 8.5pt; }
+
+  /* ── BADGES / STATUTS ── */
+  .badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 12px; font-size: 8.5pt; font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-vert  { background: #DCFCE7; color: var(--vert); }
+  .badge-rouge { background: #FEE2E2; color: var(--rouge); }
+  .badge-bleu  { background: #DBEAFE; color: var(--bleu); }
+  .badge-or    { background: #FEF3C7; color: #92400E; }
+  .badge-gris  { background: #F3F4F6; color: var(--gris); }
+
+  /* ── BOÎTES INFO ── */
+  .info-box {
+    border-left: 4px solid var(--bleu);
+    background: #EFF6FF; padding: 10px 14px;
+    border-radius: 0 6px 6px 0; margin: 12px 0;
+    font-size: 9.5pt;
+  }
+  .info-box.warning {
+    border-color: #F59E0B; background: #FFFBEB;
+  }
+  .info-box.success {
+    border-color: var(--vert); background: #F0FDF4;
+  }
+  .info-box.danger {
+    border-color: var(--rouge); background: #FEF2F2;
+  }
+  .info-box strong { font-weight: 700; }
+
+  /* ── GRILLE MODULES ── */
+  .modules-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin: 14px 0;
+  }
+  .module-card {
+    border: 1px solid #E5E7EB; border-radius: 8px;
+    padding: 10px 12px; display: flex; gap: 10px;
+    align-items: flex-start;
+  }
+  .module-card .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .module-card h4 {
+    font-size: 10pt; font-weight: 700; color: var(--sombre);
+    text-transform: none; letter-spacing: 0; margin: 0 0 3px;
+  }
+  .module-card p { font-size: 8.5pt; color: var(--gris); margin: 0; }
+
+  /* ── RIB ── */
+  .rib-box {
+    background: var(--sombre); color: white;
+    border-radius: 10px; padding: 16px 20px; margin: 12px 0;
+    font-size: 9.5pt; line-height: 2;
+  }
+  .rib-box .rib-label { color: #94A3B8; font-size: 8.5pt; }
+  .rib-box .rib-val { font-family: monospace; color: var(--or); font-size: 10pt; }
+
+  /* ── PIE DE PAGE ── */
+  @media print {
+    body { font-size: 10pt; }
+    .cover { height: 100vh; }
+    .page { page-break-after: always; }
+    @page { margin: 15mm 18mm; size: A4; }
+  }
+
+  .footer {
+    border-top: 1px solid #E5E7EB;
+    margin-top: 32px; padding-top: 12px;
+    font-size: 8.5pt; color: #9CA3AF;
+    display: flex; justify-content: space-between;
+  }
+
+  /* ── RACCOURCIS CLAVIER ── */
+  kbd {
+    background: #F3F4F6; border: 1px solid #D1D5DB;
+    border-radius: 4px; padding: 1px 6px;
+    font-family: monospace; font-size: 9pt;
+  }
+
+  /* ── COLONNES ── */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .three-col {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ── TITRE PARTIEL ── */
+  .part-title {
+    page-break-before: always;
+    padding: 36px 56px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13pt; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 3px;
+    color: var(--or);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     COUVERTURE
+═══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo">⚖️</div>
+  <h1>Mode d'emploi</h1>
+  <h2>Tableau de bord administrateur</h2>
+  <p class="subtitle">Association FDD — Ma Belle Promo · Faculté de Droit, Université de Lomé · Promotion 1994–2000</p>
+  <div class="meta">
+    <div><strong>Version :</strong> Mai 2026</div>
+    <div><strong>Audience :</strong> Administrateur(s) du site</div>
+    <div><strong>URL :</strong> mabellepromo.vercel.app/dashboard</div>
+    <div><strong>Support :</strong> mamaneric@gmail.com</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TABLE DES MATIÈRES
+═══════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>Table des matières</h2>
+
+  <div class="toc-section">
+    <h3>Démarrage</h3>
+    <div class="toc-row"><span>1. Connexion et navigation</span><span>p. 3</span></div>
+    <div class="toc-row"><span>2. Vue d'ensemble (Dashboard)</span><span>p. 4</span></div>
+  </div>
+
+  <div class="toc-section">
+    <h3>Membres</h3>
+    <div class="toc-row"><span>3. Gestion des membres</span><span>p. 5</span></div>
+    <div class="toc-row"><span>4. Demandes d'adhésion (En attente)</span><span>p. 6</span></div>
+    <div class="toc-row"><span>5. Cotisations annuelles</span><span>p. 7</span></div>
+    <div class="toc-row"><span>6. Rapport annuel membres</span><span>p. 8</span></div>
+    <div class="toc-row"><span>7. Messages reçus</span><span>p. 9</span></div>
+    <div class="toc-row"><span>8. Accès membres</span><span>p. 9</span></div>
+  </div>
+
+  <div class="toc-section">
+    <h3>Contenu du site</h3>
+    <div class="toc-row"><span>9. Articles &amp; Actualités</span><span>p. 10</span></div>
+    <div class="toc-row"><span>10. Événements</span><span>p. 11</span></div>
+    <div class="toc-row"><span>11. Projets &amp; Réalisations</span><span>p. 12</span></div>
+    <div class="toc-row"><span>12. Programmes</span><span>p. 12</span></div>
+    <div class="toc-row"><span>13. Communiqués</span><span>p. 13</span></div>
+    <div class="toc-row"><span>14. Sondages</span><span>p. 14</span></div>
+  </div>
+
+  <div class="toc-section">
+    <h3>Médias &amp; Documents</h3>
+    <div class="toc-row"><span>15. Galeries photos</span><span>p. 16</span></div>
+    <div class="toc-row"><span>16. Médiathèque</span><span>p. 16</span></div>
+    <div class="toc-row"><span>17. Documents officiels</span><span>p. 17</span></div>
+    <div class="toc-row"><span>18. Ressources</span><span>p. 17</span></div>
+  </div>
+
+  <div class="toc-section">
+    <h3>Organisation</h3>
+    <div class="toc-row"><span>19. Équipe / Bureau</span><span>p. 18</span></div>
+    <div class="toc-row"><span>20. Partenaires &amp; Sponsors</span><span>p. 18</span></div>
+    <div class="toc-row"><span>21. Trésorerie</span><span>p. 19</span></div>
+    <div class="toc-row"><span>22. Assemblées Générales</span><span>p. 21</span></div>
+    <div class="toc-row"><span>23. Élections</span><span>p. 23</span></div>
+    <div class="toc-row"><span>24. Mandats</span><span>p. 24</span></div>
+  </div>
+
+  <div class="toc-section">
+    <h3>Communication &amp; Statistiques</h3>
+    <div class="toc-row"><span>25. Circulaire (envoi massif)</span><span>p. 25</span></div>
+    <div class="toc-row"><span>26. Statistiques</span><span>p. 25</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 1 — CONNEXION
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🔑</div>
+    <div>
+      <h2>1. Connexion et navigation</h2>
+      <p>Accéder au tableau de bord et s'y repérer</p>
+    </div>
+  </div>
+
+  <h3>Se connecter</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Rendez-vous sur <strong>mabellepromo.vercel.app/dashboard</strong></span></li>
+    <li><div class="step-num">2</div><span>Entrez votre adresse <strong>email administrateur</strong> et votre <strong>mot de passe</strong></span></li>
+    <li><div class="step-num">3</div><span>Cliquez sur <strong>Se connecter</strong>. En cas d'erreur, le message est affiché sous le formulaire.</span></li>
+    <li><div class="step-num">4</div><span>La session reste active tant que vous ne vous déconnectez pas (cookie Supabase sécurisé).</span></li>
+  </ol>
+
+  <div class="info-box warning">
+    <strong>Accès restreint :</strong> Seuls les comptes ayant le rôle <strong>admin</strong> voient le tableau de bord. Les autres reçoivent un écran « Accès refusé ». Pour accorder l'accès à un nouvel admin, contacter le responsable technique.
+  </div>
+
+  <h3>Se déconnecter</h3>
+  <p>Cliquez sur votre avatar en haut à droite → <strong>Se déconnecter</strong>. Votre session locale est effacée.</p>
+
+  <h3>Navigation — les 6 groupes</h3>
+  <p>La barre latérale gauche est organisée en <strong>6 groupes</strong> :</p>
+
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="icon">🏠</div>
+      <div><h4>Vue d'ensemble</h4><p>Statistiques, alertes, agenda, anniversaires, widgets financiers</p></div>
+    </div>
+    <div class="module-card">
+      <div class="icon">👥</div>
+      <div><h4>Membres</h4><p>Membres, Cotisations, Rapport, En attente, Messages, Accès</p></div>
+    </div>
+    <div class="module-card">
+      <div class="icon">📝</div>
+      <div><h4>Contenu</h4><p>Articles, Événements, Projets, Programmes, Communiqués, Sondages</p></div>
+    </div>
+    <div class="module-card">
+      <div class="icon">🖼️</div>
+      <div><h4>Médias</h4><p>Galeries, Médiathèque, Documents, Ressources</p></div>
+    </div>
+    <div class="module-card">
+      <div class="icon">🏛️</div>
+      <div><h4>Organisation</h4><p>Équipe, Partenaires, Trésorerie, Assemblées, Élections, Mandats</p></div>
+    </div>
+    <div class="module-card">
+      <div class="icon">📡</div>
+      <div><h4>Communication</h4><p>Circulaire (emails groupés), Statistiques</p></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 2 — VUE D'ENSEMBLE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🏠</div>
+    <div>
+      <h2>2. Vue d'ensemble</h2>
+      <p>Tableau de bord centralisé avec indicateurs clés</p>
+    </div>
+  </div>
+
+  <h3>Indicateurs du haut de page</h3>
+  <table>
+    <tr><th>Indicateur</th><th>Ce qu'il mesure</th></tr>
+    <tr><td><strong>Membres</strong></td><td>Nombre total de membres validés dans la base</td></tr>
+    <tr><td><strong>En attente</strong></td><td>Demandes d'adhésion non encore traitées</td></tr>
+    <tr><td><strong>Articles</strong></td><td>Nombre d'articles publiés sur le site</td></tr>
+    <tr><td><strong>Événements</strong></td><td>Événements à venir ou en cours</td></tr>
+  </table>
+
+  <h3>Alertes automatiques</h3>
+  <ul class="bullets">
+    <li><strong>Demandes de validation</strong> — affiche le nombre de candidats en attente de votre approbation. Cliquez pour y accéder directement.</li>
+    <li><strong>Membres dormants</strong> — membres sans cotisation ni activité depuis plus d'un an.</li>
+  </ul>
+
+  <h3>Widgets latéraux</h3>
+  <ul class="bullets">
+    <li><strong>Cotisations</strong> — taux de collecte de l'année en cours (Payés / Total)</li>
+    <li><strong>Prochain événement</strong> — titre, date, lieu du premier événement à venir</li>
+    <li><strong>Trésorerie</strong> — solde recettes moins dépenses de l'exercice</li>
+    <li><strong>Prochaine AG</strong> — date et lieu de la prochaine Assemblée Générale planifiée</li>
+  </ul>
+
+  <h3>Agenda combiné</h3>
+  <p>Fusion des événements programmés et des anniversaires du mois dans une vue calendrier unique.</p>
+
+  <h3>Anniversaires (30 jours glissants)</h3>
+  <p>Liste des membres fêtant leur anniversaire dans les 30 prochains jours, avec bouton de contact direct.</p>
+
+  <h3>Répartition géographique</h3>
+  <p>Diagramme de répartition des membres par ville et par pays (Togo, France, Autre).</p>
+
+  <h3>Infos de session &amp; Sauvegarde</h3>
+  <ul class="bullets">
+    <li>Affiche votre email, votre rôle et l'heure de connexion</li>
+    <li>Bouton <strong>Backup</strong> pour exporter une sauvegarde JSON de la base de données</li>
+  </ul>
+
+  <div class="info-box success">
+    <strong>Astuce :</strong> La vue d'ensemble est la page de démarrage par défaut. Elle vous donne une vision instantanée de l'état de l'association sans devoir naviguer dans chaque section.
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 3 — MEMBRES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">👥</div>
+    <div>
+      <h2>3. Gestion des membres</h2>
+      <p>Ajouter, modifier, exporter, générer des attestations</p>
+    </div>
+  </div>
+
+  <h3>Recherche et filtres</h3>
+  <p>La barre de recherche filtre en temps réel sur le nom, la profession, la ville et le pays (accents ignorés). Le compteur en haut indique le nombre de membres affichés.</p>
+
+  <h3>Ajouter un membre manuellement</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Ajouter</strong> (en haut à droite).</span></li>
+    <li><div class="step-num">2</div><span>Remplissez les champs du formulaire (voir tableau ci-dessous).</span></li>
+    <li><div class="step-num">3</div><span>Cliquez sur <strong>Enregistrer</strong>.</span></li>
+  </ol>
+
+  <h3>Champs du formulaire membre</h3>
+  <table>
+    <tr><th>Champ</th><th>Obligatoire ?</th><th>Description</th></tr>
+    <tr><td><strong>Nom complet</strong></td><td class="req">OUI</td><td>Prénom suivi du NOM</td></tr>
+    <tr><td>Profession</td><td>Non</td><td>Métier ou fonction actuelle</td></tr>
+    <tr><td>Ville / Pays</td><td>Non</td><td>Lieu de résidence</td></tr>
+    <tr><td>Email</td><td>Non</td><td>Indispensable pour les relances cotisations et les circulaires</td></tr>
+    <tr><td>Téléphone</td><td>Non</td><td>Numéro de contact</td></tr>
+    <tr><td>Année diplôme</td><td>Non</td><td>Ex. : 2000 (promotion)</td></tr>
+    <tr><td>LinkedIn</td><td>Non</td><td>URL profil LinkedIn</td></tr>
+    <tr><td>Photo</td><td>Non</td><td>URL ou bouton d'upload (JPG, PNG, WebP)</td></tr>
+    <tr><td>Anniversaire</td><td>Non</td><td>Format : « 15 janvier » (sans l'année)</td></tr>
+    <tr><td>Notes internes</td><td>Non</td><td>Visibles uniquement par les admins</td></tr>
+  </table>
+
+  <h3>Modifier un membre</h3>
+  <p>Cliquez sur l'icône <strong>✏️ Modifier</strong> à droite d'un membre. Le même formulaire s'ouvre pré-rempli. Modifiez et enregistrez.</p>
+
+  <h3>Supprimer un membre</h3>
+  <p>Cliquez sur l'icône <strong>🗑️ Supprimer</strong>. Une confirmation est demandée avant suppression définitive.</p>
+
+  <h3>Voir la fiche détail</h3>
+  <p>Cliquez sur le nom ou la photo d'un membre pour ouvrir le panneau latéral avec : coordonnées complètes, historique cotisations (3 dernières années), notes internes.</p>
+
+  <h3>Actions de masse</h3>
+  <table>
+    <tr><th>Action</th><th>Résultat</th></tr>
+    <tr><td><strong>Importer CSV</strong></td><td>Importe une liste de membres depuis un fichier CSV (colonnes : nom, email, profession, ville, pays, anneeObtention)</td></tr>
+    <tr><td><strong>Exporter Excel</strong></td><td>Télécharge tous les membres filtrés au format XLSX</td></tr>
+    <tr><td><strong>Trombinoscope PDF</strong></td><td>Génère un PDF avec la photo et le nom de chaque membre</td></tr>
+    <tr><td><strong>Renouveler attestations</strong></td><td>Régénère les attestations de tous les membres avec une nouvelle date de validité</td></tr>
+  </table>
+
+  <h3>Générer une attestation individuelle</h3>
+  <p>Dans la fiche détail d'un membre, cliquez sur <strong>Générer Attestation</strong>. Un PDF officiel (A4) est téléchargé avec les informations du membre et le tampon de l'association.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 4 — EN ATTENTE + MESSAGES + ACCÈS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">📬</div>
+    <div>
+      <h2>4. Demandes d'adhésion — En attente</h2>
+      <p>Valider ou rejeter les candidatures reçues</p>
+    </div>
+  </div>
+
+  <p>Quand un visiteur soumet une demande d'adhésion via le site public, elle apparaît ici. Un badge numérique sur l'onglet indique le nombre de demandes non traitées.</p>
+
+  <h3>Traiter une demande</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Lisez la fiche : photo, nom, profession, ville/pays, email, téléphone, promotion, motivations.</span></li>
+    <li><div class="step-num">2</div><span>Cliquez sur <span class="badge badge-vert">✓ Valider</span> pour intégrer la personne comme membre. Elle passe directement dans la liste des membres.</span></li>
+    <li><div class="step-num">3</div><span>Ou cliquez sur <span class="badge badge-rouge">✕ Rejeter</span> pour refuser la demande. Elle est supprimée de la liste.</span></li>
+  </ol>
+
+  <div class="info-box warning">
+    <strong>Attention :</strong> La validation est définitive. En cas d'erreur, vous pouvez toujours supprimer le membre via l'onglet Membres.
+  </div>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">💬</div>
+    <div>
+      <h2>7. Messages reçus</h2>
+      <p>Boîte de réception des contacts et messages internes</p>
+    </div>
+  </div>
+
+  <p>Reçoit les messages envoyés via le formulaire de contact du site public, ainsi que les messages internes entre membres.</p>
+
+  <table>
+    <tr><th>Action</th><th>Comment faire</th></tr>
+    <tr><td>Lire un message</td><td>Cliquez sur la ligne — le détail s'affiche. Le message est marqué « lu ».</td></tr>
+    <tr><td>Répondre</td><td>Bouton <strong>Répondre</strong> dans le détail. Ouvre un éditeur avec l'email pré-renseigné.</td></tr>
+    <tr><td>Supprimer</td><td>Icône corbeille sur la ligne, confirmation requise.</td></tr>
+    <tr><td>Composer</td><td>Bouton <strong>Composer</strong> (toujours visible). Choisissez un destinataire parmi les membres.</td></tr>
+  </table>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">🔐</div>
+    <div>
+      <h2>8. Accès membres</h2>
+      <p>Définir qui peut voir quoi dans l'espace membre</p>
+    </div>
+  </div>
+
+  <p>Pour chaque ressource (Annuaire, Médiathèque, Documents), choisissez le niveau d'accès :</p>
+
+  <table>
+    <tr><th>Niveau</th><th>Qui peut accéder</th></tr>
+    <tr><td><span class="badge badge-vert">Publique</span></td><td>Tout visiteur du site (sans connexion)</td></tr>
+    <tr><td><span class="badge badge-bleu">Membres validés</span></td><td>Tout membre ayant un compte actif</td></tr>
+    <tr><td><span class="badge badge-or">Bureau</span></td><td>Membres ayant le statut Bureau uniquement</td></tr>
+    <tr><td><span class="badge badge-gris">Désactivé</span></td><td>Section masquée pour tous (sauf admins)</td></tr>
+  </table>
+
+  <p>Cliquez sur <strong>Enregistrer</strong> après chaque modification.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 5 — COTISATIONS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">💰</div>
+    <div>
+      <h2>5. Cotisations annuelles</h2>
+      <p>Suivi des paiements par membre et par année</p>
+    </div>
+  </div>
+
+  <h3>Les trois vues</h3>
+
+  <div class="three-col" style="margin-bottom: 16px;">
+    <div class="module-card">
+      <div><h4 style="margin:0 0 3px">Par année</h4><p>Tableau détaillé d'une année, filtrable par statut</p></div>
+    </div>
+    <div class="module-card">
+      <div><h4 style="margin:0 0 3px">Historique</h4><p>Grille des 5 dernières années par membre</p></div>
+    </div>
+    <div class="module-card">
+      <div><h4 style="margin:0 0 3px">Évolution</h4><p>Graphique et taux de collecte annuel</p></div>
+    </div>
+  </div>
+
+  <h3>Enregistrer un paiement</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Sélectionnez l'<strong>année</strong> en haut à gauche.</span></li>
+    <li><div class="step-num">2</div><span>Trouvez le membre (barre de recherche) et cliquez sur sa ligne pour ouvrir le détail.</span></li>
+    <li><div class="step-num">3</div><span>Cliquez sur <strong>+ Ajouter un versement</strong>.</span></li>
+    <li><div class="step-num">4</div><span>Renseignez : <strong>Date</strong>, <strong>Montant</strong> (FCFA), <strong>Mode</strong> (Virement / Mobile Money / Orange Money / Espèces / Autre).</span></li>
+    <li><div class="step-num">5</div><span>Le statut se met à jour automatiquement : <span class="badge badge-vert">Payé</span> si montant complet, <span class="badge badge-or">Partiel</span> sinon.</span></li>
+  </ol>
+
+  <h3>Statuts de cotisation</h3>
+  <table>
+    <tr><th>Statut</th><th>Signification</th><th>Comment l'attribuer</th></tr>
+    <tr><td><span class="badge badge-vert">Payé</span></td><td>Montant intégral reçu</td><td>Automatique via versement(s) ou bouton « Marquer payé »</td></tr>
+    <tr><td><span class="badge badge-or">Partiel</span></td><td>Acompte reçu, solde en attente</td><td>Automatique si versement inférieur au montant attendu</td></tr>
+    <tr><td><span class="badge badge-rouge">En attente</span></td><td>Aucun paiement reçu</td><td>Statut par défaut en début d'année</td></tr>
+    <tr><td><span class="badge badge-gris">Exempté</span></td><td>Membre dispensé (cas particulier)</td><td>Bouton « Exempter » sur la ligne du membre</td></tr>
+  </table>
+
+  <h3>Relancer un membre défaillant</h3>
+  <p>Sur la ligne d'un membre dont le statut est <span class="badge badge-rouge">En attente</span> ou <span class="badge badge-or">Partiel</span>, cliquez sur <strong>✉ Relancer</strong>. Un email de rappel est envoyé à son adresse enregistrée.</p>
+
+  <div class="info-box">
+    <strong>Synchronisation automatique :</strong> Toute cotisation marquée <strong>Payée</strong> génère automatiquement une recette dans le module <strong>Trésorerie</strong> (catégorie « Cotisations »). Pas de double saisie nécessaire.
+  </div>
+
+  <h3>Générer un reçu de cotisation</h3>
+  <p>Sur la ligne d'un membre Payé ou Partiel, cliquez sur <strong>Reçu PDF</strong>. Un document A4 officiel est téléchargé avec : nom du membre, année, montant versé, mode de paiement, date.</p>
+
+  <h3>Coordonnées bancaires de l'association</h3>
+  <div class="rib-box">
+    <div><span class="rib-label">Titulaire :</span> <span style="color:white">ASSOCIATION MA BELLE PROMO MBP</span></div>
+    <div><span class="rib-label">IBAN :</span> <span class="rib-val">TG53 TG05 5017 1014 1766 3880 0153</span></div>
+    <div><span class="rib-label">BIC/SWIFT :</span> <span class="rib-val">ECOCTGTGXXX</span></div>
+  </div>
+
+  <h3>Exporter la liste</h3>
+  <p>Bouton <strong>Exporter CSV</strong> en haut de la vue « Par année » : télécharge la liste complète avec statuts et montants pour l'année sélectionnée.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 6 — ARTICLES & ACTUALITÉS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">📰</div>
+    <div>
+      <h2>9. Articles &amp; Actualités</h2>
+      <p>Publier et gérer le contenu éditorial du site</p>
+    </div>
+  </div>
+
+  <h3>Liste des articles</h3>
+  <p>Les onglets <span class="badge badge-gris">Tous</span> / <span class="badge badge-vert">Publiés</span> / <span class="badge badge-or">Brouillons</span> filtrent la liste. Chaque article affiche son image, son titre, sa date, sa catégorie et ses tags.</p>
+
+  <h3>Créer un article</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Ajouter</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Remplissez les champs (tableau ci-dessous).</span></li>
+    <li><div class="step-num">3</div><span>Choisissez le statut : <strong>Publié</strong> (visible sur le site) ou <strong>Brouillon</strong> (masqué).</span></li>
+    <li><div class="step-num">4</div><span>Cliquez sur <strong>Enregistrer</strong>.</span></li>
+  </ol>
+
+  <table>
+    <tr><th>Champ</th><th>Requis</th><th>Description</th></tr>
+    <tr><td><strong>Titre</strong></td><td class="req">OUI</td><td>Titre affiché sur le site</td></tr>
+    <tr><td><strong>Date de publication</strong></td><td class="req">OUI</td><td>Format ISO (le formulaire affiche un datepicker)</td></tr>
+    <tr><td><strong>Extrait</strong></td><td class="req">OUI</td><td>Résumé de 1 à 2 phrases (affiché sur la liste)</td></tr>
+    <tr><td>Catégorie</td><td>Non</td><td>Webinaire, Conférence, Gala, Solidarité, Événement, Juridique, Association, Partenariat, Histoire, Hommage, Médias, Prix</td></tr>
+    <tr><td>Auteur</td><td>Non</td><td>Nom de l'auteur de l'article</td></tr>
+    <tr><td>Tags</td><td>Non</td><td>Mots-clés séparés par des virgules</td></tr>
+    <tr><td>Image principale</td><td>Non</td><td>URL ou upload — cochez « cadrer depuis le haut » si besoin</td></tr>
+    <tr><td>Galerie photos</td><td>Non</td><td>Glisser-déposer plusieurs photos</td></tr>
+    <tr><td>Vidéos</td><td>Non</td><td>URL YouTube/Vimeo ou fichier MP4</td></tr>
+    <tr><td>Contenu</td><td>Non</td><td>Éditeur riche (gras, italique, listes, liens…)</td></tr>
+    <tr><td>Statut</td><td>—</td><td>Publié / Brouillon</td></tr>
+  </table>
+
+  <h3>Voir l'article en ligne</h3>
+  <p>Cliquez sur le bouton <strong>Voir ↗</strong> sur la ligne d'un article publié pour l'ouvrir dans un nouvel onglet.</p>
+
+  <div class="info-box">
+    <strong>Brouillons :</strong> Un article en mode Brouillon est invisible sur le site public mais accessible dans le dashboard. Utile pour préparer un contenu à l'avance.
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 7 — ÉVÉNEMENTS + PROJETS + PROGRAMMES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">📅</div>
+    <div>
+      <h2>10. Événements</h2>
+      <p>Agenda des manifestations de l'association</p>
+    </div>
+  </div>
+
+  <h3>Créer un événement</h3>
+  <table>
+    <tr><th>Champ</th><th>Requis</th><th>Description</th></tr>
+    <tr><td><strong>Titre</strong></td><td class="req">OUI</td><td>Nom de l'événement</td></tr>
+    <tr><td><strong>Date</strong></td><td class="req">OUI</td><td>Ex. : « 18 Novembre 2025 »</td></tr>
+    <tr><td>Heure</td><td>Non</td><td>Ex. : « 18h00 »</td></tr>
+    <tr><td><strong>Lieu</strong></td><td class="req">OUI</td><td>Adresse ou nom de la salle</td></tr>
+    <tr><td>Type</td><td>Non</td><td>Webinaire / Conférence / Gala / Projet éditorial / Autre</td></tr>
+    <tr><td>Statut</td><td>Non</td><td><span class="badge badge-bleu">À venir</span> <span class="badge badge-vert">En cours</span> <span class="badge badge-gris">Passé</span></td></tr>
+    <tr><td><strong>Description</strong></td><td class="req">OUI</td><td>Détails de l'événement</td></tr>
+    <tr><td>Image</td><td>Non</td><td>URL ou upload</td></tr>
+  </table>
+
+  <h3>Voir les inscrits</h3>
+  <p>Cliquez sur le compteur d'inscrits (ex. : <strong>12 inscrits</strong>) sur la carte d'un événement. Une fenêtre s'ouvre avec la liste : photo, nom, email, date d'inscription.</p>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">🏗️</div>
+    <div>
+      <h2>11. Projets &amp; Réalisations</h2>
+      <p>Présenter les actions concrètes de l'association</p>
+    </div>
+  </div>
+
+  <h3>Champs principaux</h3>
+  <ul class="bullets">
+    <li><strong>Titre</strong> (requis) — Catégorie : Solidarité / Éducation / Santé publique / Autre</li>
+    <li><strong>Extrait</strong> — Accroche courte pour la liste publique</li>
+    <li><strong>Description + Contenu</strong> — La description est l'intro courte ; le contenu est le texte complet de la page détail (éditeur riche)</li>
+    <li><strong>Image principale + Galerie + Vidéos</strong> — même logique que les articles</li>
+  </ul>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📋</div>
+    <div>
+      <h2>12. Programmes</h2>
+      <p>Axes stratégiques et initiatives de l'association</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Champ</th><th>Description</th></tr>
+    <tr><td><strong>Titre</strong></td><td>Nom du programme (requis)</td></tr>
+    <tr><td>Statut</td><td>Actif / En cours / En gestation / Terminé</td></tr>
+    <tr><td>Description</td><td>Texte libre de présentation (requis)</td></tr>
+    <tr><td>Lien</td><td>URL interne optionnelle, ex. : /activites/projets</td></tr>
+  </table>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 8 — COMMUNIQUÉS + SONDAGES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">📢</div>
+    <div>
+      <h2>13. Communiqués</h2>
+      <p>Déclarations officielles et communiqués de presse</p>
+    </div>
+  </div>
+
+  <p>Même logique que les articles. Champs : Titre (requis), Date, Contenu (éditeur riche), Image illustration, Statut (Publié / Brouillon).</p>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div>
+      <h2>14. Sondages</h2>
+      <p>Créer des sondages multi-sections avec logique conditionnelle</p>
+    </div>
+  </div>
+
+  <h3>Créer un sondage</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Nouveau sondage</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Renseignez le titre, la description et les instructions pour les répondants.</span></li>
+    <li><div class="step-num">3</div><span>Choisissez un <strong>thème</strong> : MBP (doré), Togo, Nature, Minimalist, Bold, Pastel.</span></li>
+    <li><div class="step-num">4</div><span>Ajoutez des <strong>sections</strong> (pages du sondage) et des <strong>questions</strong> dans chaque section.</span></li>
+    <li><div class="step-num">5</div><span>Activez le sondage avec le toggle <strong>Actif</strong> pour le rendre accessible en ligne.</span></li>
+  </ol>
+
+  <h3>Types de questions disponibles</h3>
+  <table>
+    <tr><th>Type</th><th>Utilisation</th></tr>
+    <tr><td>Choix unique</td><td>Une seule réponse parmi plusieurs options (boutons radio)</td></tr>
+    <tr><td>Choix multiple</td><td>Plusieurs réponses possibles (cases à cocher)</td></tr>
+    <tr><td>Liste déroulante</td><td>Choix unique dans un menu déroulant (pratique si beaucoup d'options)</td></tr>
+    <tr><td>Oui / Non</td><td>Réponse binaire — deux boutons</td></tr>
+    <tr><td>Texte libre</td><td>Zone de saisie libre (avec validation optionnelle : email, nombre, téléphone)</td></tr>
+    <tr><td>Date</td><td>Sélecteur de date</td></tr>
+    <tr><td>Note /5</td><td>Évaluation par étoiles (1 à 5)</td></tr>
+  </table>
+
+  <h3>Logique conditionnelle</h3>
+  <p>Pour une question de type Choix unique ou Oui/Non, vous pouvez définir des <strong>branchements</strong> : selon la réponse choisie, le sondage saute à une section spécifique ou se termine prématurément.</p>
+
+  <h3>Consulter les résultats</h3>
+  <p>Dans la liste des sondages, cliquez sur <strong>Voir les résultats</strong>. Pour chaque question, un graphique en barres affiche la répartition des réponses avec pourcentages et nombres bruts.</p>
+
+  <h3>Invitations et export</h3>
+  <ul class="bullets">
+    <li><strong>Copier le lien</strong> — lien partageable à envoyer par WhatsApp, email, etc.</li>
+    <li><strong>Invitations email</strong> — importez un CSV d'emails ou saisissez-les manuellement, puis envoyez les invitations groupées</li>
+    <li><strong>Export CSV</strong> — télécharge toutes les réponses avec colonnes : date, nom, email, réponse par question</li>
+  </ul>
+
+  <h3>Toggle anonyme</h3>
+  <p>Activez <strong>Réponses anonymes</strong> pour ne pas collecter le nom et l'email des répondants.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 9 — MÉDIAS & DOCUMENTS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🖼️</div>
+    <div>
+      <h2>15. Galeries photos</h2>
+      <p>Albums photos des événements et activités</p>
+    </div>
+  </div>
+
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Nouvelle galerie</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Donnez un <strong>titre</strong>, une <strong>description</strong> et une <strong>date</strong>.</span></li>
+    <li><div class="step-num">3</div><span><strong>Glissez-déposez</strong> vos photos ou cliquez sur la zone d'upload. Plusieurs photos simultanément acceptées.</span></li>
+    <li><div class="step-num">4</div><span>Réordonnez les photos par glisser-déposer. Supprimez individuellement avec l'icône ✕.</span></li>
+    <li><div class="step-num">5</div><span>Choisissez <strong>Publié</strong> ou <strong>Brouillon</strong>, puis enregistrez.</span></li>
+  </ol>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">🎬</div>
+    <div>
+      <h2>16. Médiathèque</h2>
+      <p>Bibliothèque centrale de vidéos et photos</p>
+    </div>
+  </div>
+
+  <p>Stockage et catégorisation de médias indépendants des articles. Champs : titre, description, type (Vidéo / Photo), fichier, catégorie(s), tags, statut (Publié / Privé).</p>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📄</div>
+    <div>
+      <h2>17. Documents officiels</h2>
+      <p>Statuts, procédures, rapports, formulaires</p>
+    </div>
+  </div>
+
+  <h3>Ajouter un document</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Ajouter</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Renseignez le <strong>titre</strong> (requis) et la <strong>description</strong>.</span></li>
+    <li><div class="step-num">3</div><span>Uploadez le fichier (.pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .odt, .ods).</span></li>
+    <li><div class="step-num">4</div><span>Choisissez la <strong>catégorie</strong> : Statuts / Procédures / Protocoles / Formulaires / Rapports / Autres.</span></li>
+    <li><div class="step-num">5</div><span>Définissez l'<strong>accès</strong> : Publique / Membres / Admin seulement.</span></li>
+  </ol>
+
+  <div class="info-box warning">
+    <strong>Affichage des documents :</strong> Les documents s'ouvrent dans une visionneuse intégrée au site (jamais dans un nouvel onglet brut). Cela garantit une expérience uniforme et une protection des fichiers.
+  </div>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">🔗</div>
+    <div>
+      <h2>18. Ressources</h2>
+      <p>Liens utiles pour les membres</p>
+    </div>
+  </div>
+
+  <p>Liste de liens externes annotés. Champs : titre, description, URL (requis), catégorie, icône emoji. Les ressources apparaissent dans l'espace membre.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 10 — ÉQUIPE + PARTENAIRES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🏛️</div>
+    <div>
+      <h2>19. Équipe / Bureau</h2>
+      <p>Membres du bureau et personnes clés de l'association</p>
+    </div>
+  </div>
+
+  <p>Cette section alimente la page publique <strong>« Notre Équipe »</strong> avec les portraits et fonctions des membres du bureau.</p>
+
+  <table>
+    <tr><th>Champ</th><th>Description</th></tr>
+    <tr><td>Nom complet</td><td>Prénom et Nom</td></tr>
+    <tr><td>Poste</td><td>Ex. : Présidente, Trésorier, Secrétaire générale…</td></tr>
+    <tr><td>Biographie</td><td>Présentation courte (2-3 lignes)</td></tr>
+    <tr><td>Photo</td><td>URL ou upload (privilégier photos avec visage visible)</td></tr>
+    <tr><td>Email</td><td>Email de contact (optionnel — peut ne pas être affiché)</td></tr>
+    <tr><td>LinkedIn</td><td>URL profil LinkedIn</td></tr>
+  </table>
+
+  <div class="info-box">
+    <strong>Différence Équipe / Membres :</strong> L'onglet <em>Équipe</em> est une sélection éditoriale pour la vitrine publique. L'onglet <em>Membres</em> est l'annuaire complet de l'association (usage interne + espace membre).
+  </div>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">🤝</div>
+    <div>
+      <h2>20. Partenaires &amp; Sponsors</h2>
+      <p>Institutions et entreprises qui soutiennent l'association</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Champ</th><th>Description</th></tr>
+    <tr><td>Nom</td><td>Nom de l'entreprise ou institution</td></tr>
+    <tr><td>Logo</td><td>URL ou upload (format carré recommandé)</td></tr>
+    <tr><td>Description</td><td>Texte de présentation</td></tr>
+    <tr><td>Site web</td><td>URL cliquable</td></tr>
+    <tr><td>Niveau</td><td><span class="badge badge-or">Or</span> <span class="badge badge-gris">Argent</span> <span class="badge" style="background:#F9FAFB;color:#92400E">Bronze</span> <span class="badge badge-bleu">Ami</span></td></tr>
+  </table>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 11 — TRÉSORERIE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">💼</div>
+    <div>
+      <h2>21. Trésorerie</h2>
+      <p>Suivi financier complet : transactions, budget, rapports</p>
+    </div>
+  </div>
+
+  <h3>Onglet 1 — Transactions</h3>
+
+  <h4>Enregistrer une recette ou une dépense</h4>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Ajouter</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Basculez entre <strong>Recette</strong> et <strong>Dépense</strong> avec le toggle.</span></li>
+    <li><div class="step-num">3</div><span>Remplissez : <strong>Libellé</strong> (requis), <strong>Catégorie</strong>, <strong>Montant</strong> (FCFA), <strong>Date</strong>.</span></li>
+    <li><div class="step-num">4</div><span>Optionnel : ajoutez une description et uploadez une pièce justificative (URL ou fichier).</span></li>
+    <li><div class="step-num">5</div><span>Cliquez sur <strong>Enregistrer</strong>.</span></li>
+  </ol>
+
+  <div class="two-col">
+    <div>
+      <h4>Catégories recettes</h4>
+      <ul class="bullets">
+        <li>Cotisations</li>
+        <li>Dons</li>
+        <li>Subventions</li>
+        <li>Sponsoring</li>
+        <li>Événements</li>
+        <li>Autres</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Catégories dépenses</h4>
+      <ul class="bullets">
+        <li>Événements</li>
+        <li>Administration</li>
+        <li>Communication</li>
+        <li>Matériel</li>
+        <li>Transport</li>
+        <li>Restauration</li>
+        <li>Autres</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box success">
+    <strong>Sync automatique :</strong> Les cotisations enregistrées comme « Payées » dans le module Cotisations apparaissent <strong>automatiquement</strong> dans la trésorerie (catégorie Cotisations). Ces lignes sont verrouillées (icône 🔒) et ne peuvent pas être supprimées ici.
+  </div>
+
+  <h3>Indicateurs de l'onglet Transactions</h3>
+  <table>
+    <tr><th>Indicateur</th><th>Calcul</th></tr>
+    <tr><td>Total Recettes</td><td>Somme de toutes les recettes de l'exercice sélectionné</td></tr>
+    <tr><td>Total Dépenses</td><td>Somme de toutes les dépenses de l'exercice</td></tr>
+    <tr><td>Solde</td><td>Recettes − Dépenses. Affiché en vert (excédent) ou rouge (déficit)</td></tr>
+  </table>
+
+  <h3>Onglet 2 — Budget prévisionnel</h3>
+  <p>Pour chaque catégorie (recettes et dépenses), saisissez le montant budgété. Le tableau compare ensuite <strong>Réalisé</strong> vs <strong>Prévu</strong> avec une barre de progression.</p>
+
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur l'icône ✏️ en face d'une catégorie.</span></li>
+    <li><div class="step-num">2</div><span>Entrez le <strong>montant prévu</strong> (FCFA) et une note optionnelle.</span></li>
+    <li><div class="step-num">3</div><span>Enregistrez. La barre de progression se met à jour instantanément.</span></li>
+  </ol>
+
+  <h3>Onglet 3 — Rapport PDF</h3>
+  <p>Cliquez sur <strong>Générer le rapport</strong> pour produire un document A4 avec :</p>
+  <ul class="bullets">
+    <li>Synthèse des recettes et des dépenses de l'exercice</li>
+    <li>Tableau budget prévisionnel vs réalisé par catégorie</li>
+    <li>Résultat net de l'exercice (excédent ou déficit)</li>
+  </ul>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 12 — ASSEMBLÉES GÉNÉRALES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🏛️</div>
+    <div>
+      <h2>22. Assemblées Générales</h2>
+      <p>Organisation, présences, résolutions et procès-verbaux</p>
+    </div>
+  </div>
+
+  <h3>Créer une AG</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Nouvelle assemblée</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Renseignez le <strong>titre</strong>, le <strong>type</strong> (Ordinaire / Extraordinaire), la <strong>date</strong>, l'<strong>heure</strong>, le <strong>lieu</strong>.</span></li>
+    <li><div class="step-num">3</div><span>Définissez le <strong>quorum requis</strong> (pourcentage, défaut : 50 %).</span></li>
+    <li><div class="step-num">4</div><span>Ajoutez les points à l'<strong>ordre du jour</strong> (un par ligne).</span></li>
+    <li><div class="step-num">5</div><span>Statut : <span class="badge badge-bleu">Planifiée</span> → <span class="badge badge-vert">Tenue</span> → <span class="badge badge-gris">Annulée</span></span></li>
+  </ol>
+
+  <h3>Onglet Présences</h3>
+  <p>Ouvrez une assemblée et cliquez sur l'onglet <strong>Présences</strong>.</p>
+  <ul class="bullets">
+    <li>Cochez la case <strong>Présent</strong> en face de chaque membre présent.</li>
+    <li>Pour les procurations, sélectionnez dans le menu déroulant le membre présent qui reçoit la procuration.</li>
+    <li>La synthèse en bas de tableau recalcule automatiquement le quorum :
+      <br><em>Votants = Présents + Procurations reçues. Quorum atteint si ≥ quorum requis %.</em></li>
+  </ul>
+
+  <h3>Onglet Résolutions</h3>
+
+  <table>
+    <tr><th>Action</th><th>Comment faire</th></tr>
+    <tr><td>Ajouter une résolution</td><td>Saisissez le texte dans la zone en bas, puis appuyez sur Entrée ou <strong>Ajouter</strong>.</td></tr>
+    <tr><td>Enregistrer les votes</td><td>Sur chaque résolution, renseignez <strong>Votes Pour</strong>, <strong>Votes Contre</strong>, <strong>Abstentions</strong>.</td></tr>
+    <tr><td>Adopter / Rejeter</td><td>Boutons <span class="badge badge-vert">Adoptée</span> / <span class="badge badge-rouge">Rejetée</span> sur chaque résolution.</td></tr>
+    <tr><td>Supprimer</td><td>Icône corbeille (uniquement si la résolution n'a pas encore de votes).</td></tr>
+  </table>
+
+  <h3>Onglet PV (Procès-Verbal)</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Rédigez le PV dans la zone de texte (monospaced pour faciliter la lecture).</span></li>
+    <li><div class="step-num">2</div><span>Cochez <strong>Publier dans l'espace membre</strong> si vous souhaitez que les membres y aient accès.</span></li>
+    <li><div class="step-num">3</div><span>Cliquez sur <strong>Enregistrer le PV</strong>.</span></li>
+  </ol>
+
+  <div class="info-box">
+    <strong>PV publié :</strong> Quand la case est cochée, le PV apparaît dans l'espace membre privé. Décochez pour le retirer de l'espace membre sans le supprimer.
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 13 — ÉLECTIONS + MANDATS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🗳️</div>
+    <div>
+      <h2>23. Élections</h2>
+      <p>Organiser et suivre les scrutins de l'association</p>
+    </div>
+  </div>
+
+  <h3>Créer une élection</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Cliquez sur <strong>+ Nouvelle élection</strong>.</span></li>
+    <li><div class="step-num">2</div><span>Renseignez le <strong>titre</strong>, la <strong>description</strong>, les dates d'<strong>ouverture</strong> et de <strong>clôture</strong> du scrutin.</span></li>
+    <li><div class="step-num">3</div><span>Choisissez le statut : <span class="badge badge-gris">Brouillon</span> (préparer sans ouvrir), <span class="badge badge-vert">Ouverte</span> (les membres peuvent voter), <span class="badge badge-rouge">Clôturée</span> (résultats définitifs).</span></li>
+  </ol>
+
+  <h3>Ajouter des candidats</h3>
+  <p>Quand l'élection est en statut <strong>Brouillon</strong> ou <strong>Ouverte</strong> :</p>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Ouvrez l'élection en cliquant dessus.</span></li>
+    <li><div class="step-num">2</div><span>Cliquez sur <strong>+ Ajouter un candidat</strong>.</span></li>
+    <li><div class="step-num">3</div><span>Sélectionnez le <strong>membre</strong> dans la liste déroulante.</span></li>
+    <li><div class="step-num">4</div><span>Choisissez le <strong>poste</strong> : Présidente, VP, Secrétaire, Trésorier, Commissaire, Autre.</span></li>
+    <li><div class="step-num">5</div><span>Ajoutez une <strong>bio de candidature</strong> optionnelle (programme).</span></li>
+  </ol>
+
+  <h3>Consulter les résultats</h3>
+  <p>Passez le statut à <span class="badge badge-rouge">Clôturée</span>. Chaque candidat affiche son nombre de votes et son pourcentage (barre de progression). Le candidat ayant le plus de votes reçoit le badge <span class="badge badge-vert">Élu(e)</span>.</p>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📜</div>
+    <div>
+      <h2>24. Mandats</h2>
+      <p>Historique des personnes en poste dans le bureau</p>
+    </div>
+  </div>
+
+  <p>Chaque mandat lie un <strong>membre</strong> à un <strong>poste</strong> pour une <strong>période définie</strong>. Permet de retracer l'historique complet du bureau.</p>
+
+  <table>
+    <tr><th>Champ</th><th>Description</th></tr>
+    <tr><td>Poste</td><td>Présidente / VP / Secrétaire / Trésorier / Commissaire / Autre</td></tr>
+    <tr><td>Membre</td><td>Sélection dans la liste des membres</td></tr>
+    <tr><td>Date de début</td><td>Prise de fonction</td></tr>
+    <tr><td>Date de fin</td><td>Fin du mandat (vide = mandat en cours)</td></tr>
+    <tr><td>Notes</td><td>Commentaires libres (ex. : élu par AG extraordinaire)</td></tr>
+  </table>
+
+  <p>Les mandats sans date de fin sont affichés en <strong>gras</strong> comme membres actuellement en poste. Les anciens mandats sont grisés.</p>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 14 — CIRCULAIRE + STATS + RAPPORT
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">📧</div>
+    <div>
+      <h2>25. Circulaire — Envoi massif d'emails</h2>
+      <p>Communiquer avec tout ou partie des membres par email</p>
+    </div>
+  </div>
+
+  <h3>Rédiger et envoyer une circulaire</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><span>Renseignez le <strong>sujet</strong> de l'email.</span></li>
+    <li><div class="step-num">2</div><span>Rédigez le <strong>corps</strong> dans l'éditeur riche (mise en forme, liens, images).</span></li>
+    <li><div class="step-num">3</div><span>Choisissez les <strong>destinataires</strong> : Tous les membres / Bureau / Membres actifs / Sélection personnalisée.</span></li>
+    <li><div class="step-num">4</div><span>Optionnel : cochez <strong>Planifier</strong> et choisissez une date/heure d'envoi différé.</span></li>
+    <li><div class="step-num">5</div><span>Cliquez sur <strong>Envoyer</strong> (ou <strong>Planifier</strong>). L'envoi est enregistré dans l'historique.</span></li>
+  </ol>
+
+  <h3>Historique des envois</h3>
+  <p>Le tableau en bas affiche tous les emails envoyés ou planifiés : date, sujet, nombre de destinataires, statut (Envoyé / Planifié / Échoué).</p>
+
+  <div class="info-box warning">
+    <strong>Important :</strong> Assurez-vous que le serveur SMTP est configuré (ImprovMX) avant d'envoyer une circulaire. Sans SMTP actif, les emails n'arriveront pas à destination.
+  </div>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📈</div>
+    <div>
+      <h2>26. Statistiques</h2>
+      <p>Indicateurs de performance de l'association</p>
+    </div>
+  </div>
+
+  <ul class="bullets">
+    <li><strong>Croissance des membres</strong> — évolution année sur année du nombre de membres validés</li>
+    <li><strong>Taux de cotisation</strong> — pourcentage de membres à jour sur plusieurs années</li>
+    <li><strong>Participation événements</strong> — nombre d'inscriptions par événement</li>
+    <li><strong>Répartition géographique</strong> — membres par profession, ville, pays</li>
+    <li><strong>Activité éditoriale</strong> — articles et actualités publiés par période</li>
+  </ul>
+
+  <p>Utilisez les filtres en haut (année, période) pour affiner les graphiques.</p>
+
+  <br>
+
+  <div class="section-header">
+    <div class="section-icon">📋</div>
+    <div>
+      <h2>Rapport annuel</h2>
+      <p>Document de synthèse pour l'assemblée générale</p>
+    </div>
+  </div>
+
+  <p>L'onglet <strong>Rapport annuel</strong> (groupe Membres) génère un PDF de synthèse annuelle incluant :</p>
+  <ul class="bullets">
+    <li>Couverture avec l'année et le logo</li>
+    <li>Effectif des membres (total, nouveaux, dormants)</li>
+    <li>Bilan des activités (événements, articles, projets)</li>
+    <li>Synthèse financière (cotisations, transactions)</li>
+    <li>Composition du bureau (mandats en cours)</li>
+  </ul>
+
+  <div class="info-box">
+    <strong>Conseil :</strong> Générez ce rapport avant chaque Assemblée Générale ordinaire. Il peut être joint au PV ou envoyé par circulaire aux membres.
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard</span>
+    <span>Mai 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE FINALE — RÉCAPITULATIF EXPORTS + AIDE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-icon">🚀</div>
+    <div>
+      <h2>Récapitulatif — Exports disponibles</h2>
+      <p>Ce que vous pouvez télécharger depuis le dashboard</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Module</th><th>Format</th><th>Contenu</th></tr>
+    <tr><td>Membres</td><td><span class="badge badge-bleu">XLSX</span></td><td>Liste complète des membres avec tous les champs</td></tr>
+    <tr><td>Membres</td><td><span class="badge badge-gris">PDF</span></td><td>Trombinoscope (photos + noms)</td></tr>
+    <tr><td>Membres</td><td><span class="badge badge-gris">PDF</span></td><td>Attestation individuelle par membre</td></tr>
+    <tr><td>Cotisations</td><td><span class="badge badge-bleu">CSV</span></td><td>Liste membres + statuts + montants pour une année</td></tr>
+    <tr><td>Cotisations</td><td><span class="badge badge-gris">PDF</span></td><td>Reçu de cotisation individuel</td></tr>
+    <tr><td>Cotisations</td><td><span class="badge badge-gris">PDF</span></td><td>Rapport financier cotisations</td></tr>
+    <tr><td>Sondages</td><td><span class="badge badge-bleu">CSV</span></td><td>Toutes les réponses avec date, nom, email</td></tr>
+    <tr><td>Trésorerie</td><td><span class="badge badge-bleu">CSV</span></td><td>Toutes les transactions de l'exercice</td></tr>
+    <tr><td>Trésorerie</td><td><span class="badge badge-gris">PDF</span></td><td>Rapport financier annuel (budget vs réalisé)</td></tr>
+    <tr><td>Rapport annuel</td><td><span class="badge badge-gris">PDF</span></td><td>Synthèse complète annuelle de l'association</td></tr>
+    <tr><td>Vue d'ensemble</td><td><span class="badge badge-or">JSON</span></td><td>Backup complet de la base de données</td></tr>
+  </table>
+
+  <h3>Aide rapide — Questions fréquentes</h3>
+
+  <table>
+    <tr><th>Problème</th><th>Solution</th></tr>
+    <tr>
+      <td>Je ne vois pas le dashboard après connexion</td>
+      <td>Votre compte n'a peut-être pas le rôle <strong>admin</strong>. Contactez le responsable technique pour faire activer votre rôle dans Supabase.</td>
+    </tr>
+    <tr>
+      <td>Un upload de photo échoue</td>
+      <td>Vérifiez que le fichier fait moins de 5 Mo et qu'il est au format JPG, PNG ou WebP.</td>
+    </tr>
+    <tr>
+      <td>Un email de relance cotisation n'est pas envoyé</td>
+      <td>Le membre n'a probablement pas d'email enregistré. Mettez à jour sa fiche dans l'onglet Membres.</td>
+    </tr>
+    <tr>
+      <td>Le quorum n'est pas atteint dans une AG</td>
+      <td>Le calcul est automatique. Ajoutez des présences ou des procurations jusqu'à atteindre le pourcentage requis.</td>
+    </tr>
+    <tr>
+      <td>Un article publié n'apparaît pas sur le site</td>
+      <td>Vérifiez que le statut est bien <strong>Publié</strong> (et non Brouillon). Rechargez la page publique (<kbd>Ctrl</kbd> + <kbd>Maj</kbd> + <kbd>R</kbd>).</td>
+    </tr>
+    <tr>
+      <td>Une transaction de cotisation est verrouillée</td>
+      <td>Les transactions automatiques (provenant des cotisations) ne peuvent être supprimées que depuis le module Cotisations. Annulez le paiement du membre concerné.</td>
+    </tr>
+    <tr>
+      <td>Je veux changer le montant de cotisation annuel</td>
+      <td>Dans l'onglet Cotisations, en haut de la vue « Par année », un champ <strong>Montant attendu</strong> est modifiable. Changez-le pour l'année souhaitée.</td>
+    </tr>
+  </table>
+
+  <div class="info-box success">
+    <strong>Contact support technique :</strong> mamaneric@gmail.com — Pour tout bug, nouvelle fonctionnalité ou question d'architecture.
+  </div>
+
+  <div class="footer">
+    <span>Ma Belle Promo — Mode d'emploi Dashboard · mabellepromo.vercel.app</span>
+    <span>Version mai 2026</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
@@ -8,9 +8,9 @@ import { inp, Field } from "./shared";
 const POSTES_DEFAUT = ["Présidente", "Vice-Président(e)", "Secrétaire Général(e)", "Trésorier(ière)", "Commissaire aux Comptes"];
 
 const STATUT_CFG = {
-  brouillon: { label: "Brouillon", color: "bg-slate-100 text-slate-600" },
-  ouverte:   { label: "Ouverte",   color: "bg-emerald-100 text-emerald-700" },
-  cloturee:  { label: "Clôturée",  color: "bg-gray-100 text-gray-500" },
+  brouillon: { label: "Brouillon", color: "bg-muted/60 text-muted-foreground" },
+  ouverte:   { label: "Ouverte",   color: "bg-emerald-500/15 text-emerald-400" },
+  cloturee:  { label: "Clôturée",  color: "bg-muted/60 text-muted-foreground" },
 };
 
 export default function ElectionsSection() {
@@ -114,7 +114,7 @@ export default function ElectionsSection() {
 
       {/* Formulaire création/édition */}
       {form && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm p-5 space-y-4">
+        <div className="bg-card border border-border rounded-2xl shadow-sm p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-sm">{form._id ? "Modifier" : "Nouvelle élection"}</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
@@ -149,7 +149,7 @@ export default function ElectionsSection() {
             const cfg = STATUT_CFG[e.statut] || STATUT_CFG.brouillon;
             return (
               <div key={e.id} onClick={() => setSelected(e)}
-                className={`bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selected?.id === e.id ? "border-primary shadow-md" : "border-border hover:border-primary/40"}`}>
+                className={`bg-card border rounded-2xl p-4 cursor-pointer transition-all ${selected?.id === e.id ? "border-primary shadow-md" : "border-border hover:border-primary/40"}`}>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <p className="font-semibold text-sm text-foreground leading-snug">{e.titre}</p>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${cfg.color}`}>{cfg.label}</span>
@@ -162,7 +162,7 @@ export default function ElectionsSection() {
 
         {/* Détail élection */}
         {selected ? (
-          <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
             {/* En-tête */}
             <div className="px-5 py-4 border-b border-border bg-muted/10">
               <div className="flex items-center justify-between gap-3">
@@ -172,7 +172,7 @@ export default function ElectionsSection() {
                 </div>
                 <div className="flex items-center gap-2">
                   <select value={selected.statut} onChange={e => changeStatut(selected.id, e.target.value)}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-border bg-white text-foreground cursor-pointer">
+                    className="text-xs px-3 py-1.5 rounded-lg border border-border bg-card text-foreground cursor-pointer">
                     <option value="brouillon">Brouillon</option>
                     <option value="ouverte">Ouverte</option>
                     <option value="cloturee">Clôturée</option>
@@ -180,7 +180,7 @@ export default function ElectionsSection() {
                   <button onClick={() => setForm({ ...selected, _id: selected.id })}
                     className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-muted">Modifier</button>
                   <button onClick={() => deleteElection(selected.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -257,7 +257,7 @@ export default function ElectionsSection() {
                           </div>
                           {selected.statut !== "cloturee" && (
                             <button onClick={() => removeCandidat(c.id)}
-                              className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 flex-shrink-0">
+                              className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 flex-shrink-0">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           )}
@@ -272,7 +272,7 @@ export default function ElectionsSection() {
               </div>
 
               {selected.statut === "ouverte" && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-700 flex items-center gap-2">
+                <div className="bg-emerald-500/15 border border-emerald-500/25 rounded-xl px-4 py-3 text-sm text-emerald-400 flex items-center gap-2">
                   <Vote className="w-4 h-4 flex-shrink-0" />
                   Élection ouverte — les membres peuvent voter depuis leur Espace Membre.
                 </div>
@@ -286,7 +286,7 @@ export default function ElectionsSection() {
             </div>
           </div>
         ) : (
-          <div className="bg-white border border-border rounded-2xl flex items-center justify-center py-20 text-center text-muted-foreground">
+          <div className="bg-card border border-border rounded-2xl flex items-center justify-center py-20 text-center text-muted-foreground">
             <div>
               <Vote className="w-10 h-10 mx-auto mb-3 opacity-20" />
               <p className="font-medium">Sélectionnez une élection</p>

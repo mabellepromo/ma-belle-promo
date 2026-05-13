@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
@@ -8,9 +8,9 @@ import {
 import { inp, Field } from "./shared";
 
 const STATUT_STYLES = {
-  planifiee: "bg-blue-100 text-blue-700",
-  tenue:     "bg-emerald-100 text-emerald-700",
-  annulee:   "bg-red-100 text-red-700",
+  planifiee: "bg-blue-500/15 text-blue-400",
+  tenue:     "bg-emerald-500/15 text-emerald-400",
+  annulee:   "bg-red-500/15 text-red-400",
 };
 const STATUT_LABELS = { planifiee: "Planifiée", tenue: "Tenue", annulee: "Annulée" };
 
@@ -81,10 +81,10 @@ function PresencesTab({ assemblee }) {
       {/* Synthèse quorum */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Présents", value: totalPresents, color: "text-emerald-600" },
-          { label: "Procurations", value: totalProcurations, color: "text-blue-600" },
+          { label: "Présents", value: totalPresents, color: "text-emerald-400" },
+          { label: "Procurations", value: totalProcurations, color: "text-blue-400" },
           { label: "Votants", value: votants, color: "text-foreground" },
-          { label: "Quorum", value: `${quorum}%`, color: quorumAtteint ? "text-emerald-600" : "text-red-500",
+          { label: "Quorum", value: `${quorum}%`, color: quorumAtteint ? "text-emerald-400" : "text-red-500",
             sub: quorumAtteint ? "✓ Atteint" : `Requis : ${assemblee.quorum_requis}%` },
         ].map(s => (
           <div key={s.label} className="bg-muted/30 rounded-xl p-3 text-center">
@@ -104,7 +104,7 @@ function PresencesTab({ assemblee }) {
           {filtered.map(m => {
             const present = !!presences[m.id];
             return (
-              <div key={m.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors ${present ? "border-emerald-200 bg-emerald-50/50" : "border-border bg-white"}`}>
+              <div key={m.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors ${present ? "border-emerald-500/25 bg-emerald-500/15/50" : "border-border bg-card"}`}>
                 <button type="button" onClick={() => togglePresence(m.id)}
                   className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${present ? "border-emerald-500 bg-emerald-500" : "border-border"}`}>
                   {present && <Check className="w-3 h-3 text-white" />}
@@ -116,7 +116,7 @@ function PresencesTab({ assemblee }) {
                 {!present && (
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs text-muted-foreground">Procuration de :</span>
-                    <select className="text-xs border border-border rounded-lg px-2 py-1 bg-white text-foreground focus:outline-none"
+                    <select className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none"
                       value={procurations[m.id] || ""}
                       onChange={e => setProcuration(m.id, e.target.value)}>
                       <option value="">— Aucune —</option>
@@ -203,7 +203,7 @@ function ResolutionsTab({ assemblee }) {
             const total = r.votes_pour + r.votes_contre + r.abstentions;
             const pct = total > 0 ? Math.round((r.votes_pour / total) * 100) : 0;
             return (
-              <div key={r.id} className="bg-white border border-border rounded-xl p-4">
+              <div key={r.id} className="bg-card border border-border rounded-xl p-4">
                 <div className="flex items-start gap-3 mb-3">
                   <span className="text-xs font-bold text-muted-foreground bg-muted rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">{r.numero}</span>
                   <p className="text-sm font-medium text-foreground flex-1">{r.libelle}</p>
@@ -212,21 +212,21 @@ function ResolutionsTab({ assemblee }) {
                       <button key={String(v)} onClick={() => setAdoptee(r.id, r.adoptee === v ? null : v)}
                         className={`text-xs px-2 py-0.5 rounded-full border font-medium transition-colors ${
                           r.adoptee === v
-                            ? v ? "bg-emerald-100 text-emerald-700 border-emerald-300" : "bg-red-100 text-red-700 border-red-300"
+                            ? v ? "bg-emerald-500/15 text-emerald-400 border-emerald-300" : "bg-red-500/15 text-red-400 border-red-300"
                             : "border-border text-muted-foreground hover:border-primary/40"
                         }`}>
                         {v ? "Adoptée" : "Rejetée"}
                       </button>
                     ))}
                     <button onClick={() => deleteResolution(r.id)}
-                      className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                      className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {[
-                    { key: "votes_pour", label: "Pour", color: "text-emerald-600" },
+                    { key: "votes_pour", label: "Pour", color: "text-emerald-400" },
                     { key: "votes_contre", label: "Contre", color: "text-red-500" },
                     { key: "abstentions", label: "Abstentions", color: "text-muted-foreground" },
                   ].map(({ key, label, color }) => (
@@ -284,7 +284,7 @@ function PVTab({ assemblee, onUpdate }) {
           <input type="checkbox" checked={publie} onChange={e => setPublie(e.target.checked)}
             className="w-4 h-4 rounded accent-primary" />
           <span className="text-sm text-foreground">Publier dans l'espace membre</span>
-          {publie && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Visible</span>}
+          {publie && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">Visible</span>}
         </label>
         <button onClick={save} disabled={saving}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
@@ -370,7 +370,7 @@ export default function AssembleesSection() {
 
       {/* Formulaire création/édition */}
       {form && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <p className="font-semibold text-foreground text-sm">{form.id ? "Modifier" : "Nouvelle"} assemblée générale</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
@@ -413,7 +413,7 @@ export default function AssembleesSection() {
                     <span className="text-xs font-bold text-muted-foreground w-5">{i + 1}.</span>
                     <span className="text-sm text-foreground flex-1">{item}</span>
                     <button onClick={() => removeOdj(i)}
-                      className="w-5 h-5 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                      className="w-5 h-5 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -447,13 +447,13 @@ export default function AssembleesSection() {
           {loading ? (
             <div className="flex items-center gap-2 py-10 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Chargement…</div>
           ) : assemblees.length === 0 ? (
-            <div className="text-center py-16 bg-white border border-border rounded-2xl text-muted-foreground">
+            <div className="text-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">
               <Vote className="w-8 h-8 mx-auto mb-2 opacity-25" />
               <p className="text-sm font-medium">Aucune assemblée.</p>
             </div>
           ) : assemblees.map(a => (
             <div key={a.id}
-              className={`bg-white border rounded-xl p-3 cursor-pointer transition-all hover:shadow-sm ${selectedId === a.id ? "border-primary shadow-sm" : "border-border"}`}
+              className={`bg-card border rounded-xl p-3 cursor-pointer transition-all hover:shadow-sm ${selectedId === a.id ? "border-primary shadow-sm" : "border-border"}`}
               onClick={() => { setSelectedId(a.id); setDetailTab("presences"); }}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
@@ -475,12 +475,12 @@ export default function AssembleesSection() {
                     <FileText className="w-3 h-3" />
                   </button>
                   <button onClick={e => { e.stopPropagation(); handleDelete(a.id); }}
-                    className="w-6 h-6 rounded hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                    className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
-              {a.pv_publie && <span className="inline-block mt-1.5 text-xs px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">PV publié</span>}
+              {a.pv_publie && <span className="inline-block mt-1.5 text-xs px-1.5 py-0.5 bg-emerald-500/15 text-emerald-400 rounded-full">PV publié</span>}
             </div>
           ))}
         </div>
@@ -488,11 +488,11 @@ export default function AssembleesSection() {
         {/* Détail AG */}
         <div className="lg:col-span-2">
           {!selected ? (
-            <div className="h-full min-h-48 flex items-center justify-center bg-white border border-border rounded-2xl text-muted-foreground text-sm">
+            <div className="h-full min-h-48 flex items-center justify-center bg-card border border-border rounded-2xl text-muted-foreground text-sm">
               Sélectionnez une assemblée pour gérer les présences, résolutions et PV
             </div>
           ) : (
-            <div className="bg-white border border-border rounded-2xl overflow-hidden">
+            <div className="bg-card border border-border rounded-2xl overflow-hidden">
               {/* En-tête AG sélectionnée */}
               <div className="px-5 py-4 border-b border-border">
                 <div className="flex items-start justify-between gap-3">
@@ -511,7 +511,7 @@ export default function AssembleesSection() {
                     )}
                   </div>
                   {/* Changement rapide statut */}
-                  <select className="text-xs border border-border rounded-lg px-2 py-1 bg-white text-foreground focus:outline-none"
+                  <select className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none"
                     value={selected.statut}
                     onChange={e => updateStatut(selected.id, e.target.value)}>
                     <option value="planifiee">Planifiée</option>

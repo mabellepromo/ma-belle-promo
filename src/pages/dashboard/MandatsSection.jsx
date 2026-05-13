@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
@@ -163,7 +163,7 @@ export default function MandatsSection() {
 
       {/* Formulaire */}
       {form && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm p-5 space-y-4">
+        <div className="bg-card border border-border rounded-2xl shadow-sm p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-sm">{form._id ? "Modifier le mandat" : "Nouveau mandat"}</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
@@ -202,26 +202,26 @@ export default function MandatsSection() {
 
       {/* Aperçu sync → Équipe */}
       {syncPreview && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-4">
+        <div className="bg-amber-500/15 border border-amber-500/25 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <p className="font-semibold text-sm text-amber-800">
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
+              <p className="font-semibold text-sm text-amber-400">
                 Aperçu — {syncPreview.length} membre{syncPreview.length > 1 ? "s" : ""} seront synchronisés vers la table Équipe
               </p>
             </div>
-            <button onClick={() => setSyncPreview(null)} className="w-7 h-7 rounded-lg hover:bg-amber-100 flex items-center justify-center text-amber-600">
+            <button onClick={() => setSyncPreview(null)} className="w-7 h-7 rounded-lg hover:bg-amber-100 flex items-center justify-center text-amber-400">
               <X className="w-4 h-4" />
             </button>
           </div>
           <div className="grid sm:grid-cols-2 gap-2">
             {syncPreview.map(p => (
-              <div key={p.member_id} className="flex items-center gap-2 bg-white border border-amber-200 rounded-xl px-3 py-2">
+              <div key={p.member_id} className="flex items-center gap-2 bg-card border border-amber-500/25 rounded-xl px-3 py-2">
                 {p.photo ? (
                   <img src={p.photo} alt={p.nom} className="w-7 h-7 rounded-full object-cover object-top flex-shrink-0" />
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-amber-700">{(p.nom || "?")[0]}</span>
+                    <span className="text-xs font-bold text-amber-400">{(p.nom || "?")[0]}</span>
                   </div>
                 )}
                 <div className="min-w-0">
@@ -231,9 +231,9 @@ export default function MandatsSection() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-amber-700">Les membres Équipe liés à un mandat mais plus actifs seront supprimés. Les membres sans mandat dans Équipe ne sont pas touchés.</p>
+          <p className="text-xs text-amber-400">Les membres Équipe liés à un mandat mais plus actifs seront supprimés. Les membres sans mandat dans Équipe ne sont pas touchés.</p>
           <div className="flex justify-end gap-2">
-            <button onClick={() => setSyncPreview(null)} className="px-4 py-2 text-sm border border-amber-300 rounded-xl text-amber-700 hover:bg-amber-100">Annuler</button>
+            <button onClick={() => setSyncPreview(null)} className="px-4 py-2 text-sm border border-amber-300 rounded-xl text-amber-400 hover:bg-amber-100">Annuler</button>
             <button onClick={syncToEquipe} disabled={syncing}
               className="flex items-center gap-2 px-5 py-2 bg-amber-600 text-white text-sm font-semibold rounded-xl hover:bg-amber-700 disabled:opacity-50">
               {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -244,7 +244,7 @@ export default function MandatsSection() {
       )}
 
       {/* Bureau actuel */}
-      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-border bg-muted/10 flex items-center gap-2">
           <Shield className="w-4 h-4 text-primary" />
           <p className="font-semibold text-sm text-foreground">Bureau actuel ({actifs.length} poste{actifs.length > 1 ? "s" : ""})</p>
@@ -270,7 +270,7 @@ export default function MandatsSection() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">
                     <CheckCircle className="w-3 h-3" /> En poste
                   </span>
                   <button onClick={() => setForm({ ...m, _id: m.id, date_fin: m.date_fin || "" })}
@@ -278,11 +278,11 @@ export default function MandatsSection() {
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => terminate(m.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-amber-50 flex items-center justify-center text-muted-foreground hover:text-amber-600">
+                    className="w-7 h-7 rounded-lg hover:bg-amber-500/15 flex items-center justify-center text-muted-foreground hover:text-amber-400">
                     <Clock className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => remove(m.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -294,7 +294,7 @@ export default function MandatsSection() {
 
       {/* Historique */}
       {archives.length > 0 && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <button onClick={() => setShowHistorique(p => !p)}
             className="w-full px-5 py-4 border-b border-border bg-muted/10 flex items-center justify-between text-left">
             <span className="font-semibold text-sm text-foreground">Anciens mandats ({archives.length})</span>
@@ -312,7 +312,7 @@ export default function MandatsSection() {
                     </p>
                   </div>
                   <button onClick={() => remove(m.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500">
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

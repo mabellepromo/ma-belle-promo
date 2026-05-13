@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../lib/supabase";
 import { motion } from "framer-motion";
@@ -107,14 +107,14 @@ export function ComposeModal({ onClose, initialAttachment = null }) {
         </div>
 
         {status === "sent" && (
-          <div className="mx-6 mt-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 flex items-center gap-2">
+          <div className="mx-6 mt-4 px-4 py-3 bg-emerald-500/15 border border-emerald-500/25 rounded-xl text-sm text-green-800 flex items-center gap-2">
             <Check className="w-4 h-4" /> {sentCount} message{sentCount > 1 ? "s envoyés" : " envoyé"} avec succès !
           </div>
         )}
         {status === "error" && (
-          <div className="mx-6 mt-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 space-y-1">
+          <div className="mx-6 mt-4 px-4 py-3 bg-red-500/15 border border-red-500/25 rounded-xl text-sm text-red-800 space-y-1">
             <div className="flex items-center gap-2 font-semibold"><X className="w-4 h-4" /> Échec de l'envoi</div>
-            {errMsg && <p className="text-xs font-mono text-red-700 break-all">{errMsg}</p>}
+            {errMsg && <p className="text-xs font-mono text-red-400 break-all">{errMsg}</p>}
           </div>
         )}
 
@@ -136,7 +136,7 @@ export function ComposeModal({ onClose, initialAttachment = null }) {
                     onChange={e => updateRecipient(i, "nom", e.target.value)} disabled={status === "sending"} />
                   {recipients.length > 1 && (
                     <button onClick={() => removeRecipient(i)} disabled={status === "sending"}
-                      className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 disabled:opacity-40">
+                      className="w-8 h-8 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 disabled:opacity-40">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -331,7 +331,7 @@ export function MessagesSection() {
       <div className="flex items-center gap-3 mb-6">
         <h2 className="font-heading text-xl font-bold text-foreground">Messages reçus</h2>
         {unread > 0 && (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-400">
             {unread} non lu{unread > 1 ? "s" : ""}
           </span>
         )}
@@ -406,7 +406,7 @@ export function MessagesSection() {
                 </button>
                 <button onClick={sendReply} disabled={sendStatus === "sending" || sendStatus === "sent"}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                    sendStatus === "sent" ? "bg-green-500 text-white" : "bg-primary text-primary-foreground hover:opacity-90"
+                    sendStatus === "sent" ? "bg-emerald-500 text-white" : "bg-primary text-primary-foreground hover:opacity-90"
                   } disabled:opacity-60`}>
                   {sendStatus === "sending" && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                   {sendStatus === "sent"    && <Check className="w-4 h-4" />}
@@ -514,7 +514,7 @@ export function MessagesSection() {
                   <p className="text-xs text-muted-foreground">{new Date(m.receivedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
-                  m.read ? "bg-muted text-muted-foreground" : "bg-blue-50 text-blue-700 border border-blue-200"
+                  m.read ? "bg-muted text-muted-foreground" : "bg-blue-500/15 text-blue-400 border border-blue-500/25"
                 }`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${m.read ? "bg-muted-foreground/40" : "bg-blue-500"}`} />
                   {m.read ? "Lu" : "Non lu"}
@@ -531,7 +531,7 @@ export function MessagesSection() {
                     <Reply className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => askDeleteMsg(m.id)} title="Supprimer"
-                    className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

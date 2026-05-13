@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
@@ -12,24 +12,24 @@ const CATEGORIES_RECETTES = ["Cotisations", "Dons", "Subventions", "Sponsoring",
 const CATEGORIES_DEPENSES = ["Événements", "Administration", "Communication", "Matériel", "Transport", "Restauration", "Autres"];
 
 const CAT_COLORS = {
-  Cotisations: "bg-emerald-100 text-emerald-700",
-  Dons: "bg-blue-100 text-blue-700",
-  Subventions: "bg-indigo-100 text-indigo-700",
-  Sponsoring: "bg-violet-100 text-violet-700",
-  Événements: "bg-amber-100 text-amber-700",
-  Administration: "bg-slate-100 text-slate-700",
-  Communication: "bg-cyan-100 text-cyan-700",
-  Matériel: "bg-orange-100 text-orange-700",
-  Transport: "bg-rose-100 text-rose-700",
-  Restauration: "bg-pink-100 text-pink-700",
-  Autres: "bg-gray-100 text-gray-600",
+  Cotisations:   "bg-emerald-500/15 text-emerald-400",
+  Dons:          "bg-blue-500/15 text-blue-400",
+  Subventions:   "bg-indigo-500/15 text-indigo-400",
+  Sponsoring:    "bg-violet-500/15 text-violet-400",
+  Événements:    "bg-amber-500/15 text-amber-400",
+  Administration:"bg-muted/60 text-muted-foreground",
+  Communication: "bg-cyan-500/15 text-cyan-400",
+  Matériel:      "bg-orange-500/15 text-orange-400",
+  Transport:     "bg-rose-500/15 text-rose-400",
+  Restauration:  "bg-pink-500/15 text-pink-400",
+  Autres:        "bg-muted/60 text-muted-foreground",
 };
 
 const fmt = n => new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 0 }).format(Math.abs(n)) + " FCFA";
 
 function StatCard({ label, value, icon: Icon, color, sub }) {
   return (
-    <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
@@ -131,7 +131,7 @@ function TransactionsTab({ year }) {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <button onClick={exportCSV} title="Exporter CSV"
-            className="w-9 h-9 rounded-xl border border-border hover:bg-emerald-50 flex items-center justify-center text-muted-foreground hover:text-emerald-600 transition-colors">
+            className="w-9 h-9 rounded-xl border border-border hover:bg-emerald-500/15 flex items-center justify-center text-muted-foreground hover:text-emerald-400 transition-colors">
             <Download className="w-4 h-4" />
           </button>
         </div>
@@ -142,25 +142,25 @@ function TransactionsTab({ year }) {
       </div>
 
       {/* Bannière sync */}
-      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/25 text-xs text-emerald-400">
         <RefreshCw className="w-3.5 h-3.5 flex-shrink-0" />
         Les cotisations validées apparaissent automatiquement ici. Pour les modifier, allez dans <strong className="mx-0.5">Cotisations</strong>.
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Recettes" value={stats.recettes} icon={TrendingUp} color="bg-emerald-50 text-emerald-600"
+        <StatCard label="Recettes" value={stats.recettes} icon={TrendingUp} color="bg-emerald-500/15 text-emerald-400"
           sub={`${transactions.filter(t => t.type === "recette").length} opération(s)`} />
-        <StatCard label="Dépenses" value={stats.depenses} icon={TrendingDown} color="bg-red-50 text-red-600"
+        <StatCard label="Dépenses" value={stats.depenses} icon={TrendingDown} color="bg-red-500/15 text-red-400"
           sub={`${transactions.filter(t => t.type === "depense").length} opération(s)`} />
         <StatCard label="Solde" value={stats.solde} icon={Wallet}
-          color={stats.solde >= 0 ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"}
+          color={stats.solde >= 0 ? "bg-blue-500/15 text-blue-400" : "bg-amber-500/15 text-amber-400"}
           sub={stats.solde >= 0 ? "Excédent" : "Déficit"} />
       </div>
 
       {/* Formulaire */}
       {form && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <p className="font-semibold text-foreground text-sm">Nouvelle transaction</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
@@ -173,7 +173,7 @@ function TransactionsTab({ year }) {
                 <button key={t} type="button" onClick={() => setForm(p => ({ ...p, type: t, categorie: "" }))}
                   className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all ${
                     form.type === t
-                      ? t === "recette" ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-red-400 bg-red-50 text-red-700"
+                      ? t === "recette" ? "border-emerald-500 bg-emerald-500/15 text-emerald-400" : "border-red-400 bg-red-500/15 text-red-400"
                       : "border-border text-muted-foreground hover:border-muted-foreground"
                   }`}>
                   {t === "recette" ? "⬆ Recette" : "⬇ Dépense"}
@@ -241,13 +241,13 @@ function TransactionsTab({ year }) {
       {loading ? (
         <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-border rounded-2xl text-muted-foreground">
+        <div className="text-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">
           <Wallet className="w-10 h-10 mx-auto mb-3 opacity-25" />
           <p className="font-medium">Aucune transaction pour {year}.</p>
           <p className="text-sm mt-1">Cliquez sur "Ajouter" pour enregistrer une recette ou une dépense.</p>
         </div>
       ) : (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30">
@@ -262,7 +262,7 @@ function TransactionsTab({ year }) {
               {filtered.map(t => {
                 const isAuto = !!t.source_ref;
                 return (
-                  <tr key={t.id} className={`hover:bg-muted/20 transition-colors ${isAuto ? "bg-emerald-50/30" : ""}`}>
+                  <tr key={t.id} className={`hover:bg-muted/20 transition-colors ${isAuto ? "bg-emerald-500/15/30" : ""}`}>
                     <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
                       {new Date(t.date).toLocaleDateString("fr-FR")}
                     </td>
@@ -271,7 +271,7 @@ function TransactionsTab({ year }) {
                         <p className="font-medium text-foreground">{t.libelle}</p>
                         {isAuto && (
                           <span title="Synchronisé depuis les cotisations"
-                            className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex-shrink-0">
+                            className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 flex-shrink-0">
                             <RefreshCw className="w-2.5 h-2.5" /> sync
                           </span>
                         )}
@@ -280,12 +280,12 @@ function TransactionsTab({ year }) {
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <button onClick={() => setCatFilter(t.categorie)}
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80 ${CAT_COLORS[t.categorie] || "bg-gray-100 text-gray-600"}`}>
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80 ${CAT_COLORS[t.categorie] || "bg-muted/60 text-muted-foreground"}`}>
                         {t.categorie}
                       </button>
                     </td>
                     <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">
-                      <span className={t.type === "recette" ? "text-emerald-600" : "text-red-500"}>
+                      <span className={t.type === "recette" ? "text-emerald-400" : "text-red-500"}>
                         {t.type === "recette" ? "+" : "−"}{fmt(t.montant)}
                       </span>
                     </td>
@@ -296,7 +296,7 @@ function TransactionsTab({ year }) {
                         </div>
                       ) : (
                         <button onClick={() => handleDelete(t.id)}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                          className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -309,7 +309,7 @@ function TransactionsTab({ year }) {
               <tr className="border-t-2 border-border bg-muted/30">
                 <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-foreground">Solde {year}</td>
                 <td className="px-4 py-3 text-right font-bold text-base whitespace-nowrap">
-                  <span className={stats.solde >= 0 ? "text-emerald-600" : "text-red-500"}>
+                  <span className={stats.solde >= 0 ? "text-emerald-400" : "text-red-500"}>
                     {stats.solde >= 0 ? "+" : "−"}{fmt(Math.abs(stats.solde))}
                   </span>
                 </td>
@@ -392,13 +392,13 @@ function BudgetTab({ year }) {
 
   return (
     <div className="space-y-5">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700">
+      <div className="bg-blue-500/15 border border-blue-500/25 rounded-xl px-4 py-3 text-sm text-blue-400">
         <strong>Budget prévisionnel {year}</strong> — Saisissez les montants cibles par catégorie pour suivre les écarts avec le réalisé.
       </div>
 
       {/* Formulaire inline */}
       {editRow && (
-        <div className="bg-white border border-border rounded-2xl p-5 shadow-sm space-y-4">
+        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-sm text-foreground">
               Budget — {editRow.categorie} ({editRow.type === "recette" ? "Recette" : "Dépense"})
@@ -454,8 +454,8 @@ function BudgetTab({ year }) {
 
 function BudgetTable({ title, categories, type, getBudget, getActual, onEdit, color }) {
   const colorMap = {
-    emerald: { header: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700", btn: "hover:bg-emerald-50 hover:text-emerald-600" },
-    red: { header: "bg-red-400", badge: "bg-red-100 text-red-700", btn: "hover:bg-red-50 hover:text-red-600" },
+    emerald: { header: "bg-emerald-500", badge: "bg-emerald-500/15 text-emerald-400", btn: "hover:bg-emerald-500/15 hover:text-emerald-400" },
+    red: { header: "bg-red-400", badge: "bg-red-500/15 text-red-400", btn: "hover:bg-red-500/15 hover:text-red-400" },
   };
   const c = colorMap[color];
 
@@ -468,7 +468,7 @@ function BudgetTable({ title, categories, type, getBudget, getActual, onEdit, co
   const totalEcart = type === "recette" ? totalActuel - totalPrevu : totalPrevu - totalActuel;
 
   return (
-    <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
       <div className={`h-1 w-full ${c.header}`} />
       <div className="px-4 py-3 border-b border-border bg-muted/20">
         <p className="text-sm font-bold text-foreground">{title}</p>
@@ -496,7 +496,7 @@ function BudgetTable({ title, categories, type, getBudget, getActual, onEdit, co
             return (
               <tr key={cat} className={`hover:bg-muted/10 transition-colors ${!hasData ? "opacity-50" : ""}`}>
                 <td className="px-4 py-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CAT_COLORS[cat] || "bg-gray-100 text-gray-600"}`}>{cat}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CAT_COLORS[cat] || "bg-muted/60 text-muted-foreground"}`}>{cat}</span>
                 </td>
                 <td className="px-4 py-3 text-right font-semibold text-foreground text-sm">
                   {actuel > 0 ? fmt(actuel) : <span className="text-muted-foreground">—</span>}
@@ -506,7 +506,7 @@ function BudgetTable({ title, categories, type, getBudget, getActual, onEdit, co
                 </td>
                 <td className="px-4 py-3 text-right text-sm hidden sm:table-cell">
                   {prevu > 0 ? (
-                    <span className={ecart >= 0 ? "text-emerald-600 font-semibold" : "text-red-500 font-semibold"}>
+                    <span className={ecart >= 0 ? "text-emerald-400 font-semibold" : "text-red-500 font-semibold"}>
                       {ecart >= 0 ? "+" : "−"}{fmt(Math.abs(ecart))}
                     </span>
                   ) : <span className="text-muted-foreground/50">—</span>}
@@ -539,7 +539,7 @@ function BudgetTable({ title, categories, type, getBudget, getActual, onEdit, co
             <td className="px-4 py-3 text-right font-bold text-sm text-muted-foreground">{totalPrevu > 0 ? fmt(totalPrevu) : "—"}</td>
             <td className="px-4 py-3 text-right text-sm hidden sm:table-cell">
               {totalPrevu > 0 && (
-                <span className={totalEcart >= 0 ? "text-emerald-600 font-bold" : "text-red-500 font-bold"}>
+                <span className={totalEcart >= 0 ? "text-emerald-400 font-bold" : "text-red-500 font-bold"}>
                   {totalEcart >= 0 ? "+" : "−"}{fmt(Math.abs(totalEcart))}
                 </span>
               )}
@@ -569,7 +569,7 @@ function RapportTab({ year }) {
 
   return (
     <div className="space-y-5">
-      <div className="bg-white border border-border rounded-2xl p-6 shadow-sm text-center space-y-4">
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm text-center space-y-4">
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
           <FileText className="w-7 h-7 text-primary" />
         </div>
@@ -590,7 +590,7 @@ function RapportTab({ year }) {
         </p>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+      <div className="bg-amber-500/15 border border-amber-500/25 rounded-xl px-4 py-3 text-sm text-amber-400">
         <strong>Conseil :</strong> Renseignez d'abord vos objectifs dans l'onglet <em>Budget</em> pour que le rapport inclue la comparaison prévu/réalisé.
       </div>
     </div>
@@ -629,7 +629,7 @@ export default function TresorerieSection() {
         {TABS.map(({ key, label, icon: Icon }) => (
           <button key={key} onClick={() => setActiveTab(key)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-              activeTab === key ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              activeTab === key ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}>
             <Icon className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{label}</span>

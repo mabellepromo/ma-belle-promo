@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense, useEffect } from "react";
+﻿import { useState, useMemo, lazy, Suspense, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
@@ -85,7 +85,7 @@ export function ArticlesSection() {
         <div className="flex items-center gap-2">
           {!isSeeded && (
             <button onClick={handleSeed} disabled={seeding}
-              className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
+              className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold rounded-xl hover:bg-amber-100 transition-colors disabled:opacity-60">
               {seeding ? <><div className="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /> Migration…</> : <>☁️ Migrer les données initiales</>}
             </button>
           )}
@@ -120,8 +120,8 @@ export function ArticlesSection() {
             {/* Statut toggle */}
             <div className="md:col-span-2 flex gap-2">
               {[
-                { key: "publie",    label: "Publié",    icon: Eye,    cls: "border-emerald-500 bg-emerald-50 text-emerald-700" },
-                { key: "brouillon", label: "Brouillon", icon: EyeOff, cls: "border-amber-400 bg-amber-50 text-amber-700" },
+                { key: "publie",    label: "Publié",    icon: Eye,    cls: "border-emerald-500 bg-emerald-500/15 text-emerald-400" },
+                { key: "brouillon", label: "Brouillon", icon: EyeOff, cls: "border-amber-400 bg-amber-500/15 text-amber-400" },
               ].map(({ key, label, icon: Icon, cls }) => (
                 <button key={key} type="button" onClick={() => setForm(p => ({ ...p, statut: key }))}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 text-sm font-semibold transition-all ${form.statut === key ? cls : "border-border text-muted-foreground hover:border-muted-foreground"}`}>
@@ -196,7 +196,7 @@ export function ArticlesSection() {
         {filtered.map(a => (
           <div key={a.id} className="relative">
             {a.statut === "brouillon" && (
-              <span className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+              <span className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/25">
                 <EyeOff className="w-3 h-3" /> Brouillon
               </span>
             )}
@@ -307,7 +307,7 @@ export function EvenementsSection() {
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <p className="font-bold text-foreground line-clamp-2 leading-snug">{e.titre}</p>
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    e.statut === "À venir" ? "bg-green-100 text-green-700" : e.statut === "En cours" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"
+                    e.statut === "À venir" ? "bg-emerald-500/15 text-emerald-400" : e.statut === "En cours" ? "bg-blue-500/15 text-blue-400" : "bg-muted text-muted-foreground"
                   }`}>{e.statut}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">{e.date}{e.heures ? ` · ${e.heures}` : ""} · {e.lieu}</p>
@@ -326,7 +326,7 @@ export function EvenementsSection() {
                     <Edit2 className="w-3.5 h-3.5" /> Modifier
                   </button>
                   <button onClick={() => remove(e.id)}
-                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-500/15 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" /> Supprimer
                   </button>
                 </div>
@@ -338,7 +338,7 @@ export function EvenementsSection() {
 
       {/* Panneau participants */}
       {viewParts && (
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 py-3 border-b border-border bg-muted/10 flex items-center justify-between">
             <p className="font-semibold text-sm text-foreground flex items-center gap-2">
               <Users className="w-4 h-4 text-primary" />
@@ -491,7 +491,7 @@ export function ProgrammesSection() {
         {items.map(p => (
           <ItemRow key={p.id} title={p.titre} subtitle={p.description.slice(0, 80) + "..."}
             badge={p.status}
-            badgeColor={p.status === "Actif" ? "bg-green-100 text-green-700" : p.status === "En cours" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}
+            badgeColor={p.status === "Actif" ? "bg-emerald-500/15 text-emerald-400" : p.status === "En cours" ? "bg-blue-500/15 text-blue-400" : "bg-amber-500/15 text-amber-400"}
             onEdit={() => setForm({ ...p, _editing: p.id })}
             onDelete={() => remove(p.id)} />
         ))}
@@ -698,13 +698,13 @@ export function MediathequeSection() {
           ))}
           {sub === "videos" && !seededV && (
             <button onClick={async () => { if (confirm("Migrer les vidéos statiques ?")) { await seedV(); } }}
-              className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
+              className="px-3 py-1.5 bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
               ☁️ Migrer
             </button>
           )}
           {sub === "photos" && !seededP && (
             <button onClick={async () => { if (confirm("Migrer les photos statiques ?")) { await seedP(); } }}
-              className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
+              className="px-3 py-1.5 bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold rounded-lg hover:bg-amber-100 transition-colors">
               ☁️ Migrer
             </button>
           )}
@@ -757,7 +757,7 @@ export function MediathequeSection() {
               <div key={p.id} className="relative group rounded-xl overflow-hidden bg-muted aspect-video">
                 <img src={p.src} alt={p.alt} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button onClick={() => setForm({ ...p, _editing: p.id })} className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white hover:bg-white/40"><Edit2 className="w-4 h-4" /></button>
+                  <button onClick={() => setForm({ ...p, _editing: p.id })} className="w-8 h-8 bg-card/20 rounded-lg flex items-center justify-center text-white hover:bg-card/40"><Edit2 className="w-4 h-4" /></button>
                   <button onClick={() => removeP(p.id)} className="w-8 h-8 bg-red-500/70 rounded-lg flex items-center justify-center text-white hover:bg-red-500"><Trash2 className="w-4 h-4" /></button>
                 </div>
                 {p.alt && <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs px-2 py-1 truncate">{p.alt}</p>}
@@ -779,7 +779,7 @@ export function DocumentsSection() {
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const CATS = ["Gouvernance", "Stratégie", "Rapport", "Finance", "Autre"];
   const TYPES = ["PDF", "Word", "Excel", "PowerPoint", "Autre"];
-  const ACC_COLORS = { public: "bg-green-100 text-green-700", members: "bg-amber-100 text-amber-700" };
+  const ACC_COLORS = { public: "bg-emerald-500/15 text-emerald-400", members: "bg-amber-500/15 text-amber-400" };
 
   async function doSave() {
     if (!form.titre || !form.categorie) { toast.error("Titre obligatoire"); return; }
@@ -906,7 +906,7 @@ export function RessourcesSection() {
         {items.map(r => (
           <ItemRow key={r.id} title={r.titre} subtitle={`${r.categorie} · ${r.domaine} · ${r.file_type}`}
             badge={r.acces === "public" ? "Public" : "Membres"}
-            badgeColor={r.acces === "public" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}
+            badgeColor={r.acces === "public" ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}
             extraLink={r.file_url || undefined}
             onEdit={() => setForm({ ...r, _editing: r.id })}
             onDelete={() => remove(r.id)} />
@@ -923,7 +923,7 @@ export function GaleriesSection() {
   const [seeding, setSeeding] = useState(false);
   const empty = { id: "", titre: "", date: "", lieu: "", description: "", cover: "", photos: [], access: "membres" };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
-  const ACCESS_COLORS = { membres: "bg-amber-100 text-amber-700", public: "bg-green-100 text-green-700" };
+  const ACCESS_COLORS = { membres: "bg-amber-500/15 text-amber-400", public: "bg-emerald-500/15 text-emerald-400" };
 
   async function doSave() {
     if (!form.titre || !form.date) { toast.error("Titre et date obligatoires"); return; }

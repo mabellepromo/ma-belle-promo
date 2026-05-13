@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
@@ -103,18 +103,18 @@ export default function CirculaireSection() {
         <div className="space-y-5">
 
           {step === "done" ? (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 text-center space-y-4">
+            <div className="bg-emerald-500/15 border border-emerald-500/25 rounded-2xl p-8 text-center space-y-4">
               <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto" />
               <div>
-                <p className="font-bold text-emerald-800 text-lg">Circulaire envoyée !</p>
-                <p className="text-sm text-emerald-700 mt-1">Consultez l'historique ci-dessous pour les détails.</p>
+                <p className="font-bold text-emerald-400 text-lg">Circulaire envoyée !</p>
+                <p className="text-sm text-emerald-400 mt-1">Consultez l'historique ci-dessous pour les détails.</p>
               </div>
               <button onClick={reset} className="px-5 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700">
                 Nouvelle circulaire
               </button>
             </div>
           ) : (
-            <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
                 <p className="font-semibold text-sm text-foreground">
@@ -169,7 +169,7 @@ export default function CirculaireSection() {
           )}
 
           {/* Historique */}
-          <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <p className="font-semibold text-sm text-foreground">Historique des envois</p>
@@ -188,8 +188,8 @@ export default function CirculaireSection() {
                         <p className="text-xs text-muted-foreground mt-0.5">{h.expediteur} · {new Date(h.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</p>
                       </div>
                       <div className="flex gap-1.5 flex-shrink-0">
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-700 font-semibold">{h.nb_envoyes} envoyés</span>
-                        {h.nb_erreurs > 0 && <span className="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">{h.nb_erreurs} erreurs</span>}
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-emerald-500/15 text-emerald-400 font-semibold">{h.nb_envoyes} envoyés</span>
+                        {h.nb_erreurs > 0 && <span className="px-2 py-0.5 rounded-full text-xs bg-red-500/15 text-red-400">{h.nb_erreurs} erreurs</span>}
                       </div>
                     </div>
                   </div>
@@ -200,7 +200,7 @@ export default function CirculaireSection() {
         </div>
 
         {/* ── Colonne droite : destinataires ── */}
-        <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden h-fit">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden h-fit">
           <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center gap-2">
             <Users className="w-4 h-4 text-muted-foreground" />
             <p className="font-semibold text-sm text-foreground">Destinataires ({destinataires.length})</p>

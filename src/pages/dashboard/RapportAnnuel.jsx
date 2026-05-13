@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Printer, BarChart2, Calendar, Users, FileText, TrendingUp, Banknote } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";
@@ -205,8 +205,8 @@ export default function RapportAnnuel({ members }) {
     {
       label: "Membres",
       icon: Users,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
+      color: "text-blue-400",
+      bg: "bg-blue-500/15",
       bar: "bg-blue-500",
       items: [
         { label: "Total membres", value: stats.totalMembres },
@@ -216,8 +216,8 @@ export default function RapportAnnuel({ members }) {
     {
       label: "Cotisations " + annee,
       icon: Banknote,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/15",
       bar: "bg-emerald-500",
       items: [
         { label: "Ont payé", value: `${stats.payes} / ${stats.totalMembres}` },
@@ -228,8 +228,8 @@ export default function RapportAnnuel({ members }) {
     {
       label: "Activités",
       icon: Calendar,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
+      color: "text-indigo-400",
+      bg: "bg-indigo-500/15",
       bar: "bg-indigo-500",
       items: [
         { label: "Événements passés", value: stats.evtsPasses.length },
@@ -268,7 +268,7 @@ export default function RapportAnnuel({ members }) {
         <>
           <div className="grid md:grid-cols-3 gap-4">
             {SECTION_CARDS.map(({ label, icon: Icon, color, bg, bar, items }) => (
-              <div key={label} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border">
+              <div key={label} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
                 <div className={`h-1 w-full ${bar}`} />
                 <div className="p-5">
                   <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center mb-3`}>
@@ -297,7 +297,7 @@ export default function RapportAnnuel({ members }) {
 
           {/* Événements passés */}
           {stats.evtsPasses.length > 0 && (
-            <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-muted/30">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                   <Calendar className="w-3.5 h-3.5" /> Événements passés ({stats.evtsPasses.length})
@@ -324,8 +324,8 @@ export default function RapportAnnuel({ members }) {
             </div>
           )}
 
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-            <p className="text-xs text-amber-700 flex items-start gap-2">
+          <div className="bg-amber-500/15 border border-amber-500/25 rounded-2xl p-4">
+            <p className="text-xs text-amber-400 flex items-start gap-2">
               <Printer className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
               Cliquez sur <strong>Imprimer le rapport</strong> pour ouvrir une version PDF/imprimable mise en page proprement.
               Autorisez les pop-ups si votre navigateur les bloque.

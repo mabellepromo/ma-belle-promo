@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+﻿import { useState, useCallback, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
 import { Mail, Send, RefreshCw, UserCheck, UserX, KeyRound, RotateCcw } from "lucide-react";
@@ -145,22 +145,22 @@ export default function AccesSection() {
 
       {/* Compteurs */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
+        <div className="bg-amber-500/15 border border-amber-500/25 rounded-xl p-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <UserX className="w-4 h-4 text-amber-600" />
+            <UserX className="w-4 h-4 text-amber-400" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-amber-700">{uninvited.length}</div>
-            <div className="text-xs text-amber-600 font-medium">sans invitation</div>
+            <div className="text-2xl font-bold text-amber-400">{uninvited.length}</div>
+            <div className="text-xs text-amber-400 font-medium">sans invitation</div>
           </div>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+        <div className="bg-emerald-500/15 border border-emerald-500/25 rounded-xl p-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-            <UserCheck className="w-4 h-4 text-green-600" />
+            <UserCheck className="w-4 h-4 text-emerald-400" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-700">{invited.length}</div>
-            <div className="text-xs text-green-600 font-medium">invité(s)</div>
+            <div className="text-2xl font-bold text-emerald-400">{invited.length}</div>
+            <div className="text-xs text-emerald-400 font-medium">invité(s)</div>
           </div>
         </div>
       </div>
@@ -170,9 +170,9 @@ export default function AccesSection() {
         <div className="bg-card border border-border rounded-xl overflow-hidden">
 
           {/* Barre d'actions */}
-          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 border-b border-amber-200">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-500/15 border-b border-amber-500/25">
             <button onClick={toggleAll} disabled={sending}
-              className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors disabled:opacity-50">
+              className="text-xs font-semibold text-amber-400 hover:text-amber-900 transition-colors disabled:opacity-50">
               {selected.size === uninvited.length ? "Tout désélectionner" : `Tout sélectionner (${uninvited.length})`}
             </button>
 
@@ -229,10 +229,10 @@ export default function AccesSection() {
 
       {/* Tous invités */}
       {uninvited.length === 0 && (
-        <div className="text-center py-12 bg-green-50 rounded-xl border border-green-200">
+        <div className="text-center py-12 bg-emerald-500/15 rounded-xl border border-emerald-500/25">
           <UserCheck className="w-10 h-10 text-green-500 mx-auto mb-3" />
           <p className="text-green-800 font-semibold">Tous les membres ont été invités !</p>
-          <p className="text-green-600 text-sm mt-1">
+          <p className="text-emerald-400 text-sm mt-1">
             Chaque membre a reçu un email pour activer son accès.
           </p>
         </div>
@@ -241,8 +241,8 @@ export default function AccesSection() {
       {/* Liste — déjà invités */}
       {invited.length > 0 && (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border-b border-green-200">
-            <UserCheck className="w-4 h-4 text-green-600" />
+          <div className="flex items-center gap-2 px-4 py-3 bg-emerald-500/15 border-b border-emerald-500/25">
+            <UserCheck className="w-4 h-4 text-emerald-400" />
             <span className="text-sm font-semibold text-green-800">
               {invited.length} membre(s) invité(s)
             </span>
@@ -251,7 +251,7 @@ export default function AccesSection() {
             {invited.map(m => (
               <div key={m.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="w-4 h-4 rounded-full bg-green-100 border border-green-300 flex items-center justify-center flex-shrink-0">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-foreground truncate">{m.nom}</div>
@@ -263,7 +263,7 @@ export default function AccesSection() {
                 <button
                   onClick={() => resetInvitation(m.id)}
                   title="Réinviter ce membre"
-                  className="p-1.5 rounded-lg hover:bg-amber-100 text-muted-foreground hover:text-amber-700 transition-colors flex-shrink-0">
+                  className="p-1.5 rounded-lg hover:bg-amber-100 text-muted-foreground hover:text-amber-400 transition-colors flex-shrink-0">
                   <RotateCcw className="w-3.5 h-3.5" />
                 </button>
               </div>

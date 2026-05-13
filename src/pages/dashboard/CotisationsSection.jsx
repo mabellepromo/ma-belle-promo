@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from "react";
+﻿import { useState, useMemo, Fragment } from "react";
 import { toast } from "sonner";
 import {
   Check, Clock, X, Download, Search, Banknote, Users, ShieldOff,
@@ -10,10 +10,10 @@ import { inp, sel } from "./shared";
 import { genererRecu, genererRapportFinancier } from "../../lib/documentGenerators";
 
 const STATUT_CONFIG = {
-  "payé":       { label: "Payé",       color: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500" },
-  "partiel":    { label: "Partiel",    color: "bg-blue-100 text-blue-700",       dot: "bg-blue-500"    },
-  "en_attente": { label: "En attente", color: "bg-amber-100 text-amber-700",     dot: "bg-amber-500"   },
-  "exempté":    { label: "Exempté",    color: "bg-slate-100 text-slate-600",     dot: "bg-slate-400"   },
+  "payé":       { label: "Payé",       color: "bg-emerald-500/15 text-emerald-400", dot: "bg-emerald-500" },
+  "partiel":    { label: "Partiel",    color: "bg-blue-500/15 text-blue-400",       dot: "bg-blue-500"    },
+  "en_attente": { label: "En attente", color: "bg-amber-500/15 text-amber-400",     dot: "bg-amber-500"   },
+  "exempté":    { label: "Exempté",    color: "bg-muted/60 text-muted-foreground",     dot: "bg-muted-foreground/50"   },
 };
 
 const MODES = ["virement", "mobile money", "Orange Money", "espèces", "autre"];
@@ -31,7 +31,7 @@ const CELL_CONFIG = {
   "payé":       { bg: "bg-emerald-500", label: "P" },
   "partiel":    { bg: "bg-blue-400",    label: "~" },
   "en_attente": { bg: "bg-amber-300",   label: "?" },
-  "exempté":    { bg: "bg-slate-300",   label: "E" },
+  "exempté":    { bg: "bg-muted-foreground/30",   label: "E" },
 };
 
 export default function CotisationsSection({ members }) {
@@ -202,10 +202,10 @@ export default function CotisationsSection({ members }) {
   }, [members, multiData]);
 
   const STAT_CARDS = [
-    { label: "Payés (complet)", value: `${stats.payes} / ${stats.total_membres}`, icon: Check,       bg: "bg-emerald-50", text: "text-emerald-600", bar: "bg-emerald-500" },
-    { label: "Paiement partiel",  value: stats.partiels,                           icon: CreditCard,  bg: "bg-blue-50",    text: "text-blue-600",    bar: "bg-blue-500"    },
-    { label: "En attente",         value: stats.enAttente,                          icon: Clock,       bg: "bg-amber-50",   text: "text-amber-600",   bar: "bg-amber-500"   },
-    { label: "Total collecté", value: `${stats.total.toLocaleString("fr-FR")} FCFA`, icon: Banknote, bg: "bg-violet-50", text: "text-violet-600", bar: "bg-violet-500" },
+    { label: "Payés (complet)", value: `${stats.payes} / ${stats.total_membres}`, icon: Check,       bg: "bg-emerald-500/15", text: "text-emerald-400", bar: "bg-emerald-500" },
+    { label: "Paiement partiel",  value: stats.partiels,                           icon: CreditCard,  bg: "bg-blue-500/15",    text: "text-blue-400",    bar: "bg-blue-500"    },
+    { label: "En attente",         value: stats.enAttente,                          icon: Clock,       bg: "bg-amber-500/15",   text: "text-amber-400",   bar: "bg-amber-500"   },
+    { label: "Total collecté", value: `${stats.total.toLocaleString("fr-FR")} FCFA`, icon: Banknote, bg: "bg-violet-500/15", text: "text-violet-400", bar: "bg-violet-500" },
   ];
 
   return (
@@ -245,16 +245,16 @@ export default function CotisationsSection({ members }) {
           </div>
           {relancables.length > 0 && (
             <button onClick={() => setShowRelance("all")}
-              className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-amber-700 hover:bg-amber-100 transition-colors">
+              className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-amber-500/25 bg-amber-500/15 text-sm font-medium text-amber-400 hover:bg-amber-100 transition-colors">
               <Mail className="w-3.5 h-3.5" /> Relancer tous ({relancables.length})
             </button>
           )}
           <button onClick={exportCSV}
-            className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors">
+            className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-emerald-500/25 bg-emerald-500/15 text-sm font-medium text-emerald-400 hover:bg-emerald-100 transition-colors">
             <Download className="w-3.5 h-3.5" /> Exporter CSV
           </button>
           <button onClick={() => genererRapportFinancier(annee, rows, montantDefaut, stats)}
-            className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-violet-200 bg-violet-50 text-sm font-medium text-violet-700 hover:bg-violet-100 transition-colors">
+            className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-violet-500/25 bg-violet-500/15 text-sm font-medium text-violet-400 hover:bg-violet-100 transition-colors">
             <FileText className="w-3.5 h-3.5" /> Rapport PDF
           </button>
         </div>
@@ -263,7 +263,7 @@ export default function CotisationsSection({ members }) {
       {/* ── Modale relance ── */}
       {showRelance && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="font-heading text-lg font-bold text-foreground mb-1 flex items-center gap-2">
               <Mail className="w-5 h-5 text-amber-500" />
               {showRelance === "all"
@@ -277,9 +277,9 @@ export default function CotisationsSection({ members }) {
             </p>
 
             {membresIgnores.length > 0 && (
-              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+              <div className="flex items-start gap-2 bg-amber-500/15 border border-amber-500/25 rounded-xl p-3 mb-4">
                 <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700">
+                <p className="text-xs text-amber-400">
                   <strong>{membresIgnores.length} membre{membresIgnores.length > 1 ? "s" : ""}</strong> sans email seront ignoré{membresIgnores.length > 1 ? "s" : ""} : {membresIgnores.map(m => m.nom).join(", ")}.
                 </p>
               </div>
@@ -311,7 +311,7 @@ export default function CotisationsSection({ members }) {
       )}
 
       {/* RIB */}
-      <div className="rounded-xl border border-border bg-white overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/40 border-b border-border">
           <Banknote className="w-3.5 h-3.5 text-primary" />
           <span className="text-xs font-bold text-foreground uppercase tracking-wide">Coordonnées bancaires — ECOBANK Togo</span>
@@ -339,7 +339,7 @@ export default function CotisationsSection({ members }) {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {STAT_CARDS.map(({ label, value, icon: Icon, bg, text, bar }) => (
-          <div key={label} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border">
+          <div key={label} className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
             <div className={`h-1 w-full ${bar}`} />
             <div className="p-4">
               <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center mb-2`}>
@@ -379,7 +379,7 @@ export default function CotisationsSection({ members }) {
 
       {/* ── Vue historique multi-années ── */}
       {vue === "historique" && (
-        <div className="bg-white rounded-2xl border border-border shadow-sm overflow-x-auto">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-x-auto">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
             <BarChart2 className="w-4 h-4 text-primary" />
             <span className="text-sm font-bold text-foreground">Historique des cotisations {MULTI_YEARS[0]}–{MULTI_YEARS[MULTI_YEARS.length-1]}</span>
@@ -387,7 +387,7 @@ export default function CotisationsSection({ members }) {
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Payé</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Partiel</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-300 inline-block" /> En attente</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-300 inline-block" /> Exempté</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-muted-foreground/30 inline-block" /> Exempté</span>
             </div>
           </div>
           {multiLoading ? (
@@ -429,7 +429,7 @@ export default function CotisationsSection({ members }) {
                         );
                       })}
                       <td className="px-3 py-2.5 text-center">
-                        <span className={`text-xs font-bold ${paye_count >= 4 ? "text-emerald-600" : paye_count >= 2 ? "text-amber-600" : "text-red-500"}`}>
+                        <span className={`text-xs font-bold ${paye_count >= 4 ? "text-emerald-400" : paye_count >= 2 ? "text-amber-400" : "text-red-500"}`}>
                           {paye_count}/{MULTI_YEARS.length}
                         </span>
                       </td>
@@ -444,7 +444,7 @@ export default function CotisationsSection({ members }) {
 
       {/* ── Vue évolution year-over-year ── */}
       {vue === "evolution" && (
-        <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
             <TrendingUp className="w-4 h-4 text-primary" />
             <span className="text-sm font-bold text-foreground">Évolution {MULTI_YEARS[0]}–{MULTI_YEARS.at(-1)}</span>
@@ -486,24 +486,24 @@ export default function CotisationsSection({ members }) {
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left py-2 font-semibold text-muted-foreground">Année</th>
-                      <th className="text-center py-2 font-semibold text-emerald-600">Payés</th>
-                      <th className="text-center py-2 font-semibold text-blue-600">Partiels</th>
-                      <th className="text-center py-2 font-semibold text-amber-600">En attente</th>
+                      <th className="text-center py-2 font-semibold text-emerald-400">Payés</th>
+                      <th className="text-center py-2 font-semibold text-blue-400">Partiels</th>
+                      <th className="text-center py-2 font-semibold text-amber-400">En attente</th>
                       <th className="text-center py-2 font-semibold text-muted-foreground">Taux</th>
-                      <th className="text-right py-2 font-semibold text-violet-600">Collecté</th>
+                      <th className="text-right py-2 font-semibold text-violet-400">Collecté</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
                     {evolutionData.map(d => (
                       <tr key={d.annee} className={d.annee === currentYear ? "bg-primary/5" : ""}>
                         <td className="py-2 font-semibold text-foreground">{d.annee}</td>
-                        <td className="py-2 text-center text-emerald-700 font-semibold">{d.payes}</td>
-                        <td className="py-2 text-center text-blue-700">{d.partiels}</td>
-                        <td className="py-2 text-center text-amber-700">{d.enAttente}</td>
+                        <td className="py-2 text-center text-emerald-400 font-semibold">{d.payes}</td>
+                        <td className="py-2 text-center text-blue-400">{d.partiels}</td>
+                        <td className="py-2 text-center text-amber-400">{d.enAttente}</td>
                         <td className="py-2 text-center">
-                          <span className={`font-bold ${d.taux >= 80 ? "text-emerald-600" : d.taux >= 50 ? "text-amber-600" : "text-red-500"}`}>{d.taux}%</span>
+                          <span className={`font-bold ${d.taux >= 80 ? "text-emerald-400" : d.taux >= 50 ? "text-amber-400" : "text-red-500"}`}>{d.taux}%</span>
                         </td>
-                        <td className="py-2 text-right font-mono text-violet-700">{d.collecte.toLocaleString("fr-FR")} FCFA</td>
+                        <td className="py-2 text-right font-mono text-violet-400">{d.collecte.toLocaleString("fr-FR")} FCFA</td>
                       </tr>
                     ))}
                   </tbody>
@@ -516,7 +516,7 @@ export default function CotisationsSection({ members }) {
 
       {/* Table */}
       {vue === "annuelle" && (
-      <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-10 text-center text-muted-foreground text-sm">Chargement…</div>
         ) : filtered.length === 0 ? (
@@ -589,9 +589,9 @@ export default function CotisationsSection({ members }) {
                         {exempte ? (
                           <span className="text-xs text-muted-foreground">—</span>
                         ) : reste > 0 ? (
-                          <span className="text-sm font-semibold text-amber-600">{reste.toLocaleString("fr-FR")} FCFA</span>
+                          <span className="text-sm font-semibold text-amber-400">{reste.toLocaleString("fr-FR")} FCFA</span>
                         ) : verse > 0 ? (
-                          <span className="text-xs font-semibold text-emerald-600">Complet ✓</span>
+                          <span className="text-xs font-semibold text-emerald-400">Complet ✓</span>
                         ) : (
                           <span className="text-sm text-muted-foreground">{montantDefaut.toLocaleString("fr-FR")} FCFA</span>
                         )}
@@ -609,19 +609,19 @@ export default function CotisationsSection({ members }) {
                         <div className="flex items-center gap-1.5 justify-end flex-wrap">
                           {m.statut !== "payé" && m.statut !== "exempté" && (
                             <button onClick={() => marquerPaye(m.id, montantDefaut, "virement")} disabled={saving}
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-colors disabled:opacity-50">
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-xs font-semibold hover:bg-emerald-100 transition-colors disabled:opacity-50">
                               <Check className="w-3 h-3" /> Payé
                             </button>
                           )}
                           {(m.statut === "en_attente" || m.statut === "partiel") && (
                             <button onClick={() => marquerExempte(m.id)} disabled={saving}
-                              className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-100 transition-colors disabled:opacity-50">
+                              className="px-2.5 py-1 rounded-lg bg-muted/30 border border-border text-muted-foreground text-xs font-semibold hover:bg-muted/60 transition-colors disabled:opacity-50">
                               Exempter
                             </button>
                           )}
                           {(m.statut === "en_attente" || m.statut === "partiel") && m.email && (
                             <button onClick={() => setShowRelance({ id: m.id, email: m.email, nom: m.nom })}
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors">
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold hover:bg-amber-100 transition-colors">
                               <Mail className="w-3 h-3" /> Relancer
                             </button>
                           )}
@@ -629,13 +629,13 @@ export default function CotisationsSection({ members }) {
                             <button
                               onClick={() => genererRecu(m, annee, m.cotisation?.montant || montantDefaut, m.cotisation?.date_paiement, m.cotisation?.mode_paiement, montantDefaut, m.cotisation?.versements, m.statut)}
                               title="Générer le reçu de cotisation"
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors">
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/25 text-amber-400 text-xs font-semibold hover:bg-amber-100 transition-colors">
                               <FileText className="w-3 h-3" /> Reçu
                             </button>
                           )}
                           {(m.statut === "payé" || m.statut === "exempté" || m.statut === "partiel") && (
                             <button onClick={() => marquerEnAttente(m.id)} disabled={saving}
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors disabled:opacity-50">
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-500/15 border border-red-500/25 text-red-400 text-xs font-semibold hover:bg-red-100 transition-colors disabled:opacity-50">
                               <X className="w-3 h-3" /> Annuler
                             </button>
                           )}
@@ -670,12 +670,12 @@ export default function CotisationsSection({ members }) {
                                       {Math.max(0, montantDefaut - (editData.montant ?? 0)) > 0 ? (
                                         <>
                                           <span className="text-muted-foreground">Reste :</span>
-                                          <span className="font-bold text-amber-600">
+                                          <span className="font-bold text-amber-400">
                                             {Math.max(0, montantDefaut - (editData.montant ?? 0)).toLocaleString("fr-FR")} FCFA
                                           </span>
                                         </>
                                       ) : (
-                                        <span className="font-bold text-emerald-600">Complet ✓</span>
+                                        <span className="font-bold text-emerald-400">Complet ✓</span>
                                       )}
                                     </>
                                   )}
@@ -686,14 +686,14 @@ export default function CotisationsSection({ members }) {
                               {(editData.versements ?? []).length > 0 && (
                                 <div className="space-y-1.5 mb-3">
                                   {(editData.versements ?? []).map((v, i) => (
-                                    <div key={i} className="flex items-center gap-2 bg-white border border-border rounded-lg px-3 py-2 text-xs">
+                                    <div key={i} className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 text-xs">
                                       <span className="font-bold text-foreground">{Number(v.montant).toLocaleString("fr-FR")} FCFA</span>
                                       <span className="text-muted-foreground">·</span>
                                       <span className="text-muted-foreground">{v.date}</span>
                                       <span className="text-muted-foreground">·</span>
                                       <span className="text-muted-foreground capitalize">{v.mode}</span>
                                       <button onClick={() => removeVersement(i)}
-                                        className="ml-auto w-5 h-5 rounded-md bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors">
+                                        className="ml-auto w-5 h-5 rounded-md bg-red-500/15 text-red-400 hover:text-red-400 hover:bg-red-100 flex items-center justify-center transition-colors">
                                         <X className="w-3 h-3" />
                                       </button>
                                     </div>
