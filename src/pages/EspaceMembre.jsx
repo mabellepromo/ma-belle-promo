@@ -272,7 +272,12 @@ export default function EspaceMembre() {
           <div className="relative flex-shrink-0">
             <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md">
               {member?.photo ? (
-                <img src={member.photo} alt={user.full_name} className="w-full h-full object-cover object-top" />
+                <img
+                  src={member.photo}
+                  alt={user.full_name}
+                  className="w-full h-full object-cover object-top"
+                  onError={e => { e.target.onerror = null; e.target.style.display = "none"; e.target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center"><span class="text-primary-foreground font-bold text-3xl">${user.full_name?.charAt(0) || "M"}</span></div>`; }}
+                />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
                   <span className="text-primary-foreground font-heading font-bold text-3xl">
