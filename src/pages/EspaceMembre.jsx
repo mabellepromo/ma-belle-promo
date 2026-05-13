@@ -71,11 +71,15 @@ export default function EspaceMembre() {
 
       const meta = u.user_metadata || {};
 
-      const { data: m } = await supabase
+      const { data: m, error: memberError } = await supabase
         .from("members")
         .select("id, nom, telephone, ville, pays, profession, photo, linkedin, anneeObtention, bureau")
         .eq("email", u.email)
         .maybeSingle();
+
+      console.log("[EspaceMembre] auth email:", u.email);
+      console.log("[EspaceMembre] member data:", m);
+      console.log("[EspaceMembre] member error:", memberError);
 
       setMember(m ?? null);
       setUser({ ...u, ...meta, full_name: meta.nom || meta.full_name || m?.nom || u.email });
