@@ -445,7 +445,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="dark h-screen flex overflow-hidden bg-background">
+    <div className="dark h-screen flex overflow-hidden bg-background text-foreground">
 
       {compose && (
         <ComposeModal
