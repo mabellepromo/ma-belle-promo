@@ -22,6 +22,7 @@ const testimonials = [
     role: "Enseignant-chercheur",
     titre: "Faculté de Droit · Université de Lomé",
     photo: "/images/membres/edwige-kuagbenu.webp",
+    photoPosition: "center 15%",
     quote: "Animer des panels lors de La Nuit du Droit et dans le cadre des activités de MBP, c'est pour moi un devoir envers la prochaine génération. Ce que nos promoteurs ont construit à la FDD mérite d'être transmis avec fierté.",
   },
   {
@@ -95,7 +96,7 @@ export default function TestimonialsSection() {
             <div className="w-20 h-20 rounded-full flex-shrink-0 overflow-hidden border border-accent/30"
               style={{ background: "rgba(52,211,153,0.10)" }}>
               {t.photo
-                ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
+                ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover" style={{ objectPosition: t.photoPosition || "top" }} />
                 : <span className="w-full h-full flex items-center justify-center font-heading text-xl font-bold text-accent">{t.name.charAt(0)}</span>
               }
             </div>
