@@ -14,7 +14,7 @@ const navItems = [
   {
     label: "L'Association",
     children: [
-      { icon: BookOpen,  label: "Qui sommes-nous",  href: "/association/qui-sommes-nous", desc: "Valeurs & ambitions" },
+      { icon: BookOpen,  label: "Valeurs & Mission",  href: "/association/qui-sommes-nous", desc: "Nos valeurs, mission et objectifs" },
       { icon: Users,     label: "Notre Équipe",      href: "/association/equipe",          desc: "Le bureau directeur" },
       { icon: Building2, label: "Nos Partenaires",   href: "/association/sponsors",        desc: "Institutions & soutiens" },
     ],

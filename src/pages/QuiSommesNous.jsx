@@ -54,8 +54,8 @@ export default function QuiSommesNous() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Qui sommes-nous"
-        description="Découvrez les valeurs, le but et les ambitions de Ma Belle Promo, association des anciens diplômés de la FDD de l'Université de Lomé (promotion 1994-2000)."
+        title="Valeurs & Mission"
+        description="Valeurs, mission et objectifs de L'association Ma Belle Promo (MBP) — anciens diplômés de la FDD de l'Université de Lomé, promotion 1994-2000."
         path="/association/qui-sommes-nous"
       />
 
@@ -76,7 +76,7 @@ export default function QuiSommesNous() {
             Ma Belle Promo — FDD · Université de Lomé · Promotion 1994–2000
           </p>
           <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-tight mb-8">
-            Qui sommes-nous ?
+            Valeurs & Mission
           </h1>
           <div className="w-12 h-px bg-primary mx-auto mb-8" />
           <p className="font-heading text-base md:text-lg italic text-white/60 leading-relaxed max-w-xl mx-auto">
