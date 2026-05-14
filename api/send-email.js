@@ -436,9 +436,10 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
     /* Liseré doré sous l'en-tête */
     doc.rect(0, 110, W, 3).fill("#b8861a");
 
-    /* Logo MBP */
+    /* Logo MBP — save/restore pour isoler le clipping au cercle */
     try {
       const logoBuf = Buffer.from(MBP_LOGO_PNG_B64, "base64");
+      doc.save();
       doc.circle(pad + 28, 55, 28).clip();
       doc.image(logoBuf, pad, 27, { width: 56, height: 56 });
       doc.restore();
