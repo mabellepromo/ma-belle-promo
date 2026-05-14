@@ -574,7 +574,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex-1 p-6 md:p-8 overflow-y-auto pb-24">
+        <div className="flex-1 p-6 md:p-8 overflow-y-auto pb-8">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
@@ -1234,26 +1234,6 @@ export default function Dashboard() {
           {tab === "rapport"     && <RapportAnnuel members={allMembers} />}
           {tab === "acces"       && <AccesSection />}
 
-        </div>
-
-        {/* Footer contenu */}
-        <div className="fixed bottom-0 right-0 z-20"
-          style={{ left: "16rem", background: "var(--brand-dark)" }}>
-          <div className="flex items-center justify-between px-8 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-            <div>
-              <p className="text-xs font-bold text-white/70">Ma Belle Promo</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.30)" }}>FDD · Université de Lomé · Promotion 1994–2000</p>
-            </div>
-            <div className="flex items-center gap-8">
-              <Link to="/" target="_blank" className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Site public</Link>
-              <button onClick={() => setTab("messages")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Messages</button>
-              <button onClick={() => setTab("membres")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Membres</button>
-              <button onClick={() => setTab("articles")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Articles</button>
-              <button onClick={() => setTab("evenements")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Événements</button>
-              <button onClick={() => setTab("galeries")} className="text-xs font-medium hover:text-white transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Galeries</button>
-            </div>
-            <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()}</p>
-          </div>
         </div>
       </div>
 
