@@ -62,7 +62,7 @@ export default function FooterSection() {
 
       <div className="max-w-7xl mx-auto px-6 py-5">
 
-        {/* ── Barre principale ── */}
+        {/* ── Ligne 1 : Brand · Contact · Newsletter ── */}
         <div className="flex flex-col lg:flex-row items-start lg:items-stretch gap-6 lg:gap-0">
 
           {/* Brand */}
@@ -79,28 +79,6 @@ export default function FooterSection() {
               <div className="text-[10px] text-background/35 mt-0.5">FDD Lomé · 1994–2000</div>
               <div className="text-[9px] text-background/25 tracking-wide mt-0.5">Amitié · Solidarité · Entraide</div>
             </div>
-          </div>
-
-          <Divider />
-
-          {/* Navigation */}
-          <div className="shrink-0 lg:pr-6">
-            <SectionLabel>Navigation</SectionLabel>
-            <nav className="flex flex-wrap gap-x-4 gap-y-1.5">
-              {NAV.map((l) => (
-                <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
-                  {l.label}
-                </Link>
-              ))}
-              <a
-                href="https://passerelles.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-background/50 hover:text-background/80 transition-colors"
-              >
-                Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
-              </a>
-            </nav>
           </div>
 
           <Divider />
@@ -126,10 +104,10 @@ export default function FooterSection() {
             {done ? (
               <p className="text-xs text-background/40">✓ Vérifiez votre email pour confirmer l'inscription</p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5 max-w-xs">
+              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5 max-w-sm">
                 <input
                   type="email"
-                  placeholder="Entrez votre adresse e-mail"
+                  placeholder="Votre adresse e-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -142,6 +120,26 @@ export default function FooterSection() {
             )}
           </div>
 
+        </div>
+
+        {/* ── Ligne 2 : Navigation — pleine largeur ── */}
+        <div className="mt-5 pt-4 border-t border-background/10">
+          <SectionLabel>Navigation</SectionLabel>
+          <nav className="flex flex-wrap gap-x-5 gap-y-2">
+            {NAV.map((l) => (
+              <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
+                {l.label}
+              </Link>
+            ))}
+            <a
+              href="https://passerelles.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-background/50 hover:text-background/80 transition-colors"
+            >
+              Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
+            </a>
+          </nav>
         </div>
 
         {/* ── Barre du bas ── */}
