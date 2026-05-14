@@ -12,21 +12,6 @@ const SOCIAL = [
   { href: "https://www.linkedin.com/in/fdd-mbp/",   Icon: Linkedin,  label: "LinkedIn"  },
 ];
 
-const NAV = [
-  { label: "Accueil",          href: "/" },
-  { label: "Valeurs & Mission", href: "/association/qui-sommes-nous" },
-  { label: "Notre Équipe",     href: "/association/equipe" },
-  { label: "Événements",       href: "/activites/evenements" },
-  { label: "Actualités",       href: "/informations/actualites" },
-  { label: "Annuaire",         href: "/annuaire" },
-  { label: "Adhésion",         href: "/implications/adhesion" },
-  { label: "Nous soutenir",    href: "/implications/soutenir" },
-];
-
-const Divider = () => (
-  <div className="hidden lg:block w-px self-stretch bg-background/10 mx-6" />
-);
-
 const SectionLabel = ({ children }) => (
   <span className="block text-[9px] uppercase tracking-widest text-background/30 mb-2">
     {children}
@@ -62,52 +47,90 @@ export default function FooterSection() {
 
       <div className="max-w-7xl mx-auto px-6 py-5">
 
-        {/* ── Ligne 1 : Brand · Contact · Newsletter ── */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-stretch gap-6 lg:gap-0">
+        {/* ── Grille 4 colonnes ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
 
-          {/* Brand */}
-          <div className="flex items-center gap-3 shrink-0 lg:pr-6">
-            <img
-              loading="lazy"
-              src="/Logo Redesign1.webp"
-              alt="Logo Ma Belle Promo"
-              className="w-10 h-10 rounded-full opacity-90"
-              style={{ boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}
-            />
-            <div>
-              <div className="font-heading text-sm font-bold text-background leading-tight">Ma Belle Promo</div>
-              <div className="text-[10px] text-background/35 mt-0.5">FDD Lomé · 1994–2000</div>
-              <div className="text-[9px] text-background/25 tracking-wide mt-0.5">Amitié · Solidarité · Entraide</div>
+          {/* Col 1 — Brand */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                loading="lazy"
+                src="/Logo Redesign1.webp"
+                alt="Logo Ma Belle Promo"
+                className="w-10 h-10 rounded-full opacity-90 flex-shrink-0"
+                style={{ boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}
+              />
+              <div>
+                <div className="font-heading text-sm font-bold text-background leading-tight">Ma Belle Promo</div>
+                <div className="text-[10px] text-background/35 mt-0.5">FDD Lomé · 1994–2000</div>
+              </div>
             </div>
+            <p className="text-[10px] text-background/25 tracking-widest uppercase">Amitié · Solidarité · Entraide</p>
           </div>
 
-          <Divider />
+          {/* Col 2 — L'Association */}
+          <div>
+            <SectionLabel>L'Association</SectionLabel>
+            <nav className="flex flex-col gap-2">
+              {[
+                { label: "Accueil",           href: "/" },
+                { label: "Valeurs & Mission", href: "/association/qui-sommes-nous" },
+                { label: "Notre Équipe",      href: "/association/equipe" },
+                { label: "Événements",        href: "/activites/evenements" },
+                { label: "Actualités",        href: "/informations/actualites" },
+              ].map((l) => (
+                <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
+                  {l.label}
+                </Link>
+              ))}
+              <a
+                href="https://passerelles.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-background/50 hover:text-background/80 transition-colors"
+              >
+                Passerelles ↗
+              </a>
+            </nav>
+          </div>
 
-          {/* Contact */}
-          <div className="shrink-0 lg:pr-6">
+          {/* Col 3 — S'impliquer */}
+          <div>
+            <SectionLabel>S'impliquer</SectionLabel>
+            <nav className="flex flex-col gap-2">
+              {[
+                { label: "Annuaire",      href: "/annuaire" },
+                { label: "Adhésion",      href: "/implications/adhesion" },
+                { label: "Nous soutenir", href: "/implications/soutenir" },
+                { label: "Faire un don",  href: "/don" },
+              ].map((l) => (
+                <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {/* Col 4 — Contact + Newsletter */}
+          <div>
             <SectionLabel>Contact</SectionLabel>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2 mb-5">
               <a href="tel:+22896090707" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
-                <Phone className="w-3 h-3" /> +228 96 09 07 07
+                <Phone className="w-3 h-3 flex-shrink-0" /> +228 96 09 07 07
               </a>
               <a href="mailto:contact@mabellepromo.org" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
-                <Mail className="w-3 h-3" /> contact@mabellepromo.org
+                <Mail className="w-3 h-3 flex-shrink-0" /> contact@mabellepromo.org
               </a>
             </div>
-          </div>
 
-          <Divider />
-
-          {/* Newsletter */}
-          <div className="flex-1">
             <SectionLabel>Newsletter</SectionLabel>
             {done ? (
-              <p className="text-xs text-background/40">✓ Vérifiez votre email pour confirmer l'inscription</p>
+              <p className="text-xs text-background/40">✓ Vérifiez votre email pour confirmer</p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5 max-w-sm">
+              <form onSubmit={handleNewsletter} className="flex items-center gap-1.5">
                 <input
                   type="email"
-                  placeholder="Votre adresse e-mail"
+                  placeholder="Votre email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -120,26 +143,6 @@ export default function FooterSection() {
             )}
           </div>
 
-        </div>
-
-        {/* ── Ligne 2 : Navigation — pleine largeur ── */}
-        <div className="mt-5 pt-4 border-t border-background/10">
-          <SectionLabel>Navigation</SectionLabel>
-          <nav className="flex flex-wrap gap-x-5 gap-y-2">
-            {NAV.map((l) => (
-              <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
-                {l.label}
-              </Link>
-            ))}
-            <a
-              href="https://passerelles.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-background/50 hover:text-background/80 transition-colors"
-            >
-              Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
-            </a>
-          </nav>
         </div>
 
         {/* ── Barre du bas ── */}
