@@ -589,7 +589,7 @@ export default function Dashboard() {
                 <div className="relative">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "hsl(var(--primary))" }}>Bienvenue</p>
                   <h1 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight">Tableau de bord</h1>
-                  <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>FDD — Ma Belle Promo · Lomé, Togo · Promotion 1994–2000</p>
+                  <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>L'association Ma Belle Promo (MBP) · Lomé, Togo · Promotion 1994–2000</p>
                 </div>
               </div>
 
