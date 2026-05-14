@@ -1412,3 +1412,350 @@ export function genererRapportTresorerie(annee, transactions, budget = []) {
 
   openDoc(html, `Rapport-Tresorerie-MBP-${annee}.html`);
 }
+
+// ── Facture ──────────────────────────────────────────────────────────────────
+export function genererFacture(facture) {
+  const {
+    numero         = "F-????",
+    client_nom     = "",
+    client_adresse = "",
+    client_email   = "",
+    client_telephone = "",
+    date_emission  = "",
+    date_echeance  = "",
+    objet          = "",
+    lignes         = [],
+    tva_active     = false,
+    tva_taux       = 18,
+    mode_reglement = "",
+    notes          = "",
+  } = facture;
+
+  function fmt(n) {
+    return new Intl.NumberFormat("fr-FR").format(Math.round(n || 0)) + " FCFA";
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    return new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  const totalHT = lignes.reduce((s, l) => s + ((l.quantite || 0) * (l.prix_unitaire || 0)), 0);
+  const montantTVA = tva_active ? totalHT * (tva_taux / 100) : 0;
+  const totalTTC   = totalHT + montantTVA;
+
+  const lignesHtml = lignes.map((l, i) => `
+    <tr${i % 2 === 1 ? ' class="alt"' : ""}>
+      <td class="td-desc">${l.description || "—"}</td>
+      <td class="td-num">${l.quantite || 0}</td>
+      <td class="td-num">${fmt(l.prix_unitaire)}</td>
+      <td class="td-num td-total">${fmt((l.quantite || 0) * (l.prix_unitaire || 0))}</td>
+    </tr>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture ${numero}</title>
+  <style>
+    ${MBP_STYLE}
+
+    /* ── Facture-specific overrides ── */
+    .facture-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .facture-num-box {
+      background: #0a3d28;
+      border-radius: 8px;
+      padding: 14px 18px;
+      min-width: 240px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+    }
+    .facture-num-box .info-label { color: rgba(255,255,255,0.50); }
+    .facture-num-box .info-value { color: #fff; font-size: 11pt; }
+    .facture-num-box .info-row.full-width { grid-column: 1/-1; }
+
+    .parties-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .partie {
+      background: #f7faf8;
+      border: 1px solid #c8ddd2;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .partie.dest {
+      background: linear-gradient(135deg, #fffbea 0%, #fff6d6 100%);
+      border-color: #d4a017;
+    }
+    .partie-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 7pt;
+      font-weight: 700;
+      color: #0a3d28;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(10,61,40,0.12);
+    }
+    .partie.dest .partie-label { color: #7a5100; border-color: rgba(180,130,0,0.2); }
+    .partie-nom {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0a3d28;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .partie.dest .partie-nom { color: #1a1a1a; }
+    .partie-detail {
+      font-family: 'Lato', sans-serif;
+      font-size: 8.5pt;
+      color: #555;
+      line-height: 1.65;
+    }
+
+    .objet-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f7faf8;
+      border: 1px solid #c8ddd2;
+      border-radius: 6px;
+      padding: 10px 16px;
+    }
+    .objet-row .info-label { white-space: nowrap; }
+    .objet-row .info-value { font-size: 11pt; }
+
+    /* Table */
+    .table-wrap { border: 1px solid #c8ddd2; border-radius: 8px; overflow: hidden; }
+    table.prestations { width: 100%; border-collapse: collapse; }
+    table.prestations thead tr { background: #0a3d28; }
+    table.prestations thead th {
+      font-family: 'Lato', sans-serif;
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    table.prestations thead th.th-num { text-align: right; }
+    table.prestations tbody tr { border-bottom: 1px solid #e4ede8; }
+    table.prestations tbody tr.alt { background: #f7faf8; }
+    table.prestations tbody tr:last-child { border-bottom: none; }
+    table.prestations td {
+      font-family: 'Lato', sans-serif;
+      font-size: 9pt;
+      color: #444;
+      padding: 9px 14px;
+      vertical-align: middle;
+    }
+    td.td-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10.5pt;
+      color: #1a1a1a;
+      width: 52%;
+    }
+    td.td-num { text-align: right; white-space: nowrap; }
+    td.td-total { font-weight: 700; color: #0a3d28; }
+
+    /* Totaux */
+    .totaux-wrap { display: flex; justify-content: flex-end; }
+    .totaux {
+      width: 290px;
+      border: 1px solid #c8ddd2;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid #e4ede8;
+      font-family: 'Lato', sans-serif;
+      font-size: 9pt;
+    }
+    .tot-row:last-child { border-bottom: none; }
+    .tot-row.final { background: #0a3d28; padding: 12px 16px; }
+    .tot-row .lbl { color: #666; }
+    .tot-row .val { font-weight: 700; color: #0a3d28; }
+    .tot-row.final .lbl {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14pt;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tot-row.final .val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15pt;
+      font-weight: 700;
+      color: #e6b84a;
+    }
+
+    /* Pied */
+    .reglement-box {
+      background: linear-gradient(135deg, #fffbea, #fff8dc);
+      border: 1px solid #d4a017;
+      border-left: 4px solid #d4a017;
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+    .reglement-box .info-label { color: #7a5100; }
+    .reglement-box .info-value { color: #3d2600; font-size: 11pt; margin-top: 2px; }
+
+    /* Gold diagonal watermark-like accent */
+    .corner-accent {
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 56px 56px 0;
+      border-color: transparent #b8861a transparent transparent;
+      opacity: 0.18;
+    }
+  </style>
+</head>
+<body>
+<div class="a4">
+  <div class="corner-accent"></div>
+
+  <!-- En-tête -->
+  <header class="doc-header">
+    <img src="/Logo%20Redesign1.png" alt="MBP" class="doc-header-logo" />
+    <div class="doc-header-asso">
+      <p class="asso-name">FDD MA BELLE PROMO</p>
+      <p class="asso-sub">Association des Diplômés · Faculté de Droit de Lomé · Promotion 1994-2000</p>
+      <p class="asso-sub" style="margin-top:2px">contact@mabellepromo.org · mabellepromo.vercel.app</p>
+    </div>
+  </header>
+  <div class="gold-bar"></div>
+
+  <div class="doc-body">
+
+    <!-- Titre + N° facture -->
+    <div class="facture-top">
+      <div>
+        <div class="doc-title">Facture</div>
+        <div class="doc-ref" style="font-size:8.5pt;color:#666;margin-top:5px">
+          Document officiel · FDD Ma Belle Promo
+        </div>
+      </div>
+      <div class="facture-num-box">
+        <div class="info-row">
+          <span class="info-label">Numéro</span>
+          <span class="info-value" style="font-family:'Lato',sans-serif;letter-spacing:0.05em">${numero}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date d'émission</span>
+          <span class="info-value">${fmtDate(date_emission)}</span>
+        </div>
+        ${date_echeance ? `<div class="info-row full-width">
+          <span class="info-label">Échéance</span>
+          <span class="info-value">${fmtDate(date_echeance)}</span>
+        </div>` : ""}
+      </div>
+    </div>
+
+    <!-- Objet -->
+    ${objet ? `<div class="objet-row">
+      <span class="info-label">Objet</span>
+      <span class="info-value">${objet}</span>
+    </div>` : ""}
+
+    <!-- Émetteur / Destinataire -->
+    <div class="parties-grid">
+      <div class="partie">
+        <div class="partie-label">Émetteur</div>
+        <div class="partie-nom">FDD Ma Belle Promo</div>
+        <div class="partie-detail">
+          Association des Diplômés<br>
+          Faculté de Droit, Université de Lomé<br>
+          Lomé, Togo<br>
+          contact@mabellepromo.org
+        </div>
+      </div>
+      <div class="partie dest">
+        <div class="partie-label">Facturé à</div>
+        <div class="partie-nom">${client_nom || "—"}</div>
+        <div class="partie-detail">
+          ${[client_adresse, client_email, client_telephone].filter(Boolean).join("<br>") || "<em style='color:#aaa'>Coordonnées non renseignées</em>"}
+        </div>
+      </div>
+    </div>
+
+    <!-- Table des prestations -->
+    <div class="table-wrap">
+      <table class="prestations">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="th-num" style="width:8%">Qté</th>
+            <th class="th-num" style="width:20%">Prix unitaire</th>
+            <th class="th-num" style="width:20%">Total HT</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lignesHtml || `<tr><td colspan="4" style="text-align:center;color:#aaa;font-style:italic;padding:18px">Aucune prestation</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totaux -->
+    <div class="totaux-wrap">
+      <div class="totaux">
+        <div class="tot-row">
+          <span class="lbl">Sous-total HT</span>
+          <span class="val">${fmt(totalHT)}</span>
+        </div>
+        <div class="tot-row">
+          <span class="lbl">${tva_active ? `TVA (${tva_taux}%)` : "TVA"}</span>
+          <span class="val" ${!tva_active ? 'style="color:#aaa;font-style:italic;font-weight:400;font-size:8pt"' : ""}>${tva_active ? fmt(montantTVA) : "Non applicable"}</span>
+        </div>
+        <div class="tot-row final">
+          <span class="lbl">Total ${tva_active ? "TTC" : "HT"}</span>
+          <span class="val">${fmt(totalTTC)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode de règlement -->
+    ${mode_reglement ? `<div class="reglement-box">
+      <div class="info-label">Conditions de règlement</div>
+      <div class="info-value">${mode_reglement}</div>
+    </div>` : ""}
+
+    <!-- Notes -->
+    ${notes ? `<div class="notice-box">
+      <p><strong>Notes :</strong> ${notes}</p>
+    </div>` : ""}
+
+  </div>
+
+  <!-- Pied de page -->
+  <footer class="doc-footer">
+    <div>
+      <p class="footer-text">FDD Ma Belle Promo · Association des Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994-2000</p>
+      <p class="footer-text" style="margin-top:2px">Lomé, Togo · contact@mabellepromo.org</p>
+    </div>
+    <p class="footer-text" style="text-align:right;white-space:nowrap">
+      Facture ${numero}<br>
+      Généré le ${today()}
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>`;
+
+  openDoc(html, `Facture-${numero}.html`);
+}

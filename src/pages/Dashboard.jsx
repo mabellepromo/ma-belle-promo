@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -39,6 +39,7 @@ import {
   EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
   DocumentsSection, RessourcesSection, GaleriesSection,
 } from "./dashboard/CrudSections.jsx";
+import FacturesSection from "./dashboard/FacturesSection";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -419,6 +420,7 @@ export default function Dashboard() {
         { key: "equipe",      label: "Équipe",       icon: UserCheck },
         { key: "sponsors",    label: "Partenaires",  icon: Globe },
         { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
+        { key: "factures",    label: "Factures",     icon: Receipt },
         { key: "assemblees",  label: "Assemblées",   icon: Building2 },
         { key: "elections",   label: "Élections",    icon: Vote },
         { key: "mandats",     label: "Mandats",      icon: Shield },
@@ -1216,6 +1218,7 @@ export default function Dashboard() {
           {tab === "equipe"      && <EquipeSection />}
           {tab === "sponsors"    && <SponsorsSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
+          {tab === "factures"    && <FacturesSection />}
           {tab === "assemblees"  && <AssembleesSection />}
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
