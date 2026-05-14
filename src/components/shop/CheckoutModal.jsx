@@ -9,8 +9,8 @@ const METHODS = [
   { id: "card",   label: "Carte bancaire",   icon: "💳", desc: "Visa · Mastercard · Carte prépayée",      color: "#3b82f6" },
   { id: "paypal", label: "PayPal",            icon: "🅿️", desc: "Paiement sécurisé via PayPal",            color: "#003087" },
   { id: "wave",   label: "Wave",              icon: "〰️", desc: "Paiement mobile — Togo, Côte d'Ivoire, Sénégal", color: "#2563eb" },
-  { id: "orange", label: "Orange Money",      icon: "🟠", desc: "Réseau Orange Mobile Money",               color: "#f97316" },
-  { id: "mtn",    label: "MTN Mobile Money",  icon: "🟡", desc: "Réseau MTN — paiement mobile",             color: "#fbbf24" },
+  { id: "tmoney", label: "T-Money",           icon: "🔵", desc: "Paiement mobile Togocel",                  color: "#1d4ed8" },
+  { id: "flooz",  label: "Flooz",             icon: "🟢", desc: "Paiement mobile Moov Africa Togo",         color: "#16a34a" },
   { id: "wire",   label: "Virement ECOBANK",  icon: "🏦", desc: "Virement bancaire — traitement 1–3 jours", color: "#34d399" },
 ];
 
@@ -110,7 +110,7 @@ function CardForm({ onPay, loading }) {
 function MobileForm({ method, onPay, loading }) {
   const [phone, setPhone] = useState("");
   const valid = phone.replace(/\D/g,"").length >= 8;
-  const colors = { wave: "#2563eb", orange: "#f97316", mtn: "#eab308" };
+  const colors = { wave: "#2563eb", tmoney: "#1d4ed8", flooz: "#16a34a" };
   const c = colors[method] || "#34d399";
 
   return (
@@ -131,7 +131,7 @@ function MobileForm({ method, onPay, loading }) {
         className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
         style={{
           background: valid ? `linear-gradient(135deg,${c},${c}bb)` : "rgba(255,255,255,0.06)",
-          color: valid ? (method === "mtn" ? "#000" : "#fff") : "rgba(255,255,255,0.25)",
+          color: valid ? "#fff" : "rgba(255,255,255,0.25)",
           cursor: valid ? "pointer" : "not-allowed",
         }}
       >
@@ -368,7 +368,7 @@ export default function CheckoutModal() {
                     </div>
                     {method === "card"   && <CardForm onPay={handlePay} loading={loading} />}
                     {method === "paypal" && <PayPalForm onPay={handlePay} loading={loading} />}
-                    {(method === "wave" || method === "orange" || method === "mtn") && (
+                    {(method === "wave" || method === "tmoney" || method === "flooz") && (
                       <MobileForm method={method} onPay={handlePay} loading={loading} />
                     )}
                     {method === "wire" && (
