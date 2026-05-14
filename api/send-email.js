@@ -427,7 +427,7 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
     doc.on("error", reject);
 
     const W = 595, pad = 50;
-    const fmtN = n => Number(n).toLocaleString("fr-FR") + " FCFA";
+    const fmtN = n => Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " FCFA";
     const strip = s => String(s || "").replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "").trim();
     const date  = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -484,14 +484,14 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
     y = 213;
     doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e0e0e0").lineWidth(1);
 
-    /* ── Entête tableau — vert foncé charte ── */
+    /* ── Entête tableau pleine largeur ── */
     y += 8;
-    doc.rect(pad, y, W - pad * 2, 24).fill("#0a3d28");
+    doc.rect(0, y, W, 24).fill("#0a3d28");
     doc.fillColor("#fff").fontSize(9).font("Helvetica-Bold")
        .text("Article",        pad + 10, y + 7, { width: 290 })
        .text("Qté",            350, y + 7, { width: 40, align: "center" })
        .text("Prix unitaire",  395, y + 7, { width: 80, align: "right" })
-       .text("Total",          480, y + 7, { width: 65, align: "right" });
+       .text("Total",          480, y + 7, { width: W - pad - 480, align: "right" });
 
     /* ── Lignes tableau — alternance blanc / vert très clair charte ── */
     y += 24;
@@ -505,14 +505,14 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
       y += 22;
     });
 
-    /* ── Ligne total ── */
+    /* ── Ligne total pleine largeur ── */
     y += 8;
-    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e0e0e0").lineWidth(1);
+    doc.moveTo(0, y).lineTo(W, y).stroke("#e0e0e0").lineWidth(1);
     y += 8;
-    doc.rect(350, y, W - pad - 350, 30).fill("#0a3d28");
+    doc.rect(0, y, W, 30).fill("#0a3d28");
     doc.fillColor("#fff").fontSize(12).font("Helvetica-Bold")
-       .text("TOTAL TTC", 360, y + 8)
-       .text(fmtN(total), 430, y + 8, { width: W - pad - 430, align: "right" });
+       .text("TOTAL TTC", pad + 10, y + 8)
+       .text(fmtN(total), 0, y + 8, { width: W - pad, align: "right" });
     y += 48;
 
     /* ── Coordonnées bancaires (virement) — doré clair charte ── */
