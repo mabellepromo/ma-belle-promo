@@ -56,7 +56,7 @@ export default function FooterSection() {
     <footer className="bg-foreground text-background footer-safe-area">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-5">
 
         {/* ── Barre principale ── */}
         <div className="flex flex-col lg:flex-row items-start lg:items-stretch gap-6 lg:gap-0">
@@ -125,7 +125,7 @@ export default function FooterSection() {
               <form onSubmit={handleNewsletter} className="flex items-center gap-1.5 max-w-xs">
                 <input
                   type="email"
-                  placeholder="votre@email.com"
+                  placeholder="Entrez votre adresse e-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -141,7 +141,7 @@ export default function FooterSection() {
         </div>
 
         {/* ── Barre du bas ── */}
-        <div className="mt-6 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="mt-4 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo</p>
             <span className="text-background/20">·</span>
