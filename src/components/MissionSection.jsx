@@ -152,7 +152,7 @@ export default function MissionSection() {
   return (
     <section
       id="mission"
-      className="relative overflow-hidden py-12 md:py-16"
+      className="relative overflow-hidden py-8 md:py-12"
       style={{
         background:
           "linear-gradient(160deg, hsl(150,30%,7%) 0%, hsl(150,28%,10%) 50%, hsl(150,30%,7%) 100%)",
@@ -187,7 +187,7 @@ export default function MissionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-10 md:mb-14"
+          className="text-center mb-7 md:mb-10"
         >
           <span
             className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-[0.22em] uppercase mb-6"
@@ -228,7 +228,7 @@ export default function MissionSection() {
           {/* Rangée cartes hautes */}
           <div className="grid grid-cols-5 gap-3">
             {MILESTONES.map((m, i) => (
-              <div key={m.year} style={{ minHeight: 150 }} className="flex flex-col justify-end">
+              <div key={m.year} style={{ minHeight: 120 }} className="flex flex-col justify-end">
                 {m.top && <TimelineCard m={m} i={i} from="top" shouldReduce={shouldReduce} />}
               </div>
             ))}
@@ -262,7 +262,7 @@ export default function MissionSection() {
           {/* Rangée cartes basses */}
           <div className="grid grid-cols-5 gap-3">
             {MILESTONES.map((m, i) => (
-              <div key={m.year} style={{ minHeight: 150 }}>
+              <div key={m.year} style={{ minHeight: 120 }}>
                 {!m.top && <TimelineCard m={m} i={i} from="bottom" shouldReduce={shouldReduce} />}
               </div>
             ))}
@@ -340,7 +340,7 @@ export default function MissionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex justify-center mt-8 md:mt-10"
+          className="flex justify-center mt-6 md:mt-8"
         >
           <Link
             to="/association/qui-sommes-nous"
