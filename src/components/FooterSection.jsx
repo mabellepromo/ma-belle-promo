@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useLocalAuth } from "@/lib/LocalAuth";
 
 const SOCIAL = [
   { href: "https://www.instagram.com/mabellepromo",  Icon: Instagram, label: "Instagram" },
@@ -21,6 +22,8 @@ const SectionLabel = ({ children }) => (
 export default function FooterSection() {
   const [email, setEmail] = useState("");
   const [done, setDone]   = useState(false);
+  const { session } = useLocalAuth();
+  const isAdmin = session?.role === "admin";
 
   const handleNewsletter = async (e) => {
     e.preventDefault();
@@ -98,8 +101,12 @@ export default function FooterSection() {
           <div>
             <SectionLabel>S'impliquer</SectionLabel>
             <nav className="flex flex-col gap-2">
+              {isAdmin && (
+                <Link to="/boutique" className="text-xs text-background/50 hover:text-background transition-colors">
+                  Boutique MBP
+                </Link>
+              )}
               {[
-                { label: "Boutique MBP",  href: "/boutique" },
                 { label: "Annuaire",      href: "/annuaire" },
                 { label: "Adhésion",      href: "/implications/adhesion" },
                 { label: "Nous soutenir", href: "/implications/soutenir" },

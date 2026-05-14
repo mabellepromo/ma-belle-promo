@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowLeft, Lock, Loader, CheckCircle, Copy, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/lib/supabase";
 
 const fmt = (n) => n.toLocaleString("fr-FR") + " FCFA";
 
@@ -222,10 +223,26 @@ export default function CheckoutModal() {
     setTimeout(() => { setStep(0); setMethod(null); setLoading(false); setBuyer({ nom: "", email: "" }); }, 350);
   };
 
-  const handlePay = () => {
-    if (method === "wire") { clearCart(); setOrderRef("MBP-WIRE-" + Date.now().toString(36).toUpperCase()); setStep(3); return; }
+  const handlePay = async () => {
+    const isWire = method === "wire";
+    const ref = (isWire ? "MBP-WIRE-" : "MBP-") + Date.now().toString(36).toUpperCase();
+    const payload = {
+      reference:         ref,
+      acheteur_nom:      buyer.nom,
+      acheteur_email:    buyer.email,
+      methode_paiement:  method,
+      statut:            isWire ? "pending" : "completed",
+      total,
+      lignes: items.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, price: i.price, qty: i.qty })),
+    };
+
+    if (isWire) {
+      await supabase.from("commandes").insert(payload);
+      clearCart(); setOrderRef(ref); setStep(3); return;
+    }
+
     setLoading(true);
-    const ref = "MBP-" + Date.now().toString(36).toUpperCase();
+    supabase.from("commandes").insert(payload);
     setTimeout(() => { setOrderRef(ref); clearCart(); setLoading(false); setStep(3); }, 2400);
   };
 

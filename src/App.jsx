@@ -122,6 +122,18 @@ function PrivateRoute({ children }) {
   return children;
 }
 
+function AdminRoute({ children }) {
+  const { session } = useLocalAuth();
+  const location = useLocation();
+  if (!session) {
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+  if (session.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
 const AuthenticatedApp = () => {
   const location = useLocation();
 
@@ -151,7 +163,7 @@ const AuthenticatedApp = () => {
     <ErrorBoundary key={location.pathname}>
     <Routes location={location}>
       <Route path="/" element={<Home />} />
-      <Route path="/boutique" element={<Boutique />} />
+      <Route path="/boutique" element={<AdminRoute><Boutique /></AdminRoute>} />
       <Route element={<Layout />}>
         <Route path="/association/qui-sommes-nous" element={<QuiSommesNous />} />
         <Route path="/association/credo" element={<Navigate to="/association/qui-sommes-nous" replace />} />
