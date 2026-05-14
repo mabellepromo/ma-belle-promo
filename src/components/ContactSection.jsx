@@ -67,7 +67,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-14 md:py-20 bg-muted/50">
+    <section id="contact" className="py-14 md:py-20 bg-muted/50 border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 md:gap-20">
           {/* Info */}
@@ -106,10 +106,10 @@ export default function ContactSection() {
                   <Mail className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Message</p>
-                  <Link to="/informations/contacts" className="text-sm font-semibold text-primary hover:underline mt-0.5 block">
-                    Formulaire de contact →
-                  </Link>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Email</p>
+                  <a href="mailto:contact@mabellepromo.org" className="text-sm font-semibold text-primary hover:underline mt-0.5 block">
+                    contact@mabellepromo.org
+                  </a>
                 </div>
               </div>
             </div>

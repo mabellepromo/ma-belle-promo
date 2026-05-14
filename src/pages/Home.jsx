@@ -50,6 +50,8 @@ export default function Home() {
         <MarqueeSection />
       </div>
       <MissionSection />
+      {/* Filet de séparation entre les deux sections sombres */}
+      <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(52,211,153,0.18), rgba(251,191,36,0.12), transparent)" }} />
       <TestimonialsSection />
       <CredibiliteSection />
       <Fade from={dark} to={muted} />

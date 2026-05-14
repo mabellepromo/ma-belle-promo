@@ -28,7 +28,7 @@ const MILESTONES = [
   {
     year: "2018",
     label: "La Fondation",
-    desc: "1er décembre — L'AGC officialise ce qui était déjà une famille. Ma Belle Promo est officiellement née.",
+    desc: "1er décembre — L'Assemblée Générale Constitutive officialise ce qui était déjà une famille. Ma Belle Promo est née.",
     color: "#34d399",
     glowBg: "rgba(52,211,153,0.10)",
     border: "rgba(52,211,153,0.38)",
@@ -48,7 +48,7 @@ const MILESTONES = [
   {
     year: "Aujourd'hui",
     label: "Le Réseau",
-    desc: "45+ membres actifs dans plusieurs pays. Un réseau vivant au service de ses membres et de sa communauté.",
+    desc: "La Nuit du Droit, des webinaires, des actions terrain : un réseau vivant dans 6+ pays, au service de ses membres et des étudiants de la FDD.",
     color: "#34d399",
     glowBg: "rgba(52,211,153,0.10)",
     border: "rgba(52,211,153,0.30)",

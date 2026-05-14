@@ -13,10 +13,14 @@ const SOCIAL = [
 ];
 
 const NAV = [
-  { label: "Accueil",       href: "/" },
-  { label: "Adhésion",      href: "/implications/adhesion" },
-  { label: "Actualités",    href: "/informations/actualites" },
-  { label: "Nous soutenir", href: "/implications/soutenir" },
+  { label: "Accueil",          href: "/" },
+  { label: "Valeurs & Mission", href: "/association/qui-sommes-nous" },
+  { label: "Notre Équipe",     href: "/association/equipe" },
+  { label: "Événements",       href: "/activites/evenements" },
+  { label: "Actualités",       href: "/informations/actualites" },
+  { label: "Annuaire",         href: "/annuaire" },
+  { label: "Adhésion",         href: "/implications/adhesion" },
+  { label: "Nous soutenir",    href: "/implications/soutenir" },
 ];
 
 const Divider = () => (
@@ -35,7 +39,7 @@ export default function FooterSection() {
 
   const handleNewsletter = async (e) => {
     e.preventDefault();
-    if (!email.includes("@")) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
     const token = crypto.randomUUID();
     const { error } = await supabase
       .from("newsletter_subscribers")
@@ -108,9 +112,9 @@ export default function FooterSection() {
               <a href="tel:+22896090707" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
                 <Phone className="w-3 h-3" /> +228 96 09 07 07
               </a>
-              <Link to="/informations/contacts" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
-                <Mail className="w-3 h-3" /> Nous contacter
-              </Link>
+              <a href="mailto:contact@mabellepromo.org" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
+                <Mail className="w-3 h-3" /> contact@mabellepromo.org
+              </a>
             </div>
           </div>
 

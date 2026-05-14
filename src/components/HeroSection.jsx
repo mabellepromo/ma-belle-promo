@@ -7,7 +7,7 @@ const MotionLink = motion(Link);
 
 const thisYear = new Date().getFullYear();
 const stats = [
-  { from: 2015, to: 2018, suffix: "", label: "Fondée en" },
+  { from: 2016, to: 2018, suffix: "", label: "Fondée en" },
   { from: 0, to: 6, suffix: "+", label: "Pays représentés" },
   { from: 20, to: thisYear - 1994, suffix: " ans", label: "D'amitié" },
   { from: 0, to: thisYear - 2018, suffix: " ans", label: "D'engagement" },
@@ -92,8 +92,8 @@ function WaterBubble({ children }) {
               rgba(180,255,220,0.12) 30%,
               rgba(0,120,60,0.10) 60%,
               rgba(0,40,20,0.22) 100%)`,
-            backdropFilter: "blur(28px)",
-            WebkitBackdropFilter: "blur(28px)",
+            backdropFilter: shouldReduce ? "none" : "blur(14px)",
+            WebkitBackdropFilter: shouldReduce ? "none" : "blur(14px)",
             border: "1.5px solid rgba(255,255,255,0.20)",
             boxShadow: [
               "inset 0 6px 50px rgba(255,255,255,0.10)",
@@ -213,6 +213,8 @@ export default function HeroSection() {
                 src="/Logo Redesign1.webp"
                 alt="Ma Belle Promo"
                 fetchPriority="high"
+                width={64}
+                height={64}
                 initial={{ opacity: 0, scale: 0.3 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
                 style={{
@@ -331,10 +333,10 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.74 }}
             >
-              <motion.button
+              <MotionLink
+                to="/association/qui-sommes-nous"
                 {...hoverTap}
                 transition={springTransition}
-                onClick={() => document.querySelector("#mission")?.scrollIntoView({ behavior: "smooth" })}
                 className="group flex items-center gap-2 justify-center font-bold text-base rounded-full"
                 style={{
                   padding: "14px 28px",
@@ -345,7 +347,7 @@ export default function HeroSection() {
                 }}
               >
                 Notre mission <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </motion.button>
+              </MotionLink>
               <MotionLink
                 to="/implications/soutenir"
                 {...hoverTap}

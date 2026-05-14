@@ -71,6 +71,16 @@ export default function TestimonialsSection() {
 
       <div className="relative max-w-4xl mx-auto px-6">
 
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center text-[10px] font-bold uppercase tracking-[0.22em] mb-6"
+          style={{ color: "rgba(52,211,153,0.55)" }}
+        >
+          Ce qu'ils disent
+        </motion.p>
+
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={current}
@@ -117,10 +127,13 @@ export default function TestimonialsSection() {
         </AnimatePresence>
 
         {/* Points */}
-        <div className="flex gap-1.5 mt-4 justify-center">
-          {testimonials.map((_, i) => (
-            <button key={i} onClick={() => go(i)}
-              className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-1 bg-accent" : "w-1 h-1 bg-background/20"}`}
+        <div className="flex gap-2 mt-5 justify-center items-center">
+          {testimonials.map((t, i) => (
+            <button
+              key={i}
+              onClick={() => go(i)}
+              aria-label={`Afficher le témoignage de ${t.name}`}
+              className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-1.5 bg-accent" : "w-2.5 h-2.5 bg-background/20 hover:bg-background/40"}`}
             />
           ))}
         </div>
