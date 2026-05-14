@@ -431,8 +431,10 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
     const strip = s => String(s || "").replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "").trim();
     const date  = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 
-    /* ── En-tête verte ── */
-    doc.rect(0, 0, W, 110).fill("#0f5c3a");
+    /* ── En-tête verte — couleur la plus sombre de la charte (#0a3d28) ── */
+    doc.rect(0, 0, W, 110).fill("#0a3d28");
+    /* Liseré doré sous l'en-tête */
+    doc.rect(0, 110, W, 3).fill("#b8861a");
 
     /* Logo MBP */
     try {
@@ -441,8 +443,8 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
       doc.image(logoBuf, pad, 27, { width: 56, height: 56 });
       doc.restore();
     } catch (_) {
-      doc.circle(pad + 28, 55, 28).fill("#1a7a4e");
-      doc.fillColor("#34d399").fontSize(7).font("Helvetica-Bold")
+      doc.circle(pad + 28, 55, 28).fill("#0f5c3a");
+      doc.fillColor("#e6b84a").fontSize(7).font("Helvetica-Bold")
          .text("MBP", pad + 14, 50, { width: 28, align: "center" });
     }
 
@@ -453,47 +455,47 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
        .text("FDD · Université de Lomé · Promotion 1994–2000", pad + 68, 52)
        .text("contact@mabellepromo.org  ·  www.mabellepromo.org", pad + 68, 65);
 
-    /* Badge FACTURE */
-    doc.rect(410, 34, 135, 32).fill("#34d399");
-    doc.fillColor("#0a3d28").fontSize(15).font("Helvetica-Bold")
+    /* Badge FACTURE — doré charte */
+    doc.rect(410, 34, 135, 32).fill("#b8861a");
+    doc.fillColor("#fff").fontSize(15).font("Helvetica-Bold")
        .text("FACTURE", 410, 43, { width: 135, align: "center" });
 
     /* ── Bloc méta ── */
-    let y = 130;
+    let y = 133;
     const col1 = pad, col2 = 175;
 
-    doc.fillColor("#374151").fontSize(9).font("Helvetica-Bold").text("Référence", col1, y);
-    doc.font("Helvetica").text(reference, col2, y);
+    doc.fillColor("#0a3d28").fontSize(9).font("Helvetica-Bold").text("Référence", col1, y);
+    doc.fillColor("#111827").font("Helvetica").text(reference, col2, y);
     y += 16;
-    doc.font("Helvetica-Bold").text("Date", col1, y);
-    doc.font("Helvetica").text(date, col2, y);
+    doc.fillColor("#0a3d28").font("Helvetica-Bold").text("Date", col1, y);
+    doc.fillColor("#111827").font("Helvetica").text(date, col2, y);
     y += 16;
-    doc.font("Helvetica-Bold").text("Mode de paiement", col1, y);
-    doc.font("Helvetica").text(METHOD_LABELS_PDF[methode] || methode, col2, y);
+    doc.fillColor("#0a3d28").font("Helvetica-Bold").text("Mode de paiement", col1, y);
+    doc.fillColor("#111827").font("Helvetica").text(METHOD_LABELS_PDF[methode] || methode, col2, y);
 
-    /* ── Bloc Facturé à ── */
-    doc.rect(350, 125, 200, 70).fill("#f0fdf4").stroke("#bbf7d0").lineWidth(1);
-    doc.fillColor("#14532d").fontSize(8).font("Helvetica-Bold").text("FACTURÉ À", 360, 133);
-    doc.fillColor("#111827").fontSize(10).font("Helvetica-Bold").text(strip(nom), 360, 148);
-    doc.fontSize(9).font("Helvetica").fillColor("#374151").text(email, 360, 162, { width: 180 });
+    /* ── Bloc Facturé à — vert clair charte ── */
+    doc.rect(350, 128, 200, 70).fill("#f7faf8").stroke("#c8ddd2").lineWidth(1);
+    doc.fillColor("#0a3d28").fontSize(8).font("Helvetica-Bold").text("FACTURÉ À", 360, 136);
+    doc.fillColor("#111827").fontSize(10).font("Helvetica-Bold").text(strip(nom), 360, 151);
+    doc.fontSize(9).font("Helvetica").fillColor("#374151").text(email, 360, 165, { width: 180 });
 
     /* ── Séparateur ── */
-    y = 210;
-    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(1);
+    y = 213;
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e0e0e0").lineWidth(1);
 
-    /* ── Entête tableau ── */
+    /* ── Entête tableau — vert foncé charte ── */
     y += 8;
-    doc.rect(pad, y, W - pad * 2, 24).fill("#0f5c3a");
+    doc.rect(pad, y, W - pad * 2, 24).fill("#0a3d28");
     doc.fillColor("#fff").fontSize(9).font("Helvetica-Bold")
        .text("Article",        pad + 10, y + 7, { width: 290 })
        .text("Qté",            350, y + 7, { width: 40, align: "center" })
        .text("Prix unitaire",  395, y + 7, { width: 80, align: "right" })
        .text("Total",          480, y + 7, { width: 65, align: "right" });
 
-    /* ── Lignes tableau ── */
+    /* ── Lignes tableau — alternance blanc / vert très clair charte ── */
     y += 24;
     (Array.isArray(lignes) ? lignes : []).forEach((l, i) => {
-      if (i % 2 === 0) doc.rect(pad, y, W - pad * 2, 22).fill("#f9fafb").stroke("#f3f4f6").lineWidth(0.5);
+      if (i % 2 === 0) doc.rect(pad, y, W - pad * 2, 22).fill("#f7faf8").stroke("#e0e0e0").lineWidth(0.5);
       doc.fillColor("#111827").fontSize(10).font("Helvetica")
          .text(strip(l.name), pad + 10, y + 5, { width: 290 })
          .text(String(l.qty), 350, y + 5, { width: 40, align: "center" })
@@ -504,18 +506,18 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
 
     /* ── Ligne total ── */
     y += 8;
-    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(1);
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e0e0e0").lineWidth(1);
     y += 8;
-    doc.rect(350, y, W - pad - 350, 30).fill("#0f5c3a");
+    doc.rect(350, y, W - pad - 350, 30).fill("#0a3d28");
     doc.fillColor("#fff").fontSize(12).font("Helvetica-Bold")
        .text("TOTAL TTC", 360, y + 8)
        .text(fmtN(total), 430, y + 8, { width: W - pad - 430, align: "right" });
     y += 48;
 
-    /* ── Coordonnées bancaires (virement uniquement) ── */
+    /* ── Coordonnées bancaires (virement) — doré clair charte ── */
     if (methode === "wire") {
-      doc.rect(pad, y, W - pad * 2, 88).fill("#f0fdf4").stroke("#bbf7d0").lineWidth(1);
-      doc.fillColor("#14532d").fontSize(9).font("Helvetica-Bold")
+      doc.rect(pad, y, W - pad * 2, 88).fill("#fffbea").stroke("#d4a017").lineWidth(1);
+      doc.fillColor("#b8861a").fontSize(9).font("Helvetica-Bold")
          .text("Coordonnées bancaires pour le virement", pad + 12, y + 10);
       doc.fillColor("#374151").font("Helvetica").fontSize(9)
          .text("Titulaire  :  ASSOCIATION MA BELLE PROMO MBP",   pad + 12, y + 26)
@@ -528,17 +530,17 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
 
     /* ── Mentions légales ── */
     y += 10;
-    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(0.5);
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e0e0e0").lineWidth(0.5);
     doc.fillColor("#9ca3af").fontSize(7.5).font("Helvetica")
        .text(
          "Ce document tient lieu de reçu et de facture simplifiée. Association à but non lucratif — non assujettie à la TVA.",
          pad, y + 8, { width: W - pad * 2, align: "center" }
        );
 
-    /* ── Pied de page ── */
-    doc.rect(0, 800, W, 42).fill("#f3f4f6");
-    doc.moveTo(0, 800).lineTo(W, 800).stroke("#e5e7eb").lineWidth(0.5);
-    doc.fillColor("#9ca3af").fontSize(8).font("Helvetica")
+    /* ── Pied de page — vert foncé charte ── */
+    doc.rect(0, 800, W, 42).fill("#0a3d28");
+    doc.moveTo(0, 800).lineTo(W, 800).stroke("#b8861a").lineWidth(1);
+    doc.fillColor("#fff").fontSize(8).font("Helvetica")
        .text("Ma Belle Promo  ·  12 BP 335 Baguida, Lomé, Togo  ·  contact@mabellepromo.org  ·  www.mabellepromo.org",
          0, 814, { width: W, align: "center" });
 
