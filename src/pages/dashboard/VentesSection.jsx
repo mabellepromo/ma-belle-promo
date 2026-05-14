@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader } from "lucide-react";
+import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2 } from "lucide-react";
 
 const fmt = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
 
@@ -30,8 +30,9 @@ export default function VentesSection() {
   const [commandes, setCommandes]   = useState([]);
   const [loading, setLoading]       = useState(true);
   const [period, setPeriod]         = useState("all");
-  const [expandedId, setExpandedId] = useState(null);
-  const [updatingId, setUpdatingId] = useState(null);
+  const [expandedId, setExpandedId]       = useState(null);
+  const [updatingId, setUpdatingId]       = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   async function fetchCommandes() {
     setLoading(true);
@@ -44,6 +45,17 @@ export default function VentesSection() {
   }
 
   useEffect(() => { fetchCommandes(); }, []);
+
+  async function deleteCommande(id) {
+    setUpdatingId(id);
+    const { error } = await supabase.from("commandes").delete().eq("id", id);
+    if (!error) {
+      setCommandes(prev => prev.filter(c => c.id !== id));
+      setExpandedId(null);
+    }
+    setUpdatingId(null);
+    setConfirmDeleteId(null);
+  }
 
   async function updateStatut(id, statut) {
     setUpdatingId(id);
@@ -280,8 +292,8 @@ export default function VentesSection() {
                       )}
 
                       {/* Actions */}
-                      {c.statut !== "cancelled" && (
-                        <div className="flex items-center gap-2 pt-1">
+                      <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
                           {c.statut === "pending" && (
                             <button
                               onClick={() => updateStatut(c.id, "completed")}
@@ -295,19 +307,49 @@ export default function VentesSection() {
                               Valider le paiement
                             </button>
                           )}
-                          <button
-                            onClick={() => updateStatut(c.id, "cancelled")}
-                            disabled={updatingId === c.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                            style={{ background: "rgba(239,68,68,0.08)", color: "#f87171", border: "1px solid rgba(239,68,68,0.20)" }}
-                          >
-                            {updatingId === c.id
-                              ? <Loader className="w-3.5 h-3.5 animate-spin" />
-                              : <XCircle className="w-3.5 h-3.5" />}
-                            Annuler
-                          </button>
+                          {c.statut !== "cancelled" && (
+                            <button
+                              onClick={() => updateStatut(c.id, "cancelled")}
+                              disabled={updatingId === c.id}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                              style={{ background: "rgba(239,68,68,0.08)", color: "#f87171", border: "1px solid rgba(239,68,68,0.20)" }}
+                            >
+                              {updatingId === c.id
+                                ? <Loader className="w-3.5 h-3.5 animate-spin" />
+                                : <XCircle className="w-3.5 h-3.5" />}
+                              Annuler
+                            </button>
+                          )}
                         </div>
-                      )}
+
+                        {/* Suppression — deux clics requis */}
+                        {confirmDeleteId === c.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] text-muted-foreground">Supprimer définitivement ?</span>
+                            <button
+                              onClick={() => deleteCommande(c.id)}
+                              disabled={updatingId === c.id}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                              style={{ background: "rgba(239,68,68,0.18)", color: "#f87171", border: "1px solid rgba(239,68,68,0.35)" }}
+                            >
+                              {updatingId === c.id ? <Loader className="w-3 h-3 animate-spin" /> : "Confirmer"}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              Annuler
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(c.id)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-red-400 hover:bg-red-500/8 transition-colors border border-transparent hover:border-red-500/20"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Supprimer
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
