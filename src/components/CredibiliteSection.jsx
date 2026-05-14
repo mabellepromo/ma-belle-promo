@@ -88,7 +88,7 @@ export default function CredibiliteSection() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Devenir membre</h3>
-              <p className="text-white/50 text-xs mt-0.5">Anciens de la FDD de Lomé</p>
+              <p className="text-white/50 text-xs mt-0.5 leading-relaxed">Rejoignez un réseau actif de juristes présents dans 6&nbsp;pays.</p>
             </div>
             <MotionLink
               to="/implications/adhesion"
@@ -121,7 +121,7 @@ export default function CredibiliteSection() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Nous soutenir</h3>
-              <p className="text-white/50 text-xs mt-0.5">Actions sociales au Togo</p>
+              <p className="text-white/50 text-xs mt-0.5 leading-relaxed">Soutenez nos étudiants et nos initiatives au Togo.</p>
             </div>
             <MotionLink
               to="/implications/soutenir"

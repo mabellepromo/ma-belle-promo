@@ -1,15 +1,16 @@
 import { motion, useScroll, useTransform, useReducedMotion, useInView } from "framer-motion";
-import { ArrowDown, ChevronRight } from "lucide-react";
+import { ArrowDown, ChevronRight, Scale } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const MotionLink = motion(Link);
 
+const thisYear = new Date().getFullYear();
 const stats = [
-  { from: 2010, to: 2018, suffix: "", label: "Fondée en" },
-  { from: 0, to: 45, suffix: "+", label: "Membres actifs" },
-  { from: 0, to: 10, suffix: "+", label: "Projets réalisés" },
-  { from: 0, to: 8, suffix: " ans", label: "D'engagement" },
+  { from: 2015, to: 2018, suffix: "", label: "Fondée en" },
+  { from: 0, to: 6, suffix: "+", label: "Pays représentés" },
+  { from: 20, to: thisYear - 1994, suffix: " ans", label: "D'amitié" },
+  { from: 0, to: thisYear - 2018, suffix: " ans", label: "D'engagement" },
 ];
 
 function useCountUp(from, to, duration, trigger, shouldReduce) {
@@ -144,6 +145,7 @@ export default function HeroSection() {
           src="/images/conference.jpg"
           alt=""
           fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover scale-110"
           style={{ opacity: 0.07, mixBlendMode: "luminosity" }}
           onError={(e) => { e.currentTarget.style.display = "none"; }}
@@ -271,29 +273,34 @@ export default function HeroSection() {
 
           {/* ── COL 2 : Titre + message + CTAs ── */}
           <div>
-            {/* Axe 2 — blur-in reveal sur chaque ligne de titre */}
-            <motion.h1
-              className="font-heading leading-none mb-1 text-center md:text-left"
-              style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em" }}
-              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            >
-              L'excellence juridique partagée,
-            </motion.h1>
-            <motion.h1
+            {/* Titre principal — un seul h1 sémantique, deux lignes animées */}
+            <h1
               className="font-heading leading-none mb-6 text-center md:text-left"
-              style={{
-                fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, letterSpacing: "-0.04em",
-                background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}
-              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.8, delay: 0.38, ease: "easeOut" }}
+              style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, letterSpacing: "-0.04em" }}
             >
-              au service de l'avenir
-            </motion.h1>
+              <motion.span
+                className="block mb-1"
+                style={{ color: "rgba(255,255,255,0.95)" }}
+                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              >
+                L'excellence juridique partagée,
+              </motion.span>
+              <motion.span
+                className="block"
+                style={{
+                  background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.38, ease: "easeOut" }}
+              >
+                au service de l'avenir
+              </motion.span>
+            </h1>
 
             {/* Citation présidente */}
             <motion.div
@@ -390,7 +397,7 @@ export default function HeroSection() {
               animate={{ y: [0, -7, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -top-3 -right-4 z-20 rounded-2xl px-3 py-2.5 flex items-center gap-2.5"
               style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.16)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" }}>
-              <span className="text-lg">🏛️</span>
+              <Scale className="w-5 h-5 text-emerald-300" />
               <div>
                 <p className="text-xs font-bold text-white">Ma Belle Promo</p>
                 <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>Fondée en 2018</p>

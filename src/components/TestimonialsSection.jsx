@@ -48,7 +48,7 @@ export default function TestimonialsSection() {
     const timer = setInterval(() => {
       setDirection(1);
       setCurrent((c) => (c + 1) % testimonials.length);
-    }, 7000);
+    }, 10000);
     return () => clearInterval(timer);
   }, []);
 
@@ -59,7 +59,7 @@ export default function TestimonialsSection() {
   const t = testimonials[current];
 
   return (
-    <section className="py-10 bg-foreground relative overflow-hidden">
+    <section className="py-16 bg-foreground relative overflow-hidden">
 
       {/* Filigrane MBP */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
@@ -82,7 +82,7 @@ export default function TestimonialsSection() {
             className="flex items-center gap-6 py-2"
           >
             {/* Photo */}
-            <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden border border-accent/30"
+            <div className="w-20 h-20 rounded-full flex-shrink-0 overflow-hidden border border-accent/30"
               style={{ background: "rgba(52,211,153,0.10)" }}>
               {t.photo
                 ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover object-top" />
@@ -92,7 +92,7 @@ export default function TestimonialsSection() {
 
             {/* Citation + identité */}
             <div className="flex-1 min-w-0">
-              <p className="text-background/80 text-sm md:text-base leading-relaxed italic line-clamp-2">
+              <p className="text-background/80 text-sm md:text-base leading-relaxed italic line-clamp-3">
                 « {t.quote} »
               </p>
               <div className="mt-2 flex items-center gap-2">

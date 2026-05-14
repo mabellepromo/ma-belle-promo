@@ -29,7 +29,6 @@ const jsonLd = {
 };
 
 /* Dégradé de transition entre sections — même famille de teinte (150°) */
-const light = "hsl(150,10%,97%)";
 const dark  = "hsl(150,28%,12%)";
 const muted = "hsl(150,10%,93%)";
 
@@ -51,12 +50,10 @@ export default function Home() {
         <MarqueeSection />
       </div>
       <MissionSection />
+      <TestimonialsSection />
       <CredibiliteSection />
       <Fade from={dark} to={muted} />
       <ActualitesSection />
-      <Fade from={muted} to={dark} />
-      <TestimonialsSection />
-      <Fade from={dark} to={muted} />
       <ContactSection />
       <Fade from={muted} to={dark} />
       <FooterSection />

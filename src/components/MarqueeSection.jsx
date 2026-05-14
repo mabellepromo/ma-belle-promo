@@ -46,7 +46,7 @@ const ROW1 = [
   { label: "Événements",         to: "/activites/evenements" },
   { label: "Nos Projets",        to: "/activites/projets" },
   { label: "Nos Programmes",     to: "/activites/programmes" },
-  { label: "Passerelles",        href: "https://passerelles.vercel.app" },
+  { label: "Passerelles ↗",      href: "https://passerelles.vercel.app" },
 ];
 
 const ROW2 = [

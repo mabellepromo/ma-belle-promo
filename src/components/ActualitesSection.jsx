@@ -91,14 +91,14 @@ export default function ActualitesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
           <span className="eyebrow text-accent">Restez informés</span>
           <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground">
             Actualités & Événements
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-lg">
-            Nous agissons, intervenons et influons sur divers programmes. Retrouvez ici nos dernières nouvelles.
+            Événements, projets en cours et feuille de route — tout ce qui anime l'association.
           </p>
         </motion.div>
 
@@ -146,7 +146,12 @@ export default function ActualitesSection() {
             ) : (
               <div className="flex items-center gap-3 py-2">
                 <Calendar className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">Aucun événement à venir pour le moment. Revenez bientôt.</p>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Prochain événement en préparation</p>
+                  <Link to="/activites/evenements" className="text-xs text-primary hover:underline">
+                    Consulter la page Événements →
+                  </Link>
+                </div>
               </div>
             )}
           </motion.div>
