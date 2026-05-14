@@ -818,7 +818,7 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
     photos: ["https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop"],
     contenu: `Ce **1er décembre 2018**, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une **structure officielle** lors de cette Assemblée Générale Constitutive.
 
-L'association **l'association Ma Belle Promo (MBP)** — en abrégé **FDD MBP** — est officiellement née.
+**L'association Ma Belle Promo (MBP)** est officiellement née.
 
 ## Un acte fondateur
 
