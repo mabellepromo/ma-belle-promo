@@ -13,21 +13,11 @@ const SOCIAL = [
 ];
 
 const NAV = [
-  { label: "Accueil",          href: "/" },
-  { label: "Qui sommes-nous",  href: "/association/qui-sommes-nous" },
-  { label: "Nos Actions",      href: "/activites/evenements" },
-  { label: "Actualités",       href: "/informations/actualites" },
-  { label: "Adhésion",         href: "/implications/adhesion" },
-  { label: "Nous soutenir",    href: "/implications/soutenir" },
+  { label: "Accueil",       href: "/" },
+  { label: "Adhésion",      href: "/implications/adhesion" },
+  { label: "Actualités",    href: "/informations/actualites" },
+  { label: "Nous soutenir", href: "/implications/soutenir" },
 ];
-
-function FooterHeading({ children }) {
-  return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-widest text-background/40 mb-4">
-      {children}
-    </h3>
-  );
-}
 
 export default function FooterSection() {
   const [email, setEmail] = useState("");
@@ -57,93 +47,103 @@ export default function FooterSection() {
       {/* Ligne d'accent en haut */}
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-        {/* ── Grille principale : 2 colonnes ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* ── Ligne principale ── */}
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
 
-          {/* Colonne gauche — Brand + Navigation */}
-          <div className="flex flex-col gap-5">
-            {/* Brand */}
-            <div className="flex items-center gap-3">
-              <img
-                loading="lazy"
-                src="/Logo Redesign1.webp"
-                alt="Logo Ma Belle Promo"
-                className="w-11 h-11 rounded-full opacity-90 shadow-lg flex-shrink-0"
-                style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
-              />
-              <div>
-                <div className="font-heading text-base font-bold text-background leading-tight">Ma Belle Promo</div>
-                <div className="text-[11px] text-background/40 leading-tight mt-0.5">FDD Lomé · 1994–2000 · Amitié · Solidarité · Entraide</div>
-              </div>
+          {/* Brand */}
+          <div className="flex items-center gap-4 shrink-0">
+            <img
+              loading="lazy"
+              src="/Logo Redesign1.webp"
+              alt="Logo Ma Belle Promo"
+              className="w-14 h-14 rounded-full opacity-90 shadow-lg"
+              style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
+            />
+            <div>
+              <div className="font-heading text-lg font-bold text-background leading-tight">Ma Belle Promo</div>
+              <div className="text-xs text-background/40 leading-tight mt-0.5">FDD Lomé · 1994–2000</div>
+              <div className="text-[10px] text-background/30 leading-tight mt-0.5 tracking-wide">Amitié · Solidarité · Entraide</div>
             </div>
-
-            {/* Navigation en ligne */}
-            <nav className="flex flex-wrap gap-x-4 gap-y-1.5">
-              {NAV.map((l) => (
-                <Link key={l.href} to={l.href} className="text-xs text-background/50 hover:text-background transition-colors">
-                  {l.label}
-                </Link>
-              ))}
-              <a
-                href="https://passerelles.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-background/50 hover:text-background/80 transition-colors"
-              >
-                Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
-              </a>
-            </nav>
           </div>
 
-          {/* Colonne droite — Contact + Newsletter */}
-          <div className="flex flex-col gap-4">
-            {/* Contact */}
-            <div className="flex items-center gap-5">
-              <a href="tel:+22896090707" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
-                <Phone className="w-3.5 h-3.5 flex-shrink-0" /> +228 96 09 07 07
+          {/* Nav */}
+          <nav className="flex flex-wrap gap-x-5 gap-y-1.5 justify-center text-xs text-background/50">
+            {NAV.map((l) => (
+              <Link key={l.href} to={l.href} className="hover:text-background transition-colors">
+                {l.label}
+              </Link>
+            ))}
+            <a
+              href="https://passerelles.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity text-background/50"
+            >
+              Programme <span style={{ color: "#f97316" }}>
+                "Passerelles"
+              </span>
+            </a>
+          </nav>
+
+          {/* Contact + newsletter */}
+          <div className="flex flex-col gap-2.5 items-center lg:items-end text-xs text-background/50 shrink-0">
+            <div className="flex items-center gap-4">
+              <a href="tel:+22896090707" className="flex items-center gap-1.5 hover:text-background transition-colors">
+                <Phone className="w-3 h-3" /> +228 96 09 07 07
               </a>
-              <Link to="/informations/contacts" className="flex items-center gap-1.5 text-xs text-background/50 hover:text-background transition-colors">
-                <Mail className="w-3.5 h-3.5 flex-shrink-0" /> Nous contacter
+              <Link to="/informations/contacts" className="flex items-center gap-1.5 hover:text-background transition-colors">
+                <Mail className="w-3 h-3" /> Nous contacter
               </Link>
             </div>
-
-            {/* Newsletter */}
             {done ? (
-              <p className="text-xs text-background/40">✓ Vérifiez votre email pour confirmer l'inscription.</p>
+              <p className="text-background/40 text-xs">✓ Vérifiez votre email pour confirmer l'inscription</p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex items-center gap-2">
-                <span className="text-xs text-background/40 whitespace-nowrap hidden sm:block">Newsletter :</span>
-                <input
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0"
-                />
-                <button type="submit" aria-label="S'abonner à la newsletter" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-opacity">
-                  <ArrowRight className="w-3 h-3 text-primary-foreground" />
-                </button>
+              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full lg:w-auto">
+                <span className="text-background/60 text-xs font-medium text-center lg:text-right lg:whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0"
+                  />
+                  <button type="submit" aria-label="S'abonner à la newsletter" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-opacity">
+                    <ArrowRight className="w-3 h-3 text-primary-foreground" />
+                  </button>
+                </div>
               </form>
             )}
           </div>
-
         </div>
 
         {/* ── Barre du bas ── */}
-        <div className="mt-10 pt-5 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo · Tous droits réservés</p>
+        <div className="mt-6 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo</p>
+            <div className="flex items-center gap-3">
+              <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">Mentions légales</Link>
+              <span className="text-background/20">·</span>
+              <Link to="/confidentialite" className="text-xs text-background/30 hover:text-background/60 transition-colors">Confidentialité</Link>
+            </div>
+          </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">
-              Mentions légales
-            </Link>
-            <span className="text-background/20">·</span>
-            <Link to="/confidentialite" className="text-xs text-background/30 hover:text-background/60 transition-colors">
-              Confidentialité
-            </Link>
+            {SOCIAL.map(({ href, Icon, label }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="text-background/40 hover:text-background transition-colors hover:scale-110 transition-transform"
+              >
+                <Icon className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />
+              </a>
+            ))}
           </div>
 
           <p className="text-xs text-background/30 flex items-center gap-1">
