@@ -99,6 +99,7 @@ export default function FooterSection() {
             <SectionLabel>S'impliquer</SectionLabel>
             <nav className="flex flex-col gap-2">
               {[
+                { label: "Boutique MBP",  href: "/boutique" },
                 { label: "Annuaire",      href: "/annuaire" },
                 { label: "Adhésion",      href: "/implications/adhesion" },
                 { label: "Nous soutenir", href: "/implications/soutenir" },

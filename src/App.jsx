@@ -29,6 +29,7 @@ const PAGE_TITLES = {
   "/informations/documents":     "Documents",
   "/informations/contacts":      "Contacts",
   "/informations/communiques":   "Communiqués",
+  "/boutique":                   "Boutique MBP",
   "/don":                        "Faire un Don",
   "/don/merci":                  "Merci !",
   "/paiement/retour":            "Retour de paiement",
@@ -52,6 +53,9 @@ function PageTitleUpdater() {
   }, [pathname]);
   return null;
 }
+import { CartProvider } from '@/contexts/CartContext';
+import CartSidebar from '@/components/shop/CartSidebar';
+import CheckoutModal from '@/components/shop/CheckoutModal';
 import MaintenanceGate, { MAINTENANCE_MODE } from '@/components/MaintenanceGate';
 import CookieBanner from '@/components/CookieBanner';
 import PageNotFound from './lib/PageNotFound';
@@ -99,6 +103,7 @@ const NewsletterConfirm  = lazy(() => import('./pages/NewsletterConfirm'));
 const PaiementRetour     = lazy(() => import('./pages/PaiementRetour'));
 const Verifier           = lazy(() => import('./pages/Verifier'));
 const Sondage            = lazy(() => import('./pages/Sondage'));
+const Boutique           = lazy(() => import('./pages/Boutique'));
 
 function PageLoader() {
   return (
@@ -131,6 +136,8 @@ const AuthenticatedApp = () => {
     <>
     <PageTitleUpdater />
     <ScrollToTop />
+    <CartSidebar />
+    <CheckoutModal />
     <div style={{ position: "relative" }}>
     <AnimatePresence mode="popLayout" initial={false}>
     <motion.div
@@ -144,6 +151,7 @@ const AuthenticatedApp = () => {
     <ErrorBoundary key={location.pathname}>
     <Routes location={location}>
       <Route path="/" element={<Home />} />
+      <Route path="/boutique" element={<Boutique />} />
       <Route element={<Layout />}>
         <Route path="/association/qui-sommes-nous" element={<QuiSommesNous />} />
         <Route path="/association/credo" element={<Navigate to="/association/qui-sommes-nous" replace />} />
@@ -200,12 +208,14 @@ function App() {
     <MaintenanceGate>
     <LocalAuthProvider>
         <QueryClientProvider client={queryClientInstance}>
+          <CartProvider>
           <Router>
             <AuthenticatedApp />
             <CookieBanner />
           </Router>
           <Toaster />
           <SonnerToaster richColors position="top-right" />
+          </CartProvider>
         </QueryClientProvider>
         <WindowFrame />
       </LocalAuthProvider>
