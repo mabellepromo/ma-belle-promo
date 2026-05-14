@@ -12,6 +12,7 @@ const SITE = "Ma Belle Promo";
 
 const PAGE_TITLES = {
   "/":                           "Accueil",
+  "/association/qui-sommes-nous": "Qui sommes-nous",
   "/association/credo":          "Notre Credo",
   "/association/ambition":       "Notre Ambition",
   "/association/equipe":         "Notre Équipe",
@@ -67,6 +68,7 @@ import Actualites from './pages/Actualites';
 import Contacts from './pages/Contacts';
 
 // Pages chargées à la demande (code splitting)
+const QuiSommesNous  = lazy(() => import('./pages/QuiSommesNous'));
 const Credo          = lazy(() => import('./pages/Credo'));
 const Ambition       = lazy(() => import('./pages/Ambition'));
 const Equipe         = lazy(() => import('./pages/Equipe'));
@@ -143,8 +145,9 @@ const AuthenticatedApp = () => {
     <Routes location={location}>
       <Route path="/" element={<Home />} />
       <Route element={<Layout />}>
-        <Route path="/association/credo" element={<Credo />} />
-        <Route path="/association/ambition" element={<Ambition />} />
+        <Route path="/association/qui-sommes-nous" element={<QuiSommesNous />} />
+        <Route path="/association/credo" element={<Navigate to="/association/qui-sommes-nous" replace />} />
+        <Route path="/association/ambition" element={<Navigate to="/association/qui-sommes-nous" replace />} />
         <Route path="/association/equipe" element={<Equipe />} />
         <Route path="/association/sponsors" element={<Sponsors />} />
         <Route path="/activites/evenements" element={<Evenements />} />

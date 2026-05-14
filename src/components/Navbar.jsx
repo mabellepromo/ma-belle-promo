@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut,
-  BookOpen, Target, Users, Building2,
-  Calendar, FolderOpen, ListTodo,
-  UserPlus, CreditCard, Heart,
-  Newspaper, Image, Film, FileText, MessageSquare, Mail,
+  BookOpen, Users, Building2,
+  Calendar, FolderOpen, Newspaper,
+  UserPlus, Heart,
+  Film, MessageSquare, Mail,
 } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,38 +14,32 @@ const navItems = [
   {
     label: "L'Association",
     children: [
-      { icon: BookOpen,  label: "Notre Credo",      href: "/association/credo",    desc: "Nos valeurs fondatrices" },
-      { icon: Target,    label: "Notre Ambition",    href: "/association/ambition", desc: "But & objectifs" },
-      { icon: Users,     label: "Notre Équipe",      href: "/association/equipe",   desc: "Le bureau directeur" },
-      { icon: Building2, label: "Nos Partenaires",   href: "/association/sponsors", desc: "Institutions & soutiens" },
+      { icon: BookOpen,  label: "Qui sommes-nous",  href: "/association/qui-sommes-nous", desc: "Valeurs & ambitions" },
+      { icon: Users,     label: "Notre Équipe",      href: "/association/equipe",          desc: "Le bureau directeur" },
+      { icon: Building2, label: "Nos Partenaires",   href: "/association/sponsors",        desc: "Institutions & soutiens" },
     ],
   },
   {
-    label: "Activités",
+    label: "Nos Actions",
     children: [
-      { icon: Calendar,    label: "Événements", href: "/activites/evenements", desc: "Agenda et compte-rendus" },
-      { icon: FolderOpen,  label: "Projets",    href: "/activites/projets",    desc: "Nos initiatives en cours" },
-      { icon: ListTodo,    label: "Programmes", href: "/activites/programmes", desc: "Plan d'action 2026" },
+      { icon: Calendar,   label: "Événements", href: "/activites/evenements",      desc: "Agenda et compte-rendus" },
+      { icon: FolderOpen, label: "Projets",    href: "/activites/projets",         desc: "Nos initiatives en cours" },
+      { icon: Newspaper,  label: "Actualités", href: "/informations/actualites",   desc: "Dernières nouvelles" },
     ],
   },
   {
-    label: "Implications",
+    label: "Rejoindre",
     children: [
-      { icon: Users,       label: "Adhérents",      href: "/annuaire",                desc: "Annuaire des membres" },
-      { icon: UserPlus,    label: "Adhésion",        href: "/implications/adhesion",   desc: "Rejoindre l'association" },
-      { icon: CreditCard,  label: "Cotisation",      href: "/implications/cotisation", desc: "Gérer sa cotisation" },
-      { icon: Heart,       label: "Nous Soutenir",   href: "/implications/soutenir",   desc: "Faire un don" },
+      { icon: Users,    label: "Annuaire des membres", href: "/annuaire",               desc: "Nos membres" },
+      { icon: UserPlus, label: "Adhésion",             href: "/implications/adhesion",  desc: "Rejoindre l'association" },
+      { icon: Heart,    label: "Nous Soutenir",        href: "/implications/soutenir",  desc: "Faire un don" },
     ],
   },
   {
-    label: "Informations",
+    label: "Médias",
     children: [
-      { icon: Newspaper,       label: "Actualités",       href: "/informations/actualites",  desc: "Dernières nouvelles" },
-      { icon: Image,           label: "Galeries membres",  href: "/galeries", membersOnly: true, desc: "Photos & albums" },
-      { icon: Film,            label: "Médiathèque",       href: "/informations/mediatheque", desc: "Vidéos & ressources" },
-      { icon: FileText,        label: "Documents",         href: "/informations/documents",   desc: "Docs officiels" },
-      { icon: MessageSquare,   label: "Communiqués",       href: "/informations/communiques", desc: "Communiqués officiels" },
-      { icon: Mail,            label: "Contact",           href: "/informations/contacts",    desc: "Nous écrire" },
+      { icon: Film,          label: "Médiathèque", href: "/informations/mediatheque", desc: "Vidéos & ressources" },
+      { icon: MessageSquare, label: "Communiqués", href: "/informations/communiques", desc: "Communiqués officiels" },
     ],
   },
 ];
@@ -351,11 +345,21 @@ export default function Navbar() {
           background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)",
         }} />
 
-        {/* ── DESKTOP : groupe nav droit — 2 menus + DON ── */}
+        {/* ── DESKTOP : groupe nav droit — 2 menus + Contact + DON ── */}
         <div className="hidden md:flex flex-1 items-center gap-0.5">
           {navItems.slice(2).map((item) => (
             <DesktopDropdown key={item.label} item={item} />
           ))}
+          <Link
+            to="/informations/contacts"
+            className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+            style={{ color: "rgba(255,255,255,0.62)" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
+          >
+            <Mail className="w-3 h-3" />
+            Contact
+          </Link>
           <button
             onClick={() => navigate("/don")}
             className="ml-2 flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
@@ -511,6 +515,17 @@ export default function Navbar() {
             {navItems.map((item) => (
               <MobileMenuItem key={item.label} item={item} onClose={() => setOpen(false)} />
             ))}
+
+            {/* Contact */}
+            <button
+              onClick={() => { setOpen(false); navigate("/informations/contacts"); }}
+              className="flex items-center gap-2.5 w-full px-4 py-3 text-sm font-medium text-foreground bg-card rounded-xl border border-border hover:bg-muted transition-colors"
+            >
+              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Mail className="w-3.5 h-3.5 text-primary" />
+              </div>
+              Contact
+            </button>
 
             {isAdmin && (
               <button
