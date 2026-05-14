@@ -1,5 +1,6 @@
 ﻿// Vercel serverless function — proxy Brevo API
 // La clé API reste côté serveur (jamais exposée au navigateur)
+import PDFDocument from "pdfkit";
 
 const SENDER = { name: "Association Ma Belle Promo (MBP)", email: "contact@mabellepromo.org" };
 const CONTACT_TO = [{ email: "contact@mabellepromo.org", name: "Ma Belle Promo" }];
@@ -410,6 +411,133 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   };
 }
 
+const METHOD_LABELS_PDF = {
+  card: "Carte bancaire", paypal: "PayPal", wave: "Wave",
+  tmoney: "T-Money", flooz: "Flooz", wire: "Virement ECOBANK",
+};
+
+function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 0, size: "A4" });
+    const chunks = [];
+    doc.on("data", c => chunks.push(c));
+    doc.on("end",  () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+
+    const W = 595, pad = 50;
+    const fmtN = n => Number(n).toLocaleString("fr-FR") + " FCFA";
+    const strip = s => String(s || "").replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "").trim();
+    const date  = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+
+    /* ── En-tête verte ── */
+    doc.rect(0, 0, W, 110).fill("#0f5c3a");
+
+    /* Cercle logo */
+    doc.circle(pad + 28, 55, 28).fill("#1a7a4e");
+    doc.circle(pad + 28, 55, 28).stroke("#34d399").lineWidth(1.5);
+    doc.fillColor("#34d399").fontSize(7).font("Helvetica-Bold")
+       .text("MBP", pad + 14, 50, { width: 28, align: "center" });
+
+    /* Nom association */
+    doc.fillColor("#fff").fontSize(15).font("Helvetica-Bold")
+       .text("Association Ma Belle Promo (MBP)", pad + 68, 32);
+    doc.fontSize(8).font("Helvetica")
+       .text("FDD · Université de Lomé · Promotion 1994–2000", pad + 68, 52)
+       .text("contact@mabellepromo.org  ·  www.mabellepromo.org", pad + 68, 65);
+
+    /* Badge FACTURE */
+    doc.rect(410, 34, 135, 32).fill("#34d399");
+    doc.fillColor("#0a3d28").fontSize(15).font("Helvetica-Bold")
+       .text("FACTURE", 410, 43, { width: 135, align: "center" });
+
+    /* ── Bloc méta ── */
+    let y = 130;
+    const col1 = pad, col2 = 175;
+
+    doc.fillColor("#374151").fontSize(9).font("Helvetica-Bold").text("Référence", col1, y);
+    doc.font("Helvetica").text(reference, col2, y);
+    y += 16;
+    doc.font("Helvetica-Bold").text("Date", col1, y);
+    doc.font("Helvetica").text(date, col2, y);
+    y += 16;
+    doc.font("Helvetica-Bold").text("Mode de paiement", col1, y);
+    doc.font("Helvetica").text(METHOD_LABELS_PDF[methode] || methode, col2, y);
+
+    /* ── Bloc Facturé à ── */
+    doc.rect(350, 125, 200, 70).fill("#f0fdf4").stroke("#bbf7d0").lineWidth(1);
+    doc.fillColor("#14532d").fontSize(8).font("Helvetica-Bold").text("FACTURÉ À", 360, 133);
+    doc.fillColor("#111827").fontSize(10).font("Helvetica-Bold").text(strip(nom), 360, 148);
+    doc.fontSize(9).font("Helvetica").fillColor("#374151").text(email, 360, 162, { width: 180 });
+
+    /* ── Séparateur ── */
+    y = 210;
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(1);
+
+    /* ── Entête tableau ── */
+    y += 8;
+    doc.rect(pad, y, W - pad * 2, 24).fill("#0f5c3a");
+    doc.fillColor("#fff").fontSize(9).font("Helvetica-Bold")
+       .text("Article",        pad + 10, y + 7, { width: 290 })
+       .text("Qté",            350, y + 7, { width: 40, align: "center" })
+       .text("Prix unitaire",  395, y + 7, { width: 80, align: "right" })
+       .text("Total",          480, y + 7, { width: 65, align: "right" });
+
+    /* ── Lignes tableau ── */
+    y += 24;
+    (Array.isArray(lignes) ? lignes : []).forEach((l, i) => {
+      if (i % 2 === 0) doc.rect(pad, y, W - pad * 2, 22).fill("#f9fafb").stroke("#f3f4f6").lineWidth(0.5);
+      doc.fillColor("#111827").fontSize(10).font("Helvetica")
+         .text(strip(l.name), pad + 10, y + 5, { width: 290 })
+         .text(String(l.qty), 350, y + 5, { width: 40, align: "center" })
+         .text(fmtN(l.price), 395, y + 5, { width: 80, align: "right" })
+         .text(fmtN(l.price * l.qty), 480, y + 5, { width: 65, align: "right" });
+      y += 22;
+    });
+
+    /* ── Ligne total ── */
+    y += 8;
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(1);
+    y += 8;
+    doc.rect(350, y, W - pad - 350, 30).fill("#0f5c3a");
+    doc.fillColor("#fff").fontSize(12).font("Helvetica-Bold")
+       .text("TOTAL TTC", 360, y + 8)
+       .text(fmtN(total), 430, y + 8, { width: W - pad - 430, align: "right" });
+    y += 48;
+
+    /* ── Coordonnées bancaires (virement uniquement) ── */
+    if (methode === "wire") {
+      doc.rect(pad, y, W - pad * 2, 88).fill("#f0fdf4").stroke("#bbf7d0").lineWidth(1);
+      doc.fillColor("#14532d").fontSize(9).font("Helvetica-Bold")
+         .text("Coordonnées bancaires pour le virement", pad + 12, y + 10);
+      doc.fillColor("#374151").font("Helvetica").fontSize(9)
+         .text("Titulaire  :  ASSOCIATION MA BELLE PROMO MBP",   pad + 12, y + 26)
+         .text("Banque    :  ECOBANK Togo",                       pad + 12, y + 40)
+         .text("IBAN       :  TG53 TG05 5017 1014 1766 3880 0153", pad + 12, y + 54)
+         .text("Swift/BIC :  ECOCTGTGXXX",                        pad + 12, y + 68)
+         .text(`Référence virement : BOUTIQUE MBP — ${strip(nom)}`, pad + 12, y + 82);
+      y += 100;
+    }
+
+    /* ── Mentions légales ── */
+    y += 10;
+    doc.moveTo(pad, y).lineTo(W - pad, y).stroke("#e5e7eb").lineWidth(0.5);
+    doc.fillColor("#9ca3af").fontSize(7.5).font("Helvetica")
+       .text(
+         "Ce document tient lieu de reçu et de facture simplifiée. Association à but non lucratif — non assujettie à la TVA.",
+         pad, y + 8, { width: W - pad * 2, align: "center" }
+       );
+
+    /* ── Pied de page ── */
+    doc.rect(0, 800, W, 42).fill("#f3f4f6");
+    doc.moveTo(0, 800).lineTo(W, 800).stroke("#e5e7eb").lineWidth(0.5);
+    doc.fillColor("#9ca3af").fontSize(8).font("Helvetica")
+       .text("Ma Belle Promo  ·  12 BP 335 Baguida, Lomé, Togo  ·  contact@mabellepromo.org  ·  www.mabellepromo.org",
+         0, 814, { width: W, align: "center" });
+
+    doc.end();
+  });
+}
+
 export default async function handler(req, res) {
   const allowedOrigin = getAllowedOrigin(req);
   res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
@@ -579,6 +707,30 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, sent: sentIds.length, sentIds, errors });
   }
 
+  // ── Confirmation de commande avec facture PDF jointe ──
+  if (type === "order_confirm") {
+    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+    try {
+      const pdfBuffer = await generateInvoicePdf(data);
+      const emailPayload = buildOrderConfirmPayload(data);
+      emailPayload.attachment = [{
+        content: pdfBuffer.toString("base64"),
+        name: `Facture-${(data.reference || "MBP").replace(/[^A-Z0-9-]/gi, "")}.pdf`,
+      }];
+      const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(emailPayload),
+      });
+      const result = await resp.json();
+      if (!resp.ok) { console.error("Brevo order_confirm error:", result); return res.status(502).json({ error: result }); }
+      return res.status(200).json({ success: true, messageId: result.messageId });
+    } catch (err) {
+      console.error("order_confirm PDF error:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   // Validation des champs selon le type
   if (type === "contact") {
     if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
@@ -589,8 +741,6 @@ export default async function handler(req, res) {
     if (!isValidConfirmUrl(data.confirm_url)) return res.status(400).json({ error: "URL de confirmation non autorisée." });
   } else if (type === "admin_alert") {
     if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
-  } else if (type === "order_confirm") {
-    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
   }
 
   try {
@@ -598,7 +748,6 @@ export default async function handler(req, res) {
     if (type === "contact")              payload = buildContactPayload(data);
     else if (type === "reply")           payload = buildReplyPayload(data);
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
-    else if (type === "order_confirm")   payload = buildOrderConfirmPayload(data);
     else                                 payload = buildAdminAlertPayload(data);
 
     if (type === "reply" && Array.isArray(data.attachments) && data.attachments.length) {
