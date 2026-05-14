@@ -129,7 +129,7 @@ export default function FooterSection() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0"
+                  className="h-7 px-3 rounded-md bg-white/10 border border-white/15 text-white placeholder:text-white/45 text-xs focus:outline-none focus:border-white/35 flex-1 min-w-0"
                 />
                 <button type="submit" aria-label="S'abonner à la newsletter" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-opacity">
                   <ArrowRight className="w-3 h-3 text-primary-foreground" />
