@@ -93,7 +93,7 @@ export default function ActualitesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <span className="eyebrow text-accent">Restez informés</span>
+          <span className="eyebrow text-accent">Vie de l'association</span>
           <h2 className="mt-3 font-heading text-4xl md:text-5xl font-bold text-foreground">
             Actualités & Événements
           </h2>

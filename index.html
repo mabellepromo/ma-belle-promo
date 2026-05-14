@@ -2,6 +2,10 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      .skip-link { position: absolute; top: -48px; left: 0; background: #34d399; color: #000; font-weight: 700; font-size: 13px; padding: 10px 16px; z-index: 9999; transition: top 0.15s; border-radius: 0 0 8px 0; }
+      .skip-link:focus { top: 0; }
+    </style>
     <link rel="icon" type="image/webp" href="/Logo%20Redesign1.webp" />
     <link rel="preload" as="image" type="image/webp" href="/Logo%20Redesign1.webp" fetchpriority="high" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -18,6 +22,7 @@
     <meta name="theme-color" content="#0a2218" />
   </head>
   <body>
+    <a href="#hero" class="skip-link">Aller au contenu principal</a>
     <div id="root"><div style="min-height:100dvh;background:#0a2218;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"><img src="/Logo Redesign1.webp" alt="Ma Belle Promo" width="64" height="64" fetchpriority="high" style="border-radius:50%;opacity:.9;" /><p style="color:rgba(110,231,183,.7);font-size:13px;font-family:sans-serif;letter-spacing:.08em;margin:0;">Ma Belle Promo</p></div></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

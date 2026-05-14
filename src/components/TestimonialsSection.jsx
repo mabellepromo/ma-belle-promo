@@ -79,7 +79,7 @@ export default function TestimonialsSection() {
           className="text-center text-[10px] font-bold uppercase tracking-[0.22em] mb-6"
           style={{ color: "rgba(52,211,153,0.55)" }}
         >
-          Ce qu'ils disent
+          Leurs témoignages
         </motion.p>
 
         <AnimatePresence mode="wait" custom={direction}>
@@ -103,7 +103,7 @@ export default function TestimonialsSection() {
 
             {/* Citation + identité */}
             <div className="flex-1 min-w-0">
-              <p className="text-background/80 text-sm md:text-base leading-relaxed italic line-clamp-3">
+              <p className="text-background/80 text-sm md:text-base leading-relaxed italic">
                 « {t.quote} »
               </p>
               <div className="mt-2 flex items-center gap-2">

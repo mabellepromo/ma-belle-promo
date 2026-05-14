@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { ArrowUp } from "lucide-react";
 import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
 import MissionSection from "../components/MissionSection";
@@ -27,6 +29,26 @@ const jsonLd = {
     "https://www.linkedin.com/in/fdd-mbp/"
   ]
 };
+
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!visible) return null;
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Remonter en haut de la page"
+      className="fixed bottom-6 right-4 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg md:hidden"
+      style={{ background: "rgba(52,211,153,0.85)", color: "#fff", backdropFilter: "blur(8px)" }}
+    >
+      <ArrowUp className="w-4 h-4" />
+    </button>
+  );
+}
 
 /* Dégradé de transition entre sections — même famille de teinte (150°) */
 const dark  = "hsl(150,28%,12%)";
@@ -59,6 +81,7 @@ export default function Home() {
       <ContactSection />
       <Fade from={muted} to={dark} />
       <FooterSection />
+      <ScrollToTop />
     </div>
   );
 }

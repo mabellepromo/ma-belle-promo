@@ -9,7 +9,7 @@ const thisYear = new Date().getFullYear();
 const stats = [
   { from: 2016, to: 2018, suffix: "", label: "Fondée en" },
   { from: 0, to: 6, suffix: "+", label: "Pays représentés" },
-  { from: 20, to: thisYear - 1994, suffix: " ans", label: "D'amitié" },
+  { from: 20, to: thisYear - 1994, suffix: " ans", label: "Ans de fraternité" },
   { from: 0, to: thisYear - 2018, suffix: " ans", label: "D'engagement" },
 ];
 
@@ -352,12 +352,11 @@ export default function HeroSection() {
                 to="/implications/soutenir"
                 {...hoverTap}
                 transition={springTransition}
-                className="flex items-center gap-2 justify-center font-bold text-sm rounded-full"
+                className="flex items-center gap-2 justify-center font-semibold text-sm rounded-full"
                 style={{
                   padding: "14px 28px",
-                  background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
-                  color: "#000",
-                  boxShadow: "0 4px 20px rgba(251,191,36,0.40)",
+                  color: "rgba(251,191,36,0.80)",
+                  border: "1.5px solid rgba(251,191,36,0.30)",
                 }}
               >
                 Nous soutenir
@@ -383,6 +382,7 @@ export default function HeroSection() {
               <img
                 src="/images/membres/fabienne.webp"
                 alt="Fabienne SENAYA-ATAYI — Présidente"
+                fetchPriority="high"
                 className="w-full h-full object-cover object-top"
               />
               <div className="absolute bottom-0 left-0 right-0 h-1/3"
@@ -396,7 +396,8 @@ export default function HeroSection() {
 
             {/* Carte flottante */}
             <motion.div
-              animate={{ y: [0, -7, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              animate={shouldReduce ? {} : { y: [0, -7, 0] }}
+              transition={shouldReduce ? {} : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -top-3 -right-4 z-20 rounded-2xl px-3 py-2.5 flex items-center gap-2.5"
               style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.16)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" }}>
               <Scale className="w-5 h-5 text-emerald-300" />

@@ -89,6 +89,14 @@ export default function CredibiliteSection() {
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Devenir membre</h3>
               <p className="text-white/50 text-xs mt-0.5 leading-relaxed">Rejoignez un réseau actif de juristes présents dans 6&nbsp;pays.</p>
+              <ul className="mt-2 flex flex-col gap-0.5">
+                {["Accès à l'annuaire", "Webinaires & conférences", "Mentorat Passerelles"].map(b => (
+                  <li key={b} className="flex items-center gap-1 text-[10px]" style={{ color: "rgba(110,231,183,0.65)" }}>
+                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "rgba(52,211,153,0.50)" }} />
+                    {b}
+                  </li>
+                ))}
+              </ul>
             </div>
             <MotionLink
               to="/implications/adhesion"

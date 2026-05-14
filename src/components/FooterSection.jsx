@@ -127,6 +127,7 @@ export default function FooterSection() {
             {done ? (
               <p className="text-xs text-background/40">✓ Vérifiez votre email pour confirmer</p>
             ) : (
+              <>
               <form onSubmit={handleNewsletter} className="flex items-center gap-1.5">
                 <input
                   type="email"
@@ -140,6 +141,8 @@ export default function FooterSection() {
                   <ArrowRight className="w-3 h-3 text-primary-foreground" />
                 </button>
               </form>
+              <p className="text-[10px] text-background/25 mt-1.5">Actualités mensuelles et événements</p>
+              </>
             )}
           </div>
 
