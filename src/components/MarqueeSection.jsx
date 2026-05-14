@@ -46,7 +46,7 @@ const ROW1 = [
   { label: "Événements",         to: "/activites/evenements" },
   { label: "Nos Projets",        to: "/activites/projets" },
   { label: "Nos Programmes",     to: "/activites/programmes" },
-  { label: "Passerelles ↗",      href: "https://passerelles.vercel.app" },
+  { label: 'Programme "Passerelles" ↗', styledLabel: <>Programme <span style={{ color: "#f97316" }}>"Passerelles"</span> ↗</>, href: "https://passerelles.vercel.app" },
 ];
 
 const ROW2 = [
@@ -64,16 +64,17 @@ const ROW2 = [
 
 function Item({ item, gem, gemColor }) {
   const isExternal = Boolean(item.href);
+  const content = item.styledLabel ?? item.label;
 
   return (
     <span style={{ display: "flex", alignItems: "center", flexShrink: 0, padding: "0 6px" }}>
       {isExternal ? (
         <a href={item.href} target="_blank" rel="noopener noreferrer" className="mq-pill">
-          {item.label}
+          {content}
         </a>
       ) : (
         <Link to={item.to} className="mq-pill">
-          {item.label}
+          {content}
         </Link>
       )}
       <span style={{ color: gemColor, fontSize: 6, opacity: 0.55, marginLeft: 6 }}>{gem}</span>

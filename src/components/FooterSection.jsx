@@ -89,7 +89,7 @@ export default function FooterSection() {
                 rel="noopener noreferrer"
                 className="text-xs text-background/50 hover:text-background/80 transition-colors"
               >
-                Passerelles ↗
+                Programme <span style={{ color: "#f97316" }}>"Passerelles"</span> ↗
               </a>
             </nav>
           </div>

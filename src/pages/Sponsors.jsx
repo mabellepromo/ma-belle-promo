@@ -71,9 +71,9 @@ export default function Sponsors() {
             <a
               href="https://passerelles.vercel.app"
               target="_blank" rel="noopener noreferrer"
-              style={{ color: "#6ee7b7", textDecoration: "none", borderBottom: "1px solid rgba(110,231,183,0.4)" }}
+              style={{ textDecoration: "none" }}
             >
-              Passerelles
+              Programme <span style={{ color: "#f97316", borderBottom: "1px solid rgba(249,115,22,0.4)" }}>"Passerelles"</span>
             </a>.
           </motion.p>
 
