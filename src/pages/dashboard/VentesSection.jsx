@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw } from "lucide-react";
+import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader } from "lucide-react";
 
 const fmt = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
 
@@ -27,10 +27,11 @@ const PERIODS = [
 ];
 
 export default function VentesSection() {
-  const [commandes, setCommandes] = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [period, setPeriod]       = useState("all");
+  const [commandes, setCommandes]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [period, setPeriod]         = useState("all");
   const [expandedId, setExpandedId] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   async function fetchCommandes() {
     setLoading(true);
@@ -43,6 +44,16 @@ export default function VentesSection() {
   }
 
   useEffect(() => { fetchCommandes(); }, []);
+
+  async function updateStatut(id, statut) {
+    setUpdatingId(id);
+    const { error } = await supabase.from("commandes").update({ statut }).eq("id", id);
+    if (!error) {
+      setCommandes(prev => prev.map(c => c.id === id ? { ...c, statut } : c));
+      setExpandedId(null);
+    }
+    setUpdatingId(null);
+  }
 
   const filtered = useMemo(() => {
     const now = new Date();
@@ -252,17 +263,51 @@ export default function VentesSection() {
                     </span>
                   </button>
 
-                  {isOpen && lignes.length > 0 && (
-                    <div className="px-5 pb-4 pt-1 bg-muted/20 border-t border-border/40">
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Articles commandés</p>
-                      <div className="space-y-1">
-                        {lignes.map((l, i) => (
-                          <div key={i} className="flex justify-between text-xs">
-                            <span className="text-foreground">{l.emoji} {l.name} ×{l.qty}</span>
-                            <span className="font-semibold text-primary">{fmt(l.price * l.qty)}</span>
+                  {isOpen && (
+                    <div className="px-5 pb-4 pt-2 bg-muted/20 border-t border-border/40 space-y-3">
+                      {lignes.length > 0 && (
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Articles commandés</p>
+                          <div className="space-y-1">
+                            {lignes.map((l, i) => (
+                              <div key={i} className="flex justify-between text-xs">
+                                <span className="text-foreground">{l.emoji} {l.name} ×{l.qty}</span>
+                                <span className="font-semibold text-primary">{fmt(l.price * l.qty)}</span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      {c.statut !== "cancelled" && (
+                        <div className="flex items-center gap-2 pt-1">
+                          {c.statut === "pending" && (
+                            <button
+                              onClick={() => updateStatut(c.id, "completed")}
+                              disabled={updatingId === c.id}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                              style={{ background: "rgba(52,211,153,0.12)", color: "#34d399", border: "1px solid rgba(52,211,153,0.25)" }}
+                            >
+                              {updatingId === c.id
+                                ? <Loader className="w-3.5 h-3.5 animate-spin" />
+                                : <CheckCircle className="w-3.5 h-3.5" />}
+                              Valider le paiement
+                            </button>
+                          )}
+                          <button
+                            onClick={() => updateStatut(c.id, "cancelled")}
+                            disabled={updatingId === c.id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                            style={{ background: "rgba(239,68,68,0.08)", color: "#f87171", border: "1px solid rgba(239,68,68,0.20)" }}
+                          >
+                            {updatingId === c.id
+                              ? <Loader className="w-3.5 h-3.5 animate-spin" />
+                              : <XCircle className="w-3.5 h-3.5" />}
+                            Annuler
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
