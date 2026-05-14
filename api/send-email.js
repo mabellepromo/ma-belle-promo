@@ -421,8 +421,9 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   // Rate limiting — max 5 requêtes / IP / 5 minutes
+  // Exemption : order_confirm est un email transactionnel déclenché après achat
   const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
-  if (!checkRateLimit(ip)) {
+  if (type !== "order_confirm" && !checkRateLimit(ip)) {
     return res.status(429).json({ error: "Trop de requêtes. Réessayez dans quelques minutes." });
   }
 
