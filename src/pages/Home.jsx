@@ -51,7 +51,6 @@ export default function Home() {
         <MarqueeSection />
       </div>
       <MissionSection />
-      <Fade from={light} to={dark} />
       <CredibiliteSection />
       <Fade from={dark} to={muted} />
       <ActualitesSection />

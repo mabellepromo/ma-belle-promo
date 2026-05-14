@@ -3,7 +3,7 @@
 import { Link } from "react-router-dom";
 
 const BG = "var(--brand-dark-mid)";
-const LIGHT = "hsl(150,10%,97%)";
+const LIGHT = "hsl(150,30%,7%)";
 
 const MARQUEE_CSS = `
   @keyframes marquee-left {

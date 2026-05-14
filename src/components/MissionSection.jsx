@@ -1,229 +1,360 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Target, Scale, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-const MotionLink = motion(Link);
+const LINE_GRADIENT =
+  "linear-gradient(90deg, transparent, #6ee7b7 8%, #fbbf24 28%, #34d399 50%, #a78bfa 72%, #34d399 90%, transparent)";
 
-const GLOW_CSS = `
-  @keyframes glow-pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(21,128,61,0); }
-    50%      { box-shadow: 0 0 0 14px rgba(21,128,61,0.30); }
-  }
-  .btn-glow { animation: glow-pulse 2.4s ease-in-out infinite; }
-`;
-
-const TILES = [
+const MILESTONES = [
   {
-    icon: Scale,
-    color: "blue",
-    title: "Notre Statut",
-    href: "/mentions-legales",
-    desc: "Association à but non lucratif dotée de la personnalité morale, constituée conformément à la législation togolaise. Récépissé N°0920/MATDCL-SG-DLPAP-DOCA, délivré le 03 octobre 2019.",
-    tags: ["ABNL", "Personnalité morale", "FDD · UL", "Depuis 2019"],
-    cta: "Consulter nos mentions légales",
-    tagStyle: "bg-blue-50 text-blue-700 border-blue-200",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    hoverBorder: "hover:border-blue-300",
-    hoverTitle: "group-hover:text-blue-700",
-    ctaColor: "text-blue-600",
-    accentBg: "bg-blue-50/50 group-hover:bg-blue-50",
+    year: "1994",
+    label: "L'Entrée",
+    desc: "Nous intégrons la Faculté de Droit de l'Université de Lomé. Une promotion se noue sur les bancs d'un même amphithéâtre.",
+    color: "#6ee7b7",
+    glowBg: "rgba(110,231,183,0.07)",
+    border: "rgba(110,231,183,0.22)",
+    top: true,
   },
   {
-    icon: BookOpen,
-    color: "primary",
-    title: "Notre Credo",
-    href: "/association/credo",
-    desc: "Les 6 valeurs fondatrices qui définissent l'identité et l'âme de Ma Belle Promo.",
-    tags: ["Amitié", "Solidarité", "Entraide", "Excellence"],
-    cta: "Découvrir nos valeurs",
-    tagStyle: "bg-primary/10 text-primary border-primary/20",
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-    hoverBorder: "hover:border-primary/40",
-    hoverTitle: "group-hover:text-primary",
-    ctaColor: "text-primary",
-    accentBg: "bg-primary/5 group-hover:bg-primary/10",
+    year: "2000",
+    label: "L'Envol",
+    desc: "Diplômés, nous partons aux quatre coins du Togo et du monde. Les liens tissés sur les bancs de la FDD, eux, restent intacts.",
+    color: "#fbbf24",
+    glowBg: "rgba(251,191,36,0.07)",
+    border: "rgba(251,191,36,0.25)",
+    top: false,
   },
   {
-    icon: Target,
-    color: "accent",
-    title: "Notre Ambition",
-    href: "/association/ambition",
-    desc: "Notre but, nos objectifs et notre vision à moyen terme pour l'association et ses membres.",
-    tags: ["Réseau", "Mentorat", "Communauté", "Impact"],
-    cta: "Partager notre ambition",
-    tagStyle: "bg-accent/10 text-accent border-accent/20",
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
-    hoverBorder: "hover:border-accent/40",
-    hoverTitle: "group-hover:text-accent",
-    ctaColor: "text-accent",
-    accentBg: "bg-accent/5 group-hover:bg-accent/10",
+    year: "2018",
+    label: "La Fondation",
+    desc: "1er décembre — L'AGC officialise ce qui était déjà une famille. Ma Belle Promo est officiellement née.",
+    color: "#34d399",
+    glowBg: "rgba(52,211,153,0.10)",
+    border: "rgba(52,211,153,0.38)",
+    top: true,
+    featured: true,
+  },
+  {
+    year: "2019",
+    label: "La Reconnaissance",
+    desc: "03 octobre — L'État togolais reconnaît officiellement l'association.",
+    badge: "Récépissé N°0920/MATDCL-SG-DLPAP-DOCA",
+    color: "#a78bfa",
+    glowBg: "rgba(167,139,250,0.08)",
+    border: "rgba(167,139,250,0.30)",
+    top: false,
+  },
+  {
+    year: "Aujourd'hui",
+    label: "Le Réseau",
+    desc: "45+ membres actifs dans plusieurs pays. Un réseau vivant au service de ses membres et de sa communauté.",
+    color: "#34d399",
+    glowBg: "rgba(52,211,153,0.10)",
+    border: "rgba(52,211,153,0.30)",
+    top: true,
+    pulse: true,
   },
 ];
 
-export default function MissionSection() {
-  const shouldReduce = useReducedMotion();
-  const springTransition = { type: "spring", stiffness: 400, damping: 20 };
+const PULSE_CSS = `
+  @keyframes mbp-dot-pulse {
+    0%   { box-shadow: 0 0 0 0px  rgba(52,211,153,0.85); }
+    70%  { box-shadow: 0 0 0 14px rgba(52,211,153,0);    }
+    100% { box-shadow: 0 0 0 0px  rgba(52,211,153,0);    }
+  }
+  .mbp-pulse { animation: mbp-dot-pulse 2.2s ease-out infinite; }
+`;
+
+/* ── Carte milestone ───────────────────────────────────────── */
+function TimelineCard({ m, i, from, shouldReduce }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const yDir = from === "top" ? -28 : 28;
 
   return (
-    <section id="mission" className="py-16 md:py-24 bg-background">
-      <style>{GLOW_CSS}</style>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: shouldReduce ? 0 : yDir }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] }}
+      className="h-full rounded-2xl p-4 relative overflow-hidden"
+      style={{ background: m.glowBg, border: `1px solid ${m.border}` }}
+    >
+      {m.featured && (
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ boxShadow: "inset 0 0 28px rgba(52,211,153,0.12)" }}
+        />
+      )}
+      <p className="font-heading text-sm font-bold mb-1.5" style={{ color: m.color }}>
+        {m.label}
+      </p>
+      <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.48)" }}>
+        {m.desc}
+      </p>
+      {m.badge && (
+        <div
+          className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold"
+          style={{
+            background: "rgba(167,139,250,0.12)",
+            color: "#c4b5fd",
+            border: "1px solid rgba(167,139,250,0.28)",
+          }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-violet-400" />
+          {m.badge}
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
-      <div className="max-w-7xl mx-auto px-6 space-y-20">
+/* ── Point sur la ligne ─────────────────────────────────────── */
+function TimelineDot({ m, i, inView, shouldReduce }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2">
+      <motion.div
+        className={m.pulse ? "mbp-pulse" : ""}
+        initial={{ scale: shouldReduce ? 1 : 0 }}
+        animate={inView ? { scale: 1 } : {}}
+        transition={{ type: "spring", stiffness: 260, damping: 14, delay: i * 0.13 + 0.2 }}
+        style={{
+          width: m.featured ? 20 : 12,
+          height: m.featured ? 20 : 12,
+          borderRadius: "50%",
+          background: m.color,
+          boxShadow: `0 0 ${m.featured ? "20px" : "8px"} ${m.color}`,
+          flexShrink: 0,
+        }}
+      />
+      <motion.p
+        className="text-[9px] font-black tracking-wider whitespace-nowrap text-center"
+        style={{ color: m.color }}
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ delay: i * 0.13 + 0.38, duration: 0.4 }}
+      >
+        {m.year}
+      </motion.p>
+    </div>
+  );
+}
 
-        {/* ── Bloc 1 : Qui sommes-nous ── */}
-        <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+/* ══════════════════════════════════════════════════════════════
+   COMPOSANT PRINCIPAL
+══════════════════════════════════════════════════════════════ */
+export default function MissionSection() {
+  const lineRef = useRef(null);
+  const lineInView = useInView(lineRef, { once: true, margin: "-80px" });
+  const shouldReduce = useReducedMotion();
 
-          {/* Colonne texte */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+  return (
+    <section
+      id="mission"
+      className="relative overflow-hidden py-20 md:py-28"
+      style={{
+        background:
+          "linear-gradient(160deg, hsl(150,30%,7%) 0%, hsl(150,28%,10%) 50%, hsl(150,30%,7%) 100%)",
+      }}
+    >
+      <style>{PULSE_CSS}</style>
+
+      {/* Grille déco */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(52,211,153,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(52,211,153,0.022) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+      {/* Lueurs ambiantes */}
+      <div
+        className="absolute top-1/2 -translate-y-1/2 -left-40 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute top-1/2 -translate-y-1/2 -right-40 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)" }}
+      />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+
+        {/* ── En-tête ─────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-16 md:mb-24"
+        >
+          <span
+            className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-[0.22em] uppercase mb-6"
+            style={{
+              color: "#6ee7b7",
+              background: "rgba(52,211,153,0.10)",
+              border: "1px solid rgba(52,211,153,0.22)",
+            }}
           >
-            <span className="eyebrow text-accent">À propos</span>
-            <h2 className="mt-3 font-heading text-3xl md:text-5xl font-bold text-foreground leading-tight">
-              Nous sommes{" "}
-              <span className="text-primary">Ma Belle Promo</span>
-            </h2>
-            <p className="mt-2 text-accent italic font-medium text-lg">
-              Une communauté, une histoire, un engagement.
-            </p>
-
-            <p className="mt-6 text-muted-foreground leading-relaxed text-sm">
-              Ma Belle Promo réunit les anciens étudiants de la{" "}
-              <span className="text-foreground">Faculté de Droit de l'Université de Lomé</span>,
-              promotion <span className="text-foreground">1994–2000</span>. Née du désir de préserver
-              les liens tissés sur les bancs de l'université, notre association est devenue un espace
-              dynamique où l'amitié, la solidarité et l'entraide prennent une dimension collective.
-            </p>
-
-            <p className="mt-4 text-muted-foreground leading-relaxed text-sm">
-              Depuis le <span className="text-foreground">1er décembre 2018</span>, nous avons choisi
-              de transformer notre cohésion en force d'action. Officiellement reconnue le{" "}
-              <span className="text-foreground">03 octobre 2019</span>, Ma Belle Promo s'engage
-              aujourd'hui au service de ses membres et de sa communauté.
-            </p>
-
-            <div className="mt-8 flex gap-4 flex-wrap">
-              <MotionLink
-                to="/association/credo"
-                whileHover={shouldReduce ? undefined : { scale: 1.04 }}
-                whileTap={shouldReduce ? undefined : { scale: 0.96 }}
-                transition={springTransition}
-                className={`px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-full${shouldReduce ? "" : " btn-glow"}`}
-              >
-                Notre Credo
-              </MotionLink>
-              <MotionLink
-                to="/implications/soutenir"
-                whileHover={shouldReduce ? undefined : { scale: 1.04 }}
-                whileTap={shouldReduce ? undefined : { scale: 0.96 }}
-                transition={springTransition}
-                className="px-6 py-3 border border-border text-sm font-semibold rounded-full hover:bg-muted transition-colors text-foreground"
-              >
-                Nous soutenir
-              </MotionLink>
-            </div>
-          </motion.div>
-
-          {/* Colonne image */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative"
+            Notre histoire
+          </span>
+          <h2
+            className="font-heading font-black leading-tight"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "rgba(255,255,255,0.95)" }}
           >
-            <div className="rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                loading="lazy"
-                src="/images/evenements/reunion-mbp.webp"
-                alt="Soirée de Gala Ma Belle Promo"
-                className="w-full h-80 md:h-96 object-cover object-top"
+            Une promotion,{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              trente ans de liens
+            </span>
+          </h2>
+          <p
+            className="mt-4 text-sm max-w-sm mx-auto leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+          >
+            De la Faculté de Droit de Lomé à une association reconnue — le chemin de Ma Belle Promo.
+          </p>
+        </motion.div>
+
+        {/* ══ DESKTOP ══════════════════════════════════════════ */}
+        <div ref={lineRef} className="hidden md:block">
+
+          {/* Rangée cartes hautes */}
+          <div className="grid grid-cols-5 gap-3">
+            {MILESTONES.map((m, i) => (
+              <div key={m.year} style={{ minHeight: 190 }} className="flex flex-col justify-end">
+                {m.top && <TimelineCard m={m} i={i} from="top" shouldReduce={shouldReduce} />}
+              </div>
+            ))}
+          </div>
+
+          {/* Ligne + points */}
+          <div className="relative h-16 flex items-center">
+            {/* Track statique */}
+            <div
+              className="absolute left-0 right-0 h-px"
+              style={{ top: "50%", background: "rgba(255,255,255,0.05)" }}
+            />
+            {/* Ligne animée */}
+            <div className="absolute left-0 right-0 overflow-hidden" style={{ top: "50%", height: 1 }}>
+              <motion.div
+                className="h-full w-full origin-left"
+                style={{ background: LINE_GRADIENT }}
+                initial={{ scaleX: 0 }}
+                animate={lineInView ? { scaleX: 1 } : {}}
+                transition={{ duration: 1.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               />
             </div>
+            {/* Points + années */}
+            <div className="absolute inset-0 grid grid-cols-5">
+              {MILESTONES.map((m, i) => (
+                <TimelineDot key={m.year} m={m} i={i} inView={lineInView} shouldReduce={shouldReduce} />
+              ))}
+            </div>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl p-4 shadow-xl"
-            >
-              <p className="text-xs text-muted-foreground font-medium">Association reconnue</p>
-              <p className="text-sm font-bold text-foreground">depuis le 03 oct. 2019</p>
-              <p className="text-xs text-primary mt-0.5">N°0920/MATDCL-SG-DLPAP-DOCA</p>
-            </motion.div>
-
-            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-accent/20 -z-10" />
-          </motion.div>
+          {/* Rangée cartes basses */}
+          <div className="grid grid-cols-5 gap-3">
+            {MILESTONES.map((m, i) => (
+              <div key={m.year} style={{ minHeight: 190 }}>
+                {!m.top && <TimelineCard m={m} i={i} from="bottom" shouldReduce={shouldReduce} />}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* ── Bloc 2 : Credo & Ambition — 2 tuiles de navigation ── */}
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-10"
-          >
-            <span className="eyebrow text-accent">L'Association</span>
-            <h3 className="mt-3 font-heading text-2xl md:text-4xl font-bold text-foreground">
-              En savoir plus sur Ma Belle Promo
-            </h3>
-          </motion.div>
+        {/* ══ MOBILE ═══════════════════════════════════════════ */}
+        <div className="md:hidden relative pl-10">
+          {/* Ligne verticale */}
+          <div
+            className="absolute left-3 top-2 bottom-2 w-px"
+            style={{ background: LINE_GRADIENT.replace("90deg", "180deg") }}
+          />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TILES.map(({ icon: Icon, title, href, desc, tags, cta, tagStyle, iconBg, iconColor, hoverBorder, hoverTitle, ctaColor, accentBg }, i) => (
+          <div className="space-y-5">
+            {MILESTONES.map((m, i) => (
               <motion.div
-                key={title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
-                whileHover={shouldReduce ? undefined : { y: -4 }}
+                key={m.year}
+                className="relative"
+                initial={{ opacity: 0, x: shouldReduce ? 0 : 18 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
               >
-                <Link
-                  to={href}
-                  className={`group relative flex flex-col h-full bg-card border border-border rounded-2xl p-5 overflow-hidden ${hoverBorder} hover:shadow-xl transition-all duration-300`}
+                {/* Point */}
+                <div
+                  className={`absolute -left-10 top-4 -translate-x-1/2${m.pulse ? " mbp-pulse" : ""}`}
+                  style={{
+                    width: m.featured ? 16 : 10,
+                    height: m.featured ? 16 : 10,
+                    borderRadius: "50%",
+                    background: m.color,
+                    boxShadow: `0 0 10px ${m.color}`,
+                    zIndex: 10,
+                  }}
+                />
+                <div
+                  className="rounded-2xl p-4"
+                  style={{ background: m.glowBg, border: `1px solid ${m.border}` }}
                 >
-                  {/* Cercle décoratif en arrière-plan */}
-                  <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full transition-colors duration-300 ${accentBg}`} />
-
-                  <div className="flex items-center gap-3 mb-3 relative z-10">
-                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg ${iconBg} flex items-center justify-center`}>
-                      <Icon className={`w-5 h-5 ${iconColor}`} />
-                    </div>
-                    <h4 className={`font-heading text-lg font-bold text-foreground transition-colors ${hoverTitle}`}>
-                      {title}
-                    </h4>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-xs font-black tracking-wider" style={{ color: m.color }}>
+                      {m.year}
+                    </span>
+                    <span className="text-white/20 text-xs">—</span>
+                    <span className="font-heading text-sm font-bold" style={{ color: m.color }}>
+                      {m.label}
+                    </span>
                   </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-3 relative z-10">
-                    {desc}
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.50)" }}>
+                    {m.desc}
                   </p>
-
-                  {/* Tags aperçu */}
-                  <div className="flex flex-wrap gap-1.5 mb-4 relative z-10">
-                    {tags.map(tag => (
-                      <span key={tag} className={`px-2 py-0.5 rounded-full text-xs font-medium border ${tagStyle}`}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className={`mt-auto flex items-center gap-1.5 text-sm font-semibold relative z-10 ${ctaColor}`}>
-                    {cta}
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </Link>
+                  {m.badge && (
+                    <div
+                      className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold"
+                      style={{
+                        background: "rgba(167,139,250,0.12)",
+                        color: "#c4b5fd",
+                        border: "1px solid rgba(167,139,250,0.25)",
+                      }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-violet-400" />
+                      {m.badge}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* ── CTA ──────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex justify-center mt-14 md:mt-16"
+        >
+          <Link
+            to="/association/qui-sommes-nous"
+            className="group inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-all hover:bg-white/5"
+            style={{
+              color: "#6ee7b7",
+              background: "rgba(52,211,153,0.08)",
+              border: "1px solid rgba(52,211,153,0.22)",
+            }}
+          >
+            Valeurs &amp; Mission
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
 
       </div>
     </section>
