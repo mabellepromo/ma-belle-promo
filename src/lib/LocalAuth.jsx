@@ -1,5 +1,5 @@
-/**
- * Authentification via Supabase Auth — FDD Ma Belle Promo
+﻿/**
+ * Authentification via Supabase Auth — l'Association Ma Belle Promo (MBP)
  * Nom de fichier conservé pour éviter de toucher les imports existants.
  * Exporte la même API que l'ancien système : { session, login, logout }
  * Le champ session.role est lu depuis user.user_metadata.role (Supabase).

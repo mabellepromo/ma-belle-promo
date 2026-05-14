@@ -1,4 +1,4 @@
-// Vercel serverless function — proxy Brevo API
+﻿// Vercel serverless function — proxy Brevo API
 // La clé API reste côté serveur (jamais exposée au navigateur)
 
 const SENDER = { name: "Association Ma Belle Promo (MBP)", email: "contact@mabellepromo.org" };
@@ -8,7 +8,7 @@ const CONTACT_TO = [{ email: "contact@mabellepromo.org", name: "Ma Belle Promo" 
 const ALLOWED_ORIGINS = [
   "https://mabellepromo.org",
   "https://www.mabellepromo.org",
-  "https://mabellepromo.vercel.app",
+  "https://mabellepromo.org",
 ];
 
 /* ── Validation email basique ── */

@@ -1,4 +1,4 @@
-// Vercel serverless — proxy FedaPay API
+﻿// Vercel serverless — proxy FedaPay API
 // La clé secrète reste côté serveur, jamais exposée au navigateur.
 
 const FEDAPAY_BASE = process.env.FEDAPAY_ENV === "production"
@@ -8,7 +8,7 @@ const FEDAPAY_BASE = process.env.FEDAPAY_ENV === "production"
 const ALLOWED_ORIGINS = [
   "https://mabellepromo.org",
   "https://www.mabellepromo.org",
-  "https://mabellepromo.vercel.app",
+  "https://mabellepromo.org",
 ];
 
 function getAllowedOrigin(req) {

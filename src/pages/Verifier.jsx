@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { CheckCircle, XCircle, Loader2, ShieldCheck } from "lucide-react";
@@ -34,7 +34,7 @@ export default function Verifier() {
       <div className="flex items-center gap-3 mb-8">
         <img src="/Logo%20Redesign1.png" alt="MBP" className="h-12 w-auto" />
         <div className="text-white">
-          <p className="font-bold text-lg leading-tight">FDD Ma Belle Promo</p>
+          <p className="font-bold text-lg leading-tight">l'Association Ma Belle Promo (MBP)</p>
           <p className="text-green-300 text-sm">Système de vérification d'attestation</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function Verifier() {
           <>
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-green-800 mb-1">Attestation valide</h1>
-            <p className="text-gray-500 text-sm mb-6">Document authentique émis par FDD Ma Belle Promo</p>
+            <p className="text-gray-500 text-sm mb-6">Document authentique émis par l'Association Ma Belle Promo (MBP)</p>
 
             <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-left space-y-3 mb-6">
               <Row label="Titulaire"   value={attestation.nom} />

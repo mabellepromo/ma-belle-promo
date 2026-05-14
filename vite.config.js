@@ -1,4 +1,4 @@
-import react from '@vitejs/plugin-react'
+﻿import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { fileURLToPath } from 'url'
 import path from 'path'
@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: 'Ma Belle Promo',
         short_name: 'MBP',
-        description: 'Association FDD Ma Belle Promo — Lomé, Togo · Promotion 1994–2000',
+        description: 'l'Association Ma Belle Promo (MBP) — Lomé, Togo · Promotion 1994–2000',
         theme_color: '#0a2218',
         background_color: '#0a2218',
         display: 'standalone',

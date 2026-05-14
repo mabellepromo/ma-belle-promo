@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+﻿import { supabase } from "./supabase";
 
 const MBP_STYLE = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
@@ -712,7 +712,7 @@ export function genererAttestation(member, validUntil) {
       <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP"
            onerror="this.style.display='none'" />
       <div class="doc-header-asso">
-        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-name">l'Association Ma Belle Promo (MBP)</p>
         <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
@@ -733,7 +733,7 @@ export function genererAttestation(member, validUntil) {
           ${photoContent}
         </div>
         <p class="intro-text" style="flex:1;">
-          L'Association <strong>FDD Ma Belle Promo (MBP)</strong>, association des diplômés
+          L'Association <strong>l'Association Ma Belle Promo (MBP) (MBP)</strong>, association des diplômés
           de la Faculté de Droit de l'Université de Lomé, promotion 1994–2000,
           atteste par le présent document que
           <strong>${member.nom}</strong> est <strong>${titre}</strong> en règle de ladite association.
@@ -785,7 +785,7 @@ export function genererAttestation(member, validUntil) {
             <span class="sig-label">Émis à Lomé, le</span>
             <div class="sig-area"><span>${today()}</span></div>
             <span class="sig-name">Le Trésorier</span>
-            <span class="sig-title">FDD Ma Belle Promo</span>
+            <span class="sig-title">l'Association Ma Belle Promo (MBP)</span>
           </div>
           <div class="signature-col">
             <span class="sig-label">Signature et cachet</span>
@@ -795,7 +795,7 @@ export function genererAttestation(member, validUntil) {
                    onerror="this.style.display='none'" />
             </div>
             <span class="sig-name" style="margin-top:18px;">Fabienne SENAYA-ATAYI</span>
-            <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
+            <span class="sig-title">Présidente — l'Association Ma Belle Promo (MBP)</span>
           </div>
         </div>
 
@@ -818,7 +818,7 @@ export function genererAttestation(member, validUntil) {
             <div class="mini-card-right">
               <div>
                 <div class="mini-card-type">Carte de Membre</div>
-                <div class="mini-card-asso">FDD Ma Belle Promo<br/>Lomé · 1994–2000</div>
+                <div class="mini-card-asso">l'Association Ma Belle Promo (MBP)<br/>Lomé · 1994–2000</div>
               </div>
               <div>
                 <div class="mini-card-name">${member.nom}</div>
@@ -841,7 +841,7 @@ export function genererAttestation(member, validUntil) {
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        l'Association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
         Faculté de Droit — Université de Lomé, Togo
       </div>
       <div class="footer-text" style="text-align:right">
@@ -955,7 +955,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
       <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP"
            onerror="this.style.display='none'" />
       <div class="doc-header-asso">
-        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-name">l'Association Ma Belle Promo (MBP)</p>
         <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
@@ -971,7 +971,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
       </div>
 
       <p class="intro-text">
-        L'Association <strong>FDD Ma Belle Promo</strong> accuse réception du paiement de la cotisation annuelle
+        L'Association <strong>l'Association Ma Belle Promo (MBP)</strong> accuse réception du paiement de la cotisation annuelle
         pour l'exercice <strong>${annee}</strong>, versé par :
       </p>
 
@@ -1003,7 +1003,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
           <span class="sig-label">Émis à Lomé, le</span>
           <div class="sig-area"><span>${today()}</span></div>
           <span class="sig-name">Le Trésorier</span>
-          <span class="sig-title">FDD Ma Belle Promo</span>
+          <span class="sig-title">l'Association Ma Belle Promo (MBP)</span>
         </div>
         <div class="signature-col">
           <span class="sig-label">Signature et cachet</span>
@@ -1013,7 +1013,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
                  onerror="this.style.display='none'" />
           </div>
           <span class="sig-name" style="margin-top:20px;">Fabienne SENAYA-ATAYI</span>
-          <span class="sig-title">Présidente — FDD Ma Belle Promo</span>
+          <span class="sig-title">Présidente — l'Association Ma Belle Promo (MBP)</span>
         </div>
       </div>
 
@@ -1021,7 +1021,7 @@ export function genererRecu(member, annee, montant, datePaiement, modePaiement, 
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        l'Association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
         Document généré le ${today()} · Réf. ${ref}
       </div>
       <div class="footer-text" style="text-align:right">
@@ -1062,7 +1062,7 @@ export function genererTrombinoscope(members) {
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Trombinoscope — FDD Ma Belle Promo</title>
+  <title>Trombinoscope — l'Association Ma Belle Promo (MBP)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Lato:wght@400;700&display=swap');
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -1082,14 +1082,14 @@ export function genererTrombinoscope(members) {
   <div class="header">
     <img src="/Logo%20Redesign1.png" alt="MBP" style="height:40px;width:auto;" onerror="this.style.display='none'" />
     <div style="text-align:right;">
-      <p style="font-family:'Cormorant Garamond',serif;font-size:14pt;font-weight:700;color:#fff;line-height:1.2;">FDD Ma Belle Promo</p>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:14pt;font-weight:700;color:#fff;line-height:1.2;">l'Association Ma Belle Promo (MBP)</p>
       <p style="font-size:8pt;color:rgba(255,255,255,0.65);">Trombinoscope — ${actifs.length} membres · Promotion 1994–2000</p>
     </div>
   </div>
   <div class="gold-bar"></div>
   <div class="grid">${cartes}</div>
   <div class="footer">
-    <span>FDD Ma Belle Promo · www.mabellepromo.org</span>
+    <span>l'Association Ma Belle Promo (MBP) · www.mabellepromo.org</span>
     <span>Réf. ${ref} · Généré le ${today()}</span>
   </div>
 </body>
@@ -1147,7 +1147,7 @@ export function genererRapportFinancier(annee, rows, montantDefaut, stats) {
     <div class="doc-header">
       <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
       <div class="doc-header-asso">
-        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-name">l'Association Ma Belle Promo (MBP)</p>
         <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
@@ -1220,7 +1220,7 @@ export function genererRapportFinancier(annee, rows, montantDefaut, stats) {
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        l'Association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
         Faculté de Droit — Université de Lomé, Togo
       </div>
       <div class="footer-text" style="text-align:right;">
@@ -1307,7 +1307,7 @@ export function genererRapportTresorerie(annee, transactions, budget = []) {
     <div class="doc-header">
       <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
       <div class="doc-header-asso">
-        <p class="asso-name">FDD Ma Belle Promo</p>
+        <p class="asso-name">l'Association Ma Belle Promo (MBP)</p>
         <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
         <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
       </div>
@@ -1397,7 +1397,7 @@ export function genererRapportTresorerie(annee, transactions, budget = []) {
 
     <div class="doc-footer">
       <div class="footer-text">
-        FDD Ma Belle Promo · www.mabellepromo.org<br/>
+        l'Association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
         Faculté de Droit — Université de Lomé, Togo
       </div>
       <div class="footer-text" style="text-align:right;">
@@ -1633,9 +1633,9 @@ export function genererFacture(facture) {
   <header class="doc-header">
     <img src="/Logo%20Redesign1.png" alt="MBP" class="doc-header-logo" />
     <div class="doc-header-asso">
-      <p class="asso-name">FDD MA BELLE PROMO</p>
+      <p class="asso-name">l'Association Ma Belle Promo (MBP)</p>
       <p class="asso-sub">Association des Diplômés · Faculté de Droit de Lomé · Promotion 1994-2000</p>
-      <p class="asso-sub" style="margin-top:2px">contact@mabellepromo.org · mabellepromo.vercel.app</p>
+      <p class="asso-sub" style="margin-top:2px">contact@mabellepromo.org · mabellepromo.org</p>
     </div>
   </header>
   <div class="gold-bar"></div>
@@ -1647,7 +1647,7 @@ export function genererFacture(facture) {
       <div>
         <div class="doc-title">Facture</div>
         <div class="doc-ref" style="font-size:8.5pt;color:#666;margin-top:5px">
-          Document officiel · FDD Ma Belle Promo
+          Document officiel · l'Association Ma Belle Promo (MBP)
         </div>
       </div>
       <div class="facture-num-box">
@@ -1676,7 +1676,7 @@ export function genererFacture(facture) {
     <div class="parties-grid">
       <div class="partie">
         <div class="partie-label">Émetteur</div>
-        <div class="partie-nom">FDD Ma Belle Promo</div>
+        <div class="partie-nom">l'Association Ma Belle Promo (MBP)</div>
         <div class="partie-detail">
           Association des Diplômés<br>
           Faculté de Droit, Université de Lomé<br>
@@ -1744,7 +1744,7 @@ export function genererFacture(facture) {
   <!-- Pied de page -->
   <footer class="doc-footer">
     <div>
-      <p class="footer-text">FDD Ma Belle Promo · Association des Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994-2000</p>
+      <p class="footer-text">l'Association Ma Belle Promo (MBP) · Association des Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994-2000</p>
       <p class="footer-text" style="margin-top:2px">Lomé, Togo · contact@mabellepromo.org</p>
     </div>
     <p class="footer-text" style="text-align:right;white-space:nowrap">

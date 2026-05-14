@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import {
   getSondageWithQuestions, hasVoted, submitSondage,
@@ -547,7 +547,7 @@ export default function Sondage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground">
-        FDD Ma Belle Promo · <a href="/" className="hover:text-primary">mabellepromo.org</a>
+        l'Association Ma Belle Promo (MBP) · <a href="/" className="hover:text-primary">mabellepromo.org</a>
       </footer>
     </div>
   );

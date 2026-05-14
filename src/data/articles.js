@@ -1,4 +1,4 @@
-export const articles = [
+﻿export const articles = [
   // ─── 2023 ────────────────────────────────────────────────────────────────
   {
     id: "numerique-togo",
@@ -470,7 +470,7 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
   {
     id: "agc-mbp",
     titre: "Assemblée Générale Constitutive de l'association Ma Belle Promo",
-    extrait: "Ce 1er décembre 2018, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une structure officielle. L'association FDD Ma Belle Promo est officiellement née.",
+    extrait: "Ce 1er décembre 2018, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une structure officielle. L'association l'Association Ma Belle Promo (MBP) est officiellement née.",
     date: "1 Déc 2018",
     categorie: "Association",
     image: "/images/conference.jpg",
@@ -479,7 +479,7 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
     ],
     contenu: `Ce **1er décembre 2018**, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une **structure officielle** lors de cette Assemblée Générale Constitutive.
 
-L'association **FDD Ma Belle Promo** — en abrégé **FDD MBP** — est officiellement née.
+L'association **l'Association Ma Belle Promo (MBP)** — en abrégé **FDD MBP** — est officiellement née.
 
 ## Un acte fondateur
 
