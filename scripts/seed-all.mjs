@@ -810,7 +810,7 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
   {
     id: "agc-mbp",
     titre: "Assemblée Générale Constitutive de l'association Ma Belle Promo",
-    extrait: "Ce 1er décembre 2018, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une structure officielle. L'association l'Association Ma Belle Promo (MBP) est officiellement née.",
+    extrait: "Ce 1er décembre 2018, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une structure officielle. L'association Ma Belle Promo (MBP) est officiellement née.",
     date: "1 Déc 2018",
     categorie: "Association",
     image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=700&h=400&fit=crop",
@@ -818,7 +818,7 @@ Pour les membres de l'association, **les acquis et les valeurs humaines** qu'ils
     photos: ["https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=700&h=400&fit=crop"],
     contenu: `Ce **1er décembre 2018**, ce qui n'était qu'un groupe d'amis regroupés sur une plateforme numérique s'est donné une **structure officielle** lors de cette Assemblée Générale Constitutive.
 
-L'association **l'Association Ma Belle Promo (MBP)** — en abrégé **FDD MBP** — est officiellement née.
+L'association **l'association Ma Belle Promo (MBP)** — en abrégé **FDD MBP** — est officiellement née.
 
 ## Un acte fondateur
 

@@ -202,7 +202,7 @@ function buildNewsletterConfirmPayload({ email, token, confirm_url }) {
   const content = `
     <h2 style="margin:0 0 16px;font-size:17px;color:#111827;">Confirmez votre inscription</h2>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.7;">
-      Merci de votre intérêt pour les actualités de <strong>l'Association Ma Belle Promo (MBP)</strong>.<br>
+      Merci de votre intérêt pour les actualités de <strong>l'association Ma Belle Promo (MBP)</strong>.<br>
       Cliquez sur le bouton ci-dessous pour confirmer votre inscription à la newsletter.
     </p>
     <div style="text-align:center;margin:28px 0;">
@@ -259,7 +259,7 @@ function buildInvitationPayload({ to_name, titre, description, lien }) {
   const content = `
     <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
     <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.7;">
-      L'Association Ma Belle Promo vous invite à répondre au sondage suivant :
+      L'association Ma Belle Promo vous invite à répondre au sondage suivant :
     </p>
     <div style="background:#f0fdf4;border-left:4px solid #14532d;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:28px;">
       <p style="margin:0 0 4px;font-size:17px;font-weight:bold;color:#14532d;">${escHtml(titre)}</p>

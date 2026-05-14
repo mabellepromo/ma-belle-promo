@@ -1,5 +1,5 @@
 ﻿/**
- * Ressources juridiques — l'Association Ma Belle Promo (MBP)
+ * Ressources juridiques — l'association Ma Belle Promo (MBP)
  * Ajoutez vos documents ici en suivant le format ci-dessous.
  *
  * Champs disponibles :

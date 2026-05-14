@@ -13,7 +13,7 @@ Lomé, le 24 mai 2024
 LANCEMENT DU PROJET D'OUVRAGE NUMÉRIQUE COLLECTIF
 « Les Métiers du Droit au Togo — Regards croisés de la promotion FDD 1994-2000 »
 
-L'association l'Association Ma Belle Promo (MBP) a le plaisir d'annoncer le lancement officiel de son projet de publication d'un ouvrage numérique collectif intitulé « Les Métiers du Droit au Togo — Regards croisés de la promotion FDD 1994-2000 ».
+L'association Ma Belle Promo (MBP) a le plaisir d'annoncer le lancement officiel de son projet de publication d'un ouvrage numérique collectif intitulé « Les Métiers du Droit au Togo — Regards croisés de la promotion FDD 1994-2000 ».
 
 Ce projet s'inscrit dans le cadre du Plan d'Action 2023-2025 de l'association, au titre de l'axe « Valorisation des parcours et transmission des savoirs ».
 
@@ -39,7 +39,7 @@ Tous les membres de la promotion sont invités à soumettre leur contribution av
 Pour tout renseignement : contact@mabellepromo.org
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -55,7 +55,7 @@ Lomé, le 15 novembre 2023
 
 PARTICIPATION DE MA BELLE PROMO À LA NUIT DU DROIT 2023
 
-L'association l'Association Ma Belle Promo (MBP) est heureuse d'annoncer sa participation active à La Nuit du Droit, événement annuel célébrant la culture juridique, qui se tiendra le samedi 18 novembre 2023 à l'Hôtel Sarakawa de Lomé.
+L'association Ma Belle Promo (MBP) est heureuse d'annoncer sa participation active à La Nuit du Droit, événement annuel célébrant la culture juridique, qui se tiendra le samedi 18 novembre 2023 à l'Hôtel Sarakawa de Lomé.
 
 CONTEXTE
 
@@ -76,7 +76,7 @@ Ma Belle Promo invite ses membres, leurs familles et l'ensemble des professionne
 Entrée libre sur inscription. Contact : contact@mabellepromo.org
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -93,7 +93,7 @@ Lomé, le 5 décembre 2023
 WEBINAIRE — LES ENJEUX DU NUMÉRIQUE AU TOGO
 Perspectives juridiques et professionnelles
 
-L'association l'Association Ma Belle Promo (MBP), en partenariat avec le Centre d'Accès à la Justice et aux Services (CAJS) de Kara, a l'honneur de vous inviter à son webinaire :
+L'association Ma Belle Promo (MBP), en partenariat avec le Centre d'Accès à la Justice et aux Services (CAJS) de Kara, a l'honneur de vous inviter à son webinaire :
 
 « Les enjeux du numérique au Togo — Perspectives juridiques et professionnelles »
 
@@ -125,7 +125,7 @@ INSCRIPTION OBLIGATOIRE
 Merci d'envoyer vos coordonnées (nom, profession, email) à contact@mabellepromo.org avant le 13 décembre 2023. Le lien de connexion sera transmis la veille de l'événement.
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -137,7 +137,7 @@ Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
     url: "",
     contenu: `RAPPORT DE L'ASSEMBLÉE GÉNÉRALE ORDINAIRE
 
-l'Association Ma Belle Promo (MBP)
+l'association Ma Belle Promo (MBP)
 Lomé, le 17 décembre 2022
 
 PROCÈS-VERBAL DE L'ASSEMBLÉE GÉNÉRALE ORDINAIRE
@@ -145,7 +145,7 @@ Exercice 2022
 
 I. OUVERTURE DE LA SÉANCE
 
-L'Assemblée Générale ordinaire de l'Association Ma Belle Promo (MBP) s'est tenue le samedi 17 décembre 2022 à Lomé, en format hybride (présentiel et visioconférence), sous la présidence du Président en exercice.
+L'Assemblée Générale ordinaire de l'association Ma Belle Promo (MBP) s'est tenue le samedi 17 décembre 2022 à Lomé, en format hybride (présentiel et visioconférence), sous la présidence du Président en exercice.
 
 Membres présents et représentés : 27 membres sur 43 membres à jour de cotisation, soit un quorum de 62,8 % — le quorum réglementaire de 50 % étant atteint, la séance est déclarée ouverte.
 
@@ -192,10 +192,10 @@ VI. CLÔTURE
 La séance est levée à 18h30.
 
 Le Secrétaire général                    Le Président
-l'Association Ma Belle Promo (MBP)                       l'Association Ma Belle Promo (MBP)
+l'association Ma Belle Promo (MBP)                       l'association Ma Belle Promo (MBP)
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -211,7 +211,7 @@ Lomé, le 10 juin 2020
 
 L'ASSOCIATION MA BELLE PROMO (MBP) SE MOBILISE CONTRE LA COVID-19
 
-Face à la pandémie de Covid-19 et à ses conséquences humanitaires sur les populations les plus vulnérables, l'Association Ma Belle Promo (MBP) exprime sa solidarité et annonce une série d'actions concrètes en faveur des structures d'accueil des enfants en difficulté à Lomé.
+Face à la pandémie de Covid-19 et à ses conséquences humanitaires sur les populations les plus vulnérables, l'association Ma Belle Promo (MBP) exprime sa solidarité et annonce une série d'actions concrètes en faveur des structures d'accueil des enfants en difficulté à Lomé.
 
 CONTEXTE
 
@@ -219,7 +219,7 @@ La crise sanitaire mondiale liée à la Covid-19 a des effets particulièrement 
 
 ACTIONS DE SOLIDARITÉ
 
-Dans ce contexte, l'Association Ma Belle Promo (MBP) a décidé d'apporter son soutien à deux structures :
+Dans ce contexte, l'association Ma Belle Promo (MBP) a décidé d'apporter son soutien à deux structures :
 
 1. Brigade pour mineurs de Lomé
    Don de produits alimentaires et d'hygiène pour une valeur de 180 000 FCFA, remis le 5 juin 2020.
@@ -235,10 +235,10 @@ Le bureau de Ma Belle Promo tient à remercier chaleureusement tous les membres 
 
 Nous restons engagés aux côtés des populations vulnérables et continuerons à œuvrer pour une solidarité active entre membres de notre promotion et avec notre communauté.
 
-Le Bureau de l'Association Ma Belle Promo (MBP)
+Le Bureau de l'association Ma Belle Promo (MBP)
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
   {
@@ -253,11 +253,11 @@ Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
 Lomé, le 1er décembre 2018
 
 DÉCLARATION DE CRÉATION DE L'ASSOCIATION
-l'Association Ma Belle Promo (MBP)
+l'association Ma Belle Promo (MBP)
 
 Nous, anciens étudiants de la Faculté de Droit (FDD) de l'Université de Lomé, membres de la promotion 1994-2000, réunis en Assemblée Générale constitutive le 1er décembre 2018 à Lomé, déclarons solennellement la création de l'association :
 
-l'Association Ma Belle Promo (MBP)
+l'association Ma Belle Promo (MBP)
 Association des diplômés de la Faculté de Droit — Promotion 1994-2000
 
 PRÉAMBULE
@@ -293,10 +293,10 @@ La présente déclaration a été adoptée à l'unanimité des membres présents
 
 Fait à Lomé, le 1er décembre 2018
 
-Les membres fondateurs de l'Association Ma Belle Promo (MBP)
+Les membres fondateurs de l'association Ma Belle Promo (MBP)
 
 ---
-l'Association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
 Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
   },
 ];

@@ -547,7 +547,7 @@ export default function Sondage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground">
-        l'Association Ma Belle Promo (MBP) · <a href="/" className="hover:text-primary">mabellepromo.org</a>
+        l'association Ma Belle Promo (MBP) · <a href="/" className="hover:text-primary">mabellepromo.org</a>
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
 ﻿/**
- * Fallback statique des membres — l'Association Ma Belle Promo (MBP) (MBP)
+ * Fallback statique des membres — l'association Ma Belle Promo (MBP)
  * Données non sensibles uniquement (sans email, téléphone, anniversaire).
  * Les données complètes sont dans Supabase (table members).
  * Ce fichier n'est utilisé que si Supabase est inaccessible.

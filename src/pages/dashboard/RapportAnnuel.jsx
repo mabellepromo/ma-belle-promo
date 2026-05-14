@@ -107,7 +107,7 @@ export default function RapportAnnuel({ members }) {
   </div>
 
   <div class="confidential">
-    Ce rapport est destiné exclusivement aux membres du bureau exécutif de l'Association Ma Belle Promo.
+    Ce rapport est destiné exclusivement aux membres du bureau exécutif de l'association Ma Belle Promo.
   </div>
 
   <div class="section">

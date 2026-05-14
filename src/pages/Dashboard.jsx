@@ -246,7 +246,7 @@ export default function Dashboard() {
       const backup = {
         exportedAt: new Date().toISOString(),
         version: "2.0",
-        project: "l'Association Ma Belle Promo (MBP)",
+        project: "l'association Ma Belle Promo (MBP)",
         data: {
           members:                  members_.data          ?? [],
           cotisations:              cotisations_.data      ?? [],
