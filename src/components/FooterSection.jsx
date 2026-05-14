@@ -13,11 +13,21 @@ const SOCIAL = [
 ];
 
 const NAV = [
-  { label: "Accueil",       href: "/" },
-  { label: "Adhésion",      href: "/implications/adhesion" },
-  { label: "Actualités",    href: "/informations/actualites" },
-  { label: "Nous soutenir", href: "/implications/soutenir" },
+  { label: "Accueil",          href: "/" },
+  { label: "Qui sommes-nous",  href: "/association/qui-sommes-nous" },
+  { label: "Nos Actions",      href: "/activites/evenements" },
+  { label: "Actualités",       href: "/informations/actualites" },
+  { label: "Adhésion",         href: "/implications/adhesion" },
+  { label: "Nous soutenir",    href: "/implications/soutenir" },
 ];
+
+function FooterHeading({ children }) {
+  return (
+    <h3 className="text-[11px] font-semibold uppercase tracking-widest text-background/40 mb-4">
+      {children}
+    </h3>
+  );
+}
 
 export default function FooterSection() {
   const [email, setEmail] = useState("");
@@ -47,103 +57,141 @@ export default function FooterSection() {
       {/* Ligne d'accent en haut */}
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-6 py-12">
 
-        {/* ── Ligne principale ── */}
-        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
+        {/* ── Grille principale : 4 colonnes ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
 
-          {/* Brand */}
-          <div className="flex items-center gap-4 shrink-0">
-            <img
-              loading="lazy"
-              src="/Logo Redesign1.webp"
-              alt="Logo Ma Belle Promo"
-              className="w-14 h-14 rounded-full opacity-90 shadow-lg"
-              style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
-            />
-            <div>
-              <div className="font-heading text-lg font-bold text-background leading-tight">Ma Belle Promo</div>
-              <div className="text-xs text-background/40 leading-tight mt-0.5">FDD Lomé · 1994–2000</div>
-              <div className="text-[10px] text-background/30 leading-tight mt-0.5 tracking-wide">Amitié · Solidarité · Entraide</div>
+          {/* Colonne 1 — Brand */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <img
+                loading="lazy"
+                src="/Logo Redesign1.webp"
+                alt="Logo Ma Belle Promo"
+                className="w-12 h-12 rounded-full opacity-90 shadow-lg flex-shrink-0"
+                style={{ boxShadow: "0 0 20px rgba(52,211,153,0.20)" }}
+              />
+              <div>
+                <div className="font-heading text-base font-bold text-background leading-tight">Ma Belle Promo</div>
+                <div className="text-[11px] text-background/40 leading-tight mt-0.5">FDD Lomé · 1994–2000</div>
+              </div>
+            </div>
+            <p className="text-xs text-background/40 leading-relaxed">
+              Association des diplômés de la Faculté de Droit de l'Université de Lomé, promotion 1994–2000.
+            </p>
+            <p className="text-[10px] text-background/25 tracking-widest uppercase">
+              Amitié · Solidarité · Entraide
+            </p>
+            {/* Réseaux sociaux */}
+            <div className="flex items-center gap-3 mt-1">
+              {SOCIAL.map(({ href, Icon, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="text-background/35 hover:text-background transition-colors hover:scale-110"
+                  style={{ display: "inline-flex" }}
+                >
+                  <Icon style={{ width: 16, height: 16 }} />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Nav */}
-          <nav className="flex flex-wrap gap-x-5 gap-y-1.5 justify-center text-xs text-background/50">
-            {NAV.map((l) => (
-              <Link key={l.href} to={l.href} className="hover:text-background transition-colors">
-                {l.label}
-              </Link>
-            ))}
-            <a
-              href="https://passerelles.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition-opacity text-background/50"
-            >
-              Programme <span style={{ color: "#f97316" }}>
-                "Passerelles"
-              </span>
-            </a>
-          </nav>
-
-          {/* Contact + newsletter */}
-          <div className="flex flex-col gap-2.5 items-center lg:items-end text-xs text-background/50 shrink-0">
-            <div className="flex items-center gap-4">
-              <a href="tel:+22896090707" className="flex items-center gap-1.5 hover:text-background transition-colors">
-                <Phone className="w-3 h-3" /> +228 96 09 07 07
+          {/* Colonne 2 — Navigation */}
+          <div>
+            <FooterHeading>Navigation</FooterHeading>
+            <nav className="flex flex-col gap-2">
+              {NAV.map((l) => (
+                <Link
+                  key={l.href}
+                  to={l.href}
+                  className="text-xs text-background/50 hover:text-background transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <a
+                href="https://passerelles.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-background/50 hover:text-background/80 transition-colors"
+              >
+                Programme <span style={{ color: "#f97316" }}>"Passerelles"</span>
               </a>
-              <Link to="/informations/contacts" className="flex items-center gap-1.5 hover:text-background transition-colors">
-                <Mail className="w-3 h-3" /> Nous contacter
+            </nav>
+          </div>
+
+          {/* Colonne 3 — Contact */}
+          <div>
+            <FooterHeading>Contact</FooterHeading>
+            <div className="flex flex-col gap-3">
+              <a
+                href="tel:+22896090707"
+                className="flex items-center gap-2 text-xs text-background/50 hover:text-background transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                +228 96 09 07 07
+              </a>
+              <Link
+                to="/informations/contacts"
+                className="flex items-center gap-2 text-xs text-background/50 hover:text-background transition-colors"
+              >
+                <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                Nous contacter
               </Link>
             </div>
+          </div>
+
+          {/* Colonne 4 — Newsletter */}
+          <div>
+            <FooterHeading>Restez informé(e)</FooterHeading>
             {done ? (
-              <p className="text-background/40 text-xs">✓ Vérifiez votre email pour confirmer l'inscription</p>
+              <p className="text-xs text-background/40 leading-relaxed">
+                ✓ Vérifiez votre email pour confirmer l'inscription.
+              </p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full lg:w-auto">
-                <span className="text-background/60 text-xs font-medium text-center lg:text-right lg:whitespace-nowrap">Restez informé(e), inscrivez-vous à la Newsletter</span>
-                <div className="flex items-center gap-1.5">
+              <>
+                <p className="text-xs text-background/40 mb-3 leading-relaxed">
+                  Recevez nos actualités et événements directement dans votre boîte mail.
+                </p>
+                <form onSubmit={handleNewsletter} className="flex flex-col gap-2">
                   <input
                     type="email"
                     placeholder="votre@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-7 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25 flex-1 min-w-0"
+                    className="h-8 px-3 rounded-md bg-white/8 border border-white/10 text-background placeholder:text-background/25 text-xs focus:outline-none focus:border-white/25"
                   />
-                  <button type="submit" aria-label="S'abonner à la newsletter" className="h-7 w-7 flex-shrink-0 flex items-center justify-center rounded-md bg-primary hover:bg-primary/80 transition-opacity">
-                    <ArrowRight className="w-3 h-3 text-primary-foreground" />
+                  <button
+                    type="submit"
+                    className="h-8 flex items-center justify-center gap-1.5 rounded-md bg-primary hover:bg-primary/80 transition-opacity text-primary-foreground text-xs font-medium"
+                  >
+                    S'inscrire <ArrowRight className="w-3 h-3" />
                   </button>
-                </div>
-              </form>
+                </form>
+              </>
             )}
           </div>
+
         </div>
 
         {/* ── Barre du bas ── */}
-        <div className="mt-6 pt-4 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo</p>
-            <div className="flex items-center gap-3">
-              <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">Mentions légales</Link>
-              <span className="text-background/20">·</span>
-              <Link to="/confidentialite" className="text-xs text-background/30 hover:text-background/60 transition-colors">Confidentialité</Link>
-            </div>
-          </div>
+        <div className="mt-10 pt-5 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-background/30">© {new Date().getFullYear()} Ma Belle Promo · Tous droits réservés</p>
 
           <div className="flex items-center gap-4">
-            {SOCIAL.map(({ href, Icon, label }) => (
-              <a
-                key={href}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="text-background/40 hover:text-background transition-colors hover:scale-110 transition-transform"
-              >
-                <Icon className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />
-              </a>
-            ))}
+            <Link to="/mentions-legales" className="text-xs text-background/30 hover:text-background/60 transition-colors">
+              Mentions légales
+            </Link>
+            <span className="text-background/20">·</span>
+            <Link to="/confidentialite" className="text-xs text-background/30 hover:text-background/60 transition-colors">
+              Confidentialité
+            </Link>
           </div>
 
           <p className="text-xs text-background/30 flex items-center gap-1">
