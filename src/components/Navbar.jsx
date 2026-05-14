@@ -295,149 +295,144 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* ── DESKTOP : groupe nav gauche — Accueil + 2 menus ── */}
-        <div className="hidden md:flex flex-1 items-center justify-end gap-0.5">
-          <Link
-            to="/"
-            className="flex items-center px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
-            style={{ color: "rgba(255,255,255,0.62)" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
-          >
-            Accueil
-          </Link>
-          {navItems.slice(0, 2).map((item) => (
-            <DesktopDropdown key={item.label} item={item} />
-          ))}
-        </div>
+        {/* ── DESKTOP : grille 3 colonnes — logo toujours centré ── */}
+        <div className="hidden md:grid flex-1" style={{ gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}>
 
-        {/* Séparateur doré gauche */}
-        <div className="hidden md:block flex-shrink-0 mx-5" style={{
-          width: 1, height: 34,
-          background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)",
-        }} />
-
-        {/* ── DESKTOP : logo centré ── */}
-        <Link to="/" className="hidden md:flex flex-col items-center group flex-shrink-0">
-          <img
-            src="/Logo Redesign1.webp"
-            alt="Ma Belle Promo"
-            className="rounded-full object-cover shadow-lg group-hover:shadow-primary/40 transition-all duration-300"
-            style={{ width: scrolled ? 34 : 48, height: scrolled ? 34 : 48 }}
-          />
-          <div style={{
-            maxHeight: scrolled ? 0 : 36,
-            opacity: scrolled ? 0 : 1,
-            overflow: "hidden",
-            transition: "max-height 0.3s ease, opacity 0.25s ease",
-            marginTop: scrolled ? 0 : 4,
-            textAlign: "center",
-          }}>
-            <div className="font-heading text-[11px] font-bold tracking-[0.14em] uppercase whitespace-nowrap" style={{ color: "#e2f5ed" }}>
-              Ma Belle Promo
-            </div>
-            <div className="text-[8px] tracking-[0.28em] uppercase whitespace-nowrap" style={{ color: "rgba(255,255,255,0.32)" }}>
-              FDD · MBP · Togo
-            </div>
+          {/* Gauche — items alignés à droite vers le logo */}
+          <div className="flex items-center justify-end gap-0.5">
+            <Link
+              to="/"
+              className="flex items-center px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+              style={{ color: "rgba(255,255,255,0.62)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
+            >
+              Accueil
+            </Link>
+            {navItems.slice(0, 2).map((item) => (
+              <DesktopDropdown key={item.label} item={item} />
+            ))}
+            {/* Séparateur doré gauche */}
+            <div className="flex-shrink-0 ml-4" style={{ width: 1, height: 34, background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)" }} />
           </div>
-        </Link>
 
-        {/* Séparateur doré droit */}
-        <div className="hidden md:block flex-shrink-0 mx-5" style={{
-          width: 1, height: 34,
-          background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)",
-        }} />
-
-        {/* ── DESKTOP : groupe nav droit — 2 menus + Contact + DON ── */}
-        <div className="hidden md:flex flex-1 items-center gap-0.5">
-          {navItems.slice(2).map((item) => (
-            <DesktopDropdown key={item.label} item={item} />
-          ))}
-          <Link
-            to="/boutique"
-            className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
-            style={{ color: "rgba(255,255,255,0.62)" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
-          >
-            <ShoppingBag className="w-3 h-3" />
-            Boutique
+          {/* Logo — toujours au centre exact */}
+          <Link to="/" className="flex flex-col items-center group px-4 flex-shrink-0">
+            <img
+              src="/Logo Redesign1.webp"
+              alt="Ma Belle Promo"
+              className="rounded-full object-cover shadow-lg group-hover:shadow-primary/40 transition-all duration-300"
+              style={{ width: scrolled ? 34 : 48, height: scrolled ? 34 : 48 }}
+            />
+            <div style={{
+              maxHeight: scrolled ? 0 : 36,
+              opacity: scrolled ? 0 : 1,
+              overflow: "hidden",
+              transition: "max-height 0.3s ease, opacity 0.25s ease",
+              marginTop: scrolled ? 0 : 4,
+              textAlign: "center",
+            }}>
+              <div className="font-heading text-[11px] font-bold tracking-[0.14em] uppercase whitespace-nowrap" style={{ color: "#e2f5ed" }}>
+                Ma Belle Promo
+              </div>
+              <div className="text-[8px] tracking-[0.28em] uppercase whitespace-nowrap" style={{ color: "rgba(255,255,255,0.32)" }}>
+                FDD · MBP · Togo
+              </div>
+            </div>
           </Link>
-          <Link
-            to="/informations/contacts"
-            className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
-            style={{ color: "rgba(255,255,255,0.62)" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
-          >
-            <Mail className="w-3 h-3" />
-            Contact
-          </Link>
-          <button
-            onClick={() => navigate("/don")}
-            className="ml-2 flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
-            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
-          >
-            ♥ Don
-          </button>
-        </div>
 
-        {/* ── DESKTOP : icône panier ── */}
-        <button
-          onClick={() => cart?.setIsCartOpen(true)}
-          title="Mon panier"
-          className="hidden md:flex relative ml-2 w-8 h-8 items-center justify-center rounded-full hover:bg-white/10 transition-all duration-200"
-          style={{ border: "1px solid rgba(255,255,255,0.14)", color: cartCount > 0 ? "#6ee7b7" : "rgba(255,255,255,0.45)" }}
-        >
-          <ShoppingCart className="w-4 h-4" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black"
-              style={{ background: "#34d399", color: "#000" }}>
-              {cartCount}
-            </span>
-          )}
-        </button>
-
-        {/* ── DESKTOP : icône utilisateur discrète ── */}
-        <div className="hidden md:flex flex-shrink-0 ml-1 items-center gap-1.5">
-          {session ? (
-            <>
-              {isAdmin && (
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  title="Tableau de bord"
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  style={{ color: "rgba(255,255,255,0.55)" }}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                </button>
+          {/* Droite — items alignés à gauche depuis le logo */}
+          <div className="flex items-center gap-0.5">
+            {/* Séparateur doré droit */}
+            <div className="flex-shrink-0 mr-4" style={{ width: 1, height: 34, background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)" }} />
+            {navItems.slice(2).map((item) => (
+              <DesktopDropdown key={item.label} item={item} />
+            ))}
+            <Link
+              to="/boutique"
+              className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+              style={{ color: "rgba(255,255,255,0.62)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
+            >
+              <ShoppingBag className="w-3 h-3" />
+              Boutique
+            </Link>
+            <Link
+              to="/informations/contacts"
+              className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+              style={{ color: "rgba(255,255,255,0.62)" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
+            >
+              <Mail className="w-3 h-3" />
+              Contact
+            </Link>
+            <button
+              onClick={() => navigate("/don")}
+              className="ml-1 flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
+              style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
+            >
+              ♥ Don
+            </button>
+            {/* Icône panier */}
+            <button
+              onClick={() => cart?.setIsCartOpen(true)}
+              title="Mon panier"
+              className="relative ml-1 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-all duration-200 flex-shrink-0"
+              style={{ border: "1px solid rgba(255,255,255,0.14)", color: cartCount > 0 ? "#6ee7b7" : "rgba(255,255,255,0.45)" }}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black"
+                  style={{ background: "#34d399", color: "#000" }}>
+                  {cartCount}
+                </span>
               )}
-              <div className="flex items-center gap-1 rounded-full text-[10px]"
-                style={{ border: "1px solid rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.55)" }}>
+            </button>
+            {/* Icône utilisateur */}
+            <div className="flex flex-shrink-0 ml-1 items-center gap-1.5">
+              {session ? (
+                <>
+                  {isAdmin && (
+                    <button
+                      onClick={() => navigate("/dashboard")}
+                      title="Tableau de bord"
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                      style={{ color: "rgba(255,255,255,0.55)" }}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                    </button>
+                  )}
+                  <div className="flex items-center gap-1 rounded-full text-[10px]"
+                    style={{ border: "1px solid rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.55)" }}>
+                    <button
+                      onClick={() => navigate("/espace-membre")}
+                      title="Mon espace membre"
+                      className="flex items-center gap-1 pl-2 pr-1 py-1.5 hover:text-white transition-colors rounded-l-full"
+                    >
+                      <User className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="max-w-[70px] truncate">{session.nom.split(" ")[0]}</span>
+                    </button>
+                    <button onClick={() => { logout(); navigate("/"); }} title="Se déconnecter"
+                      className="pr-2 pl-1 py-1.5 hover:text-white transition-colors rounded-r-full">
+                      <LogOut className="w-3 h-3" />
+                    </button>
+                  </div>
+                </>
+              ) : (
                 <button
                   onClick={() => navigate("/espace-membre")}
-                  title="Mon espace membre"
-                  className="flex items-center gap-1 pl-2 pr-1 py-1.5 hover:text-white transition-colors rounded-l-full"
+                  title="Mon espace"
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-all duration-200"
+                  style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.55)" }}
                 >
-                  <User className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="max-w-[70px] truncate">{session.nom.split(" ")[0]}</span>
+                  <User className="w-4 h-4" />
                 </button>
-                <button onClick={() => { logout(); navigate("/"); }} title="Se déconnecter"
-                  className="pr-2 pl-1 py-1.5 hover:text-white transition-colors rounded-r-full">
-                  <LogOut className="w-3 h-3" />
-                </button>
-              </div>
-            </>
-          ) : (
-            <button
-              onClick={() => navigate("/espace-membre")}
-              title="Mon espace"
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-all duration-200"
-              style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.55)" }}
-            >
-              <User className="w-4 h-4" />
-            </button>
-          )}
+              )}
+            </div>
+          </div>
+
         </div>
 
         {/* ── MOBILE : indicateur session + hamburger ── */}
