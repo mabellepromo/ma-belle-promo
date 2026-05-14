@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowLeft, Lock, Loader, CheckCircle, Copy, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const fmt = (n) => n.toLocaleString("fr-FR") + " FCFA";
 
@@ -223,20 +224,30 @@ export default function CheckoutModal() {
     setTimeout(() => { setStep(0); setMethod(null); setLoading(false); setBuyer({ nom: "", email: "" }); }, 350);
   };
 
-  const sendConfirmEmail = (ref, methode, lignesData) => {
-    fetch("/api/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type:      "order_confirm",
-        email:     buyer.email,
-        nom:       buyer.nom,
-        reference: ref,
-        methode,
-        total,
-        lignes:    lignesData,
-      }),
-    }).catch(() => {});
+  const sendConfirmEmail = async (ref, methode, lignesData) => {
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type:      "order_confirm",
+          email:     buyer.email,
+          nom:       buyer.nom,
+          reference: ref,
+          methode,
+          total,
+          lignes:    lignesData,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("Email confirmation failed:", res.status, err);
+        toast.warning("Commande enregistrée — email de confirmation non envoyé.");
+      }
+    } catch (e) {
+      console.error("Email confirmation error:", e);
+      toast.warning("Commande enregistrée — email de confirmation non envoyé.");
+    }
   };
 
   const handlePay = async () => {
