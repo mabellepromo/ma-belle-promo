@@ -420,6 +420,8 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
+  const { type, ...data } = req.body;
+
   // Rate limiting — max 5 requêtes / IP / 5 minutes
   // Exemption : order_confirm est un email transactionnel déclenché après achat
   const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
@@ -431,8 +433,6 @@ export default async function handler(req, res) {
   if (!BREVO_API_KEY) {
     return res.status(500).json({ error: "BREVO_API_KEY not configured" });
   }
-
-  const { type, ...data } = req.body;
 
   const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm"];
   if (!VALID_TYPES.includes(type)) {
