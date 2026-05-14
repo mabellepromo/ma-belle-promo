@@ -22,7 +22,7 @@ const testimonials = [
     role: "Enseignant-chercheur",
     titre: "Faculté de Droit · Université de Lomé",
     photo: "/images/membres/edwige-kuagbenu.webp",
-    photoPosition: "center 5%",
+    photoPosition: "center 25%",
     quote: "Animer des panels lors de La Nuit du Droit et dans le cadre des activités de MBP, c'est pour moi un devoir envers la prochaine génération. Ce que nos promoteurs ont construit à la FDD mérite d'être transmis avec fierté.",
   },
   {
