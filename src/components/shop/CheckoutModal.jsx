@@ -223,9 +223,26 @@ export default function CheckoutModal() {
     setTimeout(() => { setStep(0); setMethod(null); setLoading(false); setBuyer({ nom: "", email: "" }); }, 350);
   };
 
+  const sendConfirmEmail = (ref, methode, lignesData) => {
+    fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type:      "order_confirm",
+        email:     buyer.email,
+        nom:       buyer.nom,
+        reference: ref,
+        methode,
+        total,
+        lignes:    lignesData,
+      }),
+    }).catch(() => {});
+  };
+
   const handlePay = async () => {
     const isWire = method === "wire";
     const ref = (isWire ? "MBP-WIRE-" : "MBP-") + Date.now().toString(36).toUpperCase();
+    const lignesData = items.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, price: i.price, qty: i.qty }));
     const payload = {
       reference:         ref,
       acheteur_nom:      buyer.nom,
@@ -233,16 +250,18 @@ export default function CheckoutModal() {
       methode_paiement:  method,
       statut:            isWire ? "pending" : "completed",
       total,
-      lignes: items.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, price: i.price, qty: i.qty })),
+      lignes:            lignesData,
     };
 
     if (isWire) {
       await supabase.from("commandes").insert(payload);
+      sendConfirmEmail(ref, method, lignesData);
       clearCart(); setOrderRef(ref); setStep(3); return;
     }
 
     setLoading(true);
     supabase.from("commandes").insert(payload);
+    sendConfirmEmail(ref, method, lignesData);
     setTimeout(() => { setOrderRef(ref); clearCart(); setLoading(false); setStep(3); }, 2400);
   };
 

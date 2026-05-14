@@ -283,6 +283,99 @@ function buildInvitationPayload({ to_name, titre, description, lien }) {
   };
 }
 
+function buildOrderConfirmPayload({ email, nom, reference, methode, total, lignes }) {
+  const METHOD_LABELS = {
+    card:   "Carte bancaire",
+    paypal: "PayPal",
+    wave:   "Wave",
+    tmoney: "T-Money",
+    flooz:  "Flooz",
+    wire:   "Virement ECOBANK",
+  };
+  const isWire = methode === "wire";
+  const fmtNum = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
+  const safeNom  = escHtml(nom || "");
+  const safeRef  = escHtml(reference || "");
+  const safeMeth = escHtml(METHOD_LABELS[methode] || methode);
+
+  const lignesHtml = Array.isArray(lignes) ? lignes.map(l => `
+    <tr>
+      <td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">
+        ${escHtml(l.emoji || "")} ${escHtml(l.name)}
+      </td>
+      <td style="padding:8px 12px;font-size:13px;color:#374151;text-align:center;border-bottom:1px solid #f3f4f6;">×${Number(l.qty)}</td>
+      <td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;">
+        ${fmtNum(l.price * l.qty)}
+      </td>
+    </tr>`).join("") : "";
+
+  const wireBlock = isWire ? `
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0;">
+      <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#14532d;">Coordonnées pour le virement :</p>
+      <p style="margin:0;font-size:13px;color:#374151;line-height:1.8;">
+        Titulaire : <strong>ASSOCIATION MA BELLE PROMO MBP</strong><br>
+        Banque : ECOBANK Togo<br>
+        IBAN : <code style="font-family:monospace;">TG53 TG05 5017 1014 1766 3880 0153</code><br>
+        Swift/BIC : <code style="font-family:monospace;">ECOCTGTGXXX</code><br>
+        Référence : <strong>BOUTIQUE MBP — ${safeNom}</strong>
+      </p>
+    </div>
+    <p style="font-size:13px;color:#6b7280;">
+      Votre commande sera traitée dès réception du virement (1–3 jours ouvrés).
+    </p>` : `
+    <p style="font-size:14px;color:#374151;">
+      Votre paiement a été traité avec succès. Votre commande est confirmée.
+    </p>`;
+
+  const content = `
+    <h2 style="margin:0 0 6px;font-size:18px;color:#111827;">Merci pour votre commande, ${safeNom} !</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">
+      ${isWire ? "Votre commande est en attente de réception du virement." : "Votre commande a bien été enregistrée."}
+    </p>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;margin-bottom:24px;display:inline-block;">
+      <p style="margin:0;font-size:11px;color:#16a34a;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Référence commande</p>
+      <p style="margin:4px 0 0;font-size:18px;font-weight:900;color:#14532d;font-family:monospace;">${safeRef}</p>
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+      <thead>
+        <tr style="background:#f9fafb;">
+          <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Article</th>
+          <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#6b7280;text-align:center;text-transform:uppercase;">Qté</th>
+          <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#6b7280;text-align:right;text-transform:uppercase;">Prix</th>
+        </tr>
+      </thead>
+      <tbody>${lignesHtml}</tbody>
+      <tfoot>
+        <tr style="background:#f9fafb;">
+          <td colspan="2" style="padding:10px 12px;font-size:14px;font-weight:700;color:#111827;border-top:2px solid #e5e7eb;">Total</td>
+          <td style="padding:10px 12px;font-size:14px;font-weight:900;color:#14532d;text-align:right;border-top:2px solid #e5e7eb;">${fmtNum(total)}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <p style="font-size:13px;color:#6b7280;margin:0 0 8px;">
+      Mode de paiement : <strong style="color:#111827;">${safeMeth}</strong>
+    </p>
+
+    ${wireBlock}
+
+    <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;">
+      Pour toute question, écrivez-nous à
+      <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;">contact@mabellepromo.org</a>.
+    </p>`;
+
+  return {
+    sender: SENDER,
+    to: [{ email, name: nom || email }],
+    replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+    subject: `Commande ${safeRef} — Ma Belle Promo`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
 function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
     deletion_request:    { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
@@ -340,7 +433,7 @@ export default async function handler(req, res) {
 
   const { type, ...data } = req.body;
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
   }
@@ -495,6 +588,8 @@ export default async function handler(req, res) {
     if (!isValidConfirmUrl(data.confirm_url)) return res.status(400).json({ error: "URL de confirmation non autorisée." });
   } else if (type === "admin_alert") {
     if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+  } else if (type === "order_confirm") {
+    if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
   }
 
   try {
@@ -502,6 +597,7 @@ export default async function handler(req, res) {
     if (type === "contact")              payload = buildContactPayload(data);
     else if (type === "reply")           payload = buildReplyPayload(data);
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
+    else if (type === "order_confirm")   payload = buildOrderConfirmPayload(data);
     else                                 payload = buildAdminAlertPayload(data);
 
     if (type === "reply" && Array.isArray(data.attachments) && data.attachments.length) {
