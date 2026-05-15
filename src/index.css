@@ -89,8 +89,7 @@
 
 @layer base {
   * {
-    @apply border-border;
-    outline: none;
+    @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
   }
   html {
