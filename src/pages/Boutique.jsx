@@ -136,8 +136,8 @@ function Stars({ rating }) {
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map(i => (
         <Star key={i} className="w-3 h-3"
-          fill={i <= Math.round(rating) ? "#fbbf24" : "none"}
-          style={{ color: i <= Math.round(rating) ? "#fbbf24" : "rgba(255,255,255,0.12)" }}
+          fill={i <= Math.round(rating) ? "#e6b84a" : "none"}
+          style={{ color: i <= Math.round(rating) ? "#e6b84a" : "rgba(255,255,255,0.14)" }}
         />
       ))}
     </div>
@@ -166,13 +166,13 @@ function ProductCard({ product }) {
       whileHover={{ y: -5 }}
       className="group rounded-2xl overflow-hidden flex flex-col"
       style={{
-        background: "#0a1f12",
-        border: "1px solid rgba(52,211,153,0.08)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.30)",
+        background: "linear-gradient(160deg, #1a2d22 0%, #152318 100%)",
+        border: "1px solid rgba(184,134,26,0.18)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.35)",
         transition: "box-shadow 0.3s",
       }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(52,211,153,0.15)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.30)"; }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(184,134,26,0.30)"; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.35)"; }}
     >
       {/* Visual */}
       <div className="relative h-44 flex items-center justify-center overflow-hidden select-none"
@@ -191,7 +191,7 @@ function ProductCard({ product }) {
 
         {product.digital && (
           <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold"
-            style={{ background: "rgba(0,0,0,0.50)", backdropFilter: "blur(8px)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.25)" }}>
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", color: "#e6b84a", border: "1px solid rgba(184,134,26,0.35)" }}>
             <Download className="w-2.5 h-2.5" /> Immédiat
           </div>
         )}
@@ -219,22 +219,22 @@ function ProductCard({ product }) {
       <div className="flex-1 flex flex-col p-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(52,211,153,0.08)", color: "rgba(110,231,183,0.55)" }}>
+            style={{ background: "rgba(184,134,26,0.12)", color: "rgba(230,184,74,0.85)" }}>
             {product.cat}
           </span>
           {product.level && (
-            <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.20)" }}>{product.level}</span>
+            <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.38)" }}>{product.level}</span>
           )}
         </div>
 
         <h3 className="font-heading text-white font-bold text-sm leading-snug mb-1.5 line-clamp-2">{product.name}</h3>
-        <p className="text-xs leading-relaxed mb-3 flex-1" style={{ color: "rgba(255,255,255,0.35)" }}>{product.desc}</p>
+        <p className="text-xs leading-relaxed mb-3 flex-1" style={{ color: "rgba(255,255,255,0.52)" }}>{product.desc}</p>
 
         {product.tags && (
           <div className="flex flex-wrap gap-1 mb-3">
             {product.tags.slice(0, 2).map(tag => (
               <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)" }}>
+                style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.45)" }}>
                 {tag}
               </span>
             ))}
@@ -243,7 +243,7 @@ function ProductCard({ product }) {
 
         <div className="flex items-center gap-1.5 mb-3">
           <Stars rating={product.rating} />
-          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
+          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.42)" }}>
             {product.rating} ({product.reviews})
           </span>
         </div>
@@ -252,7 +252,7 @@ function ProductCard({ product }) {
           <div>
             <span className="font-heading font-bold text-white text-base">{fmt(product.price)}</span>
             {product.original && (
-              <span className="ml-1.5 text-[11px] line-through" style={{ color: "rgba(255,255,255,0.20)" }}>
+              <span className="ml-1.5 text-[11px] line-through" style={{ color: "rgba(255,255,255,0.32)" }}>
                 {fmt(product.original)}
               </span>
             )}
@@ -263,9 +263,9 @@ function ProductCard({ product }) {
             onClick={handleAdd}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-250 flex-shrink-0"
             style={{
-              background: added ? "linear-gradient(135deg,#34d399,#10b981)" : "rgba(52,211,153,0.12)",
-              color: added ? "#000" : "#6ee7b7",
-              border: added ? "none" : "1px solid rgba(52,211,153,0.22)",
+              background: added ? "linear-gradient(135deg,#b8861a,#e6b84a)" : "rgba(184,134,26,0.12)",
+              color: added ? "#fff" : "#e6b84a",
+              border: added ? "none" : "1px solid rgba(184,134,26,0.28)",
             }}
           >
             {added ? "✓ Ajouté" : <><ShoppingCart className="w-3.5 h-3.5" /> Ajouter</>}
@@ -295,13 +295,13 @@ function FeaturedProduct({ product }) {
       className="relative rounded-2xl overflow-hidden mb-10 flex flex-col md:flex-row gap-0"
       style={{
         background: product.imgBg,
-        border: "1px solid rgba(52,211,153,0.20)",
-        boxShadow: "0 16px 60px rgba(0,0,0,0.50)",
+        border: "1px solid rgba(184,134,26,0.30)",
+        boxShadow: "0 16px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(184,134,26,0.08) inset",
       }}
     >
       {/* Glow overlay */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 80% 70% at 10% 50%, rgba(52,211,153,0.10) 0%, transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse 80% 70% at 10% 50%, rgba(184,134,26,0.12) 0%, transparent 70%)" }} />
 
       <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 p-7 md:p-10 w-full">
         <span className="text-8xl select-none flex-shrink-0">{product.emoji}</span>
@@ -312,10 +312,10 @@ function FeaturedProduct({ product }) {
               ⭐ Bestseller
             </span>
             <span className="px-3 py-1 rounded-full text-[10px] font-bold"
-              style={{ background: "rgba(52,211,153,0.15)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.25)" }}>
+              style={{ background: "rgba(184,134,26,0.18)", color: "#e6b84a", border: "1px solid rgba(184,134,26,0.30)" }}>
               {product.cat}
             </span>
-            <BadgeCheck className="w-4 h-4" style={{ color: "#6ee7b7" }} />
+            <BadgeCheck className="w-4 h-4" style={{ color: "#e6b84a" }} />
           </div>
           <h2 className="font-heading text-white font-black text-xl md:text-2xl leading-tight mb-2"
             style={{ letterSpacing: "-0.02em" }}>
@@ -334,8 +334,8 @@ function FeaturedProduct({ product }) {
               onClick={handleAdd}
               className="flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm"
               style={{
-                background: added ? "rgba(52,211,153,0.25)" : "linear-gradient(135deg,#34d399,#10b981)",
-                color: added ? "#6ee7b7" : "#000",
+                background: added ? "rgba(184,134,26,0.22)" : "linear-gradient(135deg,#b8861a,#e6b84a)",
+                color: added ? "#e6b84a" : "#fff",
               }}>
               {added ? "✓ Ajouté au panier" : <><ShoppingCart className="w-4 h-4" /> Ajouter au panier</>}
             </motion.button>
@@ -356,7 +356,7 @@ export default function Boutique() {
     .filter(p => !p.featured || activeCat !== "Tout");
 
   return (
-    <div className="min-h-screen" style={{ background: "#050f09" }}>
+    <div className="min-h-screen" style={{ background: "#0f1d15" }}>
       <SEO
         title="Boutique MBP"
         description="Formations juridiques, produits dérivés MBP, art IA exclusif et publications — la boutique officielle de Ma Belle Promo."
@@ -366,21 +366,21 @@ export default function Boutique() {
 
       {/* ── Hero ── */}
       <div className="relative pt-24 pb-14 overflow-hidden"
-        style={{ background: "linear-gradient(150deg, var(--brand-dark) 0%, hsl(150,30%,7%) 60%, hsl(150,28%,5%) 100%)" }}>
+        style={{ background: "linear-gradient(150deg, #0a3d28 0%, #0d2318 60%, #0a1a12 100%)" }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(ellipse, rgba(52,211,153,0.06) 0%, transparent 70%)" }} />
-        <div className="h-px" style={{ background: "linear-gradient(to right, transparent, #34d399 25%, #fbbf24 75%, transparent)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(184,134,26,0.08) 0%, transparent 70%)" }} />
+        <div className="h-px" style={{ background: "linear-gradient(to right, transparent, #0f5c3a 25%, #b8861a 75%, transparent)" }} />
 
         <div className="max-w-4xl mx-auto px-6 text-center mt-8">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-5"
-              style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.22)" }}>
+              style={{ color: "#e6b84a", background: "rgba(184,134,26,0.12)", border: "1px solid rgba(184,134,26,0.30)" }}>
               <Sparkles className="w-3 h-3" /> Boutique officielle — Ma Belle Promo
             </span>
             <h1 className="font-heading font-black text-white leading-tight mb-4"
               style={{ fontSize: "clamp(2rem,5vw,3.2rem)", letterSpacing: "-0.03em" }}>
               Formez-vous.{" "}
-              <span style={{ background: "linear-gradient(90deg,#34d399,#6ee7b7,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span style={{ background: "linear-gradient(90deg,#1a7a4e,#b8861a,#e6b84a)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 Portez nos couleurs.
               </span>
             </h1>
@@ -402,8 +402,8 @@ export default function Boutique() {
             ].map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: "rgba(52,211,153,0.10)" }}>
-                  <Icon className="w-3.5 h-3.5 text-emerald-400" />
+                  style={{ background: "rgba(184,134,26,0.12)" }}>
+                  <Icon className="w-3.5 h-3.5" style={{ color: "#e6b84a" }} />
                 </div>
                 <div>
                   <p className="text-white text-xs font-semibold">{label}</p>
@@ -432,9 +432,9 @@ export default function Boutique() {
                 onClick={() => setActiveCat(cat)}
                 className="px-4 py-1.5 rounded-full text-xs font-bold transition-all"
                 style={{
-                  background: activeCat === cat ? "linear-gradient(135deg,#34d399,#10b981)" : "rgba(52,211,153,0.08)",
-                  color: activeCat === cat ? "#000" : "rgba(110,231,183,0.65)",
-                  border: activeCat === cat ? "none" : "1px solid rgba(52,211,153,0.14)",
+                  background: activeCat === cat ? "linear-gradient(135deg,#b8861a,#e6b84a)" : "rgba(184,134,26,0.08)",
+                  color: activeCat === cat ? "#fff" : "rgba(230,184,74,0.72)",
+                  border: activeCat === cat ? "none" : "1px solid rgba(184,134,26,0.18)",
                 }}
               >
                 {cat}
@@ -452,7 +452,7 @@ export default function Boutique() {
             whileTap={{ scale: 0.96 }}
             onClick={() => setIsCartOpen(true)}
             className="relative flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold"
-            style={{ background: "rgba(52,211,153,0.10)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.18)" }}
+            style={{ background: "rgba(184,134,26,0.10)", color: "#e6b84a", border: "1px solid rgba(184,134,26,0.22)" }}
           >
             <ShoppingCart className="w-3.5 h-3.5" />
             Mon panier
@@ -464,7 +464,7 @@ export default function Boutique() {
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
-                  style={{ background: "#34d399", color: "#000" }}
+                  style={{ background: "#b8861a", color: "#fff" }}
                 >
                   {count}
                 </motion.span>
@@ -496,13 +496,13 @@ export default function Boutique() {
           viewport={{ once: true }}
           className="mt-16 rounded-2xl p-8 text-center relative overflow-hidden"
           style={{
-            background: "linear-gradient(135deg, rgba(52,211,153,0.10) 0%, rgba(251,191,36,0.06) 100%)",
-            border: "1px solid rgba(52,211,153,0.18)",
+            background: "linear-gradient(135deg, rgba(184,134,26,0.12) 0%, rgba(10,61,40,0.60) 100%)",
+            border: "1px solid rgba(184,134,26,0.22)",
           }}
         >
           <div className="absolute inset-0 pointer-events-none"
             style={{ backgroundImage: "radial-gradient(ellipse 60% 80% at 80% 50%, rgba(251,191,36,0.05) 0%, transparent 70%)" }} />
-          <Tag className="w-7 h-7 mx-auto mb-3" style={{ color: "rgba(52,211,153,0.55)" }} />
+          <Tag className="w-7 h-7 mx-auto mb-3" style={{ color: "rgba(230,184,74,0.65)" }} />
           <h3 className="font-heading text-white text-xl font-bold mb-2">
             -10% sur votre première commande
           </h3>
@@ -512,7 +512,7 @@ export default function Boutique() {
           <Link
             to="/#actualites"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold"
-            style={{ background: "linear-gradient(135deg,#34d399,#10b981)", color: "#000" }}
+            style={{ background: "linear-gradient(135deg,#b8861a,#e6b84a)", color: "#fff" }}
           >
             S'inscrire et économiser <ChevronRight className="w-4 h-4" />
           </Link>
