@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 // ── Contrôlé par la variable Vercel VITE_MAINTENANCE_MODE ──
-// Pour activer : passer à "true" dans Vercel > Settings > Environment Variables, puis Redeploy
-export const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === "true";
+// Pour désactiver : repasser à la ligne ci-dessous et redéployer
+export const MAINTENANCE_MODE = true;
+// export const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === "true";
 const ACCESS_CODE = "mbp2026";
 const STORAGE_KEY = "mbp_access_granted";
 
