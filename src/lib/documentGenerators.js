@@ -1959,16 +1959,21 @@ export function genererFactureBoutique(commande) {
       font-weight: 700;
       color: #e6b84a;
     }
+    /* En-tête couleur unie identique à la zone référence */
+    .doc-header { background: #0a3d28 !important; }
   </style>
 </head>
 <body>
+<button class="no-print print-btn" type="button" onclick="window.print()">
+  🖨 Imprimer / Enregistrer PDF
+</button>
 <div class="a4">
 
   <header class="doc-header">
     <img src="/Logo%20Redesign1.png" alt="MBP" class="doc-header-logo" onerror="this.style.display='none'" />
     <div class="doc-header-asso">
       <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
-      <p class="asso-sub">Boutique en ligne · Promotion 1994-2000 · Lomé, Togo</p>
+      <p class="asso-sub">Boutique en ligne · Lomé, Togo</p>
       <p class="asso-sub" style="margin-top:2px">contact@mabellepromo.org · mabellepromo.org</p>
     </div>
   </header>
@@ -2014,9 +2019,7 @@ export function genererFactureBoutique(commande) {
         <div class="partie-label">Émetteur</div>
         <div class="partie-nom">L'association Ma Belle Promo (MBP)</div>
         <div class="partie-detail">
-          Association des Diplômés<br>
-          Faculté de Droit, Université de Lomé<br>
-          Lomé, Togo<br>
+          Association des Diplômés · Lomé, Togo<br>
           contact@mabellepromo.org
         </div>
       </div>
@@ -2069,7 +2072,7 @@ export function genererFactureBoutique(commande) {
   <footer class="doc-footer">
     <div>
       <p class="footer-text">L'association Ma Belle Promo (MBP) · www.mabellepromo.org</p>
-      <p class="footer-text" style="margin-top:2px">Faculté de Droit — Université de Lomé, Togo</p>
+      <p class="footer-text" style="margin-top:2px">Lomé, Togo · contact@mabellepromo.org</p>
     </div>
     <p class="footer-text" style="text-align:right;white-space:nowrap">
       Facture ${reference}<br>
