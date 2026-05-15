@@ -50,7 +50,7 @@ export default function Cotisation() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.1 }}
-                className="bg-card border-2 border-border rounded-2xl p-7 text-center hover:border-primary/30 hover:shadow-lg transition-all"
+                className="bg-card border-2 border-border rounded-2xl p-4 sm:p-7 text-center hover:border-primary/30 hover:shadow-lg transition-all"
               >
                 <div className="font-heading text-3xl font-bold text-primary mb-1">{t.montant}</div>
                 <div className="text-xs text-muted-foreground mb-4">{t.periode}</div>
@@ -102,7 +102,7 @@ export default function Cotisation() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-primary/5 border border-primary/10 rounded-2xl p-8"
+          className="bg-primary/5 border border-primary/10 rounded-2xl p-5 sm:p-8"
         >
           <h2 className="font-heading text-2xl font-bold text-foreground mb-6">Ce qui est inclus dans votre adhésion</h2>
           <div className="grid sm:grid-cols-2 gap-3">

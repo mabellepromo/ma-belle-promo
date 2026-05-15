@@ -75,7 +75,7 @@ export default function QuiSommesNous() {
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/40 mb-5">
             Ma Belle Promo — FDD · Université de Lomé · Promotion 1994–2000
           </p>
-          <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-tight mb-8">
+          <h1 className="font-heading text-3xl sm:text-5xl md:text-7xl font-black text-white leading-tight mb-8">
             Valeurs & Mission
           </h1>
           <div className="w-12 h-px bg-primary mx-auto mb-8" />
@@ -140,7 +140,7 @@ export default function QuiSommesNous() {
           {/* Ligne déco haut */}
           <div style={{ height: 2, background: "linear-gradient(to right, transparent, #34d399 30%, #fbbf24 60%, #34d399 85%, transparent)" }} />
 
-          <div className="p-8 md:p-12">
+          <div className="p-5 sm:p-8 md:p-12">
 
             {/* En-tête */}
             <div className="flex items-center gap-4 mb-8">

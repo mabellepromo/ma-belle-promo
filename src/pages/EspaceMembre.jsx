@@ -252,11 +252,11 @@ export default function EspaceMembre() {
     <div>
       <PageHero title="Espace Adhérent" subtitle="Ma Belle Promo — Accès privé" />
 
-      <section className="py-12 max-w-5xl mx-auto px-6">
+      <section className="py-12 max-w-5xl mx-auto px-4 sm:px-6">
 
         {/* ── Carte identité ── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          className="bg-card border border-border rounded-2xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
 
           {/* Avatar */}
           <div className="relative flex-shrink-0">
@@ -319,23 +319,26 @@ export default function EspaceMembre() {
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex gap-1 bg-muted rounded-xl p-1 mb-8 w-fit overflow-x-auto">
-          {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                tab === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              }`}>
-              <t.icon className="w-4 h-4" />
-              {t.label}
-            </button>
-          ))}
+        <div className="w-full overflow-x-auto mb-8">
+          <div className="flex gap-1 bg-muted rounded-xl p-1 w-max min-w-full">
+            {tabs.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                title={t.label}
+                className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex-1 justify-center sm:flex-none sm:justify-start ${
+                  tab === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}>
+                <t.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">{t.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ── PROFIL ── */}
         {tab === "profil" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-2xl p-7">
-            <div className="flex items-center justify-between mb-6">
+            className="bg-card border border-border rounded-2xl p-4 sm:p-7">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
               <div>
                 <h3 className="font-heading text-xl font-bold text-foreground">Mes informations</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -481,7 +484,7 @@ export default function EspaceMembre() {
 
             {/* Historique */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-4 border-b border-border flex flex-wrap items-center justify-between gap-1">
                 <h3 className="font-heading text-lg font-bold text-foreground">Historique des cotisations</h3>
                 <span className="text-xs text-muted-foreground">Montant annuel : {MONTANT_COTISATION.toLocaleString("fr-FR")} FCFA</span>
               </div>
@@ -502,7 +505,7 @@ export default function EspaceMembre() {
 
                     return (
                       <div key={c.id || i}>
-                        <div className="flex items-center gap-4 px-6 py-4">
+                        <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4">
                           <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${cfg.color}`}>
                             <CFGIcon className={`w-4 h-4 ${cfg.iconColor}`} />
                           </div>

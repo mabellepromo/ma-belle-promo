@@ -78,7 +78,7 @@ export default function Don() {
 
           {/* Montant */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="bg-card border border-border rounded-2xl p-7">
+            className="bg-card border border-border rounded-2xl p-4 sm:p-7">
             <h2 className="font-heading text-lg font-bold text-foreground mb-5 flex items-center gap-2">
               <Heart className="w-5 h-5 text-primary" /> Choisissez votre montant (F CFA)
             </h2>
@@ -130,7 +130,7 @@ export default function Don() {
 
           {/* Programme */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-            className="bg-card border border-border rounded-2xl p-7">
+            className="bg-card border border-border rounded-2xl p-4 sm:p-7">
             <h2 className="font-heading text-lg font-bold text-foreground mb-5">Affecter mon don à</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               {programmes.map((p) => (
@@ -165,7 +165,7 @@ export default function Don() {
 
           {/* Mode de paiement */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-card border border-border rounded-2xl p-7">
+            className="bg-card border border-border rounded-2xl p-4 sm:p-7">
             <h2 className="font-heading text-lg font-bold text-foreground mb-5 flex items-center gap-2">
               <Phone className="w-5 h-5 text-primary" /> Mode de paiement
             </h2>
@@ -216,7 +216,7 @@ export default function Don() {
 
           {/* Donateur */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="bg-card border border-border rounded-2xl p-7">
+            className="bg-card border border-border rounded-2xl p-4 sm:p-7">
             <h2 className="font-heading text-lg font-bold text-foreground mb-5 flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary" /> Vos informations
             </h2>

@@ -55,7 +55,7 @@ export default function NewsletterConfirm() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full text-center bg-card border border-border rounded-2xl p-10 shadow-sm"
+        className="max-w-md w-full text-center bg-card border border-border rounded-2xl p-6 sm:p-10 shadow-sm"
       >
         <div className="flex justify-center mb-5">{s.icon}</div>
         <h1 className={`font-heading text-2xl font-bold mb-3 ${s.color}`}>{s.title}</h1>

@@ -78,7 +78,7 @@ export default function SoutenirSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
             </div>
-            <div className="p-8 -mt-12 relative">
+            <div className="p-5 sm:p-8 -mt-12 relative">
               <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4">
                 <HandHeart className="w-7 h-7 text-primary-foreground" />
               </div>
@@ -108,7 +108,7 @@ export default function SoutenirSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
             </div>
-            <div className="p-8 -mt-12 relative">
+            <div className="p-5 sm:p-8 -mt-12 relative">
               <div className="w-14 h-14 rounded-xl bg-accent flex items-center justify-center mb-4">
                 <Banknote className="w-7 h-7 text-accent-foreground" />
               </div>

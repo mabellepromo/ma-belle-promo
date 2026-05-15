@@ -72,7 +72,7 @@ export default function Credo() {
             Ma Belle Promo — FDD · Université de Lomé
           </p>
 
-          <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-tight mb-10">
+          <h1 className="font-heading text-3xl sm:text-5xl md:text-7xl font-black text-white leading-tight mb-10">
             Notre Credo
           </h1>
 
@@ -114,7 +114,7 @@ export default function Credo() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-30px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="group relative flex flex-col bg-card border border-border rounded-2xl p-7 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300"
+              className="group relative flex flex-col bg-card border border-border rounded-2xl p-4 sm:p-7 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300"
             >
               {/* Numéro géant en filigrane */}
               <div className="absolute -bottom-4 -right-2 font-heading text-[7rem] font-black leading-none select-none pointer-events-none text-foreground/[0.04]">

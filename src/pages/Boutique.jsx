@@ -303,7 +303,7 @@ function FeaturedProduct({ product }) {
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse 80% 70% at 10% 50%, rgba(184,134,26,0.12) 0%, transparent 70%)" }} />
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 p-7 md:p-10 w-full">
+      <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 p-5 sm:p-7 md:p-10 w-full">
         <span className="text-8xl select-none flex-shrink-0">{product.emoji}</span>
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -498,7 +498,7 @@ export default function Boutique() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 rounded-2xl p-8 text-center relative overflow-hidden"
+          className="mt-16 rounded-2xl p-5 sm:p-8 text-center relative overflow-hidden"
           style={{
             background: "#ffffff",
             border: "1px solid rgba(184,134,26,0.22)",

@@ -435,7 +435,7 @@ export default function Sondage() {
           )}
 
           {status === "notfound" && (
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-8 text-center">
+            <div className="bg-white rounded-2xl border border-border shadow-sm p-5 sm:p-8 text-center">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">❓</span>
               </div>
@@ -445,7 +445,7 @@ export default function Sondage() {
           )}
 
           {status === "expired" && sondage && (
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-8 text-center">
+            <div className="bg-white rounded-2xl border border-border shadow-sm p-5 sm:p-8 text-center">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🔒</span>
               </div>

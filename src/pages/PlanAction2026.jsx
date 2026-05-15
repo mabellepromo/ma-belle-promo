@@ -262,7 +262,7 @@ export default function PlanAction2026() {
       <section className="max-w-5xl mx-auto px-6 pt-14 pb-4">
         <motion.div {...fadeUp(0)} className="grid md:grid-cols-3 gap-6 items-start">
 
-          <div className="md:col-span-2 bg-foreground text-white rounded-2xl p-8 relative overflow-hidden">
+          <div className="md:col-span-2 bg-foreground text-white rounded-2xl p-5 sm:p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-2xl -translate-y-8 translate-x-8" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/20 rounded-full blur-2xl translate-y-6 -translate-x-6" />
             <div className="relative z-10">
@@ -947,7 +947,7 @@ export default function PlanAction2026() {
 
         {/* CTA final */}
         <motion.div {...fadeUp(0)}
-          className="bg-foreground text-white rounded-2xl p-8 md:p-12 relative overflow-hidden text-center">
+          className="bg-foreground text-white rounded-2xl p-5 sm:p-8 md:p-12 relative overflow-hidden text-center">
           <div className="absolute inset-0 opacity-5">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
               <defs>

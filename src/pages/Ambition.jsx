@@ -52,7 +52,7 @@ export default function Ambition() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative flex items-center justify-center mt-16"
+            className="relative flex items-center justify-center mt-16 overflow-hidden"
           >
             {/* Anneaux décoratifs animés */}
             <motion.div
@@ -96,7 +96,7 @@ export default function Ambition() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-card border border-border rounded-2xl p-10"
+          className="bg-card border border-border rounded-2xl p-5 sm:p-10"
         >
           <h3 className="font-heading text-2xl font-bold text-foreground mb-2">Nos Objectifs</h3>
           <p className="text-muted-foreground mb-8">
@@ -127,7 +127,7 @@ export default function Ambition() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-12 p-8 bg-primary/5 border border-primary/20 rounded-2xl text-center"
+          className="mt-12 p-5 sm:p-8 bg-primary/5 border border-primary/20 rounded-2xl text-center"
         >
           <p className="font-heading text-xl font-bold text-foreground mb-2">Notre vision à moyen terme</p>
           <p className="text-muted-foreground">

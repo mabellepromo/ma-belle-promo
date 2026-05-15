@@ -128,7 +128,7 @@ export default function Login() {
             boxShadow: "0 25px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(52,211,153,0.08)",
           }}
         >
-          <div className="p-8">
+          <div className="p-5 sm:p-8">
             {forgot ? (
               resetSent ? (
                 <div className="text-center py-4">

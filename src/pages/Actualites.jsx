@@ -55,7 +55,7 @@ function FeaturedCard({ article }) {
             {article.categorie}
           </span>
         </div>
-        <div className="flex flex-col justify-center p-8 md:p-12">
+        <div className="flex flex-col justify-center p-4 sm:p-8 md:p-12">
           <span className="text-xs text-muted-foreground flex items-center gap-1.5 mb-5">
             <Calendar className="w-3.5 h-3.5 text-primary" /> {article.date}
           </span>

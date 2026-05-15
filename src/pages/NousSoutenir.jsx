@@ -54,7 +54,7 @@ export default function NousSoutenir() {
             <div className="h-48 overflow-hidden">
               <img loading="lazy" src="/images/benevoles.jpg" alt="Bénévolat" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />
             </div>
-            <div className="p-7">
+            <div className="p-4 sm:p-7">
               <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
                 <HandHeart className="w-6 h-6 text-primary-foreground" />
               </div>
@@ -71,7 +71,7 @@ export default function NousSoutenir() {
             <div className="h-48 overflow-hidden">
               <img loading="lazy" src="/images/dons.jpg" alt="Don" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />
             </div>
-            <div className="p-7">
+            <div className="p-4 sm:p-7">
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">
                 <Banknote className="w-6 h-6 text-accent-foreground" />
               </div>

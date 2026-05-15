@@ -173,7 +173,7 @@ export default function Sponsors() {
                 key={n.label}
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}
-                className={`border-2 rounded-2xl p-6 text-center ${n.color}`}
+                className={`border-2 rounded-2xl p-4 sm:p-6 text-center ${n.color}`}
               >
                 <div className="text-4xl mb-3">{n.badge}</div>
                 <h3 className="font-heading font-bold text-foreground mb-1">{n.label}</h3>
@@ -197,7 +197,7 @@ export default function Sponsors() {
                 key={a.titre}
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + i * 0.1 }}
-                className="bg-card border border-border rounded-2xl p-7 text-center hover:shadow-md transition-all"
+                className="bg-card border border-border rounded-2xl p-5 sm:p-7 text-center hover:shadow-md transition-all"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <a.icon className="w-6 h-6 text-primary" />
@@ -244,7 +244,7 @@ export default function Sponsors() {
         {/* CTA */}
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-          className="text-center p-10 bg-primary text-primary-foreground rounded-2xl"
+          className="text-center p-6 sm:p-10 bg-primary text-primary-foreground rounded-2xl"
         >
           <Sparkles className="w-8 h-8 mx-auto mb-4 opacity-80" />
           <h3 className="font-heading text-2xl md:text-3xl font-bold mb-3">Devenez partenaire</h3>

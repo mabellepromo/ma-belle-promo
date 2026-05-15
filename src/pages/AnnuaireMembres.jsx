@@ -68,16 +68,16 @@ export default function AnnuaireMembres() {
       <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Stats */}
-        <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 mb-10">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10">
           {[
             { label: "Membres", value: allMembers.length, icon: Users },
             { label: "Pays", value: Array.from(new Set(allMembers.map(m => m.pays))).length, icon: MapPin },
             { label: "Bureau exécutif", value: allMembers.filter(m => m.bureau).length, icon: Star },
           ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="bg-card border border-border rounded-xl p-4 text-center">
-              <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
-              <div className="font-heading text-2xl font-bold text-foreground">{value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
+            <div key={label} className="bg-card border border-border rounded-xl p-2 sm:p-4 text-center">
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary mx-auto mb-1" />
+              <div className="font-heading text-xl sm:text-2xl font-bold text-foreground">{value}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">{label}</div>
             </div>
           ))}
         </div>

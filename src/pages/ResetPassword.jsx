@@ -102,7 +102,7 @@ export default function ResetPassword() {
           className="rounded-3xl border border-white/10 overflow-hidden"
           style={{ background: "rgba(5,20,10,0.75)", backdropFilter: "blur(20px)", boxShadow: "0 25px 80px rgba(0,0,0,0.5)" }}
         >
-          <form onSubmit={handleSubmit} className="p-8 space-y-4">
+          <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-4">
             <p className="text-gray-400 text-sm mb-2">Choisissez un nouveau mot de passe sécurisé.</p>
 
             <div>

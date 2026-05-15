@@ -55,7 +55,7 @@ function HeroCard({ evt }) {
       </div>
 
       {/* Texte */}
-      <div className="p-8">
+      <div className="p-5 sm:p-8">
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mb-4">
           {evt.date && <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-primary" />{evt.date}</span>}
           {evt.heures && <span className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary" />{evt.heures}</span>}
@@ -135,7 +135,7 @@ function UpcomingCard({ evt }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="relative bg-primary/5 border-2 border-primary/20 rounded-3xl p-8 overflow-hidden"
+      className="relative bg-primary/5 border-2 border-primary/20 rounded-3xl p-5 sm:p-8 overflow-hidden"
     >
       <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/5 -translate-y-1/2 translate-x-1/4 pointer-events-none" />
       <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
@@ -212,7 +212,7 @@ export default function Evenements() {
         <div className="max-w-6xl mx-auto px-6 py-8 md:py-12 text-center">
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
             <p className="eyebrow text-primary/70 mb-3">Ma Belle Promo · FDD Lomé</p>
-            <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-none mb-4">
+            <h1 className="font-heading text-3xl sm:text-5xl md:text-7xl font-black text-white leading-none mb-4">
               Événements
             </h1>
             <div className="w-12 h-0.5 bg-primary mb-6 mx-auto" />

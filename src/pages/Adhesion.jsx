@@ -218,7 +218,7 @@ export default function Adhesion() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card border border-border rounded-2xl p-8"
+          className="bg-card border border-border rounded-2xl p-4 sm:p-8"
         >
           <div className="mb-8">
             <h2 className="font-heading text-2xl font-bold text-foreground mb-2">Formulaire d'adhésion</h2>

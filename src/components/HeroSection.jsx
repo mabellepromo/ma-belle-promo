@@ -194,8 +194,8 @@ export default function HeroSection() {
           className="flex items-center gap-3 md:gap-5 mb-8 w-full"
           style={{ marginTop: "0.5cm" }}
         >
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
-          <p className="text-center shrink-0" style={{
+          <div className="flex-1 h-px hidden sm:block" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
+          <p className="text-center min-w-0 w-full sm:w-auto" style={{
             fontSize: "clamp(10px, 1.4vw, 13px)", fontWeight: 700,
             letterSpacing: "0.14em", textTransform: "uppercase",
             color: "rgba(255,255,255,0.58)", lineHeight: 1.7,
@@ -203,7 +203,7 @@ export default function HeroSection() {
             Association des anciens Diplômés de la Faculté de Droit de l'Université de Lomé
             <span style={{ color: "#fbbf24", marginLeft: 8 }}>· Promotion 1994 – 2000</span>
           </p>
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(251,191,36,0.40))" }} />
+          <div className="flex-1 h-px hidden sm:block" style={{ background: "linear-gradient(to left, transparent, rgba(251,191,36,0.40))" }} />
         </motion.div>
 
         {/* ── Grille responsive : 1 col mobile / 2 col md / 3 col lg ── */}

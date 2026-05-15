@@ -109,7 +109,7 @@ export default function Contacts() {
 
           {/* Formulaire */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-3">
-            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-sm">
+            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-4 sm:p-8 space-y-5 shadow-sm">
               <h2 className="font-heading text-2xl font-bold text-foreground mb-2">Envoyer un message</h2>
               <div className="grid sm:grid-cols-2 gap-5">
                 <div><label className="text-sm font-medium text-foreground mb-1.5 block">Nom complet *</label><Input placeholder="Votre nom" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="h-12" /></div>

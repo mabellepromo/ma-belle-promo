@@ -81,7 +81,7 @@ export default function PaiementRetour() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-8 text-center shadow-sm"
+          className="bg-card border border-border rounded-2xl p-5 sm:p-8 text-center shadow-sm"
         >
           {status === "loading" ? (
             <div className="flex flex-col items-center gap-4 py-4">

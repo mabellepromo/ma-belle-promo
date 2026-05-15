@@ -73,7 +73,7 @@ export default function EvenementsSection() {
                   )}
                 </div>
               )}
-              <div className="p-7">
+              <div className="p-4 sm:p-7">
                 {evenement.date && (
                   <p className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                     <Calendar className="w-4 h-4 text-primary" />
@@ -109,7 +109,7 @@ export default function EvenementsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="bg-card border border-border rounded-2xl p-12 text-center shadow-sm"
+            className="bg-card border border-border rounded-2xl p-6 sm:p-12 text-center shadow-sm"
           >
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
               <Calendar className="w-8 h-8 text-primary" />

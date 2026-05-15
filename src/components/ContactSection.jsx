@@ -122,7 +122,7 @@ export default function ContactSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.15 }}
           >
-            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-md">
+            <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-4 sm:p-8 space-y-5 shadow-md">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Nom complet</label>
                 <Input

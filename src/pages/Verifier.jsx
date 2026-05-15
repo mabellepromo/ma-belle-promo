@@ -42,7 +42,7 @@ export default function Verifier() {
       </div>
 
       {/* Carte résultat */}
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 sm:p-8 text-center">
 
         {etat === "chargement" && (
           <div className="flex flex-col items-center gap-4 py-6">

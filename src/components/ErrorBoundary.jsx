@@ -16,7 +16,7 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-5 p-8 text-center">
+        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-5 p-4 sm:p-8 text-center">
           <AlertCircle className="w-12 h-12 text-destructive opacity-80" />
           <div>
             <h2 className="text-xl font-bold text-foreground mb-2">

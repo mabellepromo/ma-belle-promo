@@ -40,7 +40,7 @@ export default function Programmes() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="group bg-card border border-border rounded-2xl p-8 hover:shadow-lg hover:border-primary/20 transition-all duration-300"
+              className="group bg-card border border-border rounded-2xl p-5 sm:p-8 hover:shadow-lg hover:border-primary/20 transition-all duration-300"
             >
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="flex-shrink-0">
@@ -89,7 +89,7 @@ export default function Programmes() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 text-center p-8 bg-primary/5 border border-primary/20 rounded-2xl"
+          className="mt-16 text-center p-5 sm:p-8 bg-primary/5 border border-primary/20 rounded-2xl"
         >
           <h3 className="font-heading text-xl font-bold text-foreground mb-3">
             Vous souhaitez contribuer ?

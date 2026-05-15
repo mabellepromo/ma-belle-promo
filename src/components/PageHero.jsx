@@ -20,9 +20,9 @@ export default function PageHero({ title, subtitle }) {
       {/* Contenu */}
       <div className="relative z-10 max-w-3xl mx-auto px-6">
         {subtitle && (
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span className="eyebrow text-white/80">{subtitle}</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm max-w-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse flex-shrink-0" />
+            <span className="eyebrow text-white/80 truncate">{subtitle}</span>
           </div>
         )}
 
