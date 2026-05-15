@@ -69,7 +69,7 @@ export default function FooterSection() {
               </div>
             </div>
             <p className="text-[10px] text-background/25 tracking-widest uppercase">Amitié · Solidarité · Entraide</p>
-            <p className="text-[9px] text-background/20 leading-relaxed mt-3">
+            <p className="text-[9px] text-background/20 leading-relaxed mt-3 text-center">
               Association officiellement reconnue par les autorités togolaises depuis le 03 octobre 2019<br />
               Récépissé N°0920/MATDCL-SG-DLPAP-DOCA
             </p>
