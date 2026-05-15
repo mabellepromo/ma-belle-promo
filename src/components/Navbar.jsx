@@ -70,7 +70,7 @@ function DesktopDropdown({ item }) {
       {/* Bouton déclencheur */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+        className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
         style={{
           color: open ? "#ffffff" : "rgba(255,255,255,0.62)",
           background: open ? "rgba(52,211,153,0.10)" : "transparent",
@@ -350,7 +350,7 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to="/boutique"
-                className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+                className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
                 style={{ color: "rgba(255,255,255,0.62)" }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
@@ -361,7 +361,7 @@ export default function Navbar() {
             )}
             <Link
               to="/informations/contacts"
-              className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
+              className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
               style={{ color: "rgba(255,255,255,0.62)" }}
               onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
