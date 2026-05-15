@@ -278,7 +278,7 @@ export default function HeroSection() {
             {/* Titre principal — un seul h1 sémantique, deux lignes animées */}
             <h1
               className="font-heading leading-none mb-6 text-center md:text-left"
-              style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", fontWeight: 900, letterSpacing: "-0.04em" }}
+              style={{ fontSize: "clamp(1.1rem, 2.8vw, 2rem)", fontWeight: 900, letterSpacing: "-0.03em" }}
             >
               <motion.span
                 className="block mb-1"
