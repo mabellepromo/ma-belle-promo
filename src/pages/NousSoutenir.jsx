@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { HandHeart, Banknote, Phone, MapPin, Globe } from "lucide-react";
+import { HandHeart, Banknote, Phone, MapPin, Globe, Building2 } from "lucide-react";
 import SEO from "../components/SEO";
 import PaymentModal from "../components/PaymentModal";
 
@@ -118,7 +118,7 @@ export default function NousSoutenir() {
             </motion.div>
           ))}
 
-          {/* Carte virement bancaire — copie exacte de la page Don */}
+          {/* Carte virement bancaire — harmonisée avec les 3 autres */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -127,13 +127,21 @@ export default function NousSoutenir() {
             <button
               type="button"
               onClick={() => setVirementOpen(v => !v)}
-              className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
-                virementOpen ? "bg-primary/5 border-primary" : "bg-background border-border hover:border-primary/40"
+              className={`w-full text-left p-5 rounded-xl border flex items-start gap-4 transition-all ${
+                virementOpen
+                  ? "bg-primary/5 border-primary shadow-md"
+                  : "bg-card border-border hover:shadow-md hover:border-primary/20"
               }`}
             >
-              <div className={`text-sm font-semibold ${virementOpen ? "text-primary" : "text-foreground"}`}>Virement bancaire</div>
-              <div className="text-xs text-muted-foreground mt-0.5">ECOBANK Togo · IBAN : TG53TG0550171014176638800153</div>
-              <div className="text-xs text-muted-foreground mt-1.5 italic border-t border-border/50 pt-1.5">Swift/BIC : ECOCTGTGXXX · N° compte : 141766388001</div>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${virementOpen ? "bg-primary/20" : "bg-primary/10"}`}>
+                <Building2 className="w-5 h-5 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-heading font-bold text-foreground mb-1">Virement bancaire</h4>
+                <p className="text-xs text-muted-foreground mb-1.5 leading-relaxed">Effectuez un virement depuis n'importe quelle banque, au Togo ou depuis la diaspora.</p>
+                <p className="text-xs text-foreground/70 font-medium">ECOBANK Togo · IBAN : TG53TG0550171014176638800153</p>
+                <p className="text-xs text-primary/70 font-medium mt-0.5">{virementOpen ? "▲ Masquer les détails" : "▼ Voir les coordonnées complètes"}</p>
+              </div>
             </button>
 
             {virementOpen && (
