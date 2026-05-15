@@ -2,6 +2,7 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { CheckCircle, XCircle, Loader2, ShieldCheck } from "lucide-react";
+import SEO from "../components/SEO";
 
 export default function Verifier() {
   const [params] = useSearchParams();
@@ -29,6 +30,7 @@ export default function Verifier() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-950 to-green-800 flex flex-col items-center justify-center p-6">
+      <SEO title="Vérification d'attestation" description="Vérifiez l'authenticité d'une attestation délivrée par l'association Ma Belle Promo." path="/verifier" />
 
       {/* En-tête */}
       <div className="flex items-center gap-3 mb-8">

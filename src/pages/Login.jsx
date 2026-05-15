@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { supabase } from "../lib/supabase";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowLeft, Send, Home } from "lucide-react";
+import SEO from "../components/SEO";
 
 export default function Login() {
   const { login } = useLocalAuth();
@@ -73,6 +74,7 @@ export default function Login() {
         background: "linear-gradient(160deg, #042b14 0%, #063d1e 40%, #052918 70%, #031a0e 100%)",
       }}
     >
+      <SEO title="Connexion" description="Connectez-vous à votre espace membre Ma Belle Promo." path="/login" />
       {/* Lumières ambiantes */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div

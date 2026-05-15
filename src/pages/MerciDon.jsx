@@ -1,6 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, Home, ArrowRight, Phone } from "lucide-react";
+import SEO from "../components/SEO";
 
 const programmesLabels = {
   general: "Fonds général MBP",
@@ -17,6 +18,7 @@ export default function MerciDon() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-20">
+      <SEO title="Merci pour votre don" description="Votre don a bien été reçu. Merci de soutenir les actions de Ma Belle Promo au Togo." path="/don/merci" />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

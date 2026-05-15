@@ -158,7 +158,7 @@ export function ComposeModal({ onClose, initialAttachment = null }) {
           <div className="bg-gradient-to-r from-primary/8 to-transparent border border-primary/15 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2 pb-2 border-b border-primary/10">
               <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png"
-                alt="" className="w-5 h-5 rounded-full" />
+                alt="" aria-hidden="true" className="w-5 h-5 rounded-full" />
               <span className="text-xs font-bold text-foreground">Ma Belle Promo</span>
               <span className="text-xs text-muted-foreground">· contact@mabellepromo.org</span>
             </div>

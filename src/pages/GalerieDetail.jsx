@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X, ChevronLeft, ChevronRight, Download, Play, Pause, ZoomIn, Calendar, MapPin, Images } from "lucide-react";
 import { useGaleries } from "../hooks/useGaleries";
 import { useLocalAuth } from "../lib/LocalAuth";
+import SEO from "../components/SEO";
 
 export default function GalerieDetail() {
   const { id } = useParams();
@@ -61,6 +62,11 @@ export default function GalerieDetail() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={galerie?.titre ? `${galerie.titre} — Galerie` : "Galerie photos"}
+        description={galerie?.description || "Galerie photo de l'association Ma Belle Promo — FDD Lomé 1994–2000."}
+        path={`/galeries/${id}`}
+      />
 
       {/* En-tête galerie */}
       <div className="bg-foreground border-b border-white/10">

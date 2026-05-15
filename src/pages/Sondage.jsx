@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
+import SEO from "../components/SEO";
 import {
   getSondageWithQuestions, hasVoted, submitSondage,
   getSondageResults, getFingerprint, getInvitationByToken, getTheme,
@@ -393,6 +394,11 @@ export default function Sondage() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex flex-col`}>
+      <SEO
+        title={sondage?.titre ? `${sondage.titre} — Sondage MBP` : "Sondage — Ma Belle Promo"}
+        description="Participez au sondage de l'association Ma Belle Promo."
+        path={`/sondage/${id}`}
+      />
 
       <header className="bg-white border-b border-border shadow-sm px-6 py-4 flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">

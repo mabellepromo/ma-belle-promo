@@ -143,6 +143,7 @@ export default function HeroSection() {
         <img
           src="/images/conference.jpg"
           alt=""
+          aria-hidden="true"
           fetchPriority="high"
           decoding="async"
           className="w-full h-full object-cover scale-110"
