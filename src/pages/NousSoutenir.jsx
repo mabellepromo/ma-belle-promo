@@ -38,7 +38,7 @@ export default function NousSoutenir() {
 
       <section className="py-20 max-w-5xl mx-auto px-6">
         {/* Header text */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-2xl mx-auto mb-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
           <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
             Votre soutien est un accélérateur de projets
           </h2>

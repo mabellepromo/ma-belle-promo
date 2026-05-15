@@ -23,7 +23,7 @@ export default function Programmes() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-16"
+          className="text-center text-lg text-muted-foreground mb-16"
         >
           Ma Belle Promo déploie plusieurs programmes visant à accompagner les étudiants,
           développer le réseautage et partager l'expertise de ses membres avec la communauté.

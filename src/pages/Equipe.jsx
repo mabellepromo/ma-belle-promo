@@ -16,7 +16,7 @@ export default function Equipe() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-16"
+          className="relative z-10 text-center text-lg text-muted-foreground mb-16"
         >
           Le bureau exécutif de Ma Belle Promo est composé de membres élus lors de l'Assemblée Générale.
           Ils œuvrent bénévolement pour faire avancer la mission de l'association.

@@ -69,7 +69,7 @@ export default function Don() {
 
       <section className="py-16 max-w-4xl mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Votre générosité finance directement les bourses, les webinaires et les actions humanitaires de Ma Belle Promo. Chaque franc compte.
           </p>
         </motion.div>

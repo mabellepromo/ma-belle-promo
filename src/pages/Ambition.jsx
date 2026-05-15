@@ -130,7 +130,7 @@ export default function Ambition() {
           className="mt-12 p-8 bg-primary/5 border border-primary/20 rounded-2xl text-center"
         >
           <p className="font-heading text-xl font-bold text-foreground mb-2">Notre vision à moyen terme</p>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground">
             Nous visons à ce que <strong className="text-primary">trois étudiants sur cinq</strong> de la Faculté
             de Droit de Lomé nous identifient clairement et soient impactés positivement par l'une de nos actions.
             Par conséquent toutes nos activités se tourneront prioritairement vers la consolidation de ces ambitions
