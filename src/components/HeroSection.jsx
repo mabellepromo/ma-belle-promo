@@ -196,7 +196,7 @@ export default function HeroSection() {
         >
           <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
           <p className="text-center shrink-0" style={{
-            fontSize: "clamp(7.5px, 1.1vw, 10px)", fontWeight: 700,
+            fontSize: "clamp(10px, 1.4vw, 13px)", fontWeight: 700,
             letterSpacing: "0.14em", textTransform: "uppercase",
             color: "rgba(255,255,255,0.58)", lineHeight: 1.7,
           }}>
