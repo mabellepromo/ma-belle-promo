@@ -299,7 +299,7 @@ export default function ProjetDetail() {
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-4 flex flex-col flex-1">
-                    <span className={`self-start px-2 py-0.5 text-xs font-semibold rounded-full mb-2 ${catColors[p.categorie] || "bg-gray-100 text-gray-700"}`}>
+                    <span className={`self-start px-2 py-0.5 text-xs font-semibold rounded-full mb-2 ${catColors[p.categorie] || "bg-secondary text-secondary-foreground"}`}>
                       {p.categorie}
                     </span>
                     <h3 className="text-sm font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors leading-snug flex-1">

@@ -238,7 +238,7 @@ export default function Communiques() {
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${typeColors[c.type] || "bg-gray-100 text-gray-700"}`}>
+                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${typeColors[c.type] || "bg-secondary text-secondary-foreground"}`}>
                       {c.type}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
