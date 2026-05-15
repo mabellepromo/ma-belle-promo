@@ -121,7 +121,7 @@ export default function MarqueeSection() {
         position: "absolute", top: 0, left: 0, bottom: 0, zIndex: 4,
         width: 152,
         background: "#dc2626",
-        clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)",
+        clipPath: "polygon(22px 0, 100% 0, 100% 100%, 0 100%)",
         display: "flex", alignItems: "center",
         paddingLeft: 14, paddingRight: 28,
         pointerEvents: "none",
