@@ -247,16 +247,6 @@ export default function HeroSection() {
               </motion.div>
             </WaterBubble>
 
-            {/* Slogan */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 1.0 }}
-              className="font-heading text-center italic leading-snug"
-              style={{ fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)", color: "rgba(255,255,255,0.72)", letterSpacing: "0.01em" }}
-            >
-              L'excellence juridique partagée,<br />au service de l'avenir
-            </motion.p>
-
             {/* Stats — compteurs animés au scroll */}
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
