@@ -26,19 +26,15 @@ const supportMethods = [
     desc: "Envoyez vos contributions par mobile money.",
     detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92",
   },
-  {
-    icon: Building2,
-    titre: "Virement bancaire",
-    desc: "Effectuez un virement depuis n'importe quelle banque, au Togo ou depuis la diaspora.",
-    detail: "ECOBANK Togo — IBAN : TG53 TG05 5017 1014 1766 3880 0153",
-  },
 ];
 
-const BANK_ROWS = [
-  { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
-  { label: "Banque",    value: "ECOBANK Togo" },
-  { label: "IBAN",      value: "TG53 TG05 5017 1014 1766 3880 0153" },
-  { label: "Swift/BIC", value: "ECOCTGTGXXX" },
+const BANK_FIELDS = [
+  { label: "Titulaire",    value: "ASSOCIATION MA BELLE PROMO MBP" },
+  { label: "Banque",       value: "ECOBANK Togo" },
+  { label: "IBAN",         value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
+  { label: "Swift / BIC",  value: "ECOCTGTGXXX",                        mono: true },
+  { label: "N° de compte", value: "141766388001",                       mono: true },
+  { label: "Référence",    value: "SOUTIEN MBP — [Votre nom]" },
 ];
 
 function CopyField({ value }) {
@@ -49,7 +45,7 @@ function CopyField({ value }) {
     setTimeout(() => setCopied(false), 1800);
   };
   return (
-    <button onClick={handle} title="Copier" className="ml-2 p-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0">
+    <button onClick={handle} title="Copier" className="ml-1.5 p-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0">
       {copied
         ? <Check className="w-3.5 h-3.5 text-primary" />
         : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -72,7 +68,7 @@ export default function NousSoutenir() {
             Votre soutien est un accélérateur de projets
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Quel que soit le montant de votre don, sachez que votre contribution aura un impact 
+            Quel que soit le montant de votre don, sachez que votre contribution aura un impact
             sur la vie d'autrui à travers les programmes que Ma Belle Promo met en place.
           </p>
         </motion.div>
@@ -89,8 +85,8 @@ export default function NousSoutenir() {
               </div>
               <h3 className="font-heading text-xl font-bold text-foreground mb-3">Bénévolat</h3>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Vous pouvez vous impliquer avec la Faculté de Droit et ses étudiants de plusieurs façons 
-                positives. Partagez vos connaissances, votre expertise et vos expériences. Ma Belle Promo 
+                Vous pouvez vous impliquer avec la Faculté de Droit et ses étudiants de plusieurs façons
+                positives. Partagez vos connaissances, votre expertise et vos expériences. Ma Belle Promo
                 créera les conditions de votre épanouissement dans cet engagement.
               </p>
             </div>
@@ -106,8 +102,8 @@ export default function NousSoutenir() {
               </div>
               <h3 className="font-heading text-xl font-bold text-foreground mb-3">Dons</h3>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Tout le monde a la possibilité de faire la différence avec des actions simples. 
-                Vos dons, additionnés à ceux des adhérents, nous aident à toucher nos objectifs du doigt 
+                Tout le monde a la possibilité de faire la différence avec des actions simples.
+                Vos dons, additionnés à ceux des adhérents, nous aident à toucher nos objectifs du doigt
                 et à changer des vies concrètement.
               </p>
               <button onClick={() => setDonModal(true)} className="mt-4 inline-block text-sm text-primary font-medium hover:underline">
@@ -146,45 +142,33 @@ export default function NousSoutenir() {
               </div>
             </motion.div>
           ))}
-        </div>
-        {/* Coordonnées bancaires */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-10 rounded-2xl overflow-hidden border border-border"
-          style={{ background: "linear-gradient(135deg, #fffbea 0%, #fff8dc 100%)" }}
-        >
-          {/* En-tête */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-amber-200/60"
-            style={{ background: "linear-gradient(90deg, #b8861a, #c9972a)" }}>
-            <Building2 className="w-5 h-5 text-white flex-shrink-0" />
-            <div>
-              <p className="text-white text-sm font-bold">Virement bancaire — ECOBANK Togo</p>
-              <p className="text-white/75 text-xs">Coordonnées pour vos dons et soutiens par virement</p>
+
+          {/* Virement bancaire — style Don */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="sm:col-span-2 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden"
+          >
+            <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                Virement bancaire — Coordonnées bancaires complètes
+              </span>
             </div>
-          </div>
-
-          {/* Lignes */}
-          <div className="px-6 py-5 divide-y divide-amber-200/50">
-            {BANK_ROWS.map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between gap-4 py-2.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-amber-800/70 w-20 flex-shrink-0">
-                  {label}
-                </span>
-                <div className="flex items-center flex-1 justify-end gap-1">
-                  <span className="text-sm font-mono font-medium text-amber-900 text-right">{value}</span>
-                  <CopyField value={value} />
+            <div className="divide-y divide-border/60">
+              {BANK_FIELDS.map(({ label, value, mono }) => (
+                <div key={label} className="flex items-center gap-3 px-4 py-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
+                  <div className="flex items-center flex-1">
+                    <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
+                    {mono && <CopyField value={value} />}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="px-6 pb-4 text-xs text-amber-800/55 flex items-center gap-1.5">
-            <Check className="w-3 h-3 flex-shrink-0" />
-            Cliquez sur l'icône de copie pour copier chaque champ dans le presse-papier.
-          </div>
-        </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
 
       </section>
 
