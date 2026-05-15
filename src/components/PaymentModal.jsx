@@ -73,15 +73,19 @@ export default function PaymentModal({ open, onClose, type = "don", user = null 
     <AnimatePresence>
       {open && (
         <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" onClick={onClose} />
-
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={onClose}
+          >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-background border border-border rounded-2xl shadow-2xl overflow-hidden"
+            className="w-full max-w-md bg-background border border-border rounded-2xl shadow-2xl overflow-y-auto"
+            style={{ maxHeight: "calc(100dvh - 2rem)" }}
+            onClick={e => e.stopPropagation()}
           >
             {/* En-tête */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-primary/5">
@@ -185,6 +189,7 @@ export default function PaymentModal({ open, onClose, type = "don", user = null 
                 {" "}· Vous serez redirigé(e) sur leur page sécurisée.
               </p>
             </form>
+          </motion.div>
           </motion.div>
         </>
       )}
