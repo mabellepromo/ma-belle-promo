@@ -308,7 +308,7 @@ export default function Navbar() {
             >
               Accueil
             </Link>
-            {navItems.slice(0, 2).map((item) => (
+            {navItems.slice(0, 3).map((item) => (
               <DesktopDropdown key={item.label} item={item} />
             ))}
             {/* Séparateur doré gauche */}
@@ -344,7 +344,7 @@ export default function Navbar() {
           <div className="flex items-center gap-0.5">
             {/* Séparateur doré droit */}
             <div className="flex-shrink-0 mr-4" style={{ width: 1, height: 34, background: "linear-gradient(to bottom, transparent, rgba(251,191,36,0.38), transparent)" }} />
-            {navItems.slice(2).map((item) => (
+            {navItems.slice(3).map((item) => (
               <DesktopDropdown key={item.label} item={item} />
             ))}
             {isAdmin && (
