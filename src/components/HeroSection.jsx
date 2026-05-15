@@ -192,6 +192,7 @@ export default function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
           className="flex items-center gap-3 md:gap-5 mb-8 w-full"
+          style={{ marginTop: "0.5cm" }}
         >
           <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
           <p className="text-center shrink-0" style={{
