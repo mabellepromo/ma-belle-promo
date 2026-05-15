@@ -116,6 +116,30 @@ export default function MarqueeSection() {
         background: `linear-gradient(to left, ${BG}, transparent)`,
       }} />
 
+      {/* Trapèze rouge — angle droit à gauche, côté droit oblique */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, bottom: 0, zIndex: 4,
+        width: 152,
+        background: "#dc2626",
+        clipPath: "polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%)",
+        display: "flex", alignItems: "center",
+        paddingLeft: 14, paddingRight: 28,
+        pointerEvents: "none",
+      }}>
+        <span style={{
+          fontFamily: "Lato, sans-serif",
+          fontSize: 8,
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "#fff",
+          lineHeight: 1.5,
+          whiteSpace: "nowrap",
+        }}>
+          MBP<br />en mouvement
+        </span>
+      </div>
+
       {/* Rangée 1 — gauche */}
       <Row cls="mq-left"  items={ROW1} gem="◆" gemColor="rgba(251,191,36,0.40)" />
 

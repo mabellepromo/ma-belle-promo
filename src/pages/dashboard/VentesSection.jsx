@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2 } from "lucide-react";
+import { genererFactureBoutique } from "@/lib/documentGenerators";
+import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2, Eye, FileText } from "lucide-react";
 
 const fmt = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
 
@@ -291,7 +292,18 @@ export default function VentesSection() {
                         </div>
                       )}
 
-                      {/* Actions */}
+                      {/* Boutons facture */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => genererFactureBoutique(c)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                          style={{ background: "rgba(184,134,26,0.10)", color: "#b8861a", border: "1px solid rgba(184,134,26,0.25)" }}
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Voir la facture
+                        </button>
+                      </div>
+
+                      {/* Actions statut + suppression */}
                       <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
                         <div className="flex items-center gap-2">
                           {c.statut === "pending" && (

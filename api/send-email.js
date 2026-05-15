@@ -11,7 +11,7 @@ const CONTACT_TO = [{ email: "contact@mabellepromo.org", name: "Ma Belle Promo" 
 const ALLOWED_ORIGINS = [
   "https://mabellepromo.org",
   "https://www.mabellepromo.org",
-  "https://mabellepromo.org",
+  "https://mabellepromo.vercel.app",
 ];
 
 /* ── Validation email basique ── */

@@ -1734,6 +1734,21 @@ export function genererFacture(facture) {
       <div class="info-value">${mode_reglement}</div>
     </div>` : ""}
 
+    <!-- Coordonnées bancaires si virement -->
+    ${mode_reglement && mode_reglement.toLowerCase().includes("virement") ? `
+    <div style="background:linear-gradient(135deg,#fffbea,#fff8dc);border:1px solid #d4a017;border-left:4px solid #b8861a;border-radius:6px;padding:14px 18px;">
+      <div style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#7a5100;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">
+        Coordonnées bancaires — Virement ECOBANK
+      </div>
+      <div style="font-family:'Lato',sans-serif;font-size:9pt;color:#3d2600;line-height:2;">
+        <strong>Titulaire&nbsp;:</strong> ASSOCIATION MA BELLE PROMO MBP<br>
+        <strong>Banque&nbsp;&nbsp;&nbsp;&nbsp;:</strong> ECOBANK Togo<br>
+        <strong>IBAN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> TG53 TG05 5017 1014 1766 3880 0153<br>
+        <strong>Swift/BIC&nbsp;:</strong> ECOCTGTGXXX<br>
+        <strong>Référence&nbsp;:</strong> ${numero} — ${client_nom || "Client"}
+      </div>
+    </div>` : ""}
+
     <!-- Notes -->
     ${notes ? `<div class="notice-box">
       <p><strong>Notes :</strong> ${notes}</p>
@@ -1758,4 +1773,313 @@ export function genererFacture(facture) {
 </html>`;
 
   openDoc(html, `Facture-${numero}.html`);
+}
+
+// ── Facture Boutique (commande en ligne) ─────────────────────────────────────
+export function genererFactureBoutique(commande) {
+  const {
+    reference       = "—",
+    acheteur_nom    = "—",
+    acheteur_email  = "",
+    methode_paiement = "",
+    total           = 0,
+    lignes          = [],
+    created_at,
+    statut          = "pending",
+  } = commande;
+
+  const METHOD_LABELS = {
+    card: "Carte bancaire", paypal: "PayPal", wave: "Wave",
+    tmoney: "T-Money", flooz: "Flooz", wire: "Virement ECOBANK",
+  };
+  const STATUT_CFG = {
+    completed: { label: "Payée",      bg: "#d1fae5", color: "#065f46" },
+    pending:   { label: "En attente", bg: "#fef3c7", color: "#92400e" },
+    cancelled: { label: "Annulée",    bg: "#fee2e2", color: "#991b1b" },
+  };
+
+  const fmt = n => new Intl.NumberFormat("fr-FR").format(Math.round(n || 0)) + " FCFA";
+  const strip = s => String(s || "").replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "").trim();
+  const lignesArr = Array.isArray(lignes) ? lignes : [];
+  const dateCmd = created_at
+    ? new Date(created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+    : today();
+  const modeLabel = METHOD_LABELS[methode_paiement] || methode_paiement || "—";
+  const statutCfg = STATUT_CFG[statut] ?? STATUT_CFG.pending;
+
+  const lignesHtml = lignesArr.map((l, i) => `
+    <tr${i % 2 === 1 ? ' class="alt"' : ""}>
+      <td class="td-desc">${strip(l.name)}</td>
+      <td class="td-num">${l.qty}</td>
+      <td class="td-num">${fmt(l.price)}</td>
+      <td class="td-num td-total">${fmt(l.price * l.qty)}</td>
+    </tr>`).join("");
+
+  const wireBlock = methode_paiement === "wire" ? `
+    <div style="background:linear-gradient(135deg,#fffbea,#fff8dc);border:1px solid #d4a017;border-left:4px solid #b8861a;border-radius:6px;padding:14px 18px;margin-top:16px;">
+      <div style="font-family:'Lato',sans-serif;font-size:7.5pt;font-weight:700;color:#7a5100;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">
+        Coordonnées bancaires — Virement ECOBANK
+      </div>
+      <div style="font-family:'Lato',sans-serif;font-size:9pt;color:#3d2600;line-height:2;">
+        <strong>Titulaire&nbsp;:</strong> ASSOCIATION MA BELLE PROMO MBP<br>
+        <strong>Banque&nbsp;&nbsp;&nbsp;&nbsp;:</strong> ECOBANK Togo<br>
+        <strong>IBAN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> TG53 TG05 5017 1014 1766 3880 0153<br>
+        <strong>Swift/BIC&nbsp;:</strong> ECOCTGTGXXX<br>
+        <strong>Référence&nbsp;:</strong> BOUTIQUE MBP — ${acheteur_nom}
+      </div>
+    </div>` : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture Boutique ${reference}</title>
+  <style>
+    ${MBP_STYLE}
+
+    .facture-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .facture-num-box {
+      background: #0a3d28;
+      border-radius: 8px;
+      padding: 14px 18px;
+      min-width: 220px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+    }
+    .facture-num-box .info-label { color: rgba(255,255,255,0.50); }
+    .facture-num-box .info-value { color: #fff; font-size: 10pt; }
+    .facture-num-box .info-row.full-width { grid-column: 1/-1; }
+
+    .partie {
+      background: #f7faf8;
+      border: 1px solid #c8ddd2;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .partie.dest {
+      background: linear-gradient(135deg, #fffbea 0%, #fff6d6 100%);
+      border-color: #d4a017;
+    }
+    .partie-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 7pt;
+      font-weight: 700;
+      color: #0a3d28;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(10,61,40,0.12);
+    }
+    .partie.dest .partie-label { color: #7a5100; border-color: rgba(180,130,0,0.2); }
+    .partie-nom {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0a3d28;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .partie.dest .partie-nom { color: #1a1a1a; }
+    .partie-detail {
+      font-family: 'Lato', sans-serif;
+      font-size: 8.5pt;
+      color: #555;
+      line-height: 1.65;
+    }
+
+    .table-wrap { border: 1px solid #c8ddd2; border-radius: 8px; overflow: hidden; }
+    table.prestations { width: 100%; border-collapse: collapse; }
+    table.prestations thead tr { background: #0a3d28; }
+    table.prestations thead th {
+      font-family: 'Lato', sans-serif;
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    table.prestations thead th.th-num { text-align: right; }
+    table.prestations tbody tr { border-bottom: 1px solid #e4ede8; }
+    table.prestations tbody tr.alt { background: #f7faf8; }
+    table.prestations tbody tr:last-child { border-bottom: none; }
+    table.prestations td {
+      font-family: 'Lato', sans-serif;
+      font-size: 9pt;
+      color: #444;
+      padding: 9px 14px;
+      vertical-align: middle;
+    }
+    td.td-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10.5pt;
+      color: #1a1a1a;
+      width: 52%;
+    }
+    td.td-num { text-align: right; white-space: nowrap; }
+    td.td-total { font-weight: 700; color: #0a3d28; }
+
+    .totaux-wrap { display: flex; justify-content: flex-end; }
+    .totaux {
+      width: 290px;
+      border: 1px solid #c8ddd2;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid #e4ede8;
+      font-family: 'Lato', sans-serif;
+      font-size: 9pt;
+    }
+    .tot-row:last-child { border-bottom: none; }
+    .tot-row.final { background: #0a3d28; padding: 12px 16px; }
+    .tot-row .lbl { color: #666; }
+    .tot-row .val { font-weight: 700; color: #0a3d28; }
+    .tot-row.final .lbl {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14pt;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tot-row.final .val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15pt;
+      font-weight: 700;
+      color: #e6b84a;
+    }
+  </style>
+</head>
+<body>
+<div class="a4">
+
+  <header class="doc-header">
+    <img src="/Logo%20Redesign1.png" alt="MBP" class="doc-header-logo" onerror="this.style.display='none'" />
+    <div class="doc-header-asso">
+      <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+      <p class="asso-sub">Boutique en ligne · Promotion 1994-2000 · Lomé, Togo</p>
+      <p class="asso-sub" style="margin-top:2px">contact@mabellepromo.org · mabellepromo.org</p>
+    </div>
+  </header>
+  <div class="gold-bar"></div>
+
+  <div class="doc-body">
+
+    <!-- Titre + infos commande -->
+    <div class="facture-top">
+      <div>
+        <div class="doc-title">Facture</div>
+        <div class="doc-ref" style="font-size:8.5pt;color:#666;margin-top:5px">
+          Commande Boutique MBP
+        </div>
+      </div>
+      <div class="facture-num-box">
+        <div class="info-row full-width">
+          <span class="info-label">Référence</span>
+          <span class="info-value" style="font-family:'Lato',sans-serif;letter-spacing:0.05em">${reference}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date</span>
+          <span class="info-value">${dateCmd}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Statut</span>
+          <span class="info-value">
+            <span style="background:${statutCfg.bg};color:${statutCfg.color};font-size:8pt;font-weight:700;padding:2px 8px;border-radius:99px;font-family:'Lato',sans-serif;">
+              ${statutCfg.label}
+            </span>
+          </span>
+        </div>
+        <div class="info-row full-width">
+          <span class="info-label">Mode de paiement</span>
+          <span class="info-value">${modeLabel}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Émetteur / Acheteur -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="partie">
+        <div class="partie-label">Émetteur</div>
+        <div class="partie-nom">L'association Ma Belle Promo (MBP)</div>
+        <div class="partie-detail">
+          Association des Diplômés<br>
+          Faculté de Droit, Université de Lomé<br>
+          Lomé, Togo<br>
+          contact@mabellepromo.org
+        </div>
+      </div>
+      <div class="partie dest">
+        <div class="partie-label">Facturé à</div>
+        <div class="partie-nom">${acheteur_nom}</div>
+        <div class="partie-detail">
+          ${acheteur_email || "<em style='color:#aaa'>Email non renseigné</em>"}
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="table-wrap">
+      <table class="prestations">
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th class="th-num" style="width:8%">Qté</th>
+            <th class="th-num" style="width:20%">Prix unitaire</th>
+            <th class="th-num" style="width:20%">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lignesHtml || `<tr><td colspan="4" style="text-align:center;color:#aaa;font-style:italic;padding:18px">Aucun article</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total -->
+    <div class="totaux-wrap">
+      <div class="totaux">
+        <div class="tot-row final">
+          <span class="lbl">Total TTC</span>
+          <span class="val">${fmt(total)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Virement ECOBANK si applicable -->
+    ${wireBlock}
+
+    <!-- Mention légale -->
+    <div class="notice-box" style="margin-top:8px;">
+      <p>Ce document tient lieu de reçu et de facture simplifiée. Association à but non lucratif — non assujettie à la TVA.</p>
+    </div>
+
+  </div>
+
+  <footer class="doc-footer">
+    <div>
+      <p class="footer-text">L'association Ma Belle Promo (MBP) · www.mabellepromo.org</p>
+      <p class="footer-text" style="margin-top:2px">Faculté de Droit — Université de Lomé, Togo</p>
+    </div>
+    <p class="footer-text" style="text-align:right;white-space:nowrap">
+      Facture ${reference}<br>
+      Généré le ${today()}
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>`;
+
+  openDoc(html, `Facture-Boutique-${reference}.html`);
 }
