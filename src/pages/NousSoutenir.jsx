@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { HandHeart, Banknote, Phone, Mail, MapPin, Globe, Building2, Copy, Check } from "lucide-react";
+import { HandHeart, Banknote, Phone, MapPin, Globe, Building2, Copy, Check } from "lucide-react";
 import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
 import PaymentModal from "../components/PaymentModal";
@@ -27,10 +27,10 @@ const supportMethods = [
     detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92",
   },
   {
-    icon: Mail,
-    titre: "Par mail",
-    desc: "Contactez-nous pour voir ensemble comment vous pouvez aider.",
-    detail: <Link to="/informations/contacts" className="text-primary font-semibold hover:underline">Formulaire de contact</Link>,
+    icon: Building2,
+    titre: "Virement bancaire",
+    desc: "Effectuez un virement depuis n'importe quelle banque, au Togo ou depuis la diaspora.",
+    detail: "ECOBANK Togo — IBAN : TG53 TG05 5017 1014 1766 3880 0153",
   },
 ];
 
