@@ -31,9 +31,8 @@ const navItems = [
   {
     label: "Rejoindre",
     children: [
-      { icon: Users,    label: "Annuaire des membres", href: "/annuaire",               desc: "Nos membres" },
-      { icon: UserPlus, label: "Adhésion",             href: "/implications/adhesion",  desc: "Rejoindre l'association" },
-      { icon: Heart,    label: "Nous Soutenir",        href: "/implications/soutenir",  desc: "Faire un don" },
+      { icon: Users,    label: "Annuaire des membres", href: "/annuaire",              desc: "Nos membres" },
+      { icon: UserPlus, label: "Adhésion",             href: "/implications/adhesion", desc: "Rejoindre l'association" },
     ],
   },
   {
@@ -371,11 +370,11 @@ export default function Navbar() {
               Contact
             </Link>
             <button
-              onClick={() => navigate("/don")}
+              onClick={() => navigate("/implications/soutenir")}
               className="ml-1 flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
               style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
             >
-              ♥ Don
+              ♥ Soutenir
             </button>
             {/* Icône panier — admin uniquement */}
             {isAdmin && (
@@ -583,7 +582,7 @@ export default function Navbar() {
               onClick={() => { setOpen(false); navigate("/implications/soutenir"); }}
               className="w-full mt-2 px-5 py-3.5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold rounded-xl tracking-wide"
             >
-              ♥ Faire un don
+              ♥ Nous Soutenir
             </button>
           </div>
         </motion.div>
