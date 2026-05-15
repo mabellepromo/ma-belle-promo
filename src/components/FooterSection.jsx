@@ -69,10 +69,13 @@ export default function FooterSection() {
               </div>
             </div>
             <p className="text-[10px] text-background/25 tracking-widest uppercase">Amitié · Solidarité · Entraide</p>
-            <p className="text-[9px] text-background/20 leading-relaxed mt-3 text-center">
-              Association officiellement reconnue par les autorités togolaises depuis le 03 octobre 2019<br />
-              Récépissé N°0920/MATDCL-SG-DLPAP-DOCA
-            </p>
+            <div className="mt-3 flex items-start gap-1.5 border-l border-primary/30 pl-2">
+              <p className="text-[9px] text-background/25 leading-relaxed">
+                Association officiellement reconnue par les autorités<br />
+                togolaises depuis le 03 octobre 2019<br />
+                <span className="text-background/18">Récépissé N°0920/MATDCL-SG-DLPAP-DOCA</span>
+              </p>
+            </div>
           </div>
 
           {/* Col 2 — L'Association */}
