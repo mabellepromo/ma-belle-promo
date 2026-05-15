@@ -116,34 +116,19 @@ export default function NousSoutenir() {
               </div>
             </motion.div>
           ))}
-        </div>
 
-        {/* Virement bancaire — bloc identique à la page Don */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden"
-        >
-          <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 text-xs font-bold uppercase tracking-widest text-primary">
-            Coordonnées bancaires complètes
-          </div>
-          <div className="divide-y divide-border/60">
-            {[
-              { label: "Titulaire",    value: "ASSOCIATION MA BELLE PROMO MBP" },
-              { label: "Banque",       value: "ECOBANK Togo" },
-              { label: "IBAN",         value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
-              { label: "Swift / BIC",  value: "ECOCTGTGXXX",                        mono: true },
-              { label: "N° de compte", value: "141766388001",                       mono: true },
-              { label: "Référence",    value: "SOUTIEN MBP — [Votre nom]" },
-            ].map(({ label, value, mono }) => (
-              <div key={label} className="flex items-baseline gap-3 px-4 py-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
-                <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+          {/* Carte virement bancaire — copie exacte de la page Don */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="text-left px-4 py-3 rounded-xl border bg-background border-border"
+          >
+            <div className="text-sm font-semibold text-foreground">Virement bancaire</div>
+            <div className="text-xs text-muted-foreground mt-0.5">ECOBANK Togo · IBAN : TG53TG0550171014176638800153</div>
+            <div className="text-xs text-muted-foreground mt-1.5 italic border-t border-border/50 pt-1.5">Swift/BIC : ECOCTGTGXXX · N° compte : 141766388001</div>
+          </motion.div>
+        </div>
 
       </section>
 
