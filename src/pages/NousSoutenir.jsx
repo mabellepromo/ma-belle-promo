@@ -29,6 +29,7 @@ const supportMethods = [
 
 export default function NousSoutenir() {
   const [donModal, setDonModal] = useState(false);
+  const [virementOpen, setVirementOpen] = useState(false);
 
   return (
     <div>
@@ -122,11 +123,41 @@ export default function NousSoutenir() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="text-left px-4 py-3 rounded-xl border bg-background border-border"
           >
-            <div className="text-sm font-semibold text-foreground">Virement bancaire</div>
-            <div className="text-xs text-muted-foreground mt-0.5">ECOBANK Togo · IBAN : TG53TG0550171014176638800153</div>
-            <div className="text-xs text-muted-foreground mt-1.5 italic border-t border-border/50 pt-1.5">Swift/BIC : ECOCTGTGXXX · N° compte : 141766388001</div>
+            <button
+              type="button"
+              onClick={() => setVirementOpen(v => !v)}
+              className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
+                virementOpen ? "bg-primary/5 border-primary" : "bg-background border-border hover:border-primary/40"
+              }`}
+            >
+              <div className={`text-sm font-semibold ${virementOpen ? "text-primary" : "text-foreground"}`}>Virement bancaire</div>
+              <div className="text-xs text-muted-foreground mt-0.5">ECOBANK Togo · IBAN : TG53TG0550171014176638800153</div>
+              <div className="text-xs text-muted-foreground mt-1.5 italic border-t border-border/50 pt-1.5">Swift/BIC : ECOCTGTGXXX · N° compte : 141766388001</div>
+            </button>
+
+            {virementOpen && (
+              <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
+                <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 text-xs font-bold uppercase tracking-widest text-primary">
+                  Coordonnées bancaires complètes
+                </div>
+                <div className="divide-y divide-border/60">
+                  {[
+                    { label: "Titulaire",    value: "ASSOCIATION MA BELLE PROMO MBP" },
+                    { label: "Banque",       value: "ECOBANK Togo" },
+                    { label: "IBAN",         value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
+                    { label: "Swift / BIC",  value: "ECOCTGTGXXX",                        mono: true },
+                    { label: "N° de compte", value: "141766388001",                       mono: true },
+                    { label: "Référence",    value: "SOUTIEN MBP — [Votre nom]" },
+                  ].map(({ label, value, mono }) => (
+                    <div key={label} className="flex items-baseline gap-3 px-4 py-2">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
+                      <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
 
