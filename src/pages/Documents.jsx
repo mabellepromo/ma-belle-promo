@@ -94,7 +94,7 @@ export default function Documents() {
             <Lock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
             <p className="text-sm text-muted-foreground">
               Certains documents sont réservés aux membres de l'association. Pour y accéder,{" "}
-              <a href="/login" className="text-primary font-medium hover:underline">connectez-vous</a>{" "}
+              <Link to="/login" className="text-primary font-medium hover:underline">connectez-vous</Link>{" "}
               ou contactez-nous via{" "}
               <Link to="/informations/contacts" className="text-primary font-medium hover:underline">notre formulaire de contact</Link>.
             </p>

@@ -350,7 +350,7 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                         placeholder="URL de l'image (https://…)"
                       />
                       {q.options_images?.[i] && (
-                        <img src={q.options_images[i]} alt="" className="w-8 h-8 object-cover rounded border border-border" onError={e => e.target.style.display = "none"} />
+                        <img src={q.options_images[i]} alt={`Illustration option ${i + 1}`} className="w-8 h-8 object-cover rounded border border-border" onError={e => e.target.style.display = "none"} />
                       )}
                     </div>
                   )}
@@ -621,7 +621,7 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
                             {selected && <Check className="w-3 h-3 text-white" />}
                           </div>
                           {m.photo_url
-                            ? <img src={m.photo_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                            ? <img src={m.photo_url} alt={`${m.prenom || ""} ${m.nom || ""}`.trim() || "Photo du membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                             : <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />}
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-foreground truncate">{m.prenom} {m.nom}</p>

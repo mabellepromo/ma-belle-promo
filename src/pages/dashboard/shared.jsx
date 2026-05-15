@@ -60,7 +60,7 @@ export function ImgField({ label, value, onChange }) {
         </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
         {value && (
-          <img src={value} alt="" className="h-24 rounded-lg object-cover border border-border"
+          <img src={value} alt="Aperçu de l'image" className="h-24 rounded-lg object-cover border border-border"
             onError={e => e.target.style.display = "none"} />
         )}
       </div>
@@ -110,7 +110,7 @@ export function GalerieField({ photos = [], onChange }) {
             onDragEnd={handleDragEnd}
             className="relative group cursor-grab active:cursor-grabbing">
             <div className="h-20 w-28 rounded-lg border border-border bg-muted overflow-hidden flex items-center justify-center">
-              <img src={p} alt="" className="max-h-full max-w-full object-contain" />
+              <img src={p} alt={`Photo ${i + 1}`} className="max-h-full max-w-full object-contain" />
             </div>
             <button type="button" onClick={() => onChange(photos.filter((_, j) => j !== i))}
               className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs">
@@ -339,7 +339,7 @@ export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDel
         {img !== undefined && (
           <div className="w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 flex-shrink-0 ring-2 ring-border group-hover:ring-primary/20 transition-all">
             {img && !img.startsWith("data:")
-              ? <img src={img} alt="" className="w-full h-full object-cover" onError={e => e.target.style.display = "none"} />
+              ? <img src={img} alt="Image de l'article" className="w-full h-full object-cover" onError={e => e.target.style.display = "none"} />
               : <div className="w-full h-full flex items-center justify-center text-primary/30 text-xs">📷</div>}
           </div>
         )}

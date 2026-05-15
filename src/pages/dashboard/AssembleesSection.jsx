@@ -110,7 +110,7 @@ function PresencesTab({ assemblee }) {
                   {present && <Check className="w-3 h-3 text-white" />}
                 </button>
                 {m.photo_url
-                  ? <img src={m.photo_url} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                  ? <img src={m.photo_url} alt={`${m.prenom || ""} ${m.nom || ""}`.trim() || "Photo du membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                   : <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />}
                 <span className="text-sm font-medium text-foreground flex-1">{m.prenom} {m.nom}</span>
                 {!present && (

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
 import {
@@ -971,14 +972,14 @@ export default function PlanAction2026() {
               et la mise en œuvre des activités. N'hésitez pas à prendre contact pour tout besoin de soutien.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="/implications/adhesion"
+              <Link to="/implications/adhesion"
                 className="px-6 py-3 bg-accent text-foreground text-sm font-bold rounded-full hover:opacity-90 transition-opacity">
                 Rejoindre MBP
-              </a>
-              <a href="/informations/contacts"
+              </Link>
+              <Link to="/informations/contacts"
                 className="px-6 py-3 border border-white/20 text-white text-sm font-semibold rounded-full hover:bg-white/10 transition-colors">
                 Contacter le Bureau
-              </a>
+              </Link>
             </div>
           </div>
         </motion.div>

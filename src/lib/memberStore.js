@@ -23,7 +23,9 @@ function memberToRow(m) {
     photo_position: m.photoPosition  || m.photo_position || null,
     status:         m.status         || "validated",
     submitted_at:   m.submittedAt    || m.submitted_at || new Date().toISOString(),
-    notes_internes: m.notes_internes || null,
+    notes_internes:         m.notes_internes          || null,
+    accepts_privacy_policy: m.accepts_privacy_policy  ?? false,
+    privacy_accepted_at:    m.privacy_accepted_at     || null,
   };
 }
 

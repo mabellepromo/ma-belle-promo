@@ -108,7 +108,7 @@ export default function ArticleDetail() {
             <div className="relative">
               <div className="absolute inset-0 rounded-2xl bg-emerald-700/40 translate-x-3 translate-y-3" />
               <div className="absolute inset-0 rounded-2xl bg-emerald-600/30 translate-x-1.5 translate-y-1.5" />
-              <div className="relative bg-white/95 rounded-2xl border border-white/20 px-7 py-8 shadow-2xl">
+              <div className="relative bg-card rounded-2xl border border-border px-7 py-8 shadow-2xl">
                 <Link
                   to="/informations/actualites"
                   className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors mb-5"
@@ -117,7 +117,7 @@ export default function ArticleDetail() {
                 </Link>
 
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ring-1 ${catColors[article.categorie] || "bg-gray-100 text-gray-700 ring-gray-200"}`}>
+                  <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ring-1 ${catColors[article.categorie] || "bg-secondary text-secondary-foreground ring-border"}`}>
                     {article.categorie}
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -308,7 +308,7 @@ export default function ArticleDetail() {
                     />
                   </div>
                   <div className="p-4 flex flex-col flex-1">
-                    <span className={`self-start px-2 py-0.5 text-xs font-semibold rounded-full mb-2 ${catColors[a.categorie] || "bg-gray-100 text-gray-700"}`}>
+                    <span className={`self-start px-2 py-0.5 text-xs font-semibold rounded-full mb-2 ${catColors[a.categorie] || "bg-secondary text-secondary-foreground"}`}>
                       {a.categorie}
                     </span>
                     <h3 className="text-sm font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors leading-snug flex-1">

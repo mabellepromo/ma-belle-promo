@@ -39,12 +39,11 @@ function StatCard({ from, to, suffix, label }) {
   const shouldReduce = useReducedMotion();
   const count = useCountUp(from, to, 1.8, inView, shouldReduce);
   return (
-    <div ref={ref} className="text-center rounded-xl py-2.5 px-2"
-      style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.12)" }}>
-      <div style={{ fontSize: 20, fontWeight: 800, color: "white", lineHeight: 1 }}>
+    <div ref={ref} className="text-center rounded-xl py-2.5 px-2 bg-primary/5 border border-primary/10">
+      <div className="text-xl font-extrabold text-white leading-none">
         {count}{suffix}
       </div>
-      <div style={{ fontSize: 9, color: "rgba(110,231,183,0.55)", marginTop: 4, letterSpacing: "0.10em", textTransform: "uppercase" }}>
+      <div className="text-[9px] text-accent/55 mt-1 tracking-widest uppercase">
         {label}
       </div>
     </div>

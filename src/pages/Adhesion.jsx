@@ -99,6 +99,8 @@ export default function Adhesion() {
       anneeObtention: form.anneeObtention,
       cycleCotisation: form.cycleCotisation,
       motivations: form.motivations,
+      accepts_privacy_policy: form.accepteRGPD === true,
+      privacy_accepted_at: form.accepteRGPD ? new Date().toISOString() : null,
     });
 
     // Notifier l'admin (non bloquant)

@@ -104,7 +104,7 @@ function QuestionInput({ question, answer, onChange, theme }) {
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                   {selected && <Check className="w-3 h-3 text-white" />}
                 </div>
-                {img && <img src={img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
+                {img && <img src={img} alt="Illustration de l'option" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
                 {opt}
               </div>
             </button>
@@ -133,7 +133,7 @@ function QuestionInput({ question, answer, onChange, theme }) {
                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                   {selected && <Check className="w-3 h-3 text-white" />}
                 </div>
-                {img && <img src={img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
+                {img && <img src={img} alt="Illustration de l'option" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />}
                 {opt}
               </div>
             </button>
@@ -547,7 +547,7 @@ export default function Sondage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground">
-        l'association Ma Belle Promo (MBP) · <a href="/" className="hover:text-primary">mabellepromo.org</a>
+        l'association Ma Belle Promo (MBP) · <Link to="/" className="hover:text-primary">mabellepromo.org</Link>
       </footer>
     </div>
   );

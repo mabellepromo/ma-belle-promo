@@ -433,7 +433,7 @@ function EditMemberModal({ member, onClose, onSave, isAdmin }) {
             </div>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoFile} />
             {form.photo && (
-              <img src={form.photo} alt="" className="mt-2 h-16 rounded-xl object-cover border border-border"
+              <img src={form.photo} alt="Aperçu de la photo de profil" className="mt-2 h-16 rounded-xl object-cover border border-border"
                 onError={e => e.target.style.display="none"} />
             )}
           </div>
@@ -557,7 +557,7 @@ function AddMemberModal({ onClose, onSubmit }) {
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoFile} />
               {form.photo && (
-                <img src={form.photo} alt="" className="mt-2 h-16 rounded-xl object-cover border border-border"
+                <img src={form.photo} alt="Aperçu de la photo de profil" className="mt-2 h-16 rounded-xl object-cover border border-border"
                   onError={e => e.target.style.display="none"} />
               )}
             </div>
