@@ -188,6 +188,23 @@ export default function HeroSection() {
         style={{ opacity }}
         className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-16 pt-28 pb-16 max-w-7xl mx-auto w-full"
       >
+        {/* ── Bandeau identification — pleine largeur sous le menu ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
+          className="flex items-center gap-3 md:gap-5 mb-8 w-full"
+        >
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
+          <p className="text-center shrink-0" style={{
+            fontSize: "clamp(7.5px, 1.1vw, 10px)", fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            color: "rgba(255,255,255,0.58)", lineHeight: 1.7,
+          }}>
+            Association des anciens Diplômés de la Faculté de Droit de l'Université de Lomé
+            <span style={{ color: "#fbbf24", marginLeft: 8 }}>· Promotion 1994 – 2000</span>
+          </p>
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(251,191,36,0.40))" }} />
+        </motion.div>
+
         {/* ── Grille responsive : 1 col mobile / 2 col md / 3 col lg ── */}
         <div className="grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_340px] gap-8 md:gap-10 lg:gap-14 items-center">
 
@@ -197,46 +214,6 @@ export default function HeroSection() {
             transition={{ duration: 1.1, ease: [0.34, 1.56, 0.64, 1] }}
             className="flex flex-col items-center gap-6"
           >
-            {/* Badge centré sur la bulle */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-              style={{
-                display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6,
-                padding: "11px 22px", borderRadius: 14, textAlign: "center",
-                background: "linear-gradient(135deg, rgba(10,61,40,0.65), rgba(5,20,12,0.55))",
-                border: "1px solid rgba(52,211,153,0.22)",
-                backdropFilter: "blur(12px)",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)",
-              }}
-            >
-              {/* Ligne dorée haut */}
-              <div style={{ width: 36, height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.65), transparent)" }} />
-
-              {/* Nom de l'association */}
-              <p style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase",
-                color: "rgba(255,255,255,0.72)", lineHeight: 1.65, margin: 0,
-              }}>
-                Association des anciens Diplômés<br />
-                de la Faculté de Droit<br />
-                de l'Université de Lomé
-              </p>
-
-              {/* Séparateur or */}
-              <div style={{ width: "75%", height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.50), transparent)" }} />
-
-              {/* Promotion en or */}
-              <p style={{
-                fontSize: 8, fontWeight: 900, letterSpacing: "0.24em", textTransform: "uppercase",
-                color: "#fbbf24", margin: 0,
-              }}>
-                Promotion 1994 – 2000
-              </p>
-
-              {/* Ligne dorée bas */}
-              <div style={{ width: 36, height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.65), transparent)" }} />
-            </motion.div>
-
             <WaterBubble>
               <motion.img
                 src="/Logo Redesign1.webp"
