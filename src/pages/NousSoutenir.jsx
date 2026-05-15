@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { HandHeart, Banknote, Phone, Mail, MapPin, Globe } from "lucide-react";
+import { HandHeart, Banknote, Phone, Mail, MapPin, Globe, Building2, Copy, Check } from "lucide-react";
 import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
 import PaymentModal from "../components/PaymentModal";
@@ -33,6 +33,29 @@ const supportMethods = [
     detail: <Link to="/informations/contacts" className="text-primary font-semibold hover:underline">Formulaire de contact</Link>,
   },
 ];
+
+const BANK_ROWS = [
+  { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
+  { label: "Banque",    value: "ECOBANK Togo" },
+  { label: "IBAN",      value: "TG53 TG05 5017 1014 1766 3880 0153" },
+  { label: "Swift/BIC", value: "ECOCTGTGXXX" },
+];
+
+function CopyField({ value }) {
+  const [copied, setCopied] = useState(false);
+  const handle = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+  return (
+    <button onClick={handle} title="Copier" className="ml-2 p-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0">
+      {copied
+        ? <Check className="w-3.5 h-3.5 text-primary" />
+        : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+    </button>
+  );
+}
 
 export default function NousSoutenir() {
   const [donModal, setDonModal] = useState(false);
@@ -124,6 +147,45 @@ export default function NousSoutenir() {
             </motion.div>
           ))}
         </div>
+        {/* Coordonnées bancaires */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-10 rounded-2xl overflow-hidden border border-border"
+          style={{ background: "linear-gradient(135deg, #fffbea 0%, #fff8dc 100%)" }}
+        >
+          {/* En-tête */}
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-amber-200/60"
+            style={{ background: "linear-gradient(90deg, #b8861a, #c9972a)" }}>
+            <Building2 className="w-5 h-5 text-white flex-shrink-0" />
+            <div>
+              <p className="text-white text-sm font-bold">Virement bancaire — ECOBANK Togo</p>
+              <p className="text-white/75 text-xs">Coordonnées pour vos dons et soutiens par virement</p>
+            </div>
+          </div>
+
+          {/* Lignes */}
+          <div className="px-6 py-5 divide-y divide-amber-200/50">
+            {BANK_ROWS.map(({ label, value }) => (
+              <div key={label} className="flex items-center justify-between gap-4 py-2.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-amber-800/70 w-20 flex-shrink-0">
+                  {label}
+                </span>
+                <div className="flex items-center flex-1 justify-end gap-1">
+                  <span className="text-sm font-mono font-medium text-amber-900 text-right">{value}</span>
+                  <CopyField value={value} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="px-6 pb-4 text-xs text-amber-800/55 flex items-center gap-1.5">
+            <Check className="w-3 h-3 flex-shrink-0" />
+            Cliquez sur l'icône de copie pour copier chaque champ dans le presse-papier.
+          </div>
+        </motion.div>
+
       </section>
 
       <PaymentModal
