@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
-import { HandHeart, Banknote, Phone, MapPin, Globe, Building2, Copy, Check } from "lucide-react";
+import { HandHeart, Banknote, Phone, MapPin, Globe } from "lucide-react";
 import SEO from "../components/SEO";
-import { Link } from "react-router-dom";
 import PaymentModal from "../components/PaymentModal";
 
 const supportMethods = [
@@ -27,31 +26,6 @@ const supportMethods = [
     detail: "TMoney : 90 05 36 06 / 90 03 63 43\nFlooz : 96 02 00 00 / 99 41 91 92",
   },
 ];
-
-const BANK_FIELDS = [
-  { label: "Titulaire",    value: "ASSOCIATION MA BELLE PROMO MBP" },
-  { label: "Banque",       value: "ECOBANK Togo" },
-  { label: "IBAN",         value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
-  { label: "Swift / BIC",  value: "ECOCTGTGXXX",                        mono: true },
-  { label: "N° de compte", value: "141766388001",                       mono: true },
-  { label: "Référence",    value: "SOUTIEN MBP — [Votre nom]" },
-];
-
-function CopyField({ value }) {
-  const [copied, setCopied] = useState(false);
-  const handle = () => {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
-  return (
-    <button onClick={handle} title="Copier" className="ml-1.5 p-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0">
-      {copied
-        ? <Check className="w-3.5 h-3.5 text-primary" />
-        : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
-    </button>
-  );
-}
 
 export default function NousSoutenir() {
   const [donModal, setDonModal] = useState(false);
@@ -142,33 +116,34 @@ export default function NousSoutenir() {
               </div>
             </motion.div>
           ))}
-
-          {/* Virement bancaire — style Don */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="sm:col-span-2 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden"
-          >
-            <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                Virement bancaire — Coordonnées bancaires complètes
-              </span>
-            </div>
-            <div className="divide-y divide-border/60">
-              {BANK_FIELDS.map(({ label, value, mono }) => (
-                <div key={label} className="flex items-center gap-3 px-4 py-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
-                  <div className="flex items-center flex-1">
-                    <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
-                    {mono && <CopyField value={value} />}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </div>
+
+        {/* Virement bancaire — bloc identique à la page Don */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="mt-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden"
+        >
+          <div className="px-4 py-2.5 bg-primary/10 border-b border-primary/15 text-xs font-bold uppercase tracking-widest text-primary">
+            Coordonnées bancaires complètes
+          </div>
+          <div className="divide-y divide-border/60">
+            {[
+              { label: "Titulaire",    value: "ASSOCIATION MA BELLE PROMO MBP" },
+              { label: "Banque",       value: "ECOBANK Togo" },
+              { label: "IBAN",         value: "TG53 TG05 5017 1014 1766 3880 0153", mono: true },
+              { label: "Swift / BIC",  value: "ECOCTGTGXXX",                        mono: true },
+              { label: "N° de compte", value: "141766388001",                       mono: true },
+              { label: "Référence",    value: "SOUTIEN MBP — [Votre nom]" },
+            ].map(({ label, value, mono }) => (
+              <div key={label} className="flex items-baseline gap-3 px-4 py-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary w-28 flex-shrink-0">{label}</span>
+                <span className={`text-xs font-semibold text-foreground ${mono ? "font-mono tracking-wide" : ""}`}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
       </section>
 
