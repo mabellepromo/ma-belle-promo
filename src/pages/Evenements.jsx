@@ -209,14 +209,14 @@ export default function Evenements() {
 
       {/* ── En-tête ── */}
       <div className="bg-foreground">
-        <div className="max-w-6xl mx-auto px-6 py-14 md:py-20">
+        <div className="max-w-6xl mx-auto px-6 py-8 md:py-12 text-center">
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
             <p className="eyebrow text-primary/70 mb-3">Ma Belle Promo · FDD Lomé</p>
             <h1 className="font-heading text-5xl md:text-7xl font-black text-white leading-none mb-4">
               Événements
             </h1>
-            <div className="w-12 h-0.5 bg-primary mb-6" />
-            <p className="text-white/50 text-base max-w-lg leading-relaxed">
+            <div className="w-12 h-0.5 bg-primary mb-6 mx-auto" />
+            <p className="text-white/50 text-base leading-relaxed">
               Conférences, webinaires, galas — les rendez-vous qui rythment la vie de l'association depuis 2021.
             </p>
           </motion.div>
@@ -224,7 +224,7 @@ export default function Evenements() {
           {/* Compteurs */}
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap gap-6 mt-10"
+            className="flex flex-wrap justify-center gap-6 mt-10"
           >
             {[
               { val: liste.length, label: "événements" },
