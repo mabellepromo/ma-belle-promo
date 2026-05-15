@@ -200,12 +200,41 @@ export default function HeroSection() {
             {/* Badge centré sur la bulle */}
             <motion.div
               initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+              style={{
+                display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6,
+                padding: "11px 22px", borderRadius: 14, textAlign: "center",
+                background: "linear-gradient(135deg, rgba(10,61,40,0.65), rgba(5,20,12,0.55))",
+                border: "1px solid rgba(52,211,153,0.22)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)",
+              }}
             >
-              <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase text-center"
-                style={{ color: "#6ee7b7", background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.28)" }}>
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 align-middle" style={{ boxShadow: "0 0 6px #34d399" }} />
-                Association des Diplômés FDD · Lomé, Togo
-              </span>
+              {/* Ligne dorée haut */}
+              <div style={{ width: 36, height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.65), transparent)" }} />
+
+              {/* Nom de l'association */}
+              <p style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.13em", textTransform: "uppercase",
+                color: "rgba(255,255,255,0.72)", lineHeight: 1.65, margin: 0,
+              }}>
+                Association des anciens Diplômés<br />
+                de la Faculté de Droit<br />
+                de l'Université de Lomé
+              </p>
+
+              {/* Séparateur or */}
+              <div style={{ width: "75%", height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.50), transparent)" }} />
+
+              {/* Promotion en or */}
+              <p style={{
+                fontSize: 8, fontWeight: 900, letterSpacing: "0.24em", textTransform: "uppercase",
+                color: "#fbbf24", margin: 0,
+              }}>
+                Promotion 1994 – 2000
+              </p>
+
+              {/* Ligne dorée bas */}
+              <div style={{ width: 36, height: 1, background: "linear-gradient(to right, transparent, rgba(251,191,36,0.65), transparent)" }} />
             </motion.div>
 
             <WaterBubble>
