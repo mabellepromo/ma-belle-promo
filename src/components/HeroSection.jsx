@@ -183,28 +183,29 @@ export default function HeroSection() {
         backgroundSize: "70px 70px",
       }} />
 
+      {/* ── Bandeau identification — pleine largeur, haut de section ── */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
+        className="relative z-10 flex items-center gap-3 md:gap-5 px-6 sm:px-10 lg:px-16"
+        style={{ paddingTop: "calc(var(--navbar-h, 72px) + 14px)", paddingBottom: 14 }}
+      >
+        <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
+        <p className="text-center shrink-0" style={{
+          fontSize: "clamp(7.5px, 1.1vw, 10px)", fontWeight: 700,
+          letterSpacing: "0.14em", textTransform: "uppercase",
+          color: "rgba(255,255,255,0.58)", lineHeight: 1.7,
+        }}>
+          Association des anciens Diplômés de la Faculté de Droit de l'Université de Lomé
+          <span style={{ color: "#fbbf24", marginLeft: 8 }}>· Promotion 1994 – 2000</span>
+        </p>
+        <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(251,191,36,0.40))" }} />
+      </motion.div>
+
       {/* ══ CONTENU ══ */}
       <motion.div
         style={{ opacity }}
-        className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-16 pt-28 pb-16 max-w-7xl mx-auto w-full"
+        className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-16 pb-16 max-w-7xl mx-auto w-full"
       >
-        {/* ── Bandeau identification — pleine largeur sous le menu ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
-          className="flex items-center gap-3 md:gap-5 mb-8 w-full"
-        >
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(251,191,36,0.40))" }} />
-          <p className="text-center shrink-0" style={{
-            fontSize: "clamp(7.5px, 1.1vw, 10px)", fontWeight: 700,
-            letterSpacing: "0.14em", textTransform: "uppercase",
-            color: "rgba(255,255,255,0.58)", lineHeight: 1.7,
-          }}>
-            Association des anciens Diplômés de la Faculté de Droit de l'Université de Lomé
-            <span style={{ color: "#fbbf24", marginLeft: 8 }}>· Promotion 1994 – 2000</span>
-          </p>
-          <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(251,191,36,0.40))" }} />
-        </motion.div>
-
         {/* ── Grille responsive : 1 col mobile / 2 col md / 3 col lg ── */}
         <div className="grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_340px] gap-8 md:gap-10 lg:gap-14 items-center">
 
