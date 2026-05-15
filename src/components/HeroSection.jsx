@@ -186,7 +186,7 @@ export default function HeroSection() {
       {/* ══ CONTENU ══ */}
       <motion.div
         style={{ opacity }}
-        className="relative z-10 flex-1 flex flex-col px-6 sm:px-10 lg:px-16 pt-20 md:pt-24 pb-16 max-w-7xl mx-auto w-full"
+        className="relative z-10 flex-1 flex flex-col px-6 sm:px-10 lg:px-16 pt-28 pb-16 max-w-7xl mx-auto w-full"
       >
         {/* ── Bandeau identification — pleine largeur, début de section ── */}
         <motion.div
