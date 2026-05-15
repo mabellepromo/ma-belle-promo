@@ -128,9 +128,9 @@ export default function MarqueeSection() {
       }}>
         <span style={{
           fontFamily: "Lato, sans-serif",
-          fontSize: 8,
-          fontWeight: 700,
-          letterSpacing: "0.14em",
+          fontSize: 10,
+          fontWeight: 900,
+          letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: "#fff",
           lineHeight: 1.5,
