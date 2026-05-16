@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Network, GraduationCap, Globe, Heart, Building2 } from "lucide-react";
 import SEO from "../components/SEO";
+import PageHero from "../components/PageHero";
 
 const valeurs = [
   {
@@ -59,30 +60,7 @@ export default function QuiSommesNous() {
         path="/association/qui-sommes-nous"
       />
 
-      {/* ── Hero ── */}
-      <div className="relative flex flex-col items-center justify-center py-10 bg-foreground overflow-hidden px-6">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-          <img src="/Logo Redesign1.webp" alt="" className="w-[420px] max-w-[70%] opacity-[0.06] object-contain" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative z-10 text-center max-w-3xl"
-        >
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/40 mb-3">
-            Ma Belle Promo — FDD · Université de Lomé · Promotion 1994–2000
-          </p>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4">
-            Valeurs & Mission
-          </h1>
-          <div className="w-12 h-px bg-primary mx-auto mb-4" />
-          <p className="font-heading text-sm md:text-base italic text-white/60 leading-relaxed max-w-xl mx-auto">
-            Une promotion, une famille, un réseau — au service des générations qui nous suivent.
-          </p>
-        </motion.div>
-      </div>
+      <PageHero title="Valeurs & Mission" subtitle="L'Association — FDD · Université de Lomé · Promotion 1994–2000" />
 
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-16">
 
