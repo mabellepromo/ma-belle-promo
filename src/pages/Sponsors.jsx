@@ -30,7 +30,7 @@ export default function Sponsors() {
       {/* ── Section éditoriale ── */}
       <section
         style={{
-          background: "linear-gradient(160deg, #0f0f0f 0%, #1a1a1a 60%, #111111 100%)",
+          background: "hsl(40, 25%, 96%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -38,7 +38,7 @@ export default function Sponsors() {
         {/* Ornement fond */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          backgroundImage: "radial-gradient(ellipse 70% 50% at 80% 50%, rgba(52,211,153,0.05) 0%, transparent 70%)",
+          backgroundImage: "radial-gradient(ellipse 70% 50% at 80% 50%, rgba(180,140,80,0.07) 0%, transparent 70%)",
         }} />
 
         <div className="max-w-4xl mx-auto px-6 py-20 relative">
@@ -47,7 +47,7 @@ export default function Sponsors() {
           <motion.div
             initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.9, ease: "easeOut" }}
             style={{ height: 1, marginBottom: 48, transformOrigin: "left",
-              background: "linear-gradient(to right, #34d399 0%, #fbbf24 50%, transparent 100%)" }}
+              background: "linear-gradient(to right, hsl(153,50%,28%) 0%, hsl(38,70%,55%) 50%, transparent 100%)" }}
           />
 
           {/* Paragraphe 1 */}
@@ -55,25 +55,25 @@ export default function Sponsors() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-heading leading-relaxed mb-10"
-            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
+            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "hsl(150,30%,12%)", fontWeight: 400, textAlign: "justify" }}
           >
             L'association Ma Belle Promo (MBP) n'est pas une association comme les autres. Née en 2018 de la rencontre
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit de
             l'Université de Lomé — promotion 1994–2000 —, elle a très vite choisi de ne pas se replier
             sur elle-même. Certes, nous cultivons l'excellence qui fut notre socle commun : séminaires
             de haut niveau, conférences thématiques,{" "}
-            <Link to="/activites/programmes" style={{ color: "#6ee7b7", textDecoration: "none", borderBottom: "1px solid rgba(110,231,183,0.4)" }}>webinaires</Link>
+            <Link to="/activites/programmes" style={{ color: "hsl(153,50%,28%)", textDecoration: "none", borderBottom: "1px solid hsl(153,50%,28%,0.4)" }}>webinaires</Link>
             {" "}qui font dialoguer expertise juridique
             et réalités africaines contemporaines. Mais nous avons aussi fait le choix d'aller vers la
             communauté, loin des carcans académiques, là où le besoin est réel :{" "}
-            <Link to="/activites/projets" style={{ color: "#6ee7b7", textDecoration: "none", borderBottom: "1px solid rgba(110,231,183,0.4)" }}>projets caritatifs</Link>,
+            <Link to="/activites/projets" style={{ color: "hsl(153,50%,28%)", textDecoration: "none", borderBottom: "1px solid hsl(153,50%,28%,0.4)" }}>projets caritatifs</Link>,
             actions sociales, accompagnement des jeunes à travers notre programme de mentorat{" "}
             <a
               href="https://passerelles.vercel.app"
               target="_blank" rel="noopener noreferrer"
               style={{ textDecoration: "none" }}
             >
-              Programme <span style={{ color: "#f97316", borderBottom: "1px solid rgba(249,115,22,0.4)" }}>"Passerelles"</span>
+              Programme <span style={{ color: "hsl(25,90%,40%)", borderBottom: "1px solid hsl(25,90%,40%,0.4)" }}>"Passerelles"</span>
             </a>.
           </motion.p>
 
@@ -82,14 +82,14 @@ export default function Sponsors() {
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.45 }}
             style={{
-              borderLeft: "3px solid #fbbf24",
+              borderLeft: "3px solid hsl(38,70%,45%)",
               paddingLeft: 28,
               margin: "40px 0",
             }}
           >
             <p
               className="font-heading italic"
-              style={{ fontSize: "clamp(1.3rem, 2.6vw, 1.75rem)", color: "#fbbf24", fontWeight: 600, lineHeight: 1.5 }}
+              style={{ fontSize: "clamp(1.3rem, 2.6vw, 1.75rem)", color: "hsl(38,70%,35%)", fontWeight: 600, lineHeight: 1.5 }}
             >
               "Toute ambition qui grandit appelle naturellement
               des alliances à sa hauteur."
@@ -101,7 +101,7 @@ export default function Sponsors() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.65 }}
             className="font-heading leading-relaxed mb-14"
-            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
+            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "hsl(150,30%,12%)", fontWeight: 400, textAlign: "justify" }}
           >
             Ce qui rend notre démarche singulière, c'est qu'elle a été essentiellement portée jusqu'ici
             par la seule volonté de nos membres — sur leurs ressources propres, sans autre appui que
@@ -117,15 +117,15 @@ export default function Sponsors() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.85 }}
             style={{
-              background: "rgba(52,211,153,0.08)",
-              border: "1px solid rgba(52,211,153,0.22)",
+              background: "rgba(153,50,28,0.04)",
+              border: "1px solid hsl(38,50%,75%)",
               borderRadius: 16,
               padding: "24px 32px",
             }}
           >
             <p
               className="font-heading"
-              style={{ fontSize: "clamp(1.2rem, 2.4vw, 1.6rem)", color: "#e2f5ed", fontWeight: 700, lineHeight: 1.55, textAlign: "center" }}
+              style={{ fontSize: "clamp(1.2rem, 2.4vw, 1.6rem)", color: "hsl(150,30%,12%)", fontWeight: 700, lineHeight: 1.55, textAlign: "center" }}
             >
               Être partenaire de Ma Belle Promo, c'est simplement choisir
               de faire partie de cette histoire — et de lui permettre d'aller encore plus loin.
@@ -136,7 +136,7 @@ export default function Sponsors() {
           <motion.div
             initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.9, delay: 1, ease: "easeOut" }}
             style={{ height: 1, marginTop: 48, transformOrigin: "right",
-              background: "linear-gradient(to left, #34d399 0%, #fbbf24 50%, transparent 100%)" }}
+              background: "linear-gradient(to left, hsl(153,50%,28%) 0%, hsl(38,70%,55%) 50%, transparent 100%)" }}
           />
         </div>
       </section>
