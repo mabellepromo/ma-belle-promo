@@ -30,7 +30,7 @@ export default function Sponsors() {
       {/* ── Section éditoriale ── */}
       <section
         style={{
-          background: "linear-gradient(160deg, var(--brand-dark) 0%, var(--brand-dark-mid) 60%, hsl(150,28%,10%) 100%)",
+          background: "linear-gradient(160deg, #0f0f0f 0%, #1a1a1a 60%, #111111 100%)",
           position: "relative",
           overflow: "hidden",
         }}
