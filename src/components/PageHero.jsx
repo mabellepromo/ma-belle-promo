@@ -38,7 +38,17 @@ export default function PageHero({ title, subtitle }) {
         )}
 
         <h1 className="font-heading text-3xl md:text-5xl font-bold text-white leading-tight tracking-tight">
-          {title}
+          {title.split(" ").map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 + i * 0.09, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-block mr-[0.28em] last:mr-0"
+            >
+              {word}
+            </motion.span>
+          ))}
         </h1>
 
         <div className="flex items-center justify-center gap-3 mt-5">
