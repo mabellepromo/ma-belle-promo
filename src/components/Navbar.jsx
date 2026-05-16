@@ -6,6 +6,7 @@ import {
   UserPlus, Heart,
   Film, MessageSquare, Mail, ShoppingCart, ShoppingBag,
 } from "lucide-react";
+import MagneticButton from "@/components/MagneticButton";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -369,13 +370,13 @@ export default function Navbar() {
               <Mail className="w-3 h-3" />
               Contact
             </Link>
-            <button
+            <MagneticButton
               onClick={() => navigate("/implications/soutenir")}
               className="ml-1 flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold rounded-full hover:opacity-90 active:scale-95 transition-all tracking-[0.10em] uppercase"
               style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#000" }}
             >
               ♥ Soutenir
-            </button>
+            </MagneticButton>
             {/* Icône panier — admin uniquement */}
             {isAdmin && (
               <button
