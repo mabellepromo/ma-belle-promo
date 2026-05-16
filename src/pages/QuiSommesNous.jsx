@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Target, Network, GraduationCap, Globe, Heart, Building2 } from "lucide-react";
 import SEO from "../components/SEO";
 import PageHero from "../components/PageHero";
+import TiltCard from "../components/TiltCard";
 
 const valeurs = [
   {
@@ -83,18 +84,20 @@ export default function QuiSommesNous() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-20px" }}
                 transition={{ duration: 0.45, delay: i * 0.07 }}
-                className="group relative flex flex-col bg-card border border-border rounded-2xl p-6 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300"
+                style={{ perspective: "900px" }}
               >
-                <div className="absolute -bottom-3 -right-1 font-heading text-[6rem] font-black leading-none select-none pointer-events-none text-foreground/[0.04]">
-                  {v.numero}
-                </div>
-                <div className={`w-8 h-0.5 mb-4 group-hover:w-14 transition-all duration-300 ${v.accent}`} />
-                <h3 className="font-heading text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                  {v.titre}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed relative z-10flex-1">
-                  {v.texte}
-                </p>
+                <TiltCard className="group relative flex flex-col bg-card border border-border rounded-2xl p-6 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full">
+                  <div className="absolute -bottom-3 -right-1 font-heading text-[6rem] font-black leading-none select-none pointer-events-none text-foreground/[0.04]">
+                    {v.numero}
+                  </div>
+                  <div className={`w-8 h-0.5 mb-4 group-hover:w-14 transition-all duration-300 ${v.accent}`} />
+                  <h3 className="font-heading text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {v.titre}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed relative z-10 flex-1">
+                    {v.texte}
+                  </p>
+                </TiltCard>
               </motion.div>
             ))}
           </div>
