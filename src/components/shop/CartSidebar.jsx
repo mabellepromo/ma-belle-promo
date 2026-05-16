@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 
 const fmt = (n) => n.toLocaleString("fr-FR") + " FCFA";
 
 export default function CartSidebar() {
   const { items, isCartOpen, setIsCartOpen, removeItem, updateQty, total, count, openCheckout } = useCart();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -62,7 +64,7 @@ export default function CartSidebar() {
                 <div className="flex flex-col items-center justify-center h-48 text-center">
                   <Package className="w-12 h-12 mb-3" style={{ color: "rgba(52,211,153,0.15)" }} />
                   <p className="text-white/30 text-sm font-medium">Votre panier est vide</p>
-                  <button onClick={() => setIsCartOpen(false)}
+                  <button onClick={() => { setIsCartOpen(false); navigate("/boutique"); }}
                     className="mt-4 text-xs font-semibold hover:underline"
                     style={{ color: "#6ee7b7" }}>
                     Découvrir la boutique →
