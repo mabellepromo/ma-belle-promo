@@ -54,8 +54,7 @@ export default function Sponsors() {
           <motion.p
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-heading leading-relaxed mb-10"
-            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "hsl(150,30%,12%)", fontWeight: 400, textAlign: "justify" }}
+            className="text-muted-foreground text-sm leading-relaxed mb-10"
           >
             L'association Ma Belle Promo (MBP) n'est pas une association comme les autres. Née en 2018 de la rencontre
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit de
@@ -100,8 +99,7 @@ export default function Sponsors() {
           <motion.p
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.65 }}
-            className="font-heading leading-relaxed mb-14"
-            style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "hsl(150,30%,12%)", fontWeight: 400, textAlign: "justify" }}
+            className="text-muted-foreground text-sm leading-relaxed mb-14"
           >
             Ce qui rend notre démarche singulière, c'est qu'elle a été essentiellement portée jusqu'ici
             par la seule volonté de nos membres — sur leurs ressources propres, sans autre appui que
