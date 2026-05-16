@@ -58,7 +58,6 @@ import CheckoutModal from '@/components/shop/CheckoutModal';
 import MaintenanceGate, { MAINTENANCE_MODE } from '@/components/MaintenanceGate';
 import CookieBanner from '@/components/CookieBanner';
 import SplashScreen from '@/components/SplashScreen';
-import CursorGlow from '@/components/CursorGlow';
 import PageNotFound from './lib/PageNotFound';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -223,7 +222,6 @@ function App() {
         <QueryClientProvider client={queryClientInstance}>
           <CartProvider>
           <Router>
-            <CursorGlow />
             <SplashScreen />
             <AuthenticatedApp />
             <CookieBanner />
