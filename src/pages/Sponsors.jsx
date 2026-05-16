@@ -54,7 +54,7 @@ export default function Sponsors() {
           <motion.p
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-muted-foreground text-sm leading-relaxed mb-10"
+            className="text-muted-foreground text-sm leading-relaxed mb-10 text-justify"
           >
             L'association Ma Belle Promo (MBP) n'est pas une association comme les autres. Née en 2018 de la rencontre
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit de
@@ -211,31 +211,45 @@ export default function Sponsors() {
         {/* RIB */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
-          className="mb-10 border border-border rounded-2xl overflow-hidden"
+          className="mb-10 rounded-2xl overflow-hidden border border-primary/20"
+          style={{ background: "linear-gradient(135deg, hsl(150,18%,97%) 0%, hsl(40,20%,97%) 100%)" }}
         >
-          <div className="px-6 py-4 bg-muted/40 border-b border-border flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" />
-            <span className="font-heading font-bold text-sm text-foreground">Virement bancaire — Coordonnées</span>
+          {/* En-tête */}
+          <div className="px-6 py-4 flex items-center gap-3 border-b border-primary/15"
+            style={{ background: "hsl(153,50%,28%)" }}>
+            <Building2 className="w-4 h-4 text-white/80 flex-shrink-0" />
+            <span className="font-heading font-bold text-sm text-white tracking-wide">Coordonnées bancaires — Virement</span>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-border">
+
+          {/* Champs principaux */}
+          <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-primary/10">
             {[
-              { label: "Titulaire", value: "ASSOCIATION MA BELLE PROMO MBP" },
-              { label: "Banque", value: "ECOBANK Togo" },
-              { label: "Swift / BIC", value: "ECOCTGTGXXX", mono: true },
+              { label: "Titulaire du compte", value: "ASSOCIATION MA BELLE PROMO MBP", mono: false },
+              { label: "Établissement bancaire", value: "ECOBANK Togo", mono: false },
+              { label: "Code Swift / BIC", value: "ECOCTGTGXXX", mono: true },
             ].map(({ label, value, mono }) => (
-              <div key={label} className="px-5 py-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">{label}</p>
-                <p className={`text-sm font-semibold text-foreground ${mono ? "font-mono" : ""}`}>{value}</p>
+              <div key={label} className="px-5 py-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-1.5">{label}</p>
+                <p className={`text-sm font-semibold text-foreground ${mono ? "font-mono tracking-wider" : ""}`}>{value}</p>
               </div>
             ))}
           </div>
-          <div className="border-t border-border px-5 py-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">IBAN</p>
-            <p className="text-sm font-semibold font-mono text-foreground tracking-wider">TG53 TG05 5017 1014 1766 3880 0153</p>
+
+          {/* IBAN — mis en avant */}
+          <div className="px-5 py-5 border-t border-primary/10">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-2">Numéro IBAN</p>
+            <p className="font-mono font-bold text-foreground tracking-[0.2em] text-base sm:text-lg">
+              TG53&nbsp;TG05&nbsp;5017&nbsp;1014&nbsp;1766&nbsp;3880&nbsp;0153
+            </p>
           </div>
-          <div className="border-t border-border px-5 py-3 bg-muted/20">
+
+          {/* Référence */}
+          <div className="px-5 py-3 border-t border-primary/10 flex items-start gap-2"
+            style={{ background: "hsl(153,50%,28%,0.05)" }}>
+            <span className="text-primary mt-0.5 text-xs">→</span>
             <p className="text-xs text-muted-foreground">
-              Référence à indiquer : <span className="font-semibold text-foreground">PARTENARIAT MBP — [Votre nom] — [Année]</span>
+              Référence à indiquer :{" "}
+              <span className="font-semibold text-foreground font-mono">PARTENARIAT MBP — [Votre nom] — [Année]</span>
             </p>
           </div>
         </motion.div>
