@@ -61,6 +61,7 @@ import SplashScreen from '@/components/SplashScreen';
 import PageNotFound from './lib/PageNotFound';
 import { LocalAuthProvider, useLocalAuth } from '@/lib/LocalAuth';
 import ScrollToTop from '@/components/ScrollToTop';
+import SmoothScroll from '@/components/SmoothScroll';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Pages chargées immédiatement (chemin critique)
@@ -147,6 +148,7 @@ const AuthenticatedApp = () => {
   return (
     <>
     <PageTitleUpdater />
+    <SmoothScroll />
     <ScrollToTop />
     <CartSidebar />
     <CheckoutModal />
