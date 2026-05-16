@@ -149,10 +149,12 @@
   }
 
 
-  /* Protection des photos — empêche le glisser-déposer vers le bureau */
+  /* Protection des photos — empêche toute extraction (drag, clic-droit, long-press iOS) */
   img {
     -webkit-user-drag: none;
     user-drag: none;
+    -webkit-touch-callout: none; /* bloque le menu "Enregistrer l'image" sur iOS */
+    user-select: none;
   }
 }
 
