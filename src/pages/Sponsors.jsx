@@ -142,7 +142,7 @@ export default function Sponsors() {
       </section>
 
       {/* ── Reste de la page ── */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20">
       <div className="max-w-5xl mx-auto px-6">
 
         {/* Emplacements partenaires */}
