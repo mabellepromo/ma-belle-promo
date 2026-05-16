@@ -57,7 +57,7 @@ export default function Sponsors() {
             className="font-heading leading-relaxed mb-10"
             style={{ fontSize: "clamp(1.05rem, 2vw, 1.3rem)", color: "rgba(255,255,255,0.88)", fontWeight: 400, textAlign: "justify" }}
           >
-            l'association Ma Belle Promo (MBP) n'est pas une association comme les autres. Née en 2018 de la rencontre
+            L'association Ma Belle Promo (MBP) n'est pas une association comme les autres. Née en 2018 de la rencontre
             de juristes, cadres et entrepreneurs formés à la Faculté de Droit de
             l'Université de Lomé — promotion 1994–2000 —, elle a très vite choisi de ne pas se replier
             sur elle-même. Certes, nous cultivons l'excellence qui fut notre socle commun : séminaires
@@ -142,7 +142,8 @@ export default function Sponsors() {
       </section>
 
       {/* ── Reste de la page ── */}
-      <section className="py-20 max-w-5xl mx-auto px-6">
+      <section className="py-20 bg-muted/30">
+      <div className="max-w-5xl mx-auto px-6">
 
         {/* Emplacements partenaires */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
@@ -259,6 +260,7 @@ export default function Sponsors() {
             Nous contacter
           </Link>
         </motion.div>
+      </div>
       </section>
     </div>
   );
