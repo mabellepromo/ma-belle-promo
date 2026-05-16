@@ -3,6 +3,7 @@ import { ArrowRight, Search, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
 import SEO from "../components/SEO";
 import { Link } from "react-router-dom";
+import TiltCard from "../components/TiltCard";
 import { useProjets } from "../hooks/useProjets";
 
 const catLight = {
@@ -31,10 +32,12 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.55, delay: index * 0.07 }}
       className="h-full"
+      style={{ perspective: "900px" }}
     >
+      <TiltCard className="h-full overflow-hidden rounded-2xl">
       <Link
         to={`/activites/projets/${projet.id}`}
-        className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
+        className="group flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-300"
       >
         {/* Image */}
         <div className={`relative ${imgClass} overflow-hidden flex-shrink-0`}>
@@ -66,6 +69,7 @@ function OverlayCard({ projet, size = "normal", index = 0 }) {
           </span>
         </div>
       </Link>
+      </TiltCard>
     </motion.div>
   );
 }

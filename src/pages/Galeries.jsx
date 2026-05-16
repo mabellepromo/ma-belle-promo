@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Lock, Images, ArrowRight, Calendar, MapPin } from "lucide-react";
 import SEO from "../components/SEO";
 import { useGaleries } from "../hooks/useGaleries";
+import TiltCard from "../components/TiltCard";
 import { useLocalAuth } from "../lib/LocalAuth";
 
 export default function Galeries() {
@@ -48,10 +49,12 @@ export default function Galeries() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-30px" }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
+                style={{ perspective: "900px" }}
               >
+                <TiltCard className="overflow-hidden rounded-2xl h-full">
                 <Link
                   to={g.access === "membres" && !session ? `/login?redirect=/galeries/${g.id}` : `/galeries/${g.id}`}
-                  className="group block rounded-2xl overflow-hidden border border-border hover:border-primary/30 hover:shadow-xl transition-all duration-300 bg-card"
+                  className="group block rounded-2xl overflow-hidden border border-border hover:border-primary/30 hover:shadow-xl transition-all duration-300 bg-card h-full"
                 >
 
                   {/* Image de couverture — ratio 4/3 cohérent */}
@@ -94,6 +97,7 @@ export default function Galeries() {
                     </div>
                   </div>
                 </Link>
+                </TiltCard>
               </motion.div>
             ))}
           </div>

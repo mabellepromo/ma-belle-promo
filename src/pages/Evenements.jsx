@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import { Calendar, MapPin, Clock, ArrowRight, ChevronRight } from "lucide-react";
+import TiltCard from "../components/TiltCard";
 import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
 
@@ -83,13 +84,14 @@ function HeroCard({ evt }) {
 function GridCard({ evt, i }) {
   const s = TYPE_STYLE[evt.type] || TYPE_STYLE["Événement"];
   return (
-    <motion.article
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.5, delay: i * 0.07 }}
-      className={`group bg-card border ${s.border} rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300`}
+      style={{ perspective: "900px" }}
     >
+      <TiltCard className={`group bg-card border ${s.border} rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300 h-full`}>
       <div className="relative h-48 overflow-hidden">
         <img
           src={evt.image}
@@ -124,7 +126,8 @@ function GridCard({ evt, i }) {
           </Link>
         )}
       </div>
-    </motion.article>
+      </TiltCard>
+    </motion.div>
   );
 }
 
