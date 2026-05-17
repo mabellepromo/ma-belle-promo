@@ -17,7 +17,7 @@ const fmt = (n) => n.toLocaleString("fr-FR") + " FCFA";
 const PRODUCTS = [
   {
     id: "f1", cat: "Formations", emoji: "⚖️",
-    imgBg: "linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%)",
+    imgBg: "linear-gradient(135deg,#1e5c3a 0%,#2d7a52 55%,#3d9968 100%)",
     badge: "Bestseller", badgeColor: "#fbbf24",
     name: "Droit des Affaires en Afrique Francophone",
     desc: "12 modules vidéo HD · PDF & ressources · Certificat MBP",
@@ -28,8 +28,8 @@ const PRODUCTS = [
   },
   {
     id: "f2", cat: "Formations", emoji: "📊",
-    imgBg: "linear-gradient(135deg,#eff6ff 0%,#dbeafe 55%,#bfdbfe 100%)",
-    badge: "Nouveau", badgeColor: "#34d399",
+    imgBg: "linear-gradient(135deg,#163d27 0%,#236645 55%,#2d7a52 100%)",
+    badge: "Nouveau", badgeColor: "#fbbf24",
     name: "Fiscalité Internationale : Enjeux Africains",
     desc: "Webinaire enregistré · Quiz final · Accès à vie",
     price: 15000, original: null, digital: true,
@@ -38,8 +38,8 @@ const PRODUCTS = [
   },
   {
     id: "f3", cat: "Formations", emoji: "🏆",
-    imgBg: "linear-gradient(135deg,#f5f3ff 0%,#ede9fe 55%,#ddd6fe 100%)",
-    badge: "Pack -37%", badgeColor: "#f97316",
+    imgBg: "linear-gradient(135deg,#0f2e1c 0%,#1e5c3a 55%,#2d7a52 100%)",
+    badge: "Pack -37%", badgeColor: "#fbbf24",
     name: "Pack Juriste Pro 2026",
     desc: "Accès à toutes nos formations · 12 mois · Mises à jour",
     price: 75000, original: 120000, digital: true,
@@ -356,7 +356,7 @@ export default function Boutique() {
     .filter(p => !p.featured || activeCat !== "Tout");
 
   return (
-    <div className="min-h-screen" style={{ background: "#f5f2ed" }}>
+    <div className="min-h-screen bg-background">
       <SEO
         title="Boutique MBP"
         description="Formations juridiques, produits dérivés MBP, art IA exclusif et publications — la boutique officielle de Ma Belle Promo."
