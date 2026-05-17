@@ -17,7 +17,7 @@ const fmt = (n) => n.toLocaleString("fr-FR") + " FCFA";
 const PRODUCTS = [
   {
     id: "f1", cat: "Formations", emoji: "⚖️",
-    imgBg: "linear-gradient(135deg,#064e3b 0%,#065f46 55%,#0f766e 100%)",
+    imgBg: "linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%)",
     badge: "Bestseller", badgeColor: "#fbbf24",
     name: "Droit des Affaires en Afrique Francophone",
     desc: "12 modules vidéo HD · PDF & ressources · Certificat MBP",
@@ -28,7 +28,7 @@ const PRODUCTS = [
   },
   {
     id: "f2", cat: "Formations", emoji: "📊",
-    imgBg: "linear-gradient(135deg,#1e3a5f 0%,#1e40af 55%,#1d4ed8 100%)",
+    imgBg: "linear-gradient(135deg,#eff6ff 0%,#dbeafe 55%,#bfdbfe 100%)",
     badge: "Nouveau", badgeColor: "#34d399",
     name: "Fiscalité Internationale : Enjeux Africains",
     desc: "Webinaire enregistré · Quiz final · Accès à vie",
@@ -38,7 +38,7 @@ const PRODUCTS = [
   },
   {
     id: "f3", cat: "Formations", emoji: "🏆",
-    imgBg: "linear-gradient(135deg,#3b0764 0%,#6d28d9 55%,#7c3aed 100%)",
+    imgBg: "linear-gradient(135deg,#f5f3ff 0%,#ede9fe 55%,#ddd6fe 100%)",
     badge: "Pack -37%", badgeColor: "#f97316",
     name: "Pack Juriste Pro 2026",
     desc: "Accès à toutes nos formations · 12 mois · Mises à jour",
@@ -48,7 +48,7 @@ const PRODUCTS = [
   },
   {
     id: "p1", cat: "Boutique MBP", emoji: "👕",
-    imgBg: "linear-gradient(135deg,#1a2e1a 0%,#166534 55%,#15803d 100%)",
+    imgBg: "linear-gradient(135deg,#f0fdf4 0%,#dcfce7 55%,#bbf7d0 100%)",
     badge: null, badgeColor: null,
     name: "T-shirt Ma Belle Promo — Édition 2026",
     desc: "100% coton bio · Logo brodé · Coupe premium unisexe",
@@ -58,7 +58,7 @@ const PRODUCTS = [
   },
   {
     id: "p2", cat: "Boutique MBP", emoji: "☕",
-    imgBg: "linear-gradient(135deg,#422006 0%,#92400e 55%,#b45309 100%)",
+    imgBg: "linear-gradient(135deg,#fffbeb 0%,#fef3c7 55%,#fde68a 100%)",
     badge: "Promo -20%", badgeColor: "#f97316",
     name: "Mug FDD Lomé — Logo Doré",
     desc: "Porcelaine · Lave-vaisselle OK · Boîte cadeau incluse",
@@ -68,7 +68,7 @@ const PRODUCTS = [
   },
   {
     id: "p3", cat: "Boutique MBP", emoji: "📓",
-    imgBg: "linear-gradient(135deg,#0f2337 0%,#1e3a5f 55%,#1e4976 100%)",
+    imgBg: "linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 55%,#bae6fd 100%)",
     badge: null, badgeColor: null,
     name: "Carnet de Notes MBP",
     desc: "Couverture rigide · 200 pages · Règle marque-page",
@@ -78,7 +78,7 @@ const PRODUCTS = [
   },
   {
     id: "a1", cat: "Art & Design IA", emoji: "🖼️",
-    imgBg: "linear-gradient(135deg,#1a0533 0%,#4c1d95 55%,#7c3aed 100%)",
+    imgBg: "linear-gradient(135deg,#fff1f2 0%,#ffe4e6 55%,#fecdd3 100%)",
     badge: "Exclusif — 3 ex.", badgeColor: "#f43f5e",
     name: "Portrait Juridique — Collection FDD",
     desc: "Impression A3 HD · Signé numériquement · Livraison encadrée",
@@ -88,7 +88,7 @@ const PRODUCTS = [
   },
   {
     id: "a2", cat: "Art & Design IA", emoji: "🎨",
-    imgBg: "linear-gradient(135deg,#0f172a 0%,#312e81 55%,#4338ca 100%)",
+    imgBg: "linear-gradient(135deg,#eef2ff 0%,#e0e7ff 55%,#c7d2fe 100%)",
     badge: "Téléchargement", badgeColor: "#06b6d4",
     name: "Affiche Nuit du Droit 2025",
     desc: "Fichier HD 4K · Usage personnel · Livraison immédiate",
@@ -98,7 +98,7 @@ const PRODUCTS = [
   },
   {
     id: "a3", cat: "Art & Design IA", emoji: "✨",
-    imgBg: "linear-gradient(135deg,#0c1a2e 0%,#1e3a5f 55%,#1e4976 100%)",
+    imgBg: "linear-gradient(135deg,#ecfeff 0%,#cffafe 55%,#a5f3fc 100%)",
     badge: "Série IA", badgeColor: "#22d3ee",
     name: "Collection Portraits — 5 illustrations",
     desc: "5 œuvres IA uniques · FDD Lomé · Fichiers HD + impression",
@@ -108,7 +108,7 @@ const PRODUCTS = [
   },
   {
     id: "b1", cat: "Publications", emoji: "📚",
-    imgBg: "linear-gradient(135deg,#0c1a2e 0%,#1e3a5f 55%,#1d4ed8 100%)",
+    imgBg: "linear-gradient(135deg,#faf5ff 0%,#f3e8ff 55%,#e9d5ff 100%)",
     badge: "Nouveau", badgeColor: "#34d399",
     name: "Guide du Juriste Togolais 2026",
     desc: "280 pages · PDF + EPUB · Mis à jour 2026 · Accès à vie",
@@ -118,7 +118,7 @@ const PRODUCTS = [
   },
   {
     id: "b2", cat: "Publications", emoji: "📖",
-    imgBg: "linear-gradient(135deg,#1c1917 0%,#44403c 55%,#57534e 100%)",
+    imgBg: "linear-gradient(135deg,#fafaf9 0%,#f5f5f4 55%,#e7e5e4 100%)",
     badge: null, badgeColor: null,
     name: "Recueil Jurisprudence Togo 2025",
     desc: "300+ décisions · Index thématique · Format PDF",
