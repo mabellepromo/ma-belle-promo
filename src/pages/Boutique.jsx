@@ -29,7 +29,7 @@ const PRODUCTS = [
   {
     id: "f2", cat: "Formations", emoji: "📊",
     imgBg: "linear-gradient(135deg,#1e3a5f 0%,#1e40af 55%,#1d4ed8 100%)",
-    badge: "Nouveau", badgeColor: "#34d399",
+    badge: "Nouveau", badgeColor: "#2d7a52",
     name: "Fiscalité Internationale : Enjeux Africains",
     desc: "Webinaire enregistré · Quiz final · Accès à vie",
     price: 15000, original: null, digital: true,
@@ -109,7 +109,7 @@ const PRODUCTS = [
   {
     id: "b1", cat: "Publications", emoji: "📚",
     imgBg: "linear-gradient(135deg,#0c1a2e 0%,#1e3a5f 55%,#1d4ed8 100%)",
-    badge: "Nouveau", badgeColor: "#34d399",
+    badge: "Nouveau", badgeColor: "#2d7a52",
     name: "Guide du Juriste Togolais 2026",
     desc: "280 pages · PDF + EPUB · Mis à jour 2026 · Accès à vie",
     price: 18000, original: null, digital: true,

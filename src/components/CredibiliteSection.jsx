@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const MotionLink = motion(Link);
 
-const Spiral = ({ color = "#34d399", flip = false }) => (
+const Spiral = ({ color = "#2d7a52", flip = false }) => (
   <svg
     viewBox="0 0 140 140"
     fill="none"
@@ -50,7 +50,7 @@ export default function CredibiliteSection() {
         className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-32 h-32 pointer-events-none"
         style={{ marginLeft: "-1rem" }}
       >
-        <Spiral color="#34d399" flip={false} />
+        <Spiral color="#2d7a52" flip={false} />
       </motion.div>
 
       {/* Spirale droite */}
@@ -80,10 +80,10 @@ export default function CredibiliteSection() {
               y: springTransition,
             }}
             className="rounded-xl p-5 border flex items-center gap-4"
-            style={{ background: "rgba(52,211,153,0.10)", borderColor: "rgba(52,211,153,0.30)" }}
+            style={{ background: "rgba(45,122,82,0.10)", borderColor: "rgba(45,122,82,0.30)" }}
           >
             <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: "rgba(52,211,153,0.20)" }}>
+              style={{ background: "rgba(45,122,82,0.20)" }}>
               <UserPlus className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
@@ -91,8 +91,8 @@ export default function CredibiliteSection() {
               <p className="text-white/50 text-xs mt-0.5 leading-relaxed">Rejoignez un réseau actif de juristes présents dans 6&nbsp;pays.</p>
               <ul className="mt-2 flex flex-col gap-0.5">
                 {["Accès à l'annuaire", "Webinaires & conférences", "Mentorat Passerelles"].map(b => (
-                  <li key={b} className="flex items-center gap-1 text-[10px]" style={{ color: "rgba(110,231,183,0.65)" }}>
-                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "rgba(52,211,153,0.50)" }} />
+                  <li key={b} className="flex items-center gap-1 text-[10px]" style={{ color: "rgba(125,184,154,0.65)" }}>
+                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "rgba(45,122,82,0.50)" }} />
                     {b}
                   </li>
                 ))}
@@ -103,7 +103,7 @@ export default function CredibiliteSection() {
               {...btnHover}
               transition={springTransition}
               className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold"
-              style={{ background: "rgba(52,211,153,0.25)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.40)" }}
+              style={{ background: "rgba(45,122,82,0.25)", color: "#7db89a", border: "1px solid rgba(45,122,82,0.40)" }}
             >
               Adhérer
             </MotionLink>

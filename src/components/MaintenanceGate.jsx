@@ -34,12 +34,12 @@ export default function MaintenanceGate({ children }) {
       {/* Logo / nom */}
       <div className="mb-8 text-center">
         <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden border-2"
-          style={{ borderColor: "rgba(52,211,153,0.4)" }}>
+          style={{ borderColor: "rgba(45,122,82,0.4)" }}>
           <img src="/Logo Redesign1.webp" alt="Ma Belle Promo"
             className="w-full h-full object-cover" />
         </div>
         <h1 className="font-heading text-2xl font-bold text-white tracking-wide">Ma Belle Promo</h1>
-        <p className="text-sm mt-1" style={{ color: "#6ee7b7" }}>
+        <p className="text-sm mt-1" style={{ color: "#7db89a" }}>
           Association FDD · Université de Lomé
         </p>
       </div>
@@ -62,7 +62,7 @@ export default function MaintenanceGate({ children }) {
           className="w-full px-4 py-3 rounded-xl text-sm text-center tracking-widest bg-white/10 text-white placeholder-white/40 border focus:outline-none focus:ring-2"
           style={{
             borderColor: error ? "#f87171" : "rgba(255,255,255,0.15)",
-            "--tw-ring-color": "#34d399",
+            "--tw-ring-color": "#2d7a52",
           }}
           autoFocus
         />
@@ -74,7 +74,7 @@ export default function MaintenanceGate({ children }) {
         <button
           type="submit"
           className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ background: "linear-gradient(90deg, #16a34a, #34d399)" }}>
+          style={{ background: "linear-gradient(90deg, #16a34a, #2d7a52)" }}>
           Accéder au site
         </button>
       </form>

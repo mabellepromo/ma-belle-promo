@@ -61,7 +61,7 @@ export default function FooterSection() {
                 src="/Logo Redesign1.webp"
                 alt="Logo Ma Belle Promo"
                 className="w-10 h-10 rounded-full opacity-90 flex-shrink-0"
-                style={{ boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}
+                style={{ boxShadow: "0 0 16px rgba(45,122,82,0.20)" }}
               />
               <div>
                 <div className="font-heading text-sm font-bold text-background leading-tight">Ma Belle Promo</div>

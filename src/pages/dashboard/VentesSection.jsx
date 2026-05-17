@@ -11,7 +11,7 @@ const METHOD_LABELS = {
   wave:   { label: "Wave",           color: "#2563eb", icon: "〰️" },
   tmoney: { label: "T-Money",        color: "#1d4ed8", icon: "🔵" },
   flooz:  { label: "Flooz",          color: "#16a34a", icon: "🟢" },
-  wire:   { label: "Virement",       color: "#34d399", icon: "🏦" },
+  wire:   { label: "Virement",       color: "#2d7a52", icon: "🏦" },
 };
 
 const STATUT_CFG = {
@@ -311,7 +311,7 @@ export default function VentesSection() {
                               onClick={() => updateStatut(c.id, "completed")}
                               disabled={updatingId === c.id}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                              style={{ background: "rgba(52,211,153,0.12)", color: "#34d399", border: "1px solid rgba(52,211,153,0.25)" }}
+                              style={{ background: "rgba(45,122,82,0.12)", color: "#2d7a52", border: "1px solid rgba(45,122,82,0.25)" }}
                             >
                               {updatingId === c.id
                                 ? <Loader className="w-3.5 h-3.5 animate-spin" />

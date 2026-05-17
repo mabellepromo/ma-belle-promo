@@ -45,7 +45,7 @@ const valeurs = [
 ];
 
 const objectifs = [
-  { icon: Network,      bg: "rgba(52,211,153,0.15)",  color: "text-primary", titre: "Réseautage",         desc: "Partage d'expérience et réseautage entre membres" },
+  { icon: Network,      bg: "rgba(45,122,82,0.15)",  color: "text-primary", titre: "Réseautage",         desc: "Partage d'expérience et réseautage entre membres" },
   { icon: GraduationCap,bg: "rgba(251,191,36,0.15)",  color: "text-amber-400",   titre: "Soutien FDD",        desc: "Mentorat, aides, bourses et stages pour les étudiants" },
   { icon: Globe,        bg: "rgba(96,165,250,0.15)",  color: "text-blue-400",    titre: "Diaspora",           desc: "Retour et intégration des membres diaspora" },
   { icon: Heart,        bg: "rgba(251,113,133,0.15)", color: "text-rose-400",    titre: "Liens privilégiés",  desc: "Relations durables entre les membres de la promotion" },
@@ -112,23 +112,23 @@ export default function QuiSommesNous() {
           className="relative overflow-hidden rounded-3xl"
           style={{
             background: "linear-gradient(135deg, rgba(5,18,11,0.98) 0%, rgba(10,35,20,0.98) 100%)",
-            border: "1px solid rgba(52,211,153,0.20)",
+            border: "1px solid rgba(45,122,82,0.20)",
           }}
         >
           {/* Ligne déco haut */}
-          <div style={{ height: 2, background: "linear-gradient(to right, transparent, #34d399 30%, #fbbf24 60%, #34d399 85%, transparent)" }} />
+          <div style={{ height: 2, background: "linear-gradient(to right, transparent, #2d7a52 30%, #fbbf24 60%, #2d7a52 85%, transparent)" }} />
 
           <div className="p-5 sm:p-8 md:p-12">
 
             {/* En-tête */}
             <div className="flex items-center gap-4 mb-8">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.25)" }}>
+                style={{ background: "rgba(45,122,82,0.15)", border: "1px solid rgba(45,122,82,0.25)" }}>
                 <Target className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.25em] mb-0.5"
-                  style={{ color: "rgba(110,231,183,0.55)" }}>Raison d'être · Art. 5 des statuts</p>
+                  style={{ color: "rgba(125,184,154,0.55)" }}>Raison d'être · Art. 5 des statuts</p>
                 <h2 className="font-heading text-2xl md:text-3xl font-black text-white">Notre Mission</h2>
               </div>
             </div>
@@ -168,11 +168,11 @@ export default function QuiSommesNous() {
 
             {/* Vision 3/5 */}
             <div className="flex flex-col sm:flex-row items-center gap-6 p-5 rounded-2xl"
-              style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.18)" }}>
+              style={{ background: "rgba(45,122,82,0.08)", border: "1px solid rgba(45,122,82,0.18)" }}>
               <div className="text-center flex-shrink-0">
                 <div className="font-heading font-black text-primary leading-none" style={{ fontSize: "3.5rem" }}>3/5</div>
                 <p className="text-[10px] font-bold uppercase tracking-widest mt-1"
-                  style={{ color: "rgba(110,231,183,0.55)" }}>étudiants visés</p>
+                  style={{ color: "rgba(125,184,154,0.55)" }}>étudiants visés</p>
               </div>
               <div>
                 <p className="font-heading font-bold text-white text-sm mb-1">Vision à moyen terme</p>

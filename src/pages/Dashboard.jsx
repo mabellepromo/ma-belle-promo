@@ -585,7 +585,7 @@ export default function Dashboard() {
               {/* Bannière */}
               <div className="relative overflow-hidden rounded-2xl px-8 py-7"
                 style={{ background: "linear-gradient(135deg, var(--brand-dark) 0%, #1a3d2b 60%, #0f2a1e 100%)" }}>
-                <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(52,211,153,0.08) 0%, transparent 60%)" }} />
+                <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(45,122,82,0.08) 0%, transparent 60%)" }} />
                 <div className="absolute right-0 top-0 bottom-0 w-64 opacity-5"
                   style={{ backgroundImage: "repeating-linear-gradient(45deg, white 0px, white 1px, transparent 1px, transparent 12px)" }} />
                 <div className="relative">
