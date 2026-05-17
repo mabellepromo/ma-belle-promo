@@ -451,7 +451,7 @@ export default function CheckoutModal() {
                         border: "2px solid rgba(52,211,153,0.40)",
                         boxShadow: "0 0 40px rgba(52,211,153,0.20)",
                       }}>
-                      <CheckCircle className="w-10 h-10 text-emerald-400" />
+                      <CheckCircle className="w-10 h-10 text-primary" />
                     </motion.div>
                     <h3 className="font-heading text-white text-xl font-black mb-2">Merci, {buyer.nom.split(" ")[0]} !</h3>
                     <p className="text-white/45 text-sm mb-4">

@@ -227,8 +227,8 @@ export default function Adhesion() {
 
           {sent ? (
             <div className="text-center py-14">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
-                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-5">
+                <CheckCircle2 className="w-10 h-10 text-primary" />
               </div>
               <h3 className="font-heading text-2xl font-bold text-foreground mb-3">Demande envoyée !</h3>
               <p className="text-muted-foreground max-w-sm mx-auto">Nous avons bien reçu votre dossier d'adhésion. Le bureau exécutif vous contactera dans les 48 heures.</p>

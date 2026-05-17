@@ -11,7 +11,7 @@ const TYPE_STYLE = {
   "Webinaire":        { badge: "bg-blue-100 text-blue-700",     dot: "bg-blue-500",    border: "border-blue-200" },
   "Conférence":       { badge: "bg-purple-100 text-purple-700", dot: "bg-purple-500",  border: "border-purple-200" },
   "Gala":             { badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-500",   border: "border-amber-200" },
-  "Projet éditorial": { badge: "bg-green-100 text-green-700",   dot: "bg-green-500",   border: "border-green-200" },
+  "Projet éditorial": { badge: "bg-secondary text-primary",   dot: "bg-primary",   border: "border" },
   "Événement":        { badge: "bg-gray-100 text-gray-700",     dot: "bg-gray-400",    border: "border-gray-200" },
 };
 

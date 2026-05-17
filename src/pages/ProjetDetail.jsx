@@ -11,7 +11,7 @@ import DOMPurify from "dompurify";
 const catColors = {
   "Solidarité":    "bg-rose-100 text-rose-700 ring-rose-200",
   "Éducation":     "bg-blue-100 text-blue-700 ring-blue-200",
-  "Santé publique":"bg-green-100 text-green-700 ring-green-200",
+  "Santé publique":"bg-secondary text-primary ring",
 };
 
 const catAccent = {

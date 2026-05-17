@@ -20,7 +20,7 @@ const valeurs = [
     numero: "03",
     titre: "Entraide",
     texte: "Nous contribuons activement à l'épanouissement de nos membres et à l'accompagnement des étudiants actuels de la Faculté de Droit. Partage de compétences, mentorat, soutien moral et matériel : l'entraide est le moteur qui fait avancer chacun d'entre nous et renforce la cohésion de notre groupe.",
-    accent: "bg-emerald-500",
+    accent: "bg-primary",
   },
   {
     numero: "04",

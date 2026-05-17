@@ -73,7 +73,7 @@ const OBJECTIFS_STRATEGIQUES = [
 
 const DOMAINES_AXE1 = [
   { num: "1", label: "Réseautage & Mentorat",          Icon: Network,      color: "bg-primary/10 text-primary" },
-  { num: "2", label: "Soutien aux étudiants",           Icon: GraduationCap,color: "bg-green-500/10 text-green-600" },
+  { num: "2", label: "Soutien aux étudiants",           Icon: GraduationCap,color: "bg-primary/10 text-primary" },
   { num: "3", label: "Partenariat Faculté de Droit",    Icon: Landmark,     color: "bg-violet-500/10 text-violet-600" },
   { num: "4", label: "Engagement communautaire",        Icon: Heart,        color: "bg-rose-500/10 text-rose-600" },
   { num: "5", label: "Développement professionnel",     Icon: Briefcase,    color: "bg-amber-500/10 text-amber-600" },
@@ -514,11 +514,11 @@ export default function PlanAction2026() {
               </SubActivityCard>
 
               <SubActivityCard num="1.1.b" titre="Programme formel de mentorat"
-                Icon={GraduationCap} iconColor="bg-green-500/10 text-green-600" delay={0.08}>
+                Icon={GraduationCap} iconColor="bg-primary/10 text-primary" delay={0.08}>
                 <div className="flex flex-wrap gap-2 mb-3 text-[11px] text-muted-foreground">
                   {["Mise en relation formelle mentor–mentoré", "Conseils académiques et orientation professionnelle", "Suivi régulier des binômes"].map(t => (
                     <span key={t} className="flex items-center gap-1 bg-muted px-2 py-1 rounded-full">
-                      <ChevronRight className="w-3 h-3 text-green-600" />{t}
+                      <ChevronRight className="w-3 h-3 text-primary" />{t}
                     </span>
                   ))}
                 </div>

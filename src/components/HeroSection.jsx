@@ -408,7 +408,7 @@ export default function HeroSection() {
               transition={shouldReduce ? {} : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -top-3 -right-4 z-20 rounded-2xl px-3 py-2.5 flex items-center gap-2.5"
               style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.16)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" }}>
-              <Scale className="w-5 h-5 text-emerald-300" />
+              <Scale className="w-5 h-5 text-primary/70" />
               <div>
                 <p className="text-xs font-bold text-white">Ma Belle Promo</p>
                 <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>Fondée en 2018</p>

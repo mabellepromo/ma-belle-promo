@@ -9,7 +9,7 @@ import { useProgrammes } from "../hooks/useProgrammes";
 const PROG_META = {
   1: { Icon: GraduationCap, color: "bg-primary/10 text-primary" },
   2: { Icon: Users,         color: "bg-amber-500/10 text-amber-600" },
-  3: { Icon: Mic,           color: "bg-green-500/10 text-green-600" },
+  3: { Icon: Mic,           color: "bg-primary/10 text-primary" },
 };
 
 export default function Programmes() {

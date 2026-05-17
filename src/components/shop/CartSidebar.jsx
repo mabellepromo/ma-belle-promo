@@ -43,7 +43,7 @@ export default function CartSidebar() {
             <div className="flex items-center justify-between px-5 py-4"
               style={{ borderBottom: "1px solid rgba(52,211,153,0.10)" }}>
               <div className="flex items-center gap-2.5">
-                <ShoppingBag className="w-4 h-4 text-emerald-400" />
+                <ShoppingBag className="w-4 h-4 text-primary" />
                 <span className="font-heading text-white font-bold text-sm">Mon panier</span>
                 {count > 0 && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-black"

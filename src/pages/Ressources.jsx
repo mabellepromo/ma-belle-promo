@@ -14,7 +14,7 @@ const DOMAINES   = ["Tous", "Droit des affaires", "Droit public", "Droit pénal"
 const CAT_COLORS = {
   "Modèle de contrat": "bg-blue-100 text-blue-700",
   "Fiche de synthèse": "bg-teal-100 text-teal-700",
-  "Guide pratique":    "bg-green-100 text-green-700",
+  "Guide pratique":    "bg-secondary text-primary",
   "Jurisprudence":     "bg-purple-100 text-purple-700",
   "Législation":       "bg-orange-100 text-orange-700",
   "Formulaire":        "bg-amber-100 text-amber-700",

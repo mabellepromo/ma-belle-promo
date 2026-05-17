@@ -84,7 +84,7 @@ export default function CredibiliteSection() {
           >
             <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ background: "rgba(52,211,153,0.20)" }}>
-              <UserPlus className="w-5 h-5 text-emerald-400" />
+              <UserPlus className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-bold text-white text-base">Devenir membre</h3>

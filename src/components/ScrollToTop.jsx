@@ -25,7 +25,7 @@ export default function ScrollToTop() {
           style={{ background: "var(--brand-dark-mid)", border: "1px solid rgba(52,211,153,0.30)" }}
           aria-label="Retour en haut"
         >
-          <ArrowUp className="w-4 h-4 text-emerald-400" />
+          <ArrowUp className="w-4 h-4 text-primary" />
         </motion.button>
       )}
     </AnimatePresence>

@@ -22,7 +22,7 @@ const valeurs = [
     numero: "03",
     titre: "Entraide",
     texte: "Partage de compétences, mentorat, soutien moral et matériel : l'entraide est le moteur qui fait avancer chacun et renforce la cohésion de notre groupe face aux défis du quotidien.",
-    accent: "bg-emerald-500",
+    accent: "bg-primary",
   },
   {
     numero: "04",
@@ -45,7 +45,7 @@ const valeurs = [
 ];
 
 const objectifs = [
-  { icon: Network,      bg: "rgba(52,211,153,0.15)",  color: "text-emerald-400", titre: "Réseautage",         desc: "Partage d'expérience et réseautage entre membres" },
+  { icon: Network,      bg: "rgba(52,211,153,0.15)",  color: "text-primary", titre: "Réseautage",         desc: "Partage d'expérience et réseautage entre membres" },
   { icon: GraduationCap,bg: "rgba(251,191,36,0.15)",  color: "text-amber-400",   titre: "Soutien FDD",        desc: "Mentorat, aides, bourses et stages pour les étudiants" },
   { icon: Globe,        bg: "rgba(96,165,250,0.15)",  color: "text-blue-400",    titre: "Diaspora",           desc: "Retour et intégration des membres diaspora" },
   { icon: Heart,        bg: "rgba(251,113,133,0.15)", color: "text-rose-400",    titre: "Liens privilégiés",  desc: "Relations durables entre les membres de la promotion" },
