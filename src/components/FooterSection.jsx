@@ -45,7 +45,7 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="bg-foreground text-background footer-safe-area">
+    <footer className="bg-[var(--brand-dark)] text-background footer-safe-area">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-6 py-5">
