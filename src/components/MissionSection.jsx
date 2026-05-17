@@ -4,16 +4,16 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 const LINE_GRADIENT =
-  "linear-gradient(90deg, transparent, #7db89a 8%, #fbbf24 28%, #2d7a52 50%, #a78bfa 72%, #2d7a52 90%, transparent)";
+  "linear-gradient(90deg, transparent, #6ee7b7 8%, #fbbf24 28%, #34d399 50%, #a78bfa 72%, #34d399 90%, transparent)";
 
 const MILESTONES = [
   {
     year: "1994",
     label: "L'Entrée",
     desc: "Nous intégrons la Faculté de Droit de l'Université de Lomé. Une promotion se noue sur les bancs d'un même amphithéâtre.",
-    color: "#7db89a",
-    glowBg: "rgba(125,184,154,0.07)",
-    border: "rgba(125,184,154,0.22)",
+    color: "#6ee7b7",
+    glowBg: "rgba(110,231,183,0.07)",
+    border: "rgba(110,231,183,0.22)",
     top: true,
   },
   {
@@ -29,9 +29,9 @@ const MILESTONES = [
     year: "2018",
     label: "La Fondation",
     desc: "1er décembre — L'Assemblée Générale Constitutive officialise ce qui était déjà une famille. Ma Belle Promo est née.",
-    color: "#2d7a52",
-    glowBg: "rgba(45,122,82,0.10)",
-    border: "rgba(45,122,82,0.38)",
+    color: "#34d399",
+    glowBg: "rgba(52,211,153,0.10)",
+    border: "rgba(52,211,153,0.38)",
     top: true,
     featured: true,
   },
@@ -49,9 +49,9 @@ const MILESTONES = [
     year: "Aujourd'hui",
     label: "Le Réseau",
     desc: "La Nuit du Droit, des webinaires, des actions terrain : un réseau vivant dans 6+ pays, au service de ses membres et des étudiants de la FDD.",
-    color: "#2d7a52",
-    glowBg: "rgba(45,122,82,0.10)",
-    border: "rgba(45,122,82,0.30)",
+    color: "#34d399",
+    glowBg: "rgba(52,211,153,0.10)",
+    border: "rgba(52,211,153,0.30)",
     top: true,
     pulse: true,
   },
@@ -59,9 +59,9 @@ const MILESTONES = [
 
 const PULSE_CSS = `
   @keyframes mbp-dot-pulse {
-    0%   { box-shadow: 0 0 0 0px  rgba(45,122,82,0.85); }
-    70%  { box-shadow: 0 0 0 14px rgba(45,122,82,0);    }
-    100% { box-shadow: 0 0 0 0px  rgba(45,122,82,0);    }
+    0%   { box-shadow: 0 0 0 0px  rgba(52,211,153,0.85); }
+    70%  { box-shadow: 0 0 0 14px rgba(52,211,153,0);    }
+    100% { box-shadow: 0 0 0 0px  rgba(52,211,153,0);    }
   }
   .mbp-pulse { animation: mbp-dot-pulse 2.2s ease-out infinite; }
 `;
@@ -84,7 +84,7 @@ function TimelineCard({ m, i, from, shouldReduce }) {
       {m.featured && (
         <div
           className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{ boxShadow: "inset 0 0 28px rgba(45,122,82,0.12)" }}
+          style={{ boxShadow: "inset 0 0 28px rgba(52,211,153,0.12)" }}
         />
       )}
       <p className="font-heading text-sm font-bold mb-1.5" style={{ color: m.color }}>
@@ -165,14 +165,14 @@ export default function MissionSection() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(45,122,82,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(45,122,82,0.022) 1px, transparent 1px)",
+            "linear-gradient(rgba(52,211,153,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(52,211,153,0.022) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
       {/* Lueurs ambiantes */}
       <div
         className="absolute top-1/2 -translate-y-1/2 -left-40 w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(45,122,82,0.06) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 70%)" }}
       />
       <div
         className="absolute top-1/2 -translate-y-1/2 -right-40 w-[500px] h-[500px] rounded-full pointer-events-none"
@@ -192,9 +192,9 @@ export default function MissionSection() {
           <span
             className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-[0.22em] uppercase mb-6"
             style={{
-              color: "#7db89a",
-              background: "rgba(45,122,82,0.10)",
-              border: "1px solid rgba(45,122,82,0.22)",
+              color: "#6ee7b7",
+              background: "rgba(52,211,153,0.10)",
+              border: "1px solid rgba(52,211,153,0.22)",
             }}
           >
             Notre histoire
@@ -206,7 +206,7 @@ export default function MissionSection() {
             Une promotion,{" "}
             <span
               style={{
-                background: "linear-gradient(90deg, #2d7a52, #7db89a, #fbbf24)",
+                background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -346,9 +346,9 @@ export default function MissionSection() {
             to="/association/qui-sommes-nous"
             className="group inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-all hover:bg-white/5"
             style={{
-              color: "#7db89a",
-              background: "rgba(45,122,82,0.08)",
-              border: "1px solid rgba(45,122,82,0.22)",
+              color: "#6ee7b7",
+              background: "rgba(52,211,153,0.08)",
+              border: "1px solid rgba(52,211,153,0.22)",
             }}
           >
             Valeurs &amp; Mission

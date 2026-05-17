@@ -13,7 +13,7 @@ const METHODS = [
   { id: "wave",   label: "Wave",              icon: "〰️", desc: "Paiement mobile — Togo, Côte d'Ivoire, Sénégal", color: "#2563eb" },
   { id: "tmoney", label: "T-Money",           icon: "🔵", desc: "Paiement mobile Togocel",                  color: "#1d4ed8" },
   { id: "flooz",  label: "Flooz",             icon: "🟢", desc: "Paiement mobile Moov Africa Togo",         color: "#16a34a" },
-  { id: "wire",   label: "Virement ECOBANK",  icon: "🏦", desc: "Virement bancaire — traitement 1–3 jours", color: "#2d7a52" },
+  { id: "wire",   label: "Virement ECOBANK",  icon: "🏦", desc: "Virement bancaire — traitement 1–3 jours", color: "#34d399" },
 ];
 
 function Steps({ step }) {
@@ -26,15 +26,15 @@ function Steps({ step }) {
             animate={{ scale: i === step ? 1.1 : 1 }}
             className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all"
             style={{
-              background: i < step ? "#2d7a52" : i === step ? "linear-gradient(135deg,#2d7a52,#1a5e38)" : "rgba(255,255,255,0.07)",
+              background: i < step ? "#34d399" : i === step ? "linear-gradient(135deg,#34d399,#10b981)" : "rgba(255,255,255,0.07)",
               color: i <= step ? "#000" : "rgba(255,255,255,0.25)",
-              boxShadow: i === step ? "0 0 12px rgba(45,122,82,0.40)" : "none",
+              boxShadow: i === step ? "0 0 12px rgba(52,211,153,0.40)" : "none",
             }}
           >
             {i < step ? "✓" : i + 1}
           </motion.div>
           {i < labels.length - 1 && (
-            <div className="w-8 h-px mx-1 transition-all" style={{ background: i < step ? "#2d7a52" : "rgba(255,255,255,0.08)" }} />
+            <div className="w-8 h-px mx-1 transition-all" style={{ background: i < step ? "#34d399" : "rgba(255,255,255,0.08)" }} />
           )}
         </div>
       ))}
@@ -45,7 +45,7 @@ function Steps({ step }) {
 const inputCls = {
   width: "100%",
   background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(45,122,82,0.18)",
+  border: "1px solid rgba(52,211,153,0.18)",
   borderRadius: 10,
   padding: "10px 14px",
   color: "white",
@@ -70,22 +70,22 @@ function CardForm({ onPay, loading }) {
         ⚠️ Simulation — aucun débit réel ne sera effectué
       </p>
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Titulaire</label>
+        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Titulaire</label>
         <input style={inputCls} placeholder="NOM Prénom" value={name} onChange={e => setName(e.target.value)} />
       </div>
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Numéro de carte</label>
+        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Numéro de carte</label>
         <input style={inputCls} placeholder="1234 5678 9012 3456" value={num}
           onChange={e => setNum(fmtNum(e.target.value))} inputMode="numeric" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Expiration</label>
+          <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Expiration</label>
           <input style={inputCls} placeholder="MM/AA" value={expiry}
             onChange={e => setExpiry(fmtExp(e.target.value))} inputMode="numeric" />
         </div>
         <div>
-          <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>CVV</label>
+          <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>CVV</label>
           <input style={inputCls} placeholder="•••" type="password" maxLength={4} value={cvv}
             onChange={e => setCvv(e.target.value.replace(/\D/g, ""))} inputMode="numeric" />
         </div>
@@ -97,7 +97,7 @@ function CardForm({ onPay, loading }) {
         disabled={!valid || loading}
         className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 mt-2 transition-all"
         style={{
-          background: valid ? "linear-gradient(135deg,#2d7a52,#1a5e38)" : "rgba(255,255,255,0.06)",
+          background: valid ? "linear-gradient(135deg,#34d399,#10b981)" : "rgba(255,255,255,0.06)",
           color: valid ? "#000" : "rgba(255,255,255,0.25)",
           cursor: valid ? "pointer" : "not-allowed",
         }}
@@ -113,7 +113,7 @@ function MobileForm({ method, onPay, loading }) {
   const [phone, setPhone] = useState("");
   const valid = phone.replace(/\D/g,"").length >= 8;
   const colors = { wave: "#2563eb", tmoney: "#1d4ed8", flooz: "#16a34a" };
-  const c = colors[method] || "#2d7a52";
+  const c = colors[method] || "#34d399";
 
   return (
     <div className="space-y-4">
@@ -121,7 +121,7 @@ function MobileForm({ method, onPay, loading }) {
         Vous recevrez une notification sur votre téléphone pour confirmer le paiement.
       </div>
       <div>
-        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Numéro de téléphone</label>
+        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Numéro de téléphone</label>
         <input style={{ ...inputCls, borderColor: `${c}35` }}
           placeholder="+228 90 00 00 00" value={phone} onChange={e => setPhone(e.target.value)} type="tel" inputMode="tel" />
       </div>
@@ -184,9 +184,9 @@ function WireForm({ total }) {
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(45,122,82,0.18)" }}>
-        <div className="px-4 py-2.5" style={{ background: "rgba(45,122,82,0.08)", borderBottom: "1px solid rgba(45,122,82,0.10)" }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#7db89a" }}>Coordonnées bancaires</p>
+      <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(52,211,153,0.18)" }}>
+        <div className="px-4 py-2.5" style={{ background: "rgba(52,211,153,0.08)", borderBottom: "1px solid rgba(52,211,153,0.10)" }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#6ee7b7" }}>Coordonnées bancaires</p>
         </div>
         {rows.map(r => (
           <div key={r.key} className="flex items-center justify-between px-4 py-2.5"
@@ -197,14 +197,14 @@ function WireForm({ total }) {
             </div>
             <button onClick={() => copy(r.value, r.key)}
               className="w-6 h-6 flex items-center justify-center rounded-md transition-colors ml-2 flex-shrink-0"
-              style={{ color: copied === r.key ? "#2d7a52" : "rgba(255,255,255,0.20)" }}
+              style={{ color: copied === r.key ? "#34d399" : "rgba(255,255,255,0.20)" }}
               title="Copier">
               {copied === r.key ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             </button>
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-center" style={{ color: "rgba(45,122,82,0.55)" }}>
+      <p className="text-[10px] text-center" style={{ color: "rgba(52,211,153,0.55)" }}>
         Votre commande sera traitée à réception du virement (1–3 jours ouvrés).
       </p>
     </div>
@@ -298,7 +298,7 @@ export default function CheckoutModal() {
               className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl p-6 flex flex-col pointer-events-auto"
               style={{
                 background: "linear-gradient(160deg, #0d2419 0%, #071510 100%)",
-                border: "1px solid rgba(45,122,82,0.20)",
+                border: "1px solid rgba(52,211,153,0.20)",
                 boxShadow: "0 32px 80px rgba(0,0,0,0.70)",
               }}
             >
@@ -331,26 +331,26 @@ export default function CheckoutModal() {
                 {step === 0 && (
                   <motion.div key="s0" {...slide}>
                     <div className="rounded-xl p-3 mb-5 space-y-1.5"
-                      style={{ background: "rgba(45,122,82,0.05)", border: "1px solid rgba(45,122,82,0.10)" }}>
+                      style={{ background: "rgba(52,211,153,0.05)", border: "1px solid rgba(52,211,153,0.10)" }}>
                       {items.map(i => (
                         <div key={i.id} className="flex justify-between text-xs">
                           <span className="text-white/50 truncate">{i.emoji} {i.name} ×{i.qty}</span>
-                          <span className="font-semibold ml-3 flex-shrink-0" style={{ color: "#7db89a" }}>{fmt(i.price * i.qty)}</span>
+                          <span className="font-semibold ml-3 flex-shrink-0" style={{ color: "#6ee7b7" }}>{fmt(i.price * i.qty)}</span>
                         </div>
                       ))}
                       <div className="pt-1.5 flex justify-between font-bold text-sm" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                         <span className="text-white">Total</span>
-                        <span style={{ color: "#7db89a" }}>{fmt(total)}</span>
+                        <span style={{ color: "#6ee7b7" }}>{fmt(total)}</span>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Nom complet</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Nom complet</label>
                         <input style={inputCls} placeholder="Votre nom complet"
                           value={buyer.nom} onChange={e => setBuyer(b => ({ ...b, nom: e.target.value }))} />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(125,184,154,0.50)" }}>Adresse email</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(110,231,183,0.50)" }}>Adresse email</label>
                         <input style={inputCls} placeholder="email@exemple.com" type="email"
                           value={buyer.email} onChange={e => setBuyer(b => ({ ...b, email: e.target.value }))} />
                         <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.20)" }}>
@@ -365,7 +365,7 @@ export default function CheckoutModal() {
                       disabled={!buyerValid}
                       className="w-full py-3.5 rounded-xl font-bold text-sm mt-5 transition-all"
                       style={{
-                        background: buyerValid ? "linear-gradient(135deg,#2d7a52,#1a5e38)" : "rgba(255,255,255,0.06)",
+                        background: buyerValid ? "linear-gradient(135deg,#34d399,#10b981)" : "rgba(255,255,255,0.06)",
                         color: buyerValid ? "#000" : "rgba(255,255,255,0.25)",
                         cursor: buyerValid ? "pointer" : "not-allowed",
                       }}>
@@ -399,7 +399,7 @@ export default function CheckoutModal() {
                       ))}
                     </div>
                     <div className="flex items-center justify-center gap-1.5 mt-5">
-                      <Lock className="w-3 h-3" style={{ color: "rgba(45,122,82,0.40)" }} />
+                      <Lock className="w-3 h-3" style={{ color: "rgba(52,211,153,0.40)" }} />
                       <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.20)" }}>Paiement 100% sécurisé · SSL 256 bits · Données chiffrées</p>
                     </div>
                   </motion.div>
@@ -411,7 +411,7 @@ export default function CheckoutModal() {
                     <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                       <span className="text-xl">{METHODS.find(m => m.id === method)?.icon}</span>
                       <span className="text-white/50 text-sm">{METHODS.find(m => m.id === method)?.label}</span>
-                      <span className="ml-auto font-heading font-bold" style={{ color: "#7db89a" }}>{fmt(total)}</span>
+                      <span className="ml-auto font-heading font-bold" style={{ color: "#6ee7b7" }}>{fmt(total)}</span>
                     </div>
                     {method === "card"   && <CardForm onPay={handlePay} loading={loading} />}
                     {method === "paypal" && <PayPalForm onPay={handlePay} loading={loading} />}
@@ -425,7 +425,7 @@ export default function CheckoutModal() {
                           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                           onClick={handlePay}
                           className="w-full py-3.5 rounded-xl font-bold text-sm mt-4 flex items-center justify-center gap-2"
-                          style={{ background: "rgba(45,122,82,0.12)", color: "#7db89a", border: "1px solid rgba(45,122,82,0.25)" }}>
+                          style={{ background: "rgba(52,211,153,0.12)", color: "#6ee7b7", border: "1px solid rgba(52,211,153,0.25)" }}>
                           J'ai noté les coordonnées — Enregistrer ma commande ✓
                         </motion.button>
                       </>
@@ -447,11 +447,11 @@ export default function CheckoutModal() {
                       transition={{ delay: 0.2, type: "spring", stiffness: 180 }}
                       className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
                       style={{
-                        background: "radial-gradient(circle, rgba(45,122,82,0.22) 0%, rgba(45,122,82,0.04) 100%)",
-                        border: "2px solid rgba(45,122,82,0.40)",
-                        boxShadow: "0 0 40px rgba(45,122,82,0.20)",
+                        background: "radial-gradient(circle, rgba(52,211,153,0.22) 0%, rgba(52,211,153,0.04) 100%)",
+                        border: "2px solid rgba(52,211,153,0.40)",
+                        boxShadow: "0 0 40px rgba(52,211,153,0.20)",
                       }}>
-                      <CheckCircle className="w-10 h-10 text-primary" />
+                      <CheckCircle className="w-10 h-10 text-emerald-400" />
                     </motion.div>
                     <h3 className="font-heading text-white text-xl font-black mb-2">Merci, {buyer.nom.split(" ")[0]} !</h3>
                     <p className="text-white/45 text-sm mb-4">
@@ -460,9 +460,9 @@ export default function CheckoutModal() {
                         : "Votre commande a été traitée avec succès."}
                     </p>
                     <div className="inline-block px-4 py-2.5 rounded-xl mb-5"
-                      style={{ background: "rgba(45,122,82,0.07)", border: "1px solid rgba(45,122,82,0.18)" }}>
-                      <p className="text-[9px] uppercase tracking-widest mb-0.5" style={{ color: "rgba(125,184,154,0.45)" }}>Référence commande</p>
-                      <p className="font-mono font-bold text-sm" style={{ color: "#7db89a" }}>{orderRef}</p>
+                      style={{ background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.18)" }}>
+                      <p className="text-[9px] uppercase tracking-widest mb-0.5" style={{ color: "rgba(110,231,183,0.45)" }}>Référence commande</p>
+                      <p className="font-mono font-bold text-sm" style={{ color: "#6ee7b7" }}>{orderRef}</p>
                     </div>
                     {buyer.email && (
                       <p className="text-[11px] mb-6" style={{ color: "rgba(255,255,255,0.30)" }}>
@@ -473,7 +473,7 @@ export default function CheckoutModal() {
                       whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                       onClick={close}
                       className="px-8 py-3 rounded-xl font-bold text-sm"
-                      style={{ background: "linear-gradient(135deg,#2d7a52,#1a5e38)", color: "#000" }}>
+                      style={{ background: "linear-gradient(135deg,#34d399,#10b981)", color: "#000" }}>
                       Retour à la boutique
                     </motion.button>
                   </motion.div>

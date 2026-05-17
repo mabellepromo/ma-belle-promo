@@ -9,7 +9,7 @@ import { useProjets } from "../hooks/useProjets";
 const catLight = {
   "Solidarité":    "bg-rose-100 text-rose-700",
   "Éducation":     "bg-blue-100 text-blue-700",
-  "Santé publique":"bg-secondary text-primary",
+  "Santé publique":"bg-green-100 text-green-700",
 };
 const catAccent = {
   "Solidarité":    "#f43f5e",

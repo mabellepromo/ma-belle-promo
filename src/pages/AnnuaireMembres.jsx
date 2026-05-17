@@ -273,7 +273,7 @@ function MemberModal({ member, onClose, session, onEdit }) {
           </div>
           <div className="absolute bottom-4 left-5 right-5">
             <h3 className="font-heading text-xl font-bold text-white">{member.nom}</h3>
-            <p className="text-primary/70 text-sm font-semibold mt-0.5">{member.role}</p>
+            <p className="text-emerald-300 text-sm font-semibold mt-0.5">{member.role}</p>
           </div>
         </div>
 
@@ -679,7 +679,7 @@ function ValidationModal({ pending, onValidate, onReject, onClose }) {
                 <button onClick={() => onReject(m.id)} className="w-9 h-9 rounded-full bg-red-50 border border-red-200 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
-                <button onClick={() => onValidate(m)} className="w-9 h-9 rounded-full bg-muted border border text-primary flex items-center justify-center hover:bg-secondary transition-colors">
+                <button onClick={() => onValidate(m)} className="w-9 h-9 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
               </div>

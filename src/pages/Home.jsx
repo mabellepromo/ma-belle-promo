@@ -43,7 +43,7 @@ function ScrollToTop() {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Remonter en haut de la page"
       className="fixed bottom-6 right-4 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg md:hidden"
-      style={{ background: "rgba(45,122,82,0.85)", color: "#fff", backdropFilter: "blur(8px)" }}
+      style={{ background: "rgba(52,211,153,0.85)", color: "#fff", backdropFilter: "blur(8px)" }}
     >
       <ArrowUp className="w-4 h-4" />
     </button>
@@ -73,7 +73,7 @@ export default function Home() {
       </div>
       <MissionSection />
       {/* Filet de séparation entre les deux sections sombres */}
-      <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(45,122,82,0.18), rgba(251,191,36,0.12), transparent)" }} />
+      <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(52,211,153,0.18), rgba(251,191,36,0.12), transparent)" }} />
       <TestimonialsSection />
       <CredibiliteSection />
       <Fade from={dark} to={muted} />

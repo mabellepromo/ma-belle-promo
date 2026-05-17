@@ -27,7 +27,7 @@ export default function SplashScreen() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
             className="absolute w-64 h-64 rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(45,122,82,0.18) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)" }}
           />
 
           {/* Logo */}
@@ -38,7 +38,7 @@ export default function SplashScreen() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="relative w-20 h-20 rounded-full mb-6"
-            style={{ boxShadow: "0 0 50px rgba(45,122,82,0.35), 0 8px 32px rgba(0,0,0,0.6)" }}
+            style={{ boxShadow: "0 0 50px rgba(52,211,153,0.35), 0 8px 32px rgba(0,0,0,0.6)" }}
           />
 
           {/* Nom */}

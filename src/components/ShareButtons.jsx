@@ -56,7 +56,7 @@ export default function ShareButtons({ title, description = "", dark = false }) 
 
       <button onClick={handleCopy} className={btn} title="Copier le lien">
         {copied
-          ? <Check className="w-3.5 h-3.5 text-primary/70" />
+          ? <Check className="w-3.5 h-3.5 text-green-400" />
           : <Link2 className="w-3.5 h-3.5" />}
         {copied ? "Copié !" : "Lien"}
       </button>

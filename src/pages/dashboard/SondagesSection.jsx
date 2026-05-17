@@ -13,7 +13,7 @@ import {
 import { inp, Field } from "./shared";
 
 const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-blue-500", "bg-violet-500", "bg-rose-500", "bg-cyan-500"];
-const COLOR_HEX = ["#1a5e38", "#f59e0b", "#3b82f6", "#8b5cf6", "#f43f5e", "#06b6d4"];
+const COLOR_HEX = ["#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#f43f5e", "#06b6d4"];
 
 const Q_TYPES = [
   { value: "single",   label: "Choix unique" },

@@ -74,7 +74,7 @@ function DesktopDropdown({ item }) {
         className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
         style={{
           color: open ? "#ffffff" : "rgba(255,255,255,0.62)",
-          background: open ? "rgba(45,122,82,0.10)" : "transparent",
+          background: open ? "rgba(52,211,153,0.10)" : "transparent",
           letterSpacing: "0.10em",
         }}
       >
@@ -84,7 +84,7 @@ function DesktopDropdown({ item }) {
           style={{
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)",
-            color: open ? "#7db89a" : "inherit",
+            color: open ? "#6ee7b7" : "inherit",
           }}
         />
       </button>
@@ -106,25 +106,25 @@ function DesktopDropdown({ item }) {
               className="rounded-2xl overflow-hidden"
               style={{
                 background: "linear-gradient(170deg, rgba(12,34,20,0.98) 0%, rgba(7,20,12,0.99) 100%)",
-                border: "1px solid rgba(45,122,82,0.20)",
+                border: "1px solid rgba(52,211,153,0.20)",
               }}
             >
               {/* Ligne décorative parchemin en haut */}
               <div style={{
                 height: 2,
-                background: "linear-gradient(to right, transparent 0%, #2d7a52 25%, #fbbf24 60%, #2d7a52 85%, transparent 100%)",
+                background: "linear-gradient(to right, transparent 0%, #34d399 25%, #fbbf24 60%, #34d399 85%, transparent 100%)",
               }} />
 
               {/* Titre de catégorie */}
               <div className="px-6 pt-3 pb-1.5">
                 <span className="text-[10px] font-bold tracking-[0.18em] uppercase"
-                  style={{ color: "rgba(125,184,154,0.50)" }}>
+                  style={{ color: "rgba(110,231,183,0.50)" }}>
                   {item.label}
                 </span>
               </div>
 
               {/* Séparateur */}
-              <div className="mx-6 mb-1" style={{ height: "1px", background: "rgba(45,122,82,0.12)" }} />
+              <div className="mx-6 mb-1" style={{ height: "1px", background: "rgba(52,211,153,0.12)" }} />
 
               {/* Items en cascade */}
               <div className="py-1.5">
@@ -144,7 +144,7 @@ function DesktopDropdown({ item }) {
                         style={{ color: "rgba(255,255,255,0.65)" }}
                         onMouseEnter={e => {
                           e.currentTarget.style.color = "#ffffff";
-                          e.currentTarget.style.background = "rgba(45,122,82,0.09)";
+                          e.currentTarget.style.background = "rgba(52,211,153,0.09)";
                         }}
                         onMouseLeave={e => {
                           e.currentTarget.style.color = "rgba(255,255,255,0.65)";
@@ -154,9 +154,9 @@ function DesktopDropdown({ item }) {
                         {Icon && (
                           <div
                             className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{ background: "rgba(45,122,82,0.08)" }}
+                            style={{ background: "rgba(52,211,153,0.08)" }}
                           >
-                            <Icon className="w-3.5 h-3.5" style={{ color: "rgba(45,122,82,0.65)" }} />
+                            <Icon className="w-3.5 h-3.5" style={{ color: "rgba(52,211,153,0.65)" }} />
                           </div>
                         )}
                         <div className="flex flex-col min-w-0">
@@ -256,7 +256,7 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: scrolled ? "rgba(29,83,58,0.97)" : "var(--brand-dark-mid)",
+        background: scrolled ? "rgba(5,18,11,0.92)" : "var(--brand-dark-mid)",
         backdropFilter: scrolled ? "blur(16px)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
         boxShadow: scrolled ? "0 2px 32px rgba(0,0,0,0.40)" : "none",
@@ -267,16 +267,16 @@ export default function Navbar() {
       className="navbar-safe-area fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     >
       {/* Ligne d'accent supérieure */}
-      <div className="h-px" style={{ background: "linear-gradient(to right, transparent, #2d7a52 15%, #fde047 50%, #1a5e38 85%, transparent)" }} />
+      <div className="h-px" style={{ background: "linear-gradient(to right, transparent, #34d399 15%, #fde047 50%, #10b981 85%, transparent)" }} />
 
       {/* Barre de progression scroll */}
       <div style={{ height: 2, background: "rgba(255,255,255,0.04)", position: "relative", overflow: "hidden" }}>
         <div style={{
           position: "absolute", top: 0, left: 0, height: "100%",
           width: `${progress * 100}%`,
-          background: "linear-gradient(to right, #2d7a52, #fbbf24)",
+          background: "linear-gradient(to right, #34d399, #fbbf24)",
           transition: "width 0.1s linear",
-          boxShadow: progress > 0 ? "0 0 8px rgba(45,122,82,0.60)" : "none",
+          boxShadow: progress > 0 ? "0 0 8px rgba(52,211,153,0.60)" : "none",
         }} />
       </div>
 
@@ -304,7 +304,7 @@ export default function Navbar() {
               to="/"
               className="flex items-center px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200"
               style={{ color: "rgba(255,255,255,0.62)" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(45,122,82,0.10)"; }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
             >
               Accueil
@@ -353,7 +353,7 @@ export default function Navbar() {
                 to="/boutique"
                 className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
                 style={{ color: "rgba(255,255,255,0.62)" }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(45,122,82,0.10)"; }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
               >
                 <ShoppingBag className="w-3 h-3" />
@@ -364,7 +364,7 @@ export default function Navbar() {
               to="/informations/contacts"
               className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold tracking-[0.10em] uppercase rounded-lg transition-all duration-200 whitespace-nowrap"
               style={{ color: "rgba(255,255,255,0.62)" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(45,122,82,0.10)"; }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(52,211,153,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.62)"; e.currentTarget.style.background = "transparent"; }}
             >
               <Mail className="w-3 h-3" />
@@ -383,12 +383,12 @@ export default function Navbar() {
                 onClick={() => cart?.setIsCartOpen(true)}
                 title="Mon panier"
                 className="relative ml-1 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-all duration-200 flex-shrink-0"
-                style={{ border: "1px solid rgba(255,255,255,0.14)", color: cartCount > 0 ? "#7db89a" : "rgba(255,255,255,0.45)" }}
+                style={{ border: "1px solid rgba(255,255,255,0.14)", color: cartCount > 0 ? "#6ee7b7" : "rgba(255,255,255,0.45)" }}
               >
                 <ShoppingCart className="w-4 h-4" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black"
-                    style={{ background: "#2d7a52", color: "#000" }}>
+                    style={{ background: "#34d399", color: "#000" }}>
                     {cartCount}
                   </span>
                 )}

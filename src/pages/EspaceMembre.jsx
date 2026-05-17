@@ -19,7 +19,7 @@ import PaymentModal from "../components/PaymentModal";
 const MONTANT_COTISATION = 30000; // FCFA — montant annuel attendu
 
 const STATUT_CONFIG = {
-  "payé":       { label: "Payé",       color: "bg-secondary text-primary", icon: CheckCircle, iconColor: "text-primary" },
+  "payé":       { label: "Payé",       color: "bg-emerald-100 text-emerald-700", icon: CheckCircle, iconColor: "text-emerald-600" },
   "partiel":    { label: "Partiel",    color: "bg-blue-100 text-blue-700",       icon: CreditCard,  iconColor: "text-blue-600"    },
   "en_attente": { label: "En attente", color: "bg-amber-100 text-amber-700",     icon: AlertCircle, iconColor: "text-amber-600"   },
   "exempté":    { label: "Exempté",    color: "bg-slate-100 text-slate-600",     icon: ShieldCheck, iconColor: "text-slate-500"   },
@@ -524,7 +524,7 @@ export default function EspaceMembre() {
                                     <> · Reste : <span className="font-semibold text-amber-600">{reste.toLocaleString("fr-FR")} FCFA</span></>
                                   )}
                                   {reste === 0 && verse > 0 && (
-                                    <> · <span className="font-semibold text-primary">Complet ✓</span></>
+                                    <> · <span className="font-semibold text-emerald-600">Complet ✓</span></>
                                   )}
                                 </>
                               )}
@@ -624,7 +624,7 @@ export default function EspaceMembre() {
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <h3 className="font-heading font-bold text-foreground">{e.titre}</h3>
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                        e.statut === "À venir" ? "bg-secondary text-primary" : "bg-blue-100 text-blue-700"
+                        e.statut === "À venir" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
                       }`}>{e.statut}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -632,7 +632,7 @@ export default function EspaceMembre() {
                     </p>
                     <div className="mt-4 flex items-center justify-between gap-3">
                       {isReg ? (
-                        <span className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-muted border border px-3 py-1.5 rounded-full">
+                        <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
                           <CalendarCheck className="w-3.5 h-3.5" /> Inscrit(e)
                         </span>
                       ) : <span />}
@@ -678,11 +678,11 @@ export default function EspaceMembre() {
                       {el.description && <p className="text-xs text-muted-foreground mt-0.5">{el.description}</p>}
                       {el.date_fin && <p className="text-xs text-muted-foreground mt-0.5">Clôture : {new Date(el.date_fin).toLocaleDateString("fr-FR")}</p>}
                     </div>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary text-primary flex-shrink-0">Ouverte</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex-shrink-0">Ouverte</span>
                   </div>
 
                   {myVote && (
-                    <div className="mx-5 mt-4 flex items-center gap-2 bg-muted border border rounded-xl px-4 py-2.5 text-sm text-primary">
+                    <div className="mx-5 mt-4 flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5 text-sm text-emerald-700">
                       <CheckCircle className="w-4 h-4 flex-shrink-0" /> Vote enregistré — merci pour votre participation.
                     </div>
                   )}
@@ -844,7 +844,7 @@ export default function EspaceMembre() {
                       <Trash2 className="w-4 h-4" /> Demander la suppression
                     </button>
                   ) : (
-                    <p className="text-sm font-medium text-primary">✓ Demande envoyée. Redirection…</p>
+                    <p className="text-sm font-medium text-green-600">✓ Demande envoyée. Redirection…</p>
                   )}
                 </div>
               </div>

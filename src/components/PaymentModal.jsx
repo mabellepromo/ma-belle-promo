@@ -175,8 +175,8 @@ export default function PaymentModal({ open, onClose, type = "don", user = null 
                 whileHover={{ scale: loading ? 1 : 1.02 }} whileTap={{ scale: loading ? 1 : 0.98 }}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white transition-all"
                 style={{
-                  background: loading ? "rgba(26,94,56,0.5)" : "linear-gradient(135deg,#1a5e38,#2d7a52)",
-                  boxShadow: loading ? "none" : "0 8px 24px rgba(26,94,56,0.3)",
+                  background: loading ? "rgba(16,185,129,0.5)" : "linear-gradient(135deg,#10b981,#34d399)",
+                  boxShadow: loading ? "none" : "0 8px 24px rgba(16,185,129,0.3)",
                 }}>
                 {loading
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Préparation…</>

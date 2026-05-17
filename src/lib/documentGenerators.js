@@ -1331,7 +1331,7 @@ export function genererRapportTresorerie(annee, transactions, budget = []) {
           <div class="val" style="color:#dc2626;">${fmt(totalDep)}</div>
           <div class="lbl">Total Dépenses</div>
         </div>
-        <div class="stat-card" style="background:${solde >= 0 ? "#d1fae5" : "#fee2e2"};border-color:${solde >= 0 ? "#7db89a" : "#fca5a5"};">
+        <div class="stat-card" style="background:${solde >= 0 ? "#d1fae5" : "#fee2e2"};border-color:${solde >= 0 ? "#6ee7b7" : "#fca5a5"};">
           <div class="val" style="color:${solde >= 0 ? "#065f46" : "#b91c1c"};">${solde >= 0 ? "+" : "−"}${fmt(solde)}</div>
           <div class="lbl">Solde ${solde >= 0 ? "(Excédent)" : "(Déficit)"}</div>
         </div>

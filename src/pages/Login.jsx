@@ -83,7 +83,7 @@ export default function Login() {
           style={{
             position: "absolute", top: "10%", left: "5%",
             width: 600, height: 600, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(45,122,82,0.12) 0%, transparent 65%)",
+            background: "radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 65%)",
           }}
         />
         <motion.div
@@ -92,7 +92,7 @@ export default function Login() {
           style={{
             position: "absolute", bottom: "10%", right: "5%",
             width: 400, height: 400, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(26,94,56,0.10) 0%, transparent 65%)",
+            background: "radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)",
           }}
         />
       </div>
@@ -125,7 +125,7 @@ export default function Login() {
           style={{
             background: "rgba(5, 20, 10, 0.75)",
             backdropFilter: "blur(20px)",
-            boxShadow: "0 25px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,122,82,0.08)",
+            boxShadow: "0 25px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(52,211,153,0.08)",
           }}
         >
           <div className="p-5 sm:p-8">
@@ -167,7 +167,7 @@ export default function Login() {
                     </AnimatePresence>
                     <motion.button type="submit" disabled={loading} whileHover={{ scale: loading ? 1 : 1.02 }} whileTap={{ scale: loading ? 1 : 0.98 }}
                       className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all"
-                      style={{ background: loading ? "rgba(45,122,82,0.4)" : "linear-gradient(135deg,#1a5e38,#2d7a52)", color: "white", boxShadow: loading ? "none" : "0 8px 30px rgba(45,122,82,0.3)" }}>
+                      style={{ background: loading ? "rgba(52,211,153,0.4)" : "linear-gradient(135deg,#10b981,#34d399)", color: "white", boxShadow: loading ? "none" : "0 8px 30px rgba(52,211,153,0.3)" }}>
                       {loading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <><Send className="w-4 h-4" /> Envoyer le lien</>}
                     </motion.button>
                   </form>
@@ -246,10 +246,10 @@ export default function Login() {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all"
                 style={{
                   background: loading
-                    ? "rgba(45,122,82,0.4)"
-                    : "linear-gradient(135deg, #1a5e38, #2d7a52)",
+                    ? "rgba(52,211,153,0.4)"
+                    : "linear-gradient(135deg, #10b981, #34d399)",
                   color: "white",
-                  boxShadow: loading ? "none" : "0 8px 30px rgba(45,122,82,0.3)",
+                  boxShadow: loading ? "none" : "0 8px 30px rgba(52,211,153,0.3)",
                 }}
               >
                 {loading ? (

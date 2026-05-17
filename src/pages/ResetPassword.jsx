@@ -144,9 +144,9 @@ export default function ResetPassword() {
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all"
               style={{
-                background: loading ? "rgba(45,122,82,0.4)" : "linear-gradient(135deg,#1a5e38,#2d7a52)",
+                background: loading ? "rgba(52,211,153,0.4)" : "linear-gradient(135deg,#10b981,#34d399)",
                 color: "white",
-                boxShadow: loading ? "none" : "0 8px 30px rgba(45,122,82,0.3)",
+                boxShadow: loading ? "none" : "0 8px 30px rgba(52,211,153,0.3)",
               }}
             >
               {loading

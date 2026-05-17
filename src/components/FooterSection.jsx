@@ -45,7 +45,7 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="bg-[var(--brand-dark)] text-background footer-safe-area">
+    <footer className="bg-foreground text-background footer-safe-area">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-6 py-5">
@@ -61,7 +61,7 @@ export default function FooterSection() {
                 src="/Logo Redesign1.webp"
                 alt="Logo Ma Belle Promo"
                 className="w-10 h-10 rounded-full opacity-90 flex-shrink-0"
-                style={{ boxShadow: "0 0 16px rgba(45,122,82,0.20)" }}
+                style={{ boxShadow: "0 0 16px rgba(52,211,153,0.20)" }}
               />
               <div>
                 <div className="font-heading text-sm font-bold text-background leading-tight">Ma Belle Promo</div>

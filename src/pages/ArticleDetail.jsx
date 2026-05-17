@@ -106,8 +106,8 @@ export default function ArticleDetail() {
 
             {/* ── Bloc titre avec effet pages feuilletées ── */}
             <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-primary/40 translate-x-3 translate-y-3" />
-              <div className="absolute inset-0 rounded-2xl bg-primary/30 translate-x-1.5 translate-y-1.5" />
+              <div className="absolute inset-0 rounded-2xl bg-emerald-700/40 translate-x-3 translate-y-3" />
+              <div className="absolute inset-0 rounded-2xl bg-emerald-600/30 translate-x-1.5 translate-y-1.5" />
               <div className="relative bg-card rounded-2xl border border-border px-7 py-8 shadow-2xl">
                 <Link
                   to="/informations/actualites"

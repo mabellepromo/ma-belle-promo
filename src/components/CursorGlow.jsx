@@ -59,7 +59,7 @@ export default function CursorGlow() {
           width: hovered ? 8 : 5,
           height: hovered ? 8 : 5,
           borderRadius: "50%",
-          background: hovered ? "#fbbf24" : "#2d7a52",
+          background: hovered ? "#fbbf24" : "#34d399",
           transition: "width 0.2s, height 0.2s, background 0.2s",
           mixBlendMode: "screen",
         }}
@@ -73,7 +73,7 @@ export default function CursorGlow() {
           width: hovered ? 44 : 28,
           height: hovered ? 44 : 28,
           borderRadius: "50%",
-          border: hovered ? "1.5px solid rgba(251,191,36,0.60)" : "1.5px solid rgba(45,122,82,0.40)",
+          border: hovered ? "1.5px solid rgba(251,191,36,0.60)" : "1.5px solid rgba(52,211,153,0.40)",
           transition: "width 0.25s ease, height 0.25s ease, border-color 0.2s",
           backdropFilter: "none",
         }}

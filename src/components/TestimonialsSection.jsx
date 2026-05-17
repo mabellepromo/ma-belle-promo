@@ -77,7 +77,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           className="text-center text-[10px] font-bold uppercase tracking-[0.22em] mb-6"
-          style={{ color: "rgba(45,122,82,0.55)" }}
+          style={{ color: "rgba(52,211,153,0.55)" }}
         >
           Leurs témoignages
         </motion.p>
@@ -94,7 +94,7 @@ export default function TestimonialsSection() {
           >
             {/* Photo */}
             <div className="w-20 h-20 rounded-full flex-shrink-0 overflow-hidden border border-accent/30"
-              style={{ background: "rgba(45,122,82,0.10)" }}>
+              style={{ background: "rgba(52,211,153,0.10)" }}>
               {t.photo
                 ? <img loading="lazy" src={t.photo} alt={t.name} className="w-full h-full object-cover" style={{ objectPosition: t.photoPosition || "top" }} />
                 : <span className="w-full h-full flex items-center justify-center font-heading text-xl font-bold text-accent">{t.name.charAt(0)}</span>

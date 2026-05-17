@@ -136,7 +136,7 @@ export default function HeroSection() {
       ref={ref}
       id="hero"
       className="relative flex-1 flex flex-col overflow-hidden"
-      style={{ background: "linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-dark-light) 40%, var(--brand-dark-mid) 70%, hsl(152,48%,20%) 100%)" }}
+      style={{ background: "linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-dark-light) 40%, var(--brand-dark-mid) 70%, hsl(150,28%,6%) 100%)" }}
     >
       {/* Image fond subtile */}
       <motion.div style={{ y: bgY }} className="absolute inset-0">
@@ -151,7 +151,7 @@ export default function HeroSection() {
           onError={(e) => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(150deg, hsla(152,48%,22%,0.85) 0%, hsla(152,48%,26%,0.60) 50%, hsla(152,48%,20%,0.88) 100%)",
+          background: "linear-gradient(150deg, hsla(150,30%,7%,0.88) 0%, hsla(150,32%,12%,0.70) 50%, hsla(150,28%,6%,0.90) 100%)",
         }} />
       </motion.div>
 
@@ -163,7 +163,7 @@ export default function HeroSection() {
           style={{
             position: "absolute", top: "10%", left: "5%",
             width: 600, height: 600, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(45,122,82,0.10) 0%, transparent 65%)",
+            background: "radial-gradient(circle, rgba(52,211,153,0.10) 0%, transparent 65%)",
           }}
         />
         <motion.div
@@ -179,7 +179,7 @@ export default function HeroSection() {
 
       {/* Grille déco */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: "linear-gradient(rgba(45,122,82,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(45,122,82,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(rgba(52,211,153,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(52,211,153,0.03) 1px, transparent 1px)",
         backgroundSize: "70px 70px",
       }} />
 
@@ -270,13 +270,13 @@ export default function HeroSection() {
             <div className="lg:hidden w-full flex items-center gap-3 rounded-2xl px-4 py-3"
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
               <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
-                style={{ border: "2px solid rgba(45,122,82,0.50)", boxShadow: "0 0 12px rgba(45,122,82,0.20)" }}>
+                style={{ border: "2px solid rgba(52,211,153,0.50)", boxShadow: "0 0 12px rgba(52,211,153,0.20)" }}>
                 <img src="/images/membres/fabienne.webp" alt="Fabienne SENAYA-ATAYI"
                   className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-heading text-sm font-bold leading-tight truncate">Fabienne SENAYA-ATAYI</p>
-                <p className="text-xs mt-0.5" style={{ color: "#7db89a" }}>Présidente · Ma Belle Promo</p>
+                <p className="text-xs mt-0.5" style={{ color: "#6ee7b7" }}>Présidente · Ma Belle Promo</p>
               </div>
             </div>
           </motion.div>
@@ -300,7 +300,7 @@ export default function HeroSection() {
               <motion.span
                 className="block"
                 style={{
-                  background: "linear-gradient(90deg, #2d7a52, #7db89a, #fbbf24)",
+                  background: "linear-gradient(90deg, #34d399, #6ee7b7, #fbbf24)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -315,20 +315,20 @@ export default function HeroSection() {
             {/* Citation présidente */}
             <motion.div
               className="relative mb-8 pl-5"
-              style={{ borderLeft: "2px solid rgba(45,122,82,0.45)" }}
+              style={{ borderLeft: "2px solid rgba(52,211,153,0.45)" }}
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.58, ease: "easeOut" }}
             >
-              <span className="block text-4xl font-serif leading-none mb-2" style={{ color: "#7db89a", opacity: 0.6 }}>"</span>
+              <span className="block text-4xl font-serif leading-none mb-2" style={{ color: "#6ee7b7", opacity: 0.6 }}>"</span>
               <blockquote className="font-heading text-lg md:text-xl leading-relaxed font-semibold mb-4"
                 style={{ color: "rgba(255,255,255,0.88)" }}>
                 Chaque membre de Ma Belle Promo porte la conviction que le droit et la solidarité sont les piliers d'une société plus juste et ambitieuse.
               </blockquote>
               <div className="flex items-center gap-3">
-                <div className="w-6 h-px" style={{ background: "#2d7a52" }} />
+                <div className="w-6 h-px" style={{ background: "#34d399" }} />
                 <div>
-                  <p className="text-sm font-bold" style={{ color: "#7db89a" }}>Fabienne SENAYA-ATAYI</p>
+                  <p className="text-sm font-bold" style={{ color: "#6ee7b7" }}>Fabienne SENAYA-ATAYI</p>
                   <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Présidente de Ma Belle Promo</p>
                 </div>
               </div>
@@ -348,10 +348,10 @@ export default function HeroSection() {
                 className="group flex items-center gap-2 justify-center font-bold text-base rounded-full"
                 style={{
                   padding: "14px 28px",
-                  background: "linear-gradient(135deg, rgba(45,122,82,0.30), rgba(45,122,82,0.18))",
-                  border: "1.5px solid rgba(45,122,82,0.55)",
-                  color: "#7db89a",
-                  boxShadow: "0 4px 20px rgba(45,122,82,0.15)",
+                  background: "linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.18))",
+                  border: "1.5px solid rgba(52,211,153,0.55)",
+                  color: "#6ee7b7",
+                  boxShadow: "0 4px 20px rgba(52,211,153,0.15)",
                 }}
               >
                 Notre mission <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -380,7 +380,7 @@ export default function HeroSection() {
           >
             {/* Cadres décalés */}
             <div className="absolute top-8 right-3 left-3 bottom-0 rounded-3xl"
-              style={{ background: "rgba(45,122,82,0.10)", border: "1px solid rgba(45,122,82,0.18)" }} />
+              style={{ background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.18)" }} />
             <div className="absolute -top-1 right-0 left-6 bottom-4 rounded-3xl"
               style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }} />
 
@@ -398,7 +398,7 @@ export default function HeroSection() {
               <div className="absolute bottom-4 left-4 right-4 rounded-xl px-4 py-3"
                 style={{ background: "rgba(0,0,0,0.22)", backdropFilter: "blur(14px)", border: "1px solid rgba(255,255,255,0.15)" }}>
                 <p className="text-white font-heading text-sm font-bold leading-tight">Fabienne SENAYA-ATAYI</p>
-                <p className="text-xs mt-0.5" style={{ color: "#7db89a" }}>Présidente · Ma Belle Promo</p>
+                <p className="text-xs mt-0.5" style={{ color: "#6ee7b7" }}>Présidente · Ma Belle Promo</p>
               </div>
             </div>
 
@@ -408,7 +408,7 @@ export default function HeroSection() {
               transition={shouldReduce ? {} : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -top-3 -right-4 z-20 rounded-2xl px-3 py-2.5 flex items-center gap-2.5"
               style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.16)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" }}>
-              <Scale className="w-5 h-5 text-primary/70" />
+              <Scale className="w-5 h-5 text-emerald-300" />
               <div>
                 <p className="text-xs font-bold text-white">Ma Belle Promo</p>
                 <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>Fondée en 2018</p>
@@ -430,7 +430,7 @@ export default function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:block"
-        style={{ color: "rgba(45,122,82,0.35)" }}
+        style={{ color: "rgba(52,211,153,0.35)" }}
       >
         <motion.div animate={{ y: [0, 9, 0] }} transition={{ duration: 2.2, repeat: Infinity }}>
           <ArrowDown className="w-5 h-5" />

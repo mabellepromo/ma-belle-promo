@@ -22,10 +22,10 @@ export default function ScrollToTop() {
           transition={{ duration: 0.2 }}
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-opacity hover:opacity-80"
-          style={{ background: "var(--brand-dark-mid)", border: "1px solid rgba(45,122,82,0.30)" }}
+          style={{ background: "var(--brand-dark-mid)", border: "1px solid rgba(52,211,153,0.30)" }}
           aria-label="Retour en haut"
         >
-          <ArrowUp className="w-4 h-4 text-primary" />
+          <ArrowUp className="w-4 h-4 text-emerald-400" />
         </motion.button>
       )}
     </AnimatePresence>
