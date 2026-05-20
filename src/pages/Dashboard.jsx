@@ -534,7 +534,7 @@ export default function Dashboard() {
       )}
 
       {/* ── SIDEBAR ── */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-60 flex flex-col bg-card border-r border-border transition-transform duration-200 md:relative md:translate-x-0 md:flex md:flex-shrink-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 w-60 flex flex-col bg-card border-r border-border transition-transform duration-200 md:static md:translate-x-0 md:flex md:flex-shrink-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
 
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
@@ -629,8 +629,8 @@ export default function Dashboard() {
         {/* Topbar */}
         <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 md:px-8 bg-card border-b border-border">
           <div className="flex items-center gap-3">
-            <button className="md:hidden p-1.5 rounded-lg hover:bg-muted/40 text-muted-foreground" onClick={() => setSidebarOpen(v => !v)}>
-              <Menu className="w-4 h-4" />
+            <button className="md:hidden p-2 rounded-lg hover:bg-muted/40 text-foreground" onClick={() => setSidebarOpen(v => !v)}>
+              <Menu className="w-5 h-5" />
             </button>
             <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10">
               <CurrentIcon className="w-3.5 h-3.5 text-primary" />

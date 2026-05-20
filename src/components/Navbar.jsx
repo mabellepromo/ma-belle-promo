@@ -457,7 +457,8 @@ export default function Navbar() {
           )}
           <button
             onClick={() => setOpen(!open)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/80"
+            className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+            style={{ color: "rgba(255,255,255,0.90)", border: "1px solid rgba(255,255,255,0.22)" }}
           >
             <AnimatePresence mode="wait">
               {open ? (
