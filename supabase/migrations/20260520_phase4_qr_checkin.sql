@@ -4,10 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS evenement_presences (
   id             uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
-  evenement_id   uuid        NOT NULL REFERENCES evenements(id) ON DELETE CASCADE,
+  evenement_id   text        NOT NULL REFERENCES evenements(id) ON DELETE CASCADE,
   nom            text        NOT NULL,
   email          text,
-  membre_id      uuid        REFERENCES members(id) ON DELETE SET NULL,
+  membre_id      text        REFERENCES members(id) ON DELETE SET NULL,
   checked_in_at  timestamptz DEFAULT now(),
   methode        text        DEFAULT 'qr',
   notes          text,
