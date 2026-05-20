@@ -506,7 +506,7 @@ export default function Dashboard() {
         {/* Navigation */}
         <nav
           ref={sidebarNavRef}
-          className="overflow-y-auto px-2 pb-4 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+          className="overflow-y-auto px-2 pb-4"
           style={{ maxHeight: "calc(100vh - 195px)" }}>
           {NAV_GROUPS.map((group, gi) => {
             const groupColors = [null, "text-blue-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
