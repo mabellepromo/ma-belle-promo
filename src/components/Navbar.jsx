@@ -256,10 +256,12 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: scrolled ? "rgba(5,18,11,0.92)" : "var(--brand-dark-mid)",
-        backdropFilter: scrolled ? "blur(16px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
-        boxShadow: scrolled ? "0 2px 32px rgba(0,0,0,0.40)" : "none",
+        background: "rgba(5,18,11,0.92)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: scrolled
+          ? "0 2px 32px rgba(0,0,0,0.50)"
+          : "0 2px 0 rgba(52,211,153,0.45), 0 4px 24px rgba(0,0,0,0.55)",
         paddingTop: "env(safe-area-inset-top, 0px)",
         paddingLeft: "env(safe-area-inset-left, 0px)",
         paddingRight: "env(safe-area-inset-right, 0px)",
@@ -458,7 +460,7 @@ export default function Navbar() {
           <button
             onClick={() => setOpen(!open)}
             className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-            style={{ color: "rgba(255,255,255,0.90)", border: "1px solid rgba(255,255,255,0.22)" }}
+            style={{ color: "#ffffff", border: "1px solid rgba(255,255,255,0.45)" }}
           >
             <AnimatePresence mode="wait">
               {open ? (

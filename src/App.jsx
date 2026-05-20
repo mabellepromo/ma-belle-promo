@@ -3,7 +3,6 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 import { useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -150,13 +149,6 @@ const AuthenticatedApp = () => {
     };
   }, [location.pathname]);
 
-  const hideNav = location.pathname.startsWith('/dashboard')
-    || location.pathname === '/login'
-    || location.pathname === '/reset-password'
-    || location.pathname === '/verifier'
-    || location.pathname.startsWith('/sondage/')
-    || location.pathname.startsWith('/checkin/');
-
   return (
     <>
     <PageTitleUpdater />
@@ -164,15 +156,14 @@ const AuthenticatedApp = () => {
     <ScrollToTop />
     <CartSidebar />
     <CheckoutModal />
-    {!hideNav && <Navbar />}
     <div style={{ position: "relative" }}>
     <AnimatePresence mode="wait" initial={false}>
     <motion.div
       key={location.key}
-      initial={{ opacity: 0, y: 28, scale: 0.99 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -14, scale: 1.005 }}
-      transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: "easeInOut" }}
     >
     <Suspense fallback={<PageLoader />}>
     <ErrorBoundary key={location.pathname}>

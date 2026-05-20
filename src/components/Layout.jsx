@@ -1,9 +1,11 @@
 import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
 import FooterSection from "./FooterSection";
 
 export default function Layout() {
   return (
     <div className="flex flex-col" style={{ minHeight: "100dvh" }}>
+      <Navbar />
       {/* Logo tampon fixe en filigrane sur toutes les pages */}
       <div className="fixed inset-0 overflow-hidden flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
         <img
