@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Plus, Trash2, Download, TrendingUp, TrendingDown, Wallet,
-  X, Loader2, RefreshCw, Lock, FileText, Target, BarChart2
+  X, Loader2, RefreshCw, Lock, FileText, Target, BarChart2, Receipt
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { genererRapportTresorerie } from "@/lib/documentGenerators";
@@ -26,6 +26,18 @@ const CAT_COLORS = {
 };
 
 const fmt = n => new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 0 }).format(Math.abs(n)) + " FCFA";
+
+const REMBOURS_CFG = {
+  en_attente: { label: "En attente",  cls: "bg-amber-500/15 text-amber-400"     },
+  approuvé:   { label: "Approuvé",    cls: "bg-blue-500/15 text-blue-400"       },
+  remboursé:  { label: "Remboursé",   cls: "bg-emerald-500/15 text-emerald-400" },
+  rejeté:     { label: "Rejeté",      cls: "bg-red-500/15 text-red-400"         },
+};
+
+const emptyRembForm = {
+  demandeur: "", motif: "", montant: "",
+  date_demande: new Date().toISOString().slice(0, 10), notes: "",
+};
 
 function StatCard({ label, value, icon: Icon, color, sub }) {
   return (
@@ -597,6 +609,223 @@ function RapportTab({ year }) {
   );
 }
 
+// ── Tab Remboursements de frais ──────────────────────────────────────────────
+function RemboursementsTab({ year }) {
+  const [rembs, setRembs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("tresorerie_remboursements")
+      .select("*")
+      .eq("annee", year)
+      .order("date_demande", { ascending: false });
+    setRembs(data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => { load(); }, [year]);
+
+  const stats = useMemo(() => {
+    const attente   = rembs.filter(r => r.statut === "en_attente").reduce((s, r) => s + Number(r.montant), 0);
+    const rembourse = rembs.filter(r => r.statut === "remboursé").reduce((s, r) => s + Number(r.montant), 0);
+    return { attente, rembourse };
+  }, [rembs]);
+
+  async function handleSave() {
+    if (!form.demandeur.trim()) { toast.error("Le demandeur est obligatoire."); return; }
+    if (!form.motif.trim())     { toast.error("Le motif est obligatoire."); return; }
+    if (!form.montant || Number(form.montant) <= 0) { toast.error("Montant invalide."); return; }
+    setSaving(true);
+    const { error } = await supabase.from("tresorerie_remboursements").insert({
+      annee: year,
+      demandeur: form.demandeur.trim(),
+      motif: form.motif.trim(),
+      montant: Number(form.montant),
+      date_demande: form.date_demande,
+      notes: form.notes?.trim() || null,
+    });
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success("Demande enregistrée.");
+    setForm(null);
+    load();
+  }
+
+  async function advanceStatut(remb, newStatut) {
+    if (newStatut === "remboursé") {
+      const { data: txData, error: txErr } = await supabase
+        .from("tresorerie_transactions")
+        .insert({
+          type: "depense",
+          categorie: "Administration",
+          libelle: `Remboursement — ${remb.demandeur}`,
+          montant: remb.montant,
+          date: new Date().toISOString().slice(0, 10),
+          annee: year,
+          description: remb.motif,
+        })
+        .select()
+        .single();
+      if (txErr) { toast.error("Erreur création transaction : " + txErr.message); return; }
+      await supabase.from("tresorerie_remboursements").update({
+        statut: "remboursé",
+        date_traitement: new Date().toISOString().slice(0, 10),
+        transaction_id: txData.id,
+      }).eq("id", remb.id);
+      toast.success("Remboursement effectué — transaction dépense créée automatiquement.");
+    } else {
+      await supabase.from("tresorerie_remboursements").update({
+        statut: newStatut,
+        date_traitement: newStatut !== "en_attente" ? new Date().toISOString().slice(0, 10) : null,
+      }).eq("id", remb.id);
+      toast.success(`Statut mis à jour : ${REMBOURS_CFG[newStatut].label}.`);
+    }
+    load();
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Supprimer cette demande ?")) return;
+    await supabase.from("tresorerie_remboursements").delete().eq("id", id);
+    toast.success("Demande supprimée.");
+    load();
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Toolbar */}
+      <div className="flex justify-end">
+        <button onClick={() => setForm({ ...emptyRembForm })}
+          className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+          <Plus className="w-4 h-4" /> Nouvelle demande
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <StatCard label="En attente d'approbation" value={stats.attente} icon={Receipt}
+          color="bg-amber-500/15 text-amber-400"
+          sub={`${rembs.filter(r => r.statut === "en_attente").length} demande(s)`} />
+        <StatCard label="Remboursé cette année" value={stats.rembourse} icon={RefreshCw}
+          color="bg-emerald-500/15 text-emerald-400"
+          sub={`${rembs.filter(r => r.statut === "remboursé").length} opération(s)`} />
+      </div>
+
+      {/* Formulaire */}
+      {form && (
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <p className="font-semibold text-foreground text-sm">Nouvelle demande de remboursement</p>
+            <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-5 grid md:grid-cols-2 gap-4">
+            <Field label="Demandeur *">
+              <input className={inp} value={form.demandeur}
+                onChange={e => setForm(p => ({ ...p, demandeur: e.target.value }))} placeholder="Nom du demandeur" />
+            </Field>
+            <Field label="Montant (FCFA) *">
+              <input className={inp} type="number" min="1" value={form.montant}
+                onChange={e => setForm(p => ({ ...p, montant: e.target.value }))} placeholder="0" />
+            </Field>
+            <div className="md:col-span-2">
+              <Field label="Motif *">
+                <input className={inp} value={form.motif}
+                  onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} placeholder="Objet du remboursement" />
+              </Field>
+            </div>
+            <Field label="Date de demande">
+              <input className={inp} type="date" value={form.date_demande}
+                onChange={e => setForm(p => ({ ...p, date_demande: e.target.value }))} />
+            </Field>
+            <Field label="Notes (optionnel)">
+              <input className={inp} value={form.notes}
+                onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Détails supplémentaires…" />
+            </Field>
+          </div>
+          <div className="flex justify-end gap-2 px-5 pb-5">
+            <button onClick={() => setForm(null)} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
+            <button onClick={handleSave} disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Enregistrer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Liste */}
+      {loading ? (
+        <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
+      ) : rembs.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">
+          <Receipt className="w-10 h-10 mx-auto mb-3 opacity-25" />
+          <p className="font-medium">Aucune demande de remboursement pour {year}.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {rembs.map(r => {
+            const cfg = REMBOURS_CFG[r.statut] || REMBOURS_CFG.en_attente;
+            return (
+              <div key={r.id} className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-foreground text-sm">{r.demandeur}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>
+                      {r.transaction_id && (
+                        <span className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
+                          <RefreshCw className="w-2.5 h-2.5" /> Transaction dépense créée
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">{r.motif}</p>
+                    {r.notes && <p className="text-xs text-muted-foreground mt-0.5 italic">{r.notes}</p>}
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                      <span>Demandé le {new Date(r.date_demande).toLocaleDateString("fr-FR")}</span>
+                      {r.date_traitement && <span>· Traité le {new Date(r.date_traitement).toLocaleDateString("fr-FR")}</span>}
+                    </div>
+                  </div>
+                  <p className="font-bold text-foreground text-sm flex-shrink-0">{fmt(r.montant)}</p>
+                </div>
+
+                {/* Actions workflow */}
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+                  {r.statut === "en_attente" && (
+                    <>
+                      <button onClick={() => advanceStatut(r, "approuvé")}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-500/15 text-blue-400 hover:bg-blue-500/25 transition-colors">
+                        Approuver
+                      </button>
+                      <button onClick={() => advanceStatut(r, "rejeté")}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
+                        Rejeter
+                      </button>
+                    </>
+                  )}
+                  {r.statut === "approuvé" && (
+                    <button onClick={() => advanceStatut(r, "remboursé")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors">
+                      <RefreshCw className="w-3 h-3" /> → Marquer remboursé
+                    </button>
+                  )}
+                  <button onClick={() => handleDelete(r.id)}
+                    className="ml-auto w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Composant principal ──────────────────────────────────────────────────────
 export default function TresorerieSection() {
   const currentYear = new Date().getFullYear();
@@ -606,9 +835,10 @@ export default function TresorerieSection() {
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
 
   const TABS = [
-    { key: "transactions", label: "Transactions", icon: Wallet },
-    { key: "budget", label: "Budget", icon: Target },
-    { key: "rapport", label: "Rapport PDF", icon: FileText },
+    { key: "transactions",   label: "Transactions",   icon: Wallet   },
+    { key: "budget",         label: "Budget",         icon: Target   },
+    { key: "remboursements", label: "Remboursements", icon: Receipt  },
+    { key: "rapport",        label: "Rapport PDF",    icon: FileText },
   ];
 
   return (
@@ -638,9 +868,10 @@ export default function TresorerieSection() {
       </div>
 
       {/* Contenu de l'onglet actif */}
-      {activeTab === "transactions" && <TransactionsTab year={year} />}
-      {activeTab === "budget"       && <BudgetTab year={year} />}
-      {activeTab === "rapport"      && <RapportTab year={year} />}
+      {activeTab === "transactions"   && <TransactionsTab year={year} />}
+      {activeTab === "budget"         && <BudgetTab year={year} />}
+      {activeTab === "remboursements" && <RemboursementsTab year={year} />}
+      {activeTab === "rapport"        && <RapportTab year={year} />}
     </div>
   );
 }

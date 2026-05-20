@@ -3,11 +3,12 @@ import { useMemberStore } from "@/lib/memberStore";
 import { useMultiYearCotisations } from "@/hooks/useMultiYearCotisations";
 import { useEvenements } from "@/hooks/useEvenements";
 import { useArticles } from "@/hooks/useArticles";
+import * as XLSX from "xlsx";
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { TrendingUp, Users, Globe, Banknote } from "lucide-react";
+import { TrendingUp, Users, Globe, Banknote, Download } from "lucide-react";
 
 const COLORS = ["#1b6b45", "#9a7118", "#3b82f6", "#8b5cf6", "#ef4444", "#f59e0b", "#06b6d4"];
 
@@ -86,15 +87,52 @@ export default function StatsSection() {
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [evenements]);
 
+  function exportExcel() {
+    const wb = XLSX.utils.book_new();
+
+    const memRows = (allMembers || []).map(m => ({
+      Nom: m.nom || "",
+      Prénom: m.prenom || "",
+      Email: m.email || "",
+      Téléphone: m.telephone || "",
+      Pays: m.pays || "",
+      Profession: m.profession || "",
+      Statut: m.statut || "",
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(memRows), "Membres");
+
+    const cotRows = YEARS.map(yr => {
+      const memberIds = Object.keys(multiYear || {});
+      const payes = memberIds.filter(mid => multiYear[mid]?.[yr]?.statut === "payé").length;
+      const tot = allMembers?.length || 1;
+      return { Année: yr, Payants: payes, Total: tot, "Taux (%)": Math.round((payes / tot) * 100) };
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cotRows), "Cotisations");
+
+    const geoRows = geoData.map(d => ({ Pays: d.name, Membres: d.value }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(geoRows), "Géographie");
+
+    const proRows = proData.map(d => ({ Profession: d.name, Membres: d.value }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(proRows), "Professions");
+
+    XLSX.writeFile(wb, `stats-mbp-${new Date().getFullYear()}.xlsx`);
+  }
+
   const total = allMembers?.length || 0;
   const withEmail = (allMembers || []).filter(m => m.email).length;
   const withPays = (allMembers || []).filter(m => m.pays).length;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-heading text-xl font-bold text-foreground">Statistiques & Analyses</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">Vue d'ensemble chiffrée de l'association</p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="font-heading text-xl font-bold text-foreground">Statistiques & Analyses</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Vue d'ensemble chiffrée de l'association</p>
+        </div>
+        <button onClick={exportExcel}
+          className="flex items-center gap-1.5 px-4 h-9 rounded-xl border border-border hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 text-sm font-medium transition-colors">
+          <Download className="w-4 h-4" /> Export Excel
+        </button>
       </div>
 
       {/* KPI rapides */}
