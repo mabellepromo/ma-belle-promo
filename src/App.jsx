@@ -4,6 +4,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
+import Navbar from '@/components/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SITE = "Ma Belle Promo";
@@ -149,6 +150,13 @@ const AuthenticatedApp = () => {
     };
   }, [location.pathname]);
 
+  const hideNav = location.pathname.startsWith('/dashboard')
+    || location.pathname === '/login'
+    || location.pathname === '/reset-password'
+    || location.pathname === '/verifier'
+    || location.pathname.startsWith('/sondage/')
+    || location.pathname.startsWith('/checkin/');
+
   return (
     <>
     <PageTitleUpdater />
@@ -156,6 +164,7 @@ const AuthenticatedApp = () => {
     <ScrollToTop />
     <CartSidebar />
     <CheckoutModal />
+    {!hideNav && <Navbar />}
     <div style={{ position: "relative" }}>
     <AnimatePresence mode="wait" initial={false}>
     <motion.div

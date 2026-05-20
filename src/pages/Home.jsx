@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { ArrowUp } from "lucide-react";
-import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
 import MissionSection from "../components/MissionSection";
 import CredibiliteSection from "../components/CredibiliteSection";
@@ -65,7 +64,6 @@ export default function Home() {
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
-      <Navbar />
       {/* Hero + bandeau défilant = exactement un écran */}
       <div style={{ height: "100dvh", display: "flex", flexDirection: "column" }}>
         <HeroSection />
