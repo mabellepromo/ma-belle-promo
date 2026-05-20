@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase, uploadFile } from "@/lib/supabase";
-import { openDocUrl } from "@/lib/documentGenerators";
 import {
   Shield, AlertTriangle, Plus, Trash2, X, Loader2,
   FileText, Upload, Check, Clock, Archive, Eye, Edit2,
@@ -283,11 +282,13 @@ function DocumentsTab() {
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {doc.url_fichier && (
-                      <button
-                        onClick={() => openDocUrl(doc.url_fichier, doc.titre)}
+                      <a
+                        href={doc.url_fichier}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium">
                         <Eye className="w-3.5 h-3.5" /> Voir
-                      </button>
+                      </a>
                     )}
                     <button
                       onClick={() => toggleActif(doc)}
