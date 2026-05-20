@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Plus, Trash2, Download, TrendingUp, TrendingDown, Wallet,
-  X, Loader2, RefreshCw, Lock, FileText, Target, BarChart2, Receipt
+  X, Loader2, RefreshCw, Lock, FileText, Target, BarChart2, Receipt, Landmark
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { genererRapportTresorerie } from "@/lib/documentGenerators";
@@ -37,6 +37,18 @@ const REMBOURS_CFG = {
 const emptyRembForm = {
   demandeur: "", motif: "", montant: "",
   date_demande: new Date().toISOString().slice(0, 10), notes: "",
+};
+
+const SUB_STATUT_CFG = {
+  en_attente:         { label: "En attente",          cls: "bg-amber-500/15 text-amber-400"     },
+  "partiellement_reçu": { label: "Partiellement reçu", cls: "bg-blue-500/15 text-blue-400"       },
+  reçu:               { label: "Reçu",                cls: "bg-emerald-500/15 text-emerald-400" },
+  clôturé:            { label: "Clôturé",             cls: "bg-muted/60 text-muted-foreground"  },
+};
+
+const emptySubForm = {
+  organisme: "", objet: "", montant_accorde: "", montant_recu: "0",
+  date_accord: "", date_echeance: "", statut: "en_attente", notes: "",
 };
 
 function StatCard({ label, value, icon: Icon, color, sub }) {
@@ -826,6 +838,228 @@ function RemboursementsTab({ year }) {
   );
 }
 
+// ── Tab Subventions ──────────────────────────────────────────────────────────
+function SubventionsTab({ year }) {
+  const [subs, setSubs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("tresorerie_subventions")
+      .select("*")
+      .eq("annee", year)
+      .order("date_accord", { ascending: false });
+    setSubs(data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => { load(); }, [year]);
+
+  const stats = useMemo(() => {
+    const accorde = subs.reduce((s, r) => s + Number(r.montant_accorde), 0);
+    const recu    = subs.reduce((s, r) => s + Number(r.montant_recu),    0);
+    return { accorde, recu, attente: accorde - recu };
+  }, [subs]);
+
+  function openForm(sub = null) {
+    if (sub) {
+      setEditId(sub.id);
+      setForm({
+        organisme:       sub.organisme,
+        objet:           sub.objet,
+        montant_accorde: String(sub.montant_accorde),
+        montant_recu:    String(sub.montant_recu),
+        date_accord:     sub.date_accord || "",
+        date_echeance:   sub.date_echeance || "",
+        statut:          sub.statut,
+        notes:           sub.notes || "",
+      });
+    } else {
+      setEditId(null);
+      setForm({ ...emptySubForm });
+    }
+  }
+
+  async function handleSave() {
+    if (!form.organisme.trim())     { toast.error("L'organisme est obligatoire."); return; }
+    if (!form.objet.trim())         { toast.error("L'objet est obligatoire."); return; }
+    if (!form.montant_accorde || Number(form.montant_accorde) <= 0) { toast.error("Montant accordé invalide."); return; }
+    if (Number(form.montant_recu) < 0) { toast.error("Montant reçu invalide."); return; }
+    setSaving(true);
+    const payload = {
+      annee:           year,
+      organisme:       form.organisme.trim(),
+      objet:           form.objet.trim(),
+      montant_accorde: Number(form.montant_accorde),
+      montant_recu:    Number(form.montant_recu) || 0,
+      date_accord:     form.date_accord || null,
+      date_echeance:   form.date_echeance || null,
+      statut:          form.statut,
+      notes:           form.notes?.trim() || null,
+    };
+    const { error } = editId
+      ? await supabase.from("tresorerie_subventions").update(payload).eq("id", editId)
+      : await supabase.from("tresorerie_subventions").insert(payload);
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success(editId ? "Subvention mise à jour." : "Subvention enregistrée.");
+    setForm(null); setEditId(null);
+    load();
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Supprimer cette subvention ?")) return;
+    await supabase.from("tresorerie_subventions").delete().eq("id", id);
+    toast.success("Subvention supprimée.");
+    load();
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Toolbar */}
+      <div className="flex justify-end">
+        <button onClick={() => openForm()}
+          className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+          <Plus className="w-4 h-4" /> Ajouter
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard label="Total accordé" value={stats.accorde} icon={Landmark}
+          color="bg-violet-500/15 text-violet-400"
+          sub={`${subs.length} subvention(s)`} />
+        <StatCard label="Déjà reçu" value={stats.recu} icon={TrendingUp}
+          color="bg-emerald-500/15 text-emerald-400"
+          sub={stats.accorde > 0 ? `${Math.round((stats.recu / stats.accorde) * 100)}% encaissé` : ""} />
+        <StatCard label="Reste à recevoir" value={stats.attente} icon={TrendingDown}
+          color="bg-amber-500/15 text-amber-400" />
+      </div>
+
+      {/* Formulaire */}
+      {form && (
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <p className="font-semibold text-foreground text-sm">{editId ? "Modifier la subvention" : "Nouvelle subvention"}</p>
+            <button onClick={() => { setForm(null); setEditId(null); }} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-5 grid md:grid-cols-2 gap-4">
+            <Field label="Organisme *">
+              <input className={inp} value={form.organisme}
+                onChange={e => setForm(p => ({ ...p, organisme: e.target.value }))} placeholder="Ex : Mairie de Lomé" />
+            </Field>
+            <Field label="Statut">
+              <select className={inp} value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value }))}>
+                {Object.entries(SUB_STATUT_CFG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+              </select>
+            </Field>
+            <div className="md:col-span-2">
+              <Field label="Objet *">
+                <input className={inp} value={form.objet}
+                  onChange={e => setForm(p => ({ ...p, objet: e.target.value }))} placeholder="Objet / programme subventionné" />
+              </Field>
+            </div>
+            <Field label="Montant accordé (FCFA) *">
+              <input className={inp} type="number" min="1" value={form.montant_accorde}
+                onChange={e => setForm(p => ({ ...p, montant_accorde: e.target.value }))} placeholder="0" />
+            </Field>
+            <Field label="Montant reçu (FCFA)">
+              <input className={inp} type="number" min="0" value={form.montant_recu}
+                onChange={e => setForm(p => ({ ...p, montant_recu: e.target.value }))} placeholder="0" />
+            </Field>
+            <Field label="Date d'accord">
+              <input className={inp} type="date" value={form.date_accord}
+                onChange={e => setForm(p => ({ ...p, date_accord: e.target.value }))} />
+            </Field>
+            <Field label="Date d'échéance justificatifs">
+              <input className={inp} type="date" value={form.date_echeance}
+                onChange={e => setForm(p => ({ ...p, date_echeance: e.target.value }))} />
+            </Field>
+            <div className="md:col-span-2">
+              <Field label="Notes (optionnel)">
+                <textarea className={inp} rows={2} value={form.notes}
+                  onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Conditions, contacts, références…" />
+              </Field>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 px-5 pb-5">
+            <button onClick={() => { setForm(null); setEditId(null); }} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
+            <button onClick={handleSave} disabled={saving}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Enregistrer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Liste */}
+      {loading ? (
+        <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
+      ) : subs.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">
+          <Landmark className="w-10 h-10 mx-auto mb-3 opacity-25" />
+          <p className="font-medium">Aucune subvention enregistrée pour {year}.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {subs.map(s => {
+            const cfg = SUB_STATUT_CFG[s.statut] || SUB_STATUT_CFG.en_attente;
+            const pct = s.montant_accorde > 0 ? Math.min(100, Math.round((Number(s.montant_recu) / Number(s.montant_accorde)) * 100)) : 0;
+            return (
+              <div key={s.id} className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-foreground text-sm">{s.organisme}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">{s.objet}</p>
+                    {s.notes && <p className="text-xs text-muted-foreground mt-0.5 italic">{s.notes}</p>}
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground flex-wrap">
+                      {s.date_accord    && <span>Accordé le {new Date(s.date_accord).toLocaleDateString("fr-FR")}</span>}
+                      {s.date_echeance  && <span>· Échéance {new Date(s.date_echeance).toLocaleDateString("fr-FR")}</span>}
+                    </div>
+                    {/* Barre de progression */}
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${pct >= 100 ? "bg-emerald-500" : pct > 0 ? "bg-blue-400" : "bg-muted-foreground/20"}`}
+                          style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-20 text-right">
+                        {fmt(s.montant_recu)} / {fmt(s.montant_accorde)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <p className="font-bold text-foreground text-sm">{fmt(s.montant_accorde)}</p>
+                    <p className="text-xs text-muted-foreground">{pct}% reçu</p>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-border">
+                  <button onClick={() => openForm(s)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted/60 text-muted-foreground hover:bg-muted transition-colors">
+                    Modifier
+                  </button>
+                  <button onClick={() => handleDelete(s.id)}
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Composant principal ──────────────────────────────────────────────────────
 export default function TresorerieSection() {
   const currentYear = new Date().getFullYear();
@@ -837,6 +1071,7 @@ export default function TresorerieSection() {
   const TABS = [
     { key: "transactions",   label: "Transactions",   icon: Wallet   },
     { key: "budget",         label: "Budget",         icon: Target   },
+    { key: "subventions",    label: "Subventions",    icon: Landmark },
     { key: "remboursements", label: "Remboursements", icon: Receipt  },
     { key: "rapport",        label: "Rapport PDF",    icon: FileText },
   ];
@@ -870,6 +1105,7 @@ export default function TresorerieSection() {
       {/* Contenu de l'onglet actif */}
       {activeTab === "transactions"   && <TransactionsTab year={year} />}
       {activeTab === "budget"         && <BudgetTab year={year} />}
+      {activeTab === "subventions"    && <SubventionsTab year={year} />}
       {activeTab === "remboursements" && <RemboursementsTab year={year} />}
       {activeTab === "rapport"        && <RapportTab year={year} />}
     </div>

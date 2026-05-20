@@ -2086,3 +2086,183 @@ export function genererFactureBoutique(commande) {
 
   openDoc(html, `Facture-Boutique-${reference}.html`);
 }
+
+// ── Rapport Statistique ──────────────────────────────────────────────────────
+export function genererRapportStats(annee, members, cotData, geoData, proData) {
+  const ref = refNumber("STAT", String(annee));
+  const total     = members.length;
+  const withEmail = members.filter(m => m.email).length;
+  const withPays  = members.filter(m => m.pays).length;
+  const pctEmail  = total > 0 ? Math.round((withEmail / total) * 100) : 0;
+  const pctPays   = total > 0 ? Math.round((withPays  / total) * 100) : 0;
+
+  const COLORS = ["#1b6b45","#9a7118","#3b82f6","#8b5cf6","#ef4444","#f59e0b","#06b6d4"];
+
+  const lignesCot = cotData.map(d => `
+    <tr>
+      <td style="padding:6px 10px;font-size:9pt;">${d.annee}</td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;">${d.total}</td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;font-weight:700;color:#0a3d28;">${d.payes}</td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+          <div style="width:80px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${d.taux}%;background:${d.taux >= 75 ? "#059669" : d.taux >= 50 ? "#d97706" : "#dc2626"};border-radius:3px;"></div>
+          </div>
+          <span style="font-weight:700;color:${d.taux >= 75 ? "#059669" : d.taux >= 50 ? "#d97706" : "#dc2626"};">${d.taux}%</span>
+        </div>
+      </td>
+    </tr>`).join("");
+
+  const maxGeo = geoData.length > 0 ? geoData[0].value : 1;
+  const lignesGeo = geoData.map((d, i) => `
+    <tr>
+      <td style="padding:6px 10px;font-size:9pt;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:10px;height:10px;border-radius:2px;background:${COLORS[i % COLORS.length]};flex-shrink:0;"></div>
+          ${d.name}
+        </div>
+      </td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+          <div style="width:100px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${Math.round((d.value / maxGeo) * 100)}%;background:${COLORS[i % COLORS.length]};border-radius:3px;"></div>
+          </div>
+          <span style="font-weight:700;">${d.value}</span>
+        </div>
+      </td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;color:#64748b;">${total > 0 ? Math.round((d.value / total) * 100) : 0}%</td>
+    </tr>`).join("");
+
+  const maxPro = proData.length > 0 ? proData[0].value : 1;
+  const lignesPro = proData.slice(0, 10).map((d, i) => `
+    <tr>
+      <td style="padding:6px 10px;font-size:9pt;">${d.name}</td>
+      <td style="padding:6px 10px;font-size:9pt;text-align:right;">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+          <div style="width:100px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${Math.round((d.value / maxPro) * 100)}%;background:#3b82f6;border-radius:3px;"></div>
+          </div>
+          <span style="font-weight:700;">${d.value}</span>
+        </div>
+      </td>
+    </tr>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rapport Statistique ${annee} — FDD MBP</title>
+  <style>${MBP_STYLE}</style>
+  <style>
+    .section-title { font-family:'Cormorant Garamond',serif;font-size:11pt;font-weight:700;color:#0a3d28;margin:20px 0 8px;padding-bottom:4px;border-bottom:2px solid #e2e8f0; }
+    table { width:100%;border-collapse:collapse; }
+    thead th { background:#0a3d28;color:#fff;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px; }
+    thead th:not(:first-child) { text-align:right; }
+    tbody tr:nth-child(even) { background:#f8fafc; }
+    .kpi-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px; }
+    .kpi { background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:14px 16px;text-align:center; }
+    .kpi .val { font-family:'Cormorant Garamond',serif;font-size:20pt;font-weight:700;color:#0a3d28;line-height:1; }
+    .kpi .lbl { font-size:7pt;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-top:4px; }
+    .kpi .sub { font-size:8pt;color:#64748b;margin-top:2px; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Rapport Statistique ${annee}</div>
+        <div class="doc-ref">Réf. ${ref} · Généré le ${today()}</div>
+      </div>
+
+      <!-- KPIs -->
+      <div>
+        <div class="section-title">Membres</div>
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="val">${total}</div>
+            <div class="lbl">Membres</div>
+          </div>
+          <div class="kpi">
+            <div class="val">${withEmail}</div>
+            <div class="lbl">Avec e-mail</div>
+            <div class="sub">${pctEmail}% du total</div>
+          </div>
+          <div class="kpi">
+            <div class="val">${geoData.length}</div>
+            <div class="lbl">Pays représentés</div>
+            <div class="sub">${pctPays}% renseignés</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cotisations -->
+      <div>
+        <div class="section-title">Taux de cotisation par année</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;">Année</th>
+              <th>Total membres</th>
+              <th>Payants</th>
+              <th>Taux</th>
+            </tr>
+          </thead>
+          <tbody>${lignesCot}</tbody>
+        </table>
+      </div>
+
+      <!-- Géographie -->
+      ${geoData.length > 0 ? `<div>
+        <div class="section-title">Répartition géographique</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;">Pays</th>
+              <th>Membres</th>
+              <th>Part</th>
+            </tr>
+          </thead>
+          <tbody>${lignesGeo}</tbody>
+        </table>
+      </div>` : ""}
+
+      <!-- Professions -->
+      ${proData.length > 0 ? `<div>
+        <div class="section-title">Professions (top 10)</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;">Profession</th>
+              <th>Membres</th>
+            </tr>
+          </thead>
+          <tbody>${lignesPro}</tbody>
+        </table>
+      </div>` : ""}
+
+    </div><!-- /doc-body -->
+
+    <div style="padding:16px 44px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:7pt;color:#94a3b8;">Association FDD Ma Belle Promo — Usage interne</span>
+      <span style="font-size:7pt;color:#94a3b8;">${ref}</span>
+    </div>
+
+  </div><!-- /a4 -->
+</body>
+</html>`;
+
+  openDoc(html, `Rapport-Stats-${annee}.html`);
+}

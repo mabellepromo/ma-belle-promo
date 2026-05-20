@@ -4,11 +4,12 @@ import { useMultiYearCotisations } from "@/hooks/useMultiYearCotisations";
 import { useEvenements } from "@/hooks/useEvenements";
 import { useArticles } from "@/hooks/useArticles";
 import * as XLSX from "xlsx";
+import { genererRapportStats } from "@/lib/documentGenerators";
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { TrendingUp, Users, Globe, Banknote, Download } from "lucide-react";
+import { TrendingUp, Users, Globe, Banknote, Download, FileText } from "lucide-react";
 
 const COLORS = ["#1b6b45", "#9a7118", "#3b82f6", "#8b5cf6", "#ef4444", "#f59e0b", "#06b6d4"];
 
@@ -129,10 +130,16 @@ export default function StatsSection() {
           <h2 className="font-heading text-xl font-bold text-foreground">Statistiques & Analyses</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Vue d'ensemble chiffrée de l'association</p>
         </div>
-        <button onClick={exportExcel}
-          className="flex items-center gap-1.5 px-4 h-9 rounded-xl border border-border hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 text-sm font-medium transition-colors">
-          <Download className="w-4 h-4" /> Export Excel
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportExcel}
+            className="flex items-center gap-1.5 px-4 h-9 rounded-xl border border-border hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 text-sm font-medium transition-colors">
+            <Download className="w-4 h-4" /> Excel
+          </button>
+          <button onClick={() => genererRapportStats(currentYear, allMembers || [], cotData, geoData, proData)}
+            className="flex items-center gap-1.5 px-4 h-9 rounded-xl border border-border hover:bg-blue-500/15 text-muted-foreground hover:text-blue-400 text-sm font-medium transition-colors">
+            <FileText className="w-4 h-4" /> PDF
+          </button>
+        </div>
       </div>
 
       {/* KPI rapides */}
