@@ -101,7 +101,7 @@
     text-align: left;
     font-size: 14px;
     line-height: 1.50;
-    overflow-x: hidden;
+    overflow-x: clip;
     overscroll-behavior: none;
     max-width: 100%;
     touch-action: pan-y;
