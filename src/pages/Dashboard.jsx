@@ -43,6 +43,7 @@ import {
 import FacturesSection from "./dashboard/FacturesSection";
 import VentesSection from "./dashboard/VentesSection";
 import RegistreLegalSection from "./dashboard/RegistreLegalSection";
+import BenevolesSection from "./dashboard/BenevolesSection";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -448,6 +449,7 @@ export default function Dashboard() {
         { key: "elections",     label: "Élections",      icon: Vote },
         { key: "mandats",       label: "Mandats",        icon: Shield },
         { key: "registre",      label: "Registre légal", icon: BookOpen },
+        { key: "benevoles",     label: "Bénévoles",      icon: Briefcase },
       ],
     },
     {
@@ -1250,6 +1252,7 @@ export default function Dashboard() {
           {tab === "factures"    && <FacturesSection />}
           {tab === "assemblees"  && <AssembleesSection />}
           {tab === "registre"    && <RegistreLegalSection />}
+          {tab === "benevoles"   && <BenevolesSection />}
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
