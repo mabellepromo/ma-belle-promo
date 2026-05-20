@@ -42,6 +42,7 @@ import {
 } from "./dashboard/CrudSections.jsx";
 import FacturesSection from "./dashboard/FacturesSection";
 import VentesSection from "./dashboard/VentesSection";
+import RegistreLegalSection from "./dashboard/RegistreLegalSection";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -443,9 +444,10 @@ export default function Dashboard() {
         { key: "ventes",      label: "Ventes",       icon: ShoppingBag },
         { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
         { key: "factures",    label: "Factures",     icon: Receipt },
-        { key: "assemblees",  label: "Assemblées",   icon: Building2 },
-        { key: "elections",   label: "Élections",    icon: Vote },
-        { key: "mandats",     label: "Mandats",      icon: Shield },
+        { key: "assemblees",    label: "Assemblées",     icon: Building2 },
+        { key: "elections",     label: "Élections",      icon: Vote },
+        { key: "mandats",       label: "Mandats",        icon: Shield },
+        { key: "registre",      label: "Registre légal", icon: BookOpen },
       ],
     },
     {
@@ -1247,6 +1249,7 @@ export default function Dashboard() {
           {tab === "tresorerie"  && <TresorerieSection />}
           {tab === "factures"    && <FacturesSection />}
           {tab === "assemblees"  && <AssembleesSection />}
+          {tab === "registre"    && <RegistreLegalSection />}
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
