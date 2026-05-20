@@ -14,7 +14,7 @@ function mapSession(supabaseSession) {
   const u = supabaseSession.user;
   return {
     id: u.id,
-    nom: u.user_metadata?.nom || u.email,
+    nom: u.user_metadata?.nom || u.user_metadata?.full_name || u.email?.split("@")[0] || u.email,
     email: u.email,
     role: u.user_metadata?.role || "invite",
     photo: u.user_metadata?.photo || "",
