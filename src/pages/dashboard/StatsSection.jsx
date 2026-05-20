@@ -93,12 +93,12 @@ export default function StatsSection() {
 
     const memRows = (allMembers || []).map(m => ({
       Nom: m.nom || "",
-      Prénom: m.prenom || "",
       Email: m.email || "",
       Téléphone: m.telephone || "",
+      Ville: m.ville || "",
       Pays: m.pays || "",
       Profession: m.profession || "",
-      Statut: m.statut || "",
+      Bureau: m.bureau ? "Oui" : "Non",
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(memRows), "Membres");
 

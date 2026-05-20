@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from "react";
+﻿import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
@@ -467,14 +467,14 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
   const [sending, setSending] = useState(false);
   const [tab, setTab] = useState(pendingInvitations.length > 0 ? "relance" : "membres");
 
-  useState(() => {
-    supabase.from("members").select("id, prenom, nom, email, photo_url").order("nom").then(({ data }) => {
+  useEffect(() => {
+    supabase.from("members").select("id, nom, email, photo").order("nom").then(({ data }) => {
       setMembers(data || []); setLoadingMembers(false);
     });
-  });
+  }, []);
 
   const filtered = (members || []).filter(m =>
-    !search || `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(search.toLowerCase())
+    !search || `${m.nom} ${m.email}`.toLowerCase().includes(search.toLowerCase())
   );
 
   function toggleMember(id) {
@@ -516,7 +516,7 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
     const recipients = [
       ...Array.from(selectedIds).map(id => {
         const m = members.find(m => m.id === id);
-        return { email: m.email, nom: `${m.prenom} ${m.nom}`.trim() };
+        return { email: m.email, nom: m.nom };
       }).filter(r => r.email),
       ...extraEmails,
     ];
@@ -620,11 +620,11 @@ function InviteModal({ sondage, onClose, origin, pendingInvitations = [] }) {
                           <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                             {selected && <Check className="w-3 h-3 text-white" />}
                           </div>
-                          {m.photo_url
-                            ? <img src={m.photo_url} alt={`${m.prenom || ""} ${m.nom || ""}`.trim() || "Photo du membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                          {m.photo
+                            ? <img src={m.photo} alt={m.nom || "Photo du membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                             : <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />}
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-foreground truncate">{m.prenom} {m.nom}</p>
+                            <p className="text-sm font-medium text-foreground truncate">{m.nom}</p>
                             <p className="text-xs text-muted-foreground truncate">{m.email || "Pas d'email"}</p>
                           </div>
                         </button>

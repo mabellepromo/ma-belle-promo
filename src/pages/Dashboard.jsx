@@ -253,8 +253,16 @@ export default function Dashboard() {
   async function exportBackup() {
     toast("Préparation du backup…");
     try {
-      const [members_, cotisations_, articles_, evenements_, sondages_,
-             tresoTx_, tresoBudget_, elections_, candidats_, mandats_, assemblees_] = await Promise.all([
+      const [
+        members_, cotisations_, articles_, evenements_, sondages_,
+        tresoTx_, tresoBudget_, tresoRemb_, tresoSub_,
+        elections_, candidats_, elecVotes_, mandats_,
+        assemblees_, agPresences_, agResolutions_,
+        factures_, commandes_, messages_,
+        circulaires_, benevoles_, missions_, heures_,
+        registreDocs_, registreConflits_,
+        presences_, sondageSoumissions_, sondageReponses_,
+      ] = await Promise.all([
         supabase.from("members").select("*"),
         supabase.from("cotisations").select("*"),
         supabase.from("articles").select("*"),
@@ -262,27 +270,61 @@ export default function Dashboard() {
         supabase.from("sondages").select("*"),
         supabase.from("tresorerie_transactions").select("*"),
         supabase.from("tresorerie_budget").select("*"),
+        supabase.from("tresorerie_remboursements").select("*"),
+        supabase.from("tresorerie_subventions").select("*"),
         supabase.from("elections").select("*"),
         supabase.from("election_candidats").select("*"),
+        supabase.from("election_votes").select("*"),
         supabase.from("mandats").select("*"),
         supabase.from("assemblees").select("*"),
+        supabase.from("assemblee_presences").select("*"),
+        supabase.from("assemblee_resolutions").select("*"),
+        supabase.from("factures").select("*"),
+        supabase.from("commandes").select("*"),
+        supabase.from("messages").select("*"),
+        supabase.from("circulaires").select("*"),
+        supabase.from("benevoles").select("*"),
+        supabase.from("missions_benevoles").select("*"),
+        supabase.from("heures_benevoles").select("*"),
+        supabase.from("registre_documents_legaux").select("*"),
+        supabase.from("registre_conflits").select("*"),
+        supabase.from("evenement_presences").select("*"),
+        supabase.from("sondage_soumissions").select("*"),
+        supabase.from("sondage_reponses").select("*"),
       ]);
       const backup = {
         exportedAt: new Date().toISOString(),
-        version: "2.0",
-        project: "l'association Ma Belle Promo (MBP)",
+        version: "3.0",
+        project: "Association FDD Ma Belle Promo (MBP)",
         data: {
-          members:                  members_.data          ?? [],
-          cotisations:              cotisations_.data      ?? [],
-          articles:                 articles_.data         ?? [],
-          evenements:               evenements_.data       ?? [],
-          sondages:                 sondages_.data         ?? [],
-          tresorerie_transactions:  tresoTx_.data          ?? [],
-          tresorerie_budget:        tresoBudget_.data      ?? [],
-          elections:                elections_.data        ?? [],
-          election_candidats:       candidats_.data        ?? [],
-          mandats:                  mandats_.data          ?? [],
-          assemblees:               assemblees_.data       ?? [],
+          members:                    members_.data              ?? [],
+          cotisations:                cotisations_.data          ?? [],
+          articles:                   articles_.data             ?? [],
+          evenements:                 evenements_.data           ?? [],
+          evenement_presences:        presences_.data            ?? [],
+          sondages:                   sondages_.data             ?? [],
+          sondage_soumissions:        sondageSoumissions_.data   ?? [],
+          sondage_reponses:           sondageReponses_.data      ?? [],
+          tresorerie_transactions:    tresoTx_.data              ?? [],
+          tresorerie_budget:          tresoBudget_.data          ?? [],
+          tresorerie_remboursements:  tresoRemb_.data            ?? [],
+          tresorerie_subventions:     tresoSub_.data             ?? [],
+          elections:                  elections_.data            ?? [],
+          election_candidats:         candidats_.data            ?? [],
+          election_votes:             elecVotes_.data            ?? [],
+          mandats:                    mandats_.data              ?? [],
+          assemblees:                 assemblees_.data           ?? [],
+          assemblee_presences:        agPresences_.data          ?? [],
+          assemblee_resolutions:      agResolutions_.data        ?? [],
+          factures:                   factures_.data             ?? [],
+          commandes:                  commandes_.data            ?? [],
+          messages:                   messages_.data             ?? [],
+          circulaires:                circulaires_.data          ?? [],
+          benevoles:                  benevoles_.data            ?? [],
+          missions_benevoles:         missions_.data             ?? [],
+          heures_benevoles:           heures_.data               ?? [],
+          registre_documents_legaux:  registreDocs_.data         ?? [],
+          registre_conflits:          registreConflits_.data     ?? [],
         },
       };
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8;" });
@@ -290,7 +332,7 @@ export default function Dashboard() {
       const a    = Object.assign(document.createElement("a"), { href: url, download: `mbp-backup-${new Date().toISOString().slice(0, 10)}.json` });
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Backup téléchargé !");
+      toast.success(`Backup v3.0 téléchargé — ${Object.keys(backup.data).length} tables exportées !`);
     } catch (err) {
       toast.error("Erreur backup : " + err.message);
     }
