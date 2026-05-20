@@ -338,7 +338,7 @@ export default function AutomatisationsSection() {
   const load = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("manage-automations", {
-      method: "GET",
+      body: { action: "list" },
     });
     if (error) {
       toast.error("Impossible de charger les automatisations : " + error.message);
