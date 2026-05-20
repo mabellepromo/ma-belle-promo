@@ -47,6 +47,23 @@ export default function Dashboard() {
   const { session, logout } = useLocalAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  useEffect(() => {
+    const nav = sidebarNavRef.current;
+    if (!nav) return;
+    const onWheel = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      nav.scrollTop += e.deltaY;
+    };
+    nav.addEventListener("wheel", onWheel, { passive: false });
+    return () => nav.removeEventListener("wheel", onWheel);
+  }, []);
+
   const { articles } = useArticles();
   const { evenements } = useEvenements();
   const currentYear = new Date().getFullYear();
@@ -59,6 +76,8 @@ export default function Dashboard() {
     updateMember, validateMember, rejectMember, deleteMember, addValidated,
     isSeeded, seedFromStatic, saving: memberSaving,
   } = useMemberStore({ realtime: true });
+
+  const sidebarNavRef = useRef(null);
 
   const [tab,                setTab]               = useState("overview");
   const [search,             setSearch]            = useState("");
@@ -451,7 +470,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="dark min-h-screen flex bg-[#4a4a4a] text-foreground">
+    <div className="dark h-screen flex overflow-hidden bg-[#4a4a4a] text-foreground">
 
       {compose && (
         <ComposeModal
@@ -461,7 +480,7 @@ export default function Dashboard() {
       )}
 
       {/* ── SIDEBAR ── */}
-      <aside className="w-60 flex-shrink-0 sticky top-0 h-screen flex flex-col bg-card border-r border-border">
+      <aside className="w-60 flex-shrink-0 h-screen flex flex-col bg-card border-r border-border">
 
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
@@ -485,7 +504,10 @@ export default function Dashboard() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-2 pb-4">
+        <nav
+          ref={sidebarNavRef}
+          className="overflow-y-auto px-2 pb-4 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+          style={{ maxHeight: "calc(100vh - 195px)" }}>
           {NAV_GROUPS.map((group, gi) => {
             const groupColors = [null, "text-blue-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
             const gc = groupColors[gi] || "text-muted-foreground";
@@ -548,7 +570,7 @@ export default function Dashboard() {
       </aside>
 
       {/* ── CONTENU ── */}
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
 
         {/* Topbar */}
         <div className="flex-shrink-0 h-14 flex items-center justify-between px-8 bg-card border-b border-border">
@@ -578,7 +600,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="p-6 md:p-8 pb-16">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 pb-16">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (

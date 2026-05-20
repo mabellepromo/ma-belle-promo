@@ -11,8 +11,11 @@ export function scrollToTop() {
 
 export default function SmoothScroll() {
   const location = useLocation();
+  const isDashboard = location.pathname.startsWith("/dashboard");
 
   useEffect(() => {
+    if (isDashboard) return;
+
     lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -32,9 +35,9 @@ export default function SmoothScroll() {
       lenis.destroy();
       lenis = null;
     };
-  }, []);
+  }, [isDashboard]);
 
-  // Retour en haut à chaque changement de page
+  // Retour en haut à chaque changement de page (pages publiques uniquement)
   useEffect(() => {
     if (lenis) lenis.scrollTo(0, { immediate: true });
   }, [location.pathname]);
