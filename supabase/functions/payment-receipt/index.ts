@@ -10,12 +10,17 @@ import {
   wasAlreadySent,
   markAsSent,
   jsonResponse,
+  corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
 
 const AUTOMATION_ID = "payment_receipt";
 
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   const db = getServiceClient();
 
   try {

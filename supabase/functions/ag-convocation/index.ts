@@ -11,12 +11,17 @@ import {
   markAsSent,
   nextDailyRun,
   jsonResponse,
+  corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
 
 const AUTOMATION_ID = "ag_convocation";
 
 serve(async (_req) => {
+  if (_req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   const db = getServiceClient();
 
   try {

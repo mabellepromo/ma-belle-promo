@@ -11,12 +11,17 @@ import {
   markAsSent,
   nextMonthlyRun,
   jsonResponse,
+  corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
 
 const AUTOMATION_ID = "dormant_member_alert";
 
 serve(async (_req) => {
+  if (_req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   const db = getServiceClient();
 
   try {

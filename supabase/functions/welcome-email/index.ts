@@ -10,12 +10,17 @@ import {
   wasAlreadySent,
   markAsSent,
   jsonResponse,
+  corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
 
 const AUTOMATION_ID = "welcome_email";
 
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   const db = getServiceClient();
 
   try {
