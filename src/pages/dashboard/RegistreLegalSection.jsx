@@ -6,6 +6,7 @@ import {
   FileText, Upload, Check, Clock, Archive, Eye, Edit2,
 } from "lucide-react";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 // ── Configuration catégories ──────────────────────────────────────────────
 const CATEGORIES = [
@@ -54,6 +55,7 @@ function DocumentsTab() {
   const [saving,    setSaving]    = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef();
+  const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
@@ -89,7 +91,7 @@ function DocumentsTab() {
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer ce document définitivement ?")) return;
+    if (!await confirm("Supprimer ce document ?", "Cette action est irréversible.")) return;
     const { error } = await supabase.from("registre_documents_legaux").delete().eq("id", id);
     if (error) toast.error("Erreur : " + error.message);
     else { toast.success("Document supprimé."); load(); }
@@ -124,6 +126,7 @@ function DocumentsTab() {
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       {/* Actions + filtres catégories */}
       <div className="flex items-center gap-3 flex-wrap">
         <button
@@ -327,6 +330,7 @@ function ConflitsTab() {
   const [loading, setLoading] = useState(true);
   const [form,    setForm]    = useState(null);
   const [saving,  setSaving]  = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
@@ -368,7 +372,7 @@ function ConflitsTab() {
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer cette déclaration définitivement ?")) return;
+    if (!await confirm("Supprimer cette déclaration ?", "Cette action est irréversible.")) return;
     const { error } = await supabase.from("registre_conflits").delete().eq("id", id);
     if (error) toast.error("Erreur : " + error.message);
     else { toast.success("Déclaration supprimée."); load(); }
@@ -385,6 +389,7 @@ function ConflitsTab() {
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={() => setForm(emptyConflit())}

@@ -7,6 +7,7 @@ import {
   ShieldCheck, PenLine, Eye, EyeOff,
 } from "lucide-react";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const STATUT_STYLES = {
   planifiee: "bg-blue-500/15 text-blue-400",
@@ -146,6 +147,7 @@ function ResolutionsTab({ assemblee }) {
   const [loading, setLoading] = useState(true);
   const [newLibelle, setNewLibelle] = useState("");
   const [adding, setAdding] = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   async function load() {
     setLoading(true);
@@ -180,13 +182,15 @@ function ResolutionsTab({ assemblee }) {
   }
 
   async function deleteResolution(id) {
-    if (!window.confirm("Supprimer cette résolution ?")) return;
-    await supabase.from("assemblee_resolutions").delete().eq("id", id);
+    if (!await confirm("Supprimer cette résolution ?", "Cette action est irréversible.")) return;
+    const { error } = await supabase.from("assemblee_resolutions").delete().eq("id", id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     await load();
   }
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       <div className="flex gap-2">
         <input className={`${inp} flex-1`} value={newLibelle} onChange={e => setNewLibelle(e.target.value)}
           placeholder="Libellé de la résolution…"
@@ -391,6 +395,7 @@ export default function AssembleesSection() {
   const [selectedId, setSelectedId] = useState(null);
   const [detailTab,  setDetailTab]  = useState("presences");
   const [newOdj,     setNewOdj]     = useState("");
+  const { confirm, ConfirmEl } = useConfirm();
 
   async function load() {
     setLoading(true);
@@ -422,14 +427,16 @@ export default function AssembleesSection() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Supprimer cette assemblée et toutes ses données ?")) return;
-    await supabase.from("assemblees").delete().eq("id", id);
+    if (!await confirm("Supprimer cette assemblée ?", "Présences, résolutions et PV seront supprimés définitivement.")) return;
+    const { error } = await supabase.from("assemblees").delete().eq("id", id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     if (selectedId === id) setSelectedId(null);
     toast.success("Assemblée supprimée."); load();
   }
 
   async function updateStatut(id, statut) {
-    await supabase.from("assemblees").update({ statut }).eq("id", id);
+    const { error } = await supabase.from("assemblees").update({ statut }).eq("id", id);
+    if (error) { toast.error("Erreur mise à jour statut : " + error.message); return; }
     setAssemblees(prev => prev.map(a => a.id === id ? { ...a, statut } : a));
   }
 
@@ -444,6 +451,7 @@ export default function AssembleesSection() {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Assemblées Générales</h2>

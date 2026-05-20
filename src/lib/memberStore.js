@@ -42,7 +42,11 @@ export function useMemberStore({ realtime = false } = {}) {
       .select("*")
       .order("nom");
 
-    if (error || !data?.length) {
+    if (error) {
+      toast.warning("Base de données inaccessible — affichage des données statiques.");
+      setMembers(staticMembers.map(m => ({ ...m, status: "validated" })));
+      setIsSeeded(false);
+    } else if (!data?.length) {
       setMembers(staticMembers.map(m => ({ ...m, status: "validated" })));
       setIsSeeded(false);
     } else {

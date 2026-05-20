@@ -6,6 +6,7 @@ import {
   Plus, Trash2, Edit2,
 } from "lucide-react";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 // ── Config statuts ─────────────────────────────────────────────────────────
 const BEN_STATUT_CFG = {
@@ -39,6 +40,7 @@ function FichesTab() {
   const [filter,  setFilter]  = useState("all");
   const [form,    setForm]    = useState(null);
   const [saving,  setSaving]  = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
@@ -72,7 +74,7 @@ function FichesTab() {
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer ce bénévole ? Ses heures seront également supprimées.")) return;
+    if (!await confirm("Supprimer ce bénévole ?", "Ses heures seront également supprimées.")) return;
     const { error } = await supabase.from("benevoles").delete().eq("id", id);
     if (error) toast.error("Erreur : " + error.message);
     else { toast.success("Bénévole supprimé."); load(); }
@@ -82,6 +84,7 @@ function FichesTab() {
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       {/* Actions + filtres */}
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={() => setForm(emptyBen())}
@@ -242,6 +245,7 @@ function MissionsTab() {
   const [filter,  setFilter]  = useState("all");
   const [form,    setForm]    = useState(null);
   const [saving,  setSaving]  = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
@@ -276,7 +280,7 @@ function MissionsTab() {
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer cette mission ?")) return;
+    if (!await confirm("Supprimer cette mission ?", "Cette action est irréversible.")) return;
     const { error } = await supabase.from("missions_benevoles").delete().eq("id", id);
     if (error) toast.error("Erreur : " + error.message);
     else { toast.success("Mission supprimée."); load(); }
@@ -286,6 +290,7 @@ function MissionsTab() {
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={() => setForm(emptyMission())}
           className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
@@ -433,6 +438,7 @@ function HeuresTab() {
   const [filterBen, setFilterBen] = useState("all");
   const [form,      setForm]      = useState(null);
   const [saving,    setSaving]    = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { loadAll(); }, []);
 
@@ -483,7 +489,7 @@ function HeuresTab() {
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer cette entrée ?")) return;
+    if (!await confirm("Supprimer cette entrée d'heures ?", "Cette action est irréversible.")) return;
     const { error } = await supabase.from("heures_benevoles").delete().eq("id", id);
     if (error) toast.error("Erreur : " + error.message);
     else { toast.success("Entrée supprimée."); loadAll(); }
@@ -504,6 +510,7 @@ function HeuresTab() {
 
   return (
     <div className="space-y-4">
+      {ConfirmEl}
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={openForm} disabled={benevoles.length === 0}
           className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors">

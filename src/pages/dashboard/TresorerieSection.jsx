@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { genererRapportTresorerie } from "@/lib/documentGenerators";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const CATEGORIES_RECETTES = ["Cotisations", "Dons", "Subventions", "Sponsoring", "Événements", "Autres"];
 const CATEGORIES_DEPENSES = ["Événements", "Administration", "Communication", "Matériel", "Transport", "Restauration", "Autres"];
@@ -81,6 +82,7 @@ function TransactionsTab({ year }) {
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("");
+  const { confirm, ConfirmEl } = useConfirm();
 
   async function loadTransactions() {
     setLoading(true);
@@ -127,7 +129,7 @@ function TransactionsTab({ year }) {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Supprimer cette transaction ?")) return;
+    if (!await confirm("Supprimer cette transaction ?", "Cette action est irréversible.")) return;
     await supabase.from("tresorerie_transactions").delete().eq("id", id);
     toast.success("Transaction supprimée.");
     loadTransactions();
@@ -151,6 +153,7 @@ function TransactionsTab({ year }) {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       {/* Toolbar */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
@@ -627,6 +630,7 @@ function RemboursementsTab({ year }) {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   async function load() {
     setLoading(true);
@@ -700,7 +704,7 @@ function RemboursementsTab({ year }) {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Supprimer cette demande ?")) return;
+    if (!await confirm("Supprimer cette demande ?", "Cette action est irréversible.")) return;
     await supabase.from("tresorerie_remboursements").delete().eq("id", id);
     toast.success("Demande supprimée.");
     load();
@@ -708,6 +712,7 @@ function RemboursementsTab({ year }) {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       {/* Toolbar */}
       <div className="flex justify-end">
         <button onClick={() => setForm({ ...emptyRembForm })}
@@ -842,11 +847,12 @@ function RemboursementsTab({ year }) {
 function SubventionsTab({ year }) {
   const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState(null);           // formulaire création/édition
+  const [form, setForm] = useState(null);
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [versement, setVersement] = useState(null); // { subId, organisme, reste, montant, date }
   const [savingVers, setSavingVers] = useState(false);
+  const { confirm, ConfirmEl } = useConfirm();
 
   async function load() {
     setLoading(true);
@@ -959,7 +965,7 @@ function SubventionsTab({ year }) {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Supprimer cette subvention ?")) return;
+    if (!await confirm("Supprimer cette subvention ?", "Cette action est irréversible.")) return;
     await supabase.from("tresorerie_subventions").delete().eq("id", id);
     toast.success("Subvention supprimée.");
     load();
@@ -967,6 +973,7 @@ function SubventionsTab({ year }) {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       {/* Bannière explication */}
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-500/15 border border-violet-500/25 text-xs text-violet-400">
         <RefreshCw className="w-3.5 h-3.5 flex-shrink-0" />

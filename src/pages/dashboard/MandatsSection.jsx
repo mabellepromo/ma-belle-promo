@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
 import { Plus, Trash2, Edit2, CheckCircle, Clock, Loader2, X, Shield, RefreshCw, AlertTriangle } from "lucide-react";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const POSTES_BUREAU = [
   "Présidente", "Vice-Président(e)", "Secrétaire Général(e)", "Secrétaire Général(e) Adjoint(e)",
@@ -13,6 +14,7 @@ const POSTES_BUREAU = [
 
 export default function MandatsSection() {
   const { allMembers } = useMemberStore({ realtime: false });
+  const { confirm, ConfirmEl } = useConfirm();
   const [mandats, setMandats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(null);
@@ -55,13 +57,13 @@ export default function MandatsSection() {
   }
 
   async function terminate(id) {
-    if (!confirm("Marquer ce mandat comme terminé ?")) return;
+    if (!await confirm("Terminer ce mandat ?", "Le mandat sera marqué comme terminé.", "Confirmer")) return;
     await supabase.from("mandats").update({ actif: false, date_fin: new Date().toISOString().slice(0, 10) }).eq("id", id);
     toast.success("Mandat terminé."); load();
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer définitivement ce mandat ?")) return;
+    if (!await confirm("Supprimer ce mandat ?", "Cette action est irréversible.")) return;
     await supabase.from("mandats").delete().eq("id", id);
     toast.success("Mandat supprimé."); load();
   }
@@ -144,6 +146,7 @@ export default function MandatsSection() {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Mandats & Bureau</h2>

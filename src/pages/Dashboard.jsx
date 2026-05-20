@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -83,6 +83,7 @@ export default function Dashboard() {
   const sidebarNavRef = useRef(null);
 
   const [tab,                setTab]               = useState("overview");
+  const [sidebarOpen,        setSidebarOpen]       = useState(false);
   const [search,             setSearch]            = useState("");
   const [compose,            setCompose]           = useState(false);
   const [pendingAttachment,  setPendingAttachment] = useState(null);
@@ -527,8 +528,13 @@ export default function Dashboard() {
         />
       )}
 
+      {/* Backdrop mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* ── SIDEBAR ── */}
-      <aside className="w-60 flex-shrink-0 h-screen flex flex-col bg-card border-r border-border">
+      <aside className={`fixed inset-y-0 left-0 z-40 w-60 flex flex-col bg-card border-r border-border transition-transform duration-200 md:relative md:translate-x-0 md:flex md:flex-shrink-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
 
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
@@ -570,7 +576,7 @@ export default function Dashboard() {
                   {group.items.map(({ key, label, icon: Icon, badge, badgeAlert }) => {
                     const active = tab === key;
                     return (
-                      <button key={key} onClick={() => setTab(key)}
+                      <button key={key} onClick={() => { setTab(key); setSidebarOpen(false); }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all text-left relative ${
                           active
                             ? "bg-primary/15 text-primary font-semibold"
@@ -621,8 +627,11 @@ export default function Dashboard() {
       <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
 
         {/* Topbar */}
-        <div className="flex-shrink-0 h-14 flex items-center justify-between px-8 bg-card border-b border-border">
+        <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 md:px-8 bg-card border-b border-border">
           <div className="flex items-center gap-3">
+            <button className="md:hidden p-1.5 rounded-lg hover:bg-muted/40 text-muted-foreground" onClick={() => setSidebarOpen(v => !v)}>
+              <Menu className="w-4 h-4" />
+            </button>
             <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10">
               <CurrentIcon className="w-3.5 h-3.5 text-primary" />
             </div>
@@ -898,7 +907,7 @@ export default function Dashboard() {
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-8 h-8 rounded-lg bg-pink-500/15 flex items-center justify-center">
-                        <span className="text-base">🎂</span>
+                        <Cake className="w-4 h-4 text-pink-400" />
                       </div>
                       <p className="text-sm font-bold text-foreground">
                         Anniversaires — 30 prochains jours
@@ -1008,7 +1017,7 @@ export default function Dashboard() {
                             <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.type === "event" ? "bg-indigo-500/15" : "bg-pink-500/15"}`}>
                               {item.type === "event"
                                 ? <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                                : <span className="text-xs">🎂</span>}
+                                : <Cake className="w-3.5 h-3.5 text-pink-400" />}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate">{item.titre}</p>
@@ -1449,7 +1458,7 @@ export default function Dashboard() {
               )}
               {memberDetail.anniversaire && (
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs flex-shrink-0">🎂</span>
+                  <Cake className="w-3.5 h-3.5 text-pink-400 flex-shrink-0" />
                   <span className="text-sm text-foreground">{memberDetail.anniversaire}</span>
                 </div>
               )}

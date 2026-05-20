@@ -11,6 +11,7 @@ import {
   createInvitations, markInvitationsSent, SONDAGE_THEMES, anonymiserSoumissions,
 } from "../../hooks/useSondages";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-blue-500", "bg-violet-500", "bg-rose-500", "bg-cyan-500"];
 const COLOR_HEX = ["#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#f43f5e", "#06b6d4"];
@@ -700,6 +701,7 @@ const emptyForm = { titre: "", description: "", actif: true, expires_at: "", the
 // ── Composant principal ────────────────────────────────────────────────────
 export default function SondagesSection() {
   const { sondages, loading, createSondage, updateSondage, deleteSondage, duplicateSondage } = useSondages({ adminMode: true });
+  const { confirm, ConfirmEl } = useConfirm();
   const [form, setForm] = useState(null);
   const [items, setItems] = useState([emptyQ()]); // flat list: questions + section breaks
   const [expanded, setExpanded] = useState({});
@@ -801,7 +803,7 @@ export default function SondagesSection() {
   }
 
   async function handleDelete(s) {
-    if (!window.confirm(`Supprimer « ${s.titre} » et toutes ses réponses ?`)) return;
+    if (!await confirm(`Supprimer « ${s.titre} » ?`, "Toutes les réponses associées seront supprimées définitivement.")) return;
     await deleteSondage(s.id); toast.success("Sondage supprimé.");
   }
 
@@ -812,7 +814,7 @@ export default function SondagesSection() {
   }
 
   async function handleAnonymize(s) {
-    if (!confirm(`Anonymiser toutes les réponses de « ${s.titre} » ?\n\nLes noms et emails associés aux réponses seront supprimés définitivement. Les réponses elles-mêmes sont conservées.`)) return;
+    if (!await confirm(`Anonymiser « ${s.titre} » ?`, "Les noms et emails associés aux réponses seront supprimés définitivement. Les réponses elles-mêmes sont conservées.")) return;
     const error = await anonymiserSoumissions(s.id);
     if (error) toast.error("Erreur : " + error.message);
     else {
@@ -823,6 +825,7 @@ export default function SondagesSection() {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       {inviteModal && (
         <InviteModal
           sondage={inviteModal.sondage}

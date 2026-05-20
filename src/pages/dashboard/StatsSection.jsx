@@ -148,7 +148,7 @@ export default function StatsSection() {
           { label: "Membres", value: total, icon: Users, color: "bg-emerald-500/15 text-emerald-400" },
           { label: "Avec email", value: withEmail, icon: TrendingUp, color: "bg-blue-500/15 text-blue-400", sub: `${total > 0 ? Math.round(withEmail/total*100) : 0}%` },
           { label: "Pays représentés", value: geoData.length, icon: Globe, color: "bg-violet-500/15 text-violet-400" },
-          { label: "Articles publiés", value: articles?.length || 0, icon: Banknote, color: "bg-amber-500/15 text-amber-400" },
+          { label: "Articles publiés", value: articles?.length || 0, icon: FileText, color: "bg-amber-500/15 text-amber-400" },
         ].map(({ label, value, icon: Icon, color, sub }) => (
           <div key={label} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
             <div className="flex items-start justify-between">

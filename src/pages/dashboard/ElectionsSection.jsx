@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
 import { Plus, Trash2, Users, Vote, ChevronRight, X, Loader2, CheckCircle, Lock } from "lucide-react";
 import { inp, Field } from "./shared";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const POSTES_DEFAUT = ["Présidente", "Vice-Président(e)", "Secrétaire Général(e)", "Trésorier(ière)", "Commissaire aux Comptes"];
 
@@ -15,6 +16,7 @@ const STATUT_CFG = {
 
 export default function ElectionsSection() {
   const { allMembers } = useMemberStore({ realtime: false });
+  const { confirm, ConfirmEl } = useConfirm();
   const [elections, setElections]     = useState([]);
   const [selected, setSelected]       = useState(null);
   const [candidats, setCandidats]     = useState([]);
@@ -46,24 +48,26 @@ export default function ElectionsSection() {
   async function saveElection() {
     if (!form.titre?.trim()) { toast.error("Titre obligatoire."); return; }
     setSaving(true);
-    if (form._id) {
-      await supabase.from("elections").update({ titre: form.titre, description: form.description, date_debut: form.date_debut || null, date_fin: form.date_fin || null, statut: form.statut }).eq("id", form._id);
-    } else {
-      await supabase.from("elections").insert({ titre: form.titre, description: form.description, date_debut: form.date_debut || null, date_fin: form.date_fin || null });
-    }
-    setSaving(false); setForm(null); loadElections();
+    const { error } = form._id
+      ? await supabase.from("elections").update({ titre: form.titre, description: form.description, date_debut: form.date_debut || null, date_fin: form.date_fin || null, statut: form.statut }).eq("id", form._id)
+      : await supabase.from("elections").insert({ titre: form.titre, description: form.description, date_debut: form.date_debut || null, date_fin: form.date_fin || null });
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    setForm(null); loadElections();
     toast.success(form._id ? "Élection mise à jour." : "Élection créée.");
   }
 
   async function deleteElection(id) {
-    if (!confirm("Supprimer cette élection et tous ses votes ?")) return;
-    await supabase.from("elections").delete().eq("id", id);
+    if (!await confirm("Supprimer cette élection ?", "Tous ses votes et candidats seront supprimés définitivement.")) return;
+    const { error } = await supabase.from("elections").delete().eq("id", id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     if (selected?.id === id) setSelected(null);
     loadElections(); toast.success("Élection supprimée.");
   }
 
   async function changeStatut(id, statut) {
-    await supabase.from("elections").update({ statut }).eq("id", id);
+    const { error } = await supabase.from("elections").update({ statut }).eq("id", id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     setSelected(prev => prev?.id === id ? { ...prev, statut } : prev);
     setElections(prev => prev.map(e => e.id === id ? { ...e, statut } : e));
     toast.success("Statut mis à jour.");
@@ -82,8 +86,9 @@ export default function ElectionsSection() {
   }
 
   async function removeCandidat(id) {
-    if (!confirm("Retirer ce candidat ?")) return;
-    await supabase.from("election_candidats").delete().eq("id", id);
+    if (!await confirm("Retirer ce candidat ?", "Cette action est irréversible.")) return;
+    const { error } = await supabase.from("election_candidats").delete().eq("id", id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     toast.success("Candidat retiré."); loadDetail(selected.id);
   }
 
@@ -101,6 +106,7 @@ export default function ElectionsSection() {
 
   return (
     <div className="space-y-5">
+      {ConfirmEl}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Élections</h2>
