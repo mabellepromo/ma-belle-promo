@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête (Version Moderne)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-fonce:  hsl(150, 28%,  8%);
+      --dore:        hsl(38,  70%, 55%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #664d03;
+      max-width: 794px;
+      width: 100%;
+    }
+    .print-hint strong { font-weight: 600; }
+    @media print { .print-hint { display: none; } }
+
+    .page {
+      width: 794px;
+      min-height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; min-height: 100vh; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       EN-TÊTE — Version Moderne / Épurée
+       Concept : bandeau gauche coloré + typographie aérée
+       ══════════════════════════════════════════════════ */
+    .header {
+      display: flex;
+      align-items: stretch;
+      min-height: 110px;
+      border-bottom: 1px solid var(--bordure);
+    }
+
+    /* Accent vertical gauche */
+    .header-accent {
+      width: 6px;
+      background: linear-gradient(180deg, var(--vert-foret) 0%, var(--dore) 100%);
+      flex-shrink: 0;
+    }
+
+    /* Zone logo */
+    .header-logo-zone {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      background: var(--fond-sauge);
+      border-right: 1px solid var(--bordure);
+    }
+    .header-logo-zone img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    /* Texte identité */
+    .header-identity {
+      flex: 1;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .assoc-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--texte);
+      letter-spacing: -0.01em;
+    }
+
+    .assoc-name span {
+      color: var(--vert-foret);
+    }
+
+    .assoc-sub {
+      font-size: 11px;
+      color: var(--texte-muted);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Bloc méta en haut à droite */
+    .header-meta {
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 180px;
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .meta-chip-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+    }
+    .meta-chip-value {
+      font-size: 13px;
+      color: var(--texte);
+      font-weight: 500;
+      text-align: right;
+      outline: none;
+      min-width: 80px;
+      border-bottom: 1px solid transparent;
+    }
+    .meta-chip-value:focus {
+      border-bottom-color: var(--vert-foret);
+      background: hsl(148,38%,97%);
+    }
+
+    /* ── Bandeau objet ── */
+    .objet-band {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--vert-foret);
+      padding: 0;
+    }
+    .objet-band-label {
+      background: var(--dore);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 8px 16px;
+      flex-shrink: 0;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+    }
+    .objet-band-text {
+      flex: 1;
+      padding: 8px 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      outline: none;
+      background: transparent;
+    }
+    .objet-band-text:focus {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── Corps ── */
+    .body {
+      flex: 1;
+      padding: 36px 48px 36px 54px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Destinataire */
+    .dest-wrapper {
+      display: flex;
+      gap: 48px;
+    }
+
+    .dest-spacer { flex: 1; }
+
+    .dest-bloc {
+      min-width: 220px;
+      max-width: 280px;
+    }
+
+    .dest-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+      margin-bottom: 8px;
+    }
+
+    .editable-dest {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      display: block;
+      padding: 8px 12px;
+      background: var(--fond-sauge);
+      border-radius: 4px;
+      border: 1px solid var(--bordure);
+      min-height: 80px;
+    }
+    .editable-dest:focus { border-color: var(--vert-foret); background: #fff; }
+
+    /* Séparateur décoratif */
+    .separator-modern {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sep-line { flex: 1; height: 1px; background: var(--bordure); }
+    .sep-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--dore);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Formule d'appel */
+    .formule-appel {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Corps de la lettre */
+    .corps-lettre {
+      flex: 1;
+      font-size: 13.5px;
+      line-height: 1.78;
+      color: var(--texte);
+      outline: none;
+      min-height: 280px;
+      padding: 2px 4px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    /* Closing */
+    .closing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      padding-top: 8px;
+    }
+
+    .politesse {
+      flex: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 48px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .signature-bloc {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .sig-role {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--vert-foret);
+      margin-bottom: 28px;
+    }
+    .editable-sig-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      min-height: 20px;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+    .editable-sig-titre {
+      font-size: 11.5px;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — moderne : ligne fine + icônes ══ */
+    .footer {
+      border-top: 2px solid var(--vert-foret);
+      padding: 12px 40px 14px;
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--vert-foret);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--texte-muted);
+    }
+
+    .footer-dot {
+      display: inline-block;
+      width: 3px;
+      height: 3px;
+      background: var(--dore);
+      border-radius: 50%;
+    }
+
+    /* Focus common */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint">
+    <strong>Mode édition :</strong> cliquez sur n'importe quelle zone pour la modifier.
+    <strong>Ctrl + P</strong> pour imprimer / exporter en PDF.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  VERSION 2 — Moderne / Épurée                      -->
+  <!--  Concept : bandeau vertical gauche + espace blanc  -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <div class="header-accent"></div>
+
+      <!-- LOGO — chemin relatif depuis docs/ -->
+      <div class="header-logo-zone">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="header-identity">
+        <div class="assoc-name">Ma <span>Belle</span> Promo</div>
+        <div class="assoc-sub">Association des anciens diplômés · Faculté de Droit · Université de Lomé · Promo 1994–2000</div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-chip">
+          <span class="meta-chip-label">Date</span>
+          <span class="meta-chip-value" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+        </div>
+        <div class="meta-chip">
+          <span class="meta-chip-label">Réf.</span>
+          <span class="meta-chip-value" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BANDEAU OBJET -->
+    <div class="objet-band">
+      <div class="objet-band-label">Objet</div>
+      <div
+        class="objet-band-text"
+        contenteditable="true"
+        data-placeholder="Saisissez l'objet du courrier"
+      >Objet de votre courrier</div>
+    </div>
+
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire (aligné à droite, style courrier classique) -->
+      <div class="dest-wrapper">
+        <div class="dest-spacer"></div>
+        <div class="dest-bloc">
+          <div class="dest-label">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction&#10;Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction<br>Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <!-- Séparateur décoratif -->
+      <div class="separator-modern">
+        <div class="sep-line"></div>
+        <div class="sep-dot"></div>
+        <div class="sep-line"></div>
+      </div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="signature-bloc">
+          <div class="sig-role">Le Président</div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Président de l'association</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="footer-brand">Ma Belle Promo</div>
+        <div class="footer-contacts">
+          <div class="footer-item">📍 12 BP 335 Baguida, Togo</div>
+          <span class="footer-dot"></span>
+          <div class="footer-item">📞 90 05 36 06 · 96 02 00 00</div>
+          <span class="footer-dot"></span>
+          <div class="footer-item">✉ contact@mabellepromo.org</div>
+          <span class="footer-dot"></span>
+          <div class="footer-item">🌐 mabellepromo.org</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /.page -->
+
+</body>
+</html>

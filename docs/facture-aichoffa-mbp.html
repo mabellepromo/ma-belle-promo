@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facture N° FAC-2026-001 — SARL AÏchoffa</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #1a6641;
+      --green-light: #e8f4ee;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --red: #dc2626;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f0f0;
+      color: var(--gray-900);
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 24px 16px 48px;
+    }
+
+    /* ── Bouton impression ─────────────────────────────────── */
+    .print-bar {
+      max-width: 800px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-200); }
+
+    /* ── Page facture ──────────────────────────────────────── */
+    .invoice {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+    }
+
+    /* Header */
+    .invoice-header {
+      background: var(--green);
+      color: #fff;
+      padding: 32px 40px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    .company-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+    }
+    .company-tagline {
+      font-size: 11px;
+      opacity: .75;
+      margin-top: 4px;
+      font-style: italic;
+    }
+    .company-contact {
+      font-size: 11.5px;
+      opacity: .85;
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+
+    .invoice-label-block {
+      text-align: right;
+    }
+    .invoice-label-block .word-facture {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      opacity: .95;
+    }
+    .invoice-label-block .invoice-number {
+      font-size: 13px;
+      opacity: .80;
+      margin-top: 4px;
+    }
+
+    /* Meta row */
+    .invoice-meta {
+      background: var(--green-light);
+      padding: 16px 40px;
+      display: flex;
+      gap: 32px;
+    }
+    .meta-item { flex: 1; }
+    .meta-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--green);
+    }
+    .meta-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-top: 2px;
+    }
+
+    /* Parties */
+    .invoice-parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .party {
+      padding: 24px 40px;
+    }
+    .party:first-child {
+      border-right: 1px solid var(--gray-200);
+    }
+    .party-role {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .party-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 6px;
+    }
+    .party-details {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.7;
+    }
+    .placeholder {
+      color: #aaa;
+      font-style: italic;
+    }
+
+    /* Objet */
+    .invoice-objet {
+      padding: 18px 40px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 12.5px;
+      color: var(--gray-700);
+    }
+    .invoice-objet strong { color: var(--gray-900); }
+
+    /* Table */
+    .invoice-table {
+      padding: 24px 40px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: var(--gray-900);
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    thead th:last-child { text-align: right; }
+
+    tbody tr { border-bottom: 1px solid var(--gray-100); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: var(--gray-700);
+      vertical-align: top;
+    }
+    tbody td:last-child {
+      text-align: right;
+      font-weight: 600;
+      color: var(--gray-900);
+      white-space: nowrap;
+    }
+    .td-desc { font-weight: 500; color: var(--gray-900); }
+    .td-sub  { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+
+    /* Totaux */
+    .invoice-totals {
+      padding: 0 40px 28px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .totals-table {
+      width: 320px;
+    }
+    .totals-table td {
+      padding: 5px 14px;
+      font-size: 12.5px;
+    }
+    .totals-table .tot-label { color: var(--gray-500); }
+    .totals-table .tot-value { text-align: right; font-weight: 600; }
+    .totals-table .tot-total-row { background: var(--green); border-radius: 6px; }
+    .totals-table .tot-total-row td {
+      padding: 11px 14px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Pied */
+    .invoice-footer {
+      border-top: 1px solid var(--gray-200);
+      padding: 20px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .footer-block-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+    .footer-block-body {
+      font-size: 11.5px;
+      color: var(--gray-500);
+      line-height: 1.7;
+    }
+
+    .invoice-legal {
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      padding: 12px 40px;
+      font-size: 10px;
+      color: var(--gray-500);
+      text-align: center;
+    }
+
+    /* Badge statut */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    /* ── Print ─────────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .print-bar { display: none; }
+      .invoice {
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+      }
+      @page { margin: 12mm 14mm; size: A4; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Boutons -->
+  <div class="print-bar">
+    <button class="btn btn-outline" onclick="window.close()">✕ Fermer</button>
+    <button class="btn btn-primary" onclick="window.print()">
+      ⬇ Télécharger / Imprimer PDF
+    </button>
+  </div>
+
+  <!-- Facture -->
+  <div class="invoice">
+
+    <!-- En-tête -->
+    <div class="invoice-header">
+      <div>
+        <div class="company-name">SARL AÏchoffa</div>
+        <div class="company-tagline">Développement web &amp; solutions numériques</div>
+        <div class="company-contact">
+          <span class="placeholder">[Adresse complète]</span><br>
+          <span class="placeholder">[Ville, Code postal] — Togo</span><br>
+          <span class="placeholder">[Téléphone]</span> &nbsp;·&nbsp; <span class="placeholder">[Email]</span><br>
+          RCCM : <span class="placeholder">[N° RCCM]</span>
+        </div>
+      </div>
+      <div class="invoice-label-block">
+        <div class="word-facture">FACTURE</div>
+        <div class="invoice-number">N° FAC-2026-001</div>
+        <div style="margin-top:12px">
+          <span class="status-badge">En attente de paiement</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Méta -->
+    <div class="invoice-meta">
+      <div class="meta-item">
+        <div class="meta-label">Date d'émission</div>
+        <div class="meta-value">17 mai 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Échéance</div>
+        <div class="meta-value">À réception</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Devise</div>
+        <div class="meta-value">Franc CFA (XOF)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Référence projet</div>
+        <div class="meta-value">MBP-SITE-2025/2026</div>
+      </div>
+    </div>
+
+    <!-- Parties -->
+    <div class="invoice-parties">
+      <div class="party">
+        <div class="party-role">Émetteur</div>
+        <div class="party-name">SARL AÏchoffa</div>
+        <div class="party-details">
+          <span class="placeholder">[Adresse ligne 1]</span><br>
+          <span class="placeholder">[Ville] — Togo</span><br>
+          Tél. : <span class="placeholder">[Téléphone]</span><br>
+          Email : <span class="placeholder">[Email]</span><br>
+          RCCM : <span class="placeholder">[N° RCCM]</span>
+        </div>
+      </div>
+      <div class="party">
+        <div class="party-role">Destinataire</div>
+        <div class="party-name">Association FDD Ma Belle Promo</div>
+        <div class="party-details">
+          Faculté de Droit, Université de Lomé<br>
+          Promotion 1994 – 2000<br>
+          Lomé, Togo<br>
+          Site web : mabellepromo.vercel.app
+        </div>
+      </div>
+    </div>
+
+    <!-- Objet -->
+    <div class="invoice-objet">
+      <strong>Objet :</strong> Conception, développement et mise en production du site web institutionnel de l'Association FDD Ma Belle Promo — application React complète avec espace d'administration et backend Supabase.
+    </div>
+
+    <!-- Tableau des prestations -->
+    <div class="invoice-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:45%">Prestation</th>
+            <th style="width:35%">Détail</th>
+            <th style="width:20%">Montant (F CFA)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="td-desc">Conception UX/UI</div>
+              <div class="td-sub">Maquettes, charte graphique, thème clair/sombre</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">5 jours</td>
+            <td>650 000</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Développement frontend</div>
+              <div class="td-sub">React 18 / Vite, routing, animations Framer Motion, responsive mobile-first</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">12 jours</td>
+            <td>1 650 000</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Backend Supabase</div>
+              <div class="td-sub">Base de données PostgreSQL, authentification JWT, stockage fichiers, politiques RLS</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">7 jours</td>
+            <td>950 000</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Dashboard d'administration</div>
+              <div class="td-sub">Gestion membres, articles, projets, cotisations — interface CRUD complète</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">8 jours</td>
+            <td>1 000 000</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Intégrations tierces</div>
+              <div class="td-sub">Brevo (emailing), FedaPay (paiement), ImprovMX (SMTP), hébergement Vercel</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">3 jours</td>
+            <td>345 560</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Recette, QA &amp; mise en production</div>
+              <div class="td-sub">Tests multi-appareils, accessibilité WCAG AA, déploiement, configuration DNS</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">3 jours</td>
+            <td>350 000</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-desc">Formation &amp; documentation</div>
+              <div class="td-sub">Passation à l'équipe dirigeante, guide utilisateur</div>
+            </td>
+            <td style="color:var(--gray-500);font-size:12px;">1 jour</td>
+            <td>300 000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totaux -->
+    <div class="invoice-totals">
+      <table class="totals-table">
+        <tbody>
+          <tr>
+            <td class="tot-label">Sous-total HT</td>
+            <td class="tot-value">5 245 560 F CFA</td>
+          </tr>
+          <tr>
+            <td class="tot-label">TVA</td>
+            <td class="tot-value">Non applicable</td>
+          </tr>
+          <tr class="tot-total-row">
+            <td>Total dû</td>
+            <td style="text-align:right;">5 245 560 F CFA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pied de facture -->
+    <div class="invoice-footer">
+      <div>
+        <div class="footer-block-title">Coordonnées bancaires</div>
+        <div class="footer-block-body">
+          Banque : <span class="placeholder">[Nom de la banque]</span><br>
+          Titulaire : SARL AÏchoffa<br>
+          N° compte : <span class="placeholder">[Numéro de compte]</span><br>
+          Code banque : <span class="placeholder">[Code]</span> — Code guichet : <span class="placeholder">[Code]</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-block-title">Conditions de règlement</div>
+        <div class="footer-block-body">
+          Paiement à réception de facture.<br>
+          Tout retard de paiement entraînera des pénalités conformément aux dispositions légales en vigueur.<br><br>
+          <strong>Merci pour votre confiance.</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mention légale -->
+    <div class="invoice-legal">
+      SARL AÏchoffa — RCCM : <span class="placeholder">[N° RCCM]</span> — Lomé, Togo &nbsp;|&nbsp;
+      Document généré le 17 mai 2026 &nbsp;|&nbsp; Facture N° FAC-2026-001
+    </div>
+
+  </div>
+
+</body>
+</html>

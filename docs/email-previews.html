@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Prévisualisation des emails MBP</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; display: flex; }
+    .sidebar { width: 240px; flex-shrink: 0; background: #1e293b; border-right: 1px solid #334155; overflow-y: auto; padding: 20px 0; }
+    .sidebar h1 { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; padding: 0 16px 14px; border-bottom: 1px solid #334155; margin-bottom: 8px; }
+    .sidebar button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 16px; background: none; border: none; color: #94a3b8; font-size: 13px; cursor: pointer; text-align: left; transition: all .15s; border-left: 3px solid transparent; }
+    .sidebar button:hover { background: #334155; color: #e2e8f0; }
+    .sidebar button.active { background: #14532d22; color: #fff; border-left-color: #16a34a; }
+    .sidebar button .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .email-info { background: #1e293b; border-bottom: 1px solid #334155; padding: 12px 24px; display: flex; align-items: center; gap-12px; flex-shrink: 0; }
+    .email-meta { display: flex; flex-direction: column; gap: 3px; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; margin-right: 10px; color: #fff; }
+    .subject { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 3px; }
+    .from { font-size: 11px; color: #64748b; }
+    .preview-scroll { flex: 1; overflow-y: auto; background: #e5e7eb; padding: 24px; }
+    .preview-wrap { max-width: 660px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <h1>Emails MBP</h1>
+  <button class="active" onclick="show(0,this)"><span class="dot" style="background:#ec4899"></span>Anniversaire</button>
+  <button onclick="show(1,this)"><span class="dot" style="background:#f59e0b"></span>Relance cotisation</button>
+  <button onclick="show(2,this)"><span class="dot" style="background:#10b981"></span>Bienvenue</button>
+  <button onclick="show(3,this)"><span class="dot" style="background:#3b82f6"></span>Rappel événement</button>
+  <button onclick="show(4,this)"><span class="dot" style="background:#8b5cf6"></span>Convocation AG</button>
+  <button onclick="show(5,this)"><span class="dot" style="background:#14b8a6"></span>Reçu paiement</button>
+  <button onclick="show(6,this)"><span class="dot" style="background:#ef4444"></span>Alerte dormants</button>
+</nav>
+
+<div class="main">
+  <div class="email-info" id="info">
+    <span class="badge" id="badge" style="background:#14532d">Cron</span>
+    <div class="email-meta">
+      <div class="subject" id="subject"></div>
+      <div class="from" id="from"></div>
+    </div>
+  </div>
+  <div class="preview-scroll">
+    <div class="preview-wrap" id="preview"></div>
+  </div>
+</div>
+
+<script>
+const LOGO = "https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png";
+
+function header() {
+  return `<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:#14532d;padding:28px 32px;text-align:center;">
+    <img src="${LOGO}" width="56" height="56" alt="MBP" style="border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:block;margin:0 auto 12px;">
+    <div style="color:#fff;font-size:18px;font-weight:bold;">Association Ma Belle Promo (MBP)</div>
+    <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:4px;">FDD · Université de Lomé · Promotion 1994–2000</div>
+  </td></tr>`;
+}
+
+function footer() {
+  return `<tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;">
+    <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>
+    <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;text-decoration:none;">contact@mabellepromo.org</a>
+    &nbsp;·&nbsp; <a href="https://www.mabellepromo.org" style="color:#16a34a;text-decoration:none;">www.mabellepromo.org</a></p>
+  </td></tr></table>`;
+}
+
+const EMAILS = [
+  {
+    badge: "Cron · 8h", badgeColor: "#ec4899",
+    subject: "🎂 Joyeux anniversaire, Kofi ! — Ma Belle Promo",
+    from: "De : contact@mabellepromo.org  ·  À : kofi.mensah@email.com",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <h2 style="margin:0 0 20px;font-size:22px;color:#111827;text-align:center;">🎂 Joyeux anniversaire, Kofi !</h2>
+        <p style="font-size:15px;color:#374151;line-height:1.8;text-align:center;margin:0 0 24px;">
+          Toute l'association <strong>Ma Belle Promo</strong> se joint à cette occasion pour vous souhaiter un excellent anniversaire et une belle année 2026 !
+        </p>
+        <div style="background:#f0fdf4;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px;">
+          <div style="font-size:48px;margin-bottom:8px;">🎉</div>
+          <p style="margin:0;font-size:13px;color:#16a34a;font-weight:600;">FDD · Promotion 1994–2000</p>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;text-align:center;line-height:1.7;">
+          Avec toute notre amitié et notre fraternité de promotionnaires.<br>
+          <strong style="color:#111827;">Le Bureau Exécutif — Ma Belle Promo</strong>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "Cron · 9h", badgeColor: "#f59e0b",
+    subject: "[MBP] ⚠️ Dernier rappel — Cotisation 2025",
+    from: "De : contact@mabellepromo.org  ·  À : amivi.kodjo@email.com",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <div style="display:inline-block;padding:4px 14px;background:#dc2626;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">⚠️ Dernier rappel — J+60</div>
+        <h2 style="margin:0 0 16px;font-size:17px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:10px;">Cotisation 2025 — En attente de règlement</h2>
+        <p style="margin:0 0 20px;font-size:15px;color:#111827;">Cher(e) Amivi,</p>
+        <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.8;">
+          Votre cotisation annuelle pour l'exercice <strong>2025</strong> est toujours en attente de règlement,
+          60 jours après l'échéance du 31 décembre 2025.
+        </p>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="https://www.mabellepromo.org/implications/cotisation"
+            style="display:inline-block;padding:13px 32px;background:#14532d;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;">
+            Payer ma cotisation en ligne →
+          </a>
+        </div>
+        <div style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:24px;">
+          <p style="margin:0;font-size:13px;color:#78350f;line-height:1.7;">
+            Besoin d'aide ? Écrivez-nous à
+            <a href="mailto:contact@mabellepromo.org" style="color:#d97706;font-weight:600;">contact@mabellepromo.org</a>
+          </p>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.8;">
+          Cordialement,<br><strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "Trigger", badgeColor: "#10b981",
+    subject: "Bienvenue dans l'association Ma Belle Promo ! 🎓",
+    from: "De : contact@mabellepromo.org  ·  À : yawa.nouveau@email.com",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <h2 style="margin:0 0 20px;font-size:20px;color:#111827;">Bienvenue parmi nous, Yawa ! 🎓</h2>
+        <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.8;">
+          C'est avec une grande joie que l'association <strong>Ma Belle Promo (MBP)</strong> vous accueille
+          officiellement en tant que nouveau membre. Votre dossier d'adhésion a bien été validé.
+        </p>
+        <div style="background:#f0fdf4;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+          <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#14532d;">Vos avantages en tant que membre :</p>
+          <ul style="margin:0;padding-left:20px;font-size:13px;color:#374151;line-height:2.2;">
+            <li>Accès à l'espace membres privé sur <a href="https://www.mabellepromo.org" style="color:#16a34a;">mabellepromo.org</a></li>
+            <li>Invitation aux événements et assemblées générales</li>
+            <li>Accès aux ressources, documents et archives de la promotion</li>
+            <li>Réseau des diplômés FDD Lomé 1994–2000</li>
+          </ul>
+        </div>
+        <div style="text-align:center;margin:28px 0;">
+          <a href="https://www.mabellepromo.org" style="display:inline-block;padding:13px 32px;background:#14532d;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;">Accéder à l'espace membres →</a>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.8;">
+          Pour toute question : <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;">contact@mabellepromo.org</a><br><br>
+          Fraternellement,<br><strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "Cron · 8h", badgeColor: "#3b82f6",
+    subject: "[MBP] ⏰ Demain ! — Soirée de gala annuelle MBP 2026",
+    from: "De : contact@mabellepromo.org  ·  À : tous les membres actifs",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <div style="display:inline-block;padding:4px 14px;background:#3b82f6;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">⏰ Demain !</div>
+        <h2 style="margin:0 0 16px;font-size:18px;color:#111827;">Soirée de gala annuelle MBP 2026</h2>
+        <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0">
+            <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:80px;">📅 Date :</td><td style="font-size:13px;color:#111827;font-weight:600;">20 mai 2026</td></tr>
+            <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">📍 Lieu :</td><td style="font-size:13px;color:#111827;">Hôtel Ibis Lomé, Salle Harmattan</td></tr>
+          </table>
+        </div>
+        <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.8;">
+          Ne manquez pas ce moment de fraternité et de célébration entre promotionnaires. Tenue de soirée recommandée.
+        </p>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="https://www.mabellepromo.org/activites/evenements" style="display:inline-block;padding:13px 28px;background:#14532d;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;">Voir les événements →</a>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.8;">
+          Cordialement,<br><strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "Cron · 8h", badgeColor: "#8b5cf6",
+    subject: "[MBP] Convocation — Assemblée Générale Ordinaire 2026 — 18 juin 2026",
+    from: "De : contact@mabellepromo.org  ·  À : tous les membres actifs",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <div style="display:inline-block;padding:4px 14px;background:#7c3aed;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">📋 Convocation officielle — J-30</div>
+        <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Assemblée Générale Ordinaire 2026</h2>
+        <p style="margin:0 0 24px;font-size:13px;color:#6b7280;">Association Ma Belle Promo — FDD Lomé 1994–2000</p>
+        <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;">
+            <tr><td style="padding:6px 0;font-size:13px;color:#6b7280;width:100px;">📅 Date :</td><td style="font-size:13px;color:#111827;font-weight:700;">18 juin 2026</td></tr>
+            <tr><td style="padding:6px 0;font-size:13px;color:#6b7280;">📍 Lieu :</td><td style="font-size:13px;color:#111827;">Salle de conférences FDD, Université de Lomé</td></tr>
+          </table>
+        </div>
+        <div style="margin-bottom:24px;">
+          <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#111827;">Ordre du jour :</p>
+          <ol style="margin:0;padding-left:20px;font-size:13px;color:#374151;line-height:1.9;">
+            <li style="margin:4px 0;">Rapport moral du Président</li>
+            <li style="margin:4px 0;">Rapport financier du Trésorier</li>
+            <li style="margin:4px 0;">Bilan des activités 2025–2026</li>
+            <li style="margin:4px 0;">Programme et budget 2026–2027</li>
+            <li style="margin:4px 0;">Questions diverses</li>
+          </ol>
+        </div>
+        <div style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:24px;">
+          <p style="margin:0;font-size:13px;color:#92400e;line-height:1.7;">
+            <strong>Votre présence est vivement souhaitée.</strong><br>
+            En cas d'empêchement, veuillez nous le signaler en répondant à cet email.
+          </p>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.8;">
+          Fraternellement,<br><strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "Trigger", badgeColor: "#14b8a6",
+    subject: "[MBP] Reçu de cotisation 2026 — Merci !",
+    from: "De : contact@mabellepromo.org  ·  À : akosua.member@email.com",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <div style="display:inline-block;padding:4px 14px;background:#16a34a;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">✅ Paiement confirmé</div>
+        <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Reçu de cotisation 2026</h2>
+        <p style="margin:0 0 24px;font-size:14px;color:#374151;">Cher(e) Akosua,</p>
+        <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.8;">
+          Nous avons bien enregistré votre paiement de cotisation pour l'exercice <strong>2026</strong>.
+          Merci de votre contribution à la vie de notre association !
+        </p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+          <p style="margin:0 0 12px;font-size:11px;color:#16a34a;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Récapitulatif</p>
+          <table cellpadding="0" cellspacing="0" style="width:100%;">
+            <tr><td style="padding:5px 0;font-size:13px;color:#6b7280;width:140px;">Exercice :</td><td style="font-size:13px;color:#111827;font-weight:600;">2026</td></tr>
+            <tr><td style="padding:5px 0;font-size:13px;color:#6b7280;">Montant :</td><td style="font-size:15px;color:#14532d;font-weight:900;">25 000 FCFA</td></tr>
+            <tr><td style="padding:5px 0;font-size:13px;color:#6b7280;">Date :</td><td style="font-size:13px;color:#111827;">19 mai 2026</td></tr>
+            <tr><td style="padding:5px 0;font-size:13px;color:#6b7280;">Statut :</td><td><span style="display:inline-block;padding:2px 10px;background:#16a34a;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;">Payé ✓</span></td></tr>
+          </table>
+        </div>
+        <p style="margin:0 0 20px;font-size:12px;color:#9ca3af;text-align:center;">Conservez cet email comme preuve de paiement.</p>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.8;">
+          Avec toute notre gratitude,<br><strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>
+      </td></tr>
+      ${footer()}`
+  },
+  {
+    badge: "1er/mois", badgeColor: "#ef4444",
+    subject: "[MBP] ⚠️ 7 membres dormants — Rapport mensuel",
+    from: "De : contact@mabellepromo.org  ·  À : Trésorier MBP",
+    html: () => `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+      ${header()}
+      <tr><td style="padding:32px;">
+        <div style="display:inline-block;padding:4px 14px;background:#dc2626;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">⚠️ Alerte mensuelle — Membres dormants</div>
+        <h2 style="margin:0 0 16px;font-size:17px;color:#111827;">7 membres sans cotisation depuis 12 mois</h2>
+        <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.8;">
+          Le rapport mensuel automatique identifie les membres actifs n'ayant enregistré aucun paiement
+          de cotisation depuis au moins <strong>12 mois</strong>.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:24px;">
+          <thead>
+            <tr style="background:#f9fafb;">
+              <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Membre</th>
+              <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">Kodjo Mensah</td><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;"><a href="mailto:k.mensah@email.com" style="color:#14532d;">k.mensah@email.com</a></td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">Afi Dossou</td><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;"><a href="mailto:afi.dossou@email.com" style="color:#14532d;">afi.dossou@email.com</a></td></tr>
+            <tr><td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">Mawuéna Agbéko</td><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;"><a href="mailto:m.agbeko@email.com" style="color:#14532d;">m.agbeko@email.com</a></td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">Komi Attivor</td><td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;"><a href="mailto:k.attivor@email.com" style="color:#14532d;">k.attivor@email.com</a></td></tr>
+            <tr><td style="padding:8px 12px;font-size:13px;color:#374151;">Edem Koffi</td><td style="padding:8px 12px;font-size:13px;color:#6b7280;"><a href="mailto:e.koffi@email.com" style="color:#14532d;">e.koffi@email.com</a></td></tr>
+          </tbody>
+        </table>
+        <div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px;">
+          <p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.7;">
+            <strong>Action suggérée :</strong> Utilisez le module Cotisations du dashboard pour envoyer
+            une relance groupée ou contactez ces membres individuellement.
+          </p>
+        </div>
+        <p style="margin:0;font-size:12px;color:#9ca3af;">Rapport généré automatiquement le 01/05/2026 — Module Automatisations MBP</p>
+      </td></tr>
+      ${footer()}`
+  }
+];
+
+function show(index, btn) {
+  const e = EMAILS[index];
+  document.getElementById("badge").textContent = e.badge;
+  document.getElementById("badge").style.background = e.badgeColor;
+  document.getElementById("subject").textContent = e.subject;
+  document.getElementById("from").textContent = e.from;
+  document.getElementById("preview").innerHTML = e.html();
+  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// Afficher le premier email au chargement
+show(0, document.querySelector(".sidebar button"));
+</script>
+</body>
+</html>

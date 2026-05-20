@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête (Version Classique)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Palette officielle MBP ── */
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);   /* Primary */
+      --vert-fonce:  hsl(150, 28%,  8%);   /* Brand dark */
+      --dore:        hsl(38,  70%, 55%);   /* Accent */
+      --fond-sauge:  hsl(148, 38%, 95%);   /* Background */
+      --bordure:     hsl(148, 30%, 84%);   /* Border */
+      --texte:       hsl(150, 30%, 10%);   /* Foreground */
+      --texte-muted: hsl(150, 10%, 45%);   /* Muted foreground */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    /* ── Bandeau d'instructions (hors impression) ── */
+    .print-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #664d03;
+      max-width: 794px;
+      width: 100%;
+    }
+    .print-hint strong { font-weight: 600; }
+    @media print { .print-hint { display: none; } }
+
+    /* ── Feuille A4 ── */
+    .page {
+      width: 794px;
+      min-height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      page-break-after: always;
+    }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; min-height: 100vh; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       EN-TÊTE — Version Classique / Institutionnelle
+       ══════════════════════════════════════════════════ */
+    .header {
+      background: var(--vert-foret);
+      padding: 28px 40px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border-bottom: 4px solid var(--dore);
+    }
+
+    /* ── Zone logo ── */
+    .header-logo {
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    /* LOGO : remplacez le chemin si vous ouvrez ce fichier hors du dossier docs/ */
+    .header-logo img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .header-text { flex: 1; color: #fff; }
+
+    .header-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .header-sub {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.80);
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header-promo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--dore);
+      margin-top: 3px;
+    }
+
+    /* ── Bande décorative sous l'en-tête ── */
+    .header-stripe {
+      height: 6px;
+      background: linear-gradient(90deg, var(--dore) 0%, hsl(148,38%,80%) 100%);
+    }
+
+    /* ── Corps de la lettre ── */
+    .body {
+      flex: 1;
+      padding: 36px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Bloc destinataire + méta (date / réf / objet) */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+    }
+
+    .destinataire {
+      flex: 1;
+    }
+
+    .destinataire-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 6px;
+    }
+
+    .destinataire-bloc {
+      border-left: 3px solid var(--dore);
+      padding: 8px 14px;
+      background: var(--fond-sauge);
+      border-radius: 0 6px 6px 0;
+      min-height: 80px;
+    }
+
+    .editable-dest {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--texte);
+      min-height: 70px;
+      outline: none;
+      display: block;
+    }
+    .editable-dest:focus { background: rgba(255,255,255,0.6); }
+
+    .meta-col {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .meta-field {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--texte-muted);
+    }
+
+    .editable-meta {
+      font-size: 13px;
+      color: var(--texte);
+      border-bottom: 1px dashed var(--bordure);
+      outline: none;
+      padding: 1px 4px;
+      min-width: 80px;
+    }
+    .editable-meta:focus { border-bottom-color: var(--vert-foret); background: rgba(255,255,255,0.5); }
+
+    /* Objet */
+    .objet-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--fond-sauge);
+      border-radius: 6px;
+      border: 1px solid var(--bordure);
+    }
+    .objet-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--vert-foret);
+      flex-shrink: 0;
+    }
+    .editable-objet {
+      flex: 1;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      border: none;
+      background: transparent;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .editable-objet:focus { background: rgba(255,255,255,0.5); border-radius: 3px; }
+
+    /* Séparateur */
+    .separator {
+      height: 1px;
+      background: var(--bordure);
+    }
+
+    /* Formule d'appel */
+    .formule-appel {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+    }
+    .formule-appel:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Corps de la lettre */
+    .corps-lettre {
+      flex: 1;
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--texte);
+      outline: none;
+      min-height: 280px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    /* Politesse + signature */
+    .closing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      margin-top: 8px;
+    }
+
+    .politesse {
+      flex: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      line-height: 1.6;
+      min-height: 48px;
+    }
+    .politesse:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .signature-bloc {
+      min-width: 200px;
+      text-align: right;
+    }
+    .signature-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 32px;
+    }
+    .editable-signature {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      display: block;
+      min-height: 20px;
+    }
+    .editable-signature:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+    .signature-titre {
+      font-size: 11.5px;
+      color: var(--texte-muted);
+      outline: none;
+      text-align: right;
+      display: block;
+      min-height: 16px;
+    }
+    .signature-titre:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE ══ */
+    .footer {
+      border-top: 1px solid var(--bordure);
+      background: var(--fond-sauge);
+      padding: 14px 40px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--texte-muted);
+    }
+
+    .footer-icon {
+      width: 12px;
+      height: 12px;
+      fill: var(--vert-foret);
+      flex-shrink: 0;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: var(--bordure);
+      margin-bottom: 10px;
+    }
+
+    .footer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--vert-foret);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    /* Zones editables — style commun focus */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsl(153,50%,28%,0.18);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint">
+    <strong>Mode édition :</strong> cliquez sur n'importe quelle zone de texte pour la modifier directement.
+    Pour imprimer : <strong>Ctrl + P</strong> (ou Cmd + P) — choisissez « Enregistrer en PDF » pour un export propre.
+    Le logo s'affiche si vous ouvrez ce fichier depuis le dossier <code>docs/</code> du projet.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  VERSION 1 — Classique / Institutionnelle          -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <!-- LOGO — chemin relatif depuis docs/ vers public/ -->
+      <div class="header-logo">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="header-text">
+        <div class="header-name">Ma Belle Promo</div>
+        <div class="header-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé</div>
+        <div class="header-promo">Promotion 1994 – 2000</div>
+      </div>
+    </header>
+    <div class="header-stripe"></div>
+
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire + méta -->
+      <div class="meta-row">
+
+        <div class="destinataire">
+          <div class="destinataire-label">À l'attention de</div>
+          <div class="destinataire-bloc">
+            <div
+              class="editable-dest"
+              contenteditable="true"
+              data-placeholder="M. / Mme Nom Prénom&#10;Fonction&#10;Organisation&#10;Adresse"
+            >M. / Mme Nom Prénom<br>Fonction<br>Organisation<br>Adresse</div>
+          </div>
+        </div>
+
+        <div class="meta-col">
+          <div class="meta-field">
+            <span class="meta-label">Lomé, le</span>
+            <span class="editable-meta" contenteditable="true" data-placeholder="date">19 mai 2026</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">Réf.</span>
+            <span class="editable-meta" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objet -->
+      <div class="objet-row">
+        <span class="objet-label">Objet :</span>
+        <span
+          class="editable-objet"
+          contenteditable="true"
+          data-placeholder="Saisissez l'objet de votre courrier"
+        >Objet du courrier</span>
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps de la lettre -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam.
+
+        <br><br>
+
+        Paragraph suivant. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="signature-bloc">
+          <div class="signature-label">Le Président</div>
+          <span
+            class="editable-signature"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="signature-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Président de l'association</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-name">FDD MA BELLE PROMO — Association des Anciens Diplômés de la Faculté de Droit de l'Université de Lomé · Promotion 1994–2000</div>
+      <div class="footer-divider"></div>
+      <div class="footer-inner">
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          12 BP 335 Baguida, Togo
+        </div>
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          90 05 36 06 · 96 02 00 00
+        </div>
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          contact@mabellepromo.org
+        </div>
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          mabellepromo.org
+        </div>
+
+      </div>
+    </footer>
+
+  </div><!-- /.page -->
+
+</body>
+</html>
