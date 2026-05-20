@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { genererFactureBoutique } from "@/lib/documentGenerators";
 import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2, Eye, FileText } from "lucide-react";
@@ -50,10 +51,8 @@ export default function VentesSection() {
   async function deleteCommande(id) {
     setUpdatingId(id);
     const { error } = await supabase.from("commandes").delete().eq("id", id);
-    if (!error) {
-      setCommandes(prev => prev.filter(c => c.id !== id));
-      setExpandedId(null);
-    }
+    if (error) toast.error("Erreur lors de la suppression : " + error.message);
+    else { setCommandes(prev => prev.filter(c => c.id !== id)); setExpandedId(null); }
     setUpdatingId(null);
     setConfirmDeleteId(null);
   }
@@ -61,10 +60,8 @@ export default function VentesSection() {
   async function updateStatut(id, statut) {
     setUpdatingId(id);
     const { error } = await supabase.from("commandes").update({ statut }).eq("id", id);
-    if (!error) {
-      setCommandes(prev => prev.map(c => c.id === id ? { ...c, statut } : c));
-      setExpandedId(null);
-    }
+    if (error) toast.error("Erreur lors de la mise à jour : " + error.message);
+    else { setCommandes(prev => prev.map(c => c.id === id ? { ...c, statut } : c)); setExpandedId(null); }
     setUpdatingId(null);
   }
 

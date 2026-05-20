@@ -27,7 +27,7 @@ export default function MandatsSection() {
     setLoading(true);
     const { data } = await supabase
       .from("mandats")
-      .select("*, members(nom, image)")
+      .select("*, members(nom, photo)")
       .order("actif", { ascending: false })
       .order("poste");
     setMandats(data || []);
@@ -76,7 +76,7 @@ export default function MandatsSection() {
         member_id: m.member_id,
         nom: member?.nom || m.member_id,
         role: m.poste,
-        photo: member?.image || member?.photo || null,
+        photo: member?.photo || null,
         profession: member?.profession || null,
         email: member?.email || null,
       };
@@ -255,8 +255,8 @@ export default function MandatsSection() {
           <div className="divide-y divide-border/60">
             {actifs.map(m => (
               <div key={m.id} className="px-5 py-4 flex items-center gap-3">
-                {m.members?.image ? (
-                  <img src={m.members.image} alt={m.members?.nom} className="w-9 h-9 rounded-full object-cover object-top flex-shrink-0" />
+                {m.members?.photo ? (
+                  <img src={m.members.photo} alt={m.members?.nom} className="w-9 h-9 rounded-full object-cover object-top flex-shrink-0" />
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-bold text-primary">{(m.members?.nom || "?")[0]}</span>

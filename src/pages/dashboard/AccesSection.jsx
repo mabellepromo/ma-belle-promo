@@ -44,7 +44,7 @@ export default function AccesSection() {
     const { data } = await supabase
       .from("members")
       .select("id, nom, email, invited_at")
-      .eq("status", "validated")
+      .eq("statut", "actif")
       .order("nom");
     setMembers(data || []);
     setLoading(false);

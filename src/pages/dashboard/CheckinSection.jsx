@@ -66,7 +66,8 @@ export default function CheckinSection() {
   }
 
   async function deletePresence(presenceId, eventId) {
-    await supabase.from("evenement_presences").delete().eq("id", presenceId);
+    const { error } = await supabase.from("evenement_presences").delete().eq("id", presenceId);
+    if (error) { toast.error("Erreur : " + error.message); return; }
     toast.success("Présence supprimée.");
     setPresenceCounts(c => ({ ...c, [eventId]: Math.max(0, (c[eventId] || 1) - 1) }));
     setPanel(p => p ? { ...p, list: p.list.filter(x => x.id !== presenceId) } : null);

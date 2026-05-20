@@ -230,7 +230,11 @@ export default function CirculaireSection() {
 
   useEffect(() => {
     supabase.from("circulaires").select("*").order("created_at", { ascending: false }).limit(20)
-      .then(({ data }) => { setHistory(data || []); setHistLoading(false); });
+      .then(({ data, error }) => {
+        if (error) toast.error("Impossible de charger l'historique : " + error.message);
+        setHistory(data || []);
+        setHistLoading(false);
+      });
   }, []);
 
   const allPays = useMemo(() =>
