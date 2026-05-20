@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -44,6 +44,7 @@ import FacturesSection from "./dashboard/FacturesSection";
 import VentesSection from "./dashboard/VentesSection";
 import RegistreLegalSection from "./dashboard/RegistreLegalSection";
 import BenevolesSection from "./dashboard/BenevolesSection";
+import CheckinSection from "./dashboard/CheckinSection";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -422,6 +423,7 @@ export default function Dashboard() {
       items: [
         { key: "articles",    label: "Articles",    icon: FileText },
         { key: "evenements",  label: "Événements",  icon: Calendar },
+        { key: "checkin",     label: "Check-in QR", icon: QrCode   },
         { key: "projets",     label: "Projets",     icon: Star },
         { key: "programmes",  label: "Programmes",  icon: Tag },
         { key: "communiques", label: "Communiqués", icon: Mail },
@@ -1243,6 +1245,7 @@ export default function Dashboard() {
           {tab === "messages"    && <MessagesSection />}
           {tab === "articles"    && <ArticlesSection />}
           {tab === "evenements"  && <EvenementsSection />}
+          {tab === "checkin"     && <CheckinSection />}
           {tab === "projets"     && <ProjetsSection />}
           {tab === "programmes"  && <ProgrammesSection />}
           {tab === "equipe"      && <EquipeSection />}

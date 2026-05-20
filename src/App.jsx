@@ -105,6 +105,7 @@ const PaiementRetour     = lazy(() => import('./pages/PaiementRetour'));
 const Verifier           = lazy(() => import('./pages/Verifier'));
 const Sondage            = lazy(() => import('./pages/Sondage'));
 const Boutique           = lazy(() => import('./pages/Boutique'));
+const Checkin            = lazy(() => import('./pages/Checkin'));
 
 function PageLoader() {
   return (
@@ -206,6 +207,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/verifier" element={<Verifier />} />
       <Route path="/sondage/:id" element={<Sondage />} />
+      <Route path="/checkin/:id" element={<Checkin />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
