@@ -148,9 +148,10 @@ function ConfigEditor({ automationId, config, onSaved }) {
       const parsed = JSON.parse(draft);
       setSaving(true);
       setError("");
-      const { error: err } = await supabase.functions.invoke("manage-automations", {
-        body: { action: "save_config", id: automationId, config: parsed },
-      });
+      const { error: err } = await supabase
+        .from("automations")
+        .update({ config: parsed })
+        .eq("id", automationId);
       if (err) throw err;
       toast.success("Configuration sauvegardée");
       onSaved(parsed);
@@ -337,14 +338,14 @@ export default function AutomatisationsSection() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke("manage-automations", {
-      body: { action: "list" },
-    });
+    const { data, error } = await supabase
+      .from("automations")
+      .select("*")
+      .order("id");
     if (error) {
       toast.error("Impossible de charger les automatisations : " + error.message);
     } else {
-      const list = Array.isArray(data) ? data : [];
-      setAutomations(list.sort((a, b) => a.id.localeCompare(b.id)));
+      setAutomations(data ?? []);
     }
     setLoading(false);
   }, []);
@@ -353,9 +354,10 @@ export default function AutomatisationsSection() {
 
   const handleToggle = async (id, enabled) => {
     setAutomations(prev => prev.map(a => a.id === id ? { ...a, enabled } : a));
-    const { error } = await supabase.functions.invoke("manage-automations", {
-      body: { action: "toggle", id, enabled },
-    });
+    const { error } = await supabase
+      .from("automations")
+      .update({ enabled })
+      .eq("id", id);
     if (error) {
       toast.error("Erreur : " + error.message);
       setAutomations(prev => prev.map(a => a.id === id ? { ...a, enabled: !enabled } : a));
