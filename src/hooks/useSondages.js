@@ -277,3 +277,14 @@ export async function getInvitationByToken(token) {
     a_repondu: (data.sondage_soumissions || []).length > 0,
   };
 }
+
+// ── RGPD ───────────────────────────────────────────────────────────────────
+
+/** Supprime les données nominatives (nom + email) de toutes les soumissions d'un sondage */
+export async function anonymiserSoumissions(sondageId) {
+  const { error } = await supabase
+    .from("sondage_soumissions")
+    .update({ repondant_nom: null, repondant_email: null })
+    .eq("sondage_id", sondageId);
+  return error;
+}

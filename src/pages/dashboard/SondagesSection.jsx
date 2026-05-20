@@ -3,12 +3,12 @@ import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
   ChevronUp, ChevronDown, Send, Check, Clock, UserPlus, Download,
-  RefreshCw, Copy, Palette, Image, GitBranch, Columns,
+  RefreshCw, Copy, Palette, Image, GitBranch, Columns, ShieldCheck,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
   useSondages, getSondageResults, getInvitationStats,
-  createInvitations, markInvitationsSent, SONDAGE_THEMES,
+  createInvitations, markInvitationsSent, SONDAGE_THEMES, anonymiserSoumissions,
 } from "../../hooks/useSondages";
 import { inp, Field } from "./shared";
 
@@ -695,7 +695,7 @@ const emptySection = () => ({
   _id: Date.now() + Math.random(), _type: "section",
   titre: "Nouvelle section", description: "",
 });
-const emptyForm = { titre: "", description: "", actif: true, expires_at: "", theme: { preset: "mbp" } };
+const emptyForm = { titre: "", description: "", actif: true, expires_at: "", theme: { preset: "mbp" }, anonyme: false, mention_rgpd: "" };
 
 // ── Composant principal ────────────────────────────────────────────────────
 export default function SondagesSection() {
@@ -770,6 +770,8 @@ export default function SondagesSection() {
       actif: form.actif,
       expires_at: form.expires_at || null,
       theme: form.theme || {},
+      anonyme: form.anonyme || false,
+      mention_rgpd: form.mention_rgpd?.trim() || null,
       sections,
       questions: questionsWithSection,
     });
@@ -807,6 +809,16 @@ export default function SondagesSection() {
     const err = await duplicateSondage(s);
     if (err) toast.error("Erreur : " + err.message);
     else toast.success(`Copie de « ${s.titre} » créée.`);
+  }
+
+  async function handleAnonymize(s) {
+    if (!confirm(`Anonymiser toutes les réponses de « ${s.titre} » ?\n\nLes noms et emails associés aux réponses seront supprimés définitivement. Les réponses elles-mêmes sont conservées.`)) return;
+    const error = await anonymiserSoumissions(s.id);
+    if (error) toast.error("Erreur : " + error.message);
+    else {
+      toast.success("Données nominatives supprimées — réponses conservées.");
+      if (results[s.id]) loadResults(s.id);
+    }
   }
 
   return (
@@ -854,6 +866,27 @@ export default function SondagesSection() {
               </div>
               <div className="md:col-span-2">
                 <ThemePicker value={form.theme} onChange={theme => setForm(p => ({ ...p, theme }))} />
+              </div>
+
+              {/* RGPD */}
+              <div className="md:col-span-2 bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
+                <p className="text-xs font-semibold text-amber-500 uppercase tracking-wide flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5" /> Paramètres RGPD
+                </p>
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input type="checkbox" checked={form.anonyme || false}
+                    onChange={e => setForm(p => ({ ...p, anonyme: e.target.checked }))}
+                    className="mt-0.5 w-4 h-4 rounded accent-primary flex-shrink-0" />
+                  <div>
+                    <span className="text-sm text-foreground font-medium">Sondage anonyme</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">Les noms et emails des répondants ne seront pas stockés, même pour les invitations nominatives.</p>
+                  </div>
+                </label>
+                <Field label="Mention RGPD personnalisée (optionnelle)">
+                  <textarea className={inp} rows={2} value={form.mention_rgpd || ""}
+                    onChange={e => setForm(p => ({ ...p, mention_rgpd: e.target.value }))}
+                    placeholder="Laissez vide pour afficher la mention standard MBP sur la page publique…" />
+                </Field>
               </div>
             </div>
 
@@ -946,6 +979,10 @@ export default function SondagesSection() {
                         <span className="text-xs text-muted-foreground">{s.questions?.length || 0} question{(s.questions?.length || 0) !== 1 ? "s" : ""}</span>
                         {s.sections?.length > 0 && <span className="text-xs text-violet-400 bg-violet-500/15 px-1.5 py-0.5 rounded-full">{s.sections.length} section{s.sections.length !== 1 ? "s" : ""}</span>}
                         {s.expires_at && <span className="text-xs text-muted-foreground">· Expire le {new Date(s.expires_at).toLocaleDateString("fr-FR")}</span>}
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium flex items-center gap-1 ${s.anonyme ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/10 text-amber-500"}`}>
+                          <ShieldCheck className="w-2.5 h-2.5" />
+                          {s.anonyme ? "Anonyme" : "Nominatif"}
+                        </span>
                         <span className="w-2.5 h-2.5 rounded-full" style={{ background: theme.primary }} title={theme.label} />
                       </div>
                       <h3 className="font-semibold text-foreground leading-tight">{s.titre}</h3>
@@ -993,6 +1030,12 @@ export default function SondagesSection() {
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                               {res.total} réponse{res.total !== 1 ? "s" : ""}
                             </p>
+                            {!s.anonyme && res.total > 0 && (
+                              <button onClick={() => handleAnonymize(s)}
+                                className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg text-amber-500 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-colors">
+                                <ShieldCheck className="w-3 h-3" /> Anonymiser les données
+                              </button>
+                            )}
                             {res.invitations?.length > 0 && (
                               <div className="flex items-center gap-2">
                                 <p className="text-xs text-muted-foreground">

@@ -5,7 +5,7 @@ import {
   getSondageWithQuestions, hasVoted, submitSondage,
   getSondageResults, getFingerprint, getInvitationByToken, getTheme,
 } from "../hooks/useSondages";
-import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react";
 
 // ── Résultats après vote ───────────────────────────────────────────────────
 function PublicQuestionResults({ question, reponses, theme }) {
@@ -253,6 +253,7 @@ export default function Sondage() {
   const [submitting, setSubmitting] = useState(false);
   const [results, setResults] = useState(null);
   const [currentPageIdx, setCurrentPageIdx] = useState(0);
+  const [rgpdConsent, setRgpdConsent] = useState(false);
 
   // Regrouper les questions par section pour la navigation
   const pages = useMemo(() => {
@@ -373,11 +374,12 @@ export default function Sondage() {
   async function doSubmit() {
     setSubmitting(true);
     const fp = invitation ? null : getFingerprint();
+    const nominatif = !sondage?.anonyme;
     const error = await submitSondage(
       id, answers, fp,
       invitation?.id || null,
-      invitation?.nom || null,
-      invitation?.email || null,
+      nominatif ? (invitation?.nom || null) : null,
+      nominatif ? (invitation?.email || null) : null,
     );
 
     if (error) {
@@ -528,15 +530,50 @@ export default function Sondage() {
                   ))}
                 </div>
 
+                {/* Consentement RGPD — affiché sur la dernière page uniquement */}
+                {isLastPage && (
+                  <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div className="flex items-start gap-2">
+                      <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" />
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {sondage.mention_rgpd || (
+                          <>
+                            {sondage.anonyme
+                              ? "Ce sondage est anonyme — aucune donnée permettant de vous identifier n'est collectée ni conservée."
+                              : invitation
+                                ? `Votre réponse sera associée à votre identité (${invitation.nom || invitation.email}). Elle est collectée par l'association FDD Ma Belle Promo dans le cadre de cette consultation.`
+                                : "Vos réponses sont collectées par l'association FDD Ma Belle Promo dans le cadre de cette consultation."}
+                            {" "}Conformément à nos engagements RGPD, vous disposez d'un droit d'accès, de rectification et de suppression —{" "}
+                            <Link to="/informations/contacts" className="underline hover:text-primary">contactez-nous</Link>
+                            {" "}ou consultez notre{" "}
+                            <Link to="/confidentialite" className="underline hover:text-primary">politique de confidentialité</Link>.
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rgpdConsent}
+                        onChange={e => setRgpdConsent(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded flex-shrink-0 accent-primary"
+                      />
+                      <span className="text-sm font-medium text-foreground">
+                        J'accepte que mes réponses soient collectées et traitées par l'association FDD Ma Belle Promo.
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Navigation */}
-                <div className="mt-8 flex items-center gap-3">
+                <div className="mt-6 flex items-center gap-3">
                   {useSections && currentPageIdx > 0 && (
                     <button onClick={() => { setCurrentPageIdx(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                       className="flex items-center gap-1.5 px-5 py-3 rounded-xl border border-border font-medium text-sm text-foreground hover:bg-muted transition-all">
                       <ChevronLeft className="w-4 h-4" /> Précédent
                     </button>
                   )}
-                  <button onClick={handleNext} disabled={submitting}
+                  <button onClick={handleNext} disabled={submitting || (isLastPage && !rgpdConsent)}
                     className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-white"
                     style={{ background: theme.primary }}>
                     {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
