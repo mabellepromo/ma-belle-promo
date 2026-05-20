@@ -256,9 +256,7 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: "rgba(5,18,11,0.92)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "rgba(5,18,11,0.97)",
         boxShadow: scrolled
           ? "0 2px 32px rgba(0,0,0,0.50)"
           : "0 2px 0 rgba(52,211,153,0.45), 0 4px 24px rgba(0,0,0,0.55)",

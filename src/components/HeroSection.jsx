@@ -64,7 +64,7 @@ function WaterBubble({ children }) {
           <style>{`
             @keyframes bubble-ripple {
               0%   { transform: scale(1);    opacity: 0.55; }
-              100% { transform: scale(1.65); opacity: 0;    }
+              100% { transform: scale(1.30); opacity: 0;    }
             }
             .bubble-ripple {
               position: absolute; inset: 0;

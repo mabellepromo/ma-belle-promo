@@ -65,8 +65,7 @@ export default function Home() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       {/* Hero + bandeau défilant = exactement un écran */}
-      {/* transform:translateZ(0) → GPU layer propre qui contient les animations enfants (Android) */}
-      <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden", transform: "translateZ(0)" }}>
+      <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <HeroSection />
         <MarqueeSection />
       </div>
