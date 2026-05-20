@@ -5,7 +5,6 @@ import {
   Tag, ChevronRight, Sparkles, Heart, BadgeCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import FooterSection from "../components/FooterSection";
 import SEO from "../components/SEO";
 import { useCart } from "@/contexts/CartContext";
@@ -362,8 +361,6 @@ export default function Boutique() {
         description="Formations juridiques, produits dérivés MBP, art IA exclusif et publications — la boutique officielle de Ma Belle Promo."
         path="/boutique"
       />
-      <Navbar />
-
       {/* ── Hero ── */}
       <div className="relative pt-24 pb-14 overflow-hidden"
         style={{ background: "linear-gradient(150deg, #0a3d28 0%, #0d2318 60%, #0a1a12 100%)" }}>

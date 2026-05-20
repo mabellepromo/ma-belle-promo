@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "./Navbar";
 import FooterSection from "./FooterSection";
 
 export default function Layout() {
@@ -15,7 +14,6 @@ export default function Layout() {
           style={{ opacity: 0.035, filter: "grayscale(100%) contrast(1.8)" }}
         />
       </div>
-      <Navbar />
       <main className="relative z-10 flex-1 main-safe-offset">
         <Outlet />
       </main>
