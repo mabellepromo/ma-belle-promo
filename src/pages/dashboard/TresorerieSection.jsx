@@ -842,9 +842,11 @@ function RemboursementsTab({ year }) {
 function SubventionsTab({ year }) {
   const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState(null);           // formulaire création/édition
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [versement, setVersement] = useState(null); // { subId, organisme, reste, montant, date }
+  const [savingVers, setSavingVers] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -872,7 +874,6 @@ function SubventionsTab({ year }) {
         organisme:       sub.organisme,
         objet:           sub.objet,
         montant_accorde: String(sub.montant_accorde),
-        montant_recu:    String(sub.montant_recu),
         date_accord:     sub.date_accord || "",
         date_echeance:   sub.date_echeance || "",
         statut:          sub.statut,
@@ -880,7 +881,7 @@ function SubventionsTab({ year }) {
       });
     } else {
       setEditId(null);
-      setForm({ ...emptySubForm });
+      setForm({ organisme: "", objet: "", montant_accorde: "", date_accord: "", date_echeance: "", statut: "en_attente", notes: "" });
     }
   }
 
@@ -888,14 +889,12 @@ function SubventionsTab({ year }) {
     if (!form.organisme.trim())     { toast.error("L'organisme est obligatoire."); return; }
     if (!form.objet.trim())         { toast.error("L'objet est obligatoire."); return; }
     if (!form.montant_accorde || Number(form.montant_accorde) <= 0) { toast.error("Montant accordé invalide."); return; }
-    if (Number(form.montant_recu) < 0) { toast.error("Montant reçu invalide."); return; }
     setSaving(true);
     const payload = {
       annee:           year,
       organisme:       form.organisme.trim(),
       objet:           form.objet.trim(),
       montant_accorde: Number(form.montant_accorde),
-      montant_recu:    Number(form.montant_recu) || 0,
       date_accord:     form.date_accord || null,
       date_echeance:   form.date_echeance || null,
       statut:          form.statut,
@@ -911,6 +910,54 @@ function SubventionsTab({ year }) {
     load();
   }
 
+  function openVersement(s) {
+    const reste = Number(s.montant_accorde) - Number(s.montant_recu);
+    setVersement({
+      subId:     s.id,
+      organisme: s.organisme,
+      objet:     s.objet,
+      actuelRecu: Number(s.montant_recu),
+      montantAccorde: Number(s.montant_accorde),
+      reste:     reste > 0 ? reste : 0,
+      montant:   "",
+      date:      new Date().toISOString().slice(0, 10),
+    });
+  }
+
+  async function handleVersement() {
+    const montant = Number(versement.montant);
+    if (!montant || montant <= 0) { toast.error("Montant invalide."); return; }
+    if (montant > versement.reste) { toast.error(`Maximum restant : ${fmt(versement.reste)}.`); return; }
+    setSavingVers(true);
+
+    // 1 — Créer la transaction recette dans la trésorerie
+    const { error: txErr } = await supabase.from("tresorerie_transactions").insert({
+      type:       "recette",
+      categorie:  "Subventions",
+      libelle:    `Subvention reçue — ${versement.organisme}`,
+      montant,
+      date:       versement.date,
+      annee:      year,
+      description: versement.objet,
+      source_ref: `subvention:${versement.subId}`,
+    });
+    if (txErr) { setSavingVers(false); toast.error("Erreur transaction : " + txErr.message); return; }
+
+    // 2 — Mettre à jour montant_recu et statut sur la subvention
+    const newRecu = versement.actuelRecu + montant;
+    const newStatut = newRecu >= versement.montantAccorde ? "reçu" : "partiellement_reçu";
+    const { error: subErr } = await supabase.from("tresorerie_subventions").update({
+      montant_recu: newRecu,
+      statut:       newStatut,
+    }).eq("id", versement.subId);
+
+    setSavingVers(false);
+    if (subErr) { toast.error("Erreur mise à jour subvention : " + subErr.message); return; }
+    toast.success(`${fmt(montant)} encaissés → recette automatiquement créée dans la trésorerie.`);
+    setVersement(null);
+    load();
+  }
+
   async function handleDelete(id) {
     if (!window.confirm("Supprimer cette subvention ?")) return;
     await supabase.from("tresorerie_subventions").delete().eq("id", id);
@@ -920,6 +967,12 @@ function SubventionsTab({ year }) {
 
   return (
     <div className="space-y-5">
+      {/* Bannière explication */}
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-500/15 border border-violet-500/25 text-xs text-violet-400">
+        <RefreshCw className="w-3.5 h-3.5 flex-shrink-0" />
+        Chaque versement reçu crée automatiquement une recette dans <strong className="mx-0.5">Transactions</strong> et alimente le budget et le bilan.
+      </div>
+
       {/* Toolbar */}
       <div className="flex justify-end">
         <button onClick={() => openForm()}
@@ -933,14 +986,14 @@ function SubventionsTab({ year }) {
         <StatCard label="Total accordé" value={stats.accorde} icon={Landmark}
           color="bg-violet-500/15 text-violet-400"
           sub={`${subs.length} subvention(s)`} />
-        <StatCard label="Déjà reçu" value={stats.recu} icon={TrendingUp}
+        <StatCard label="Déjà encaissé" value={stats.recu} icon={TrendingUp}
           color="bg-emerald-500/15 text-emerald-400"
-          sub={stats.accorde > 0 ? `${Math.round((stats.recu / stats.accorde) * 100)}% encaissé` : ""} />
-        <StatCard label="Reste à recevoir" value={stats.attente} icon={TrendingDown}
+          sub={stats.accorde > 0 ? `${Math.round((stats.recu / stats.accorde) * 100)}% du total accordé` : ""} />
+        <StatCard label="Reste à encaisser" value={stats.attente} icon={TrendingDown}
           color="bg-amber-500/15 text-amber-400" />
       </div>
 
-      {/* Formulaire */}
+      {/* Formulaire création/édition */}
       {form && (
         <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
@@ -969,10 +1022,6 @@ function SubventionsTab({ year }) {
               <input className={inp} type="number" min="1" value={form.montant_accorde}
                 onChange={e => setForm(p => ({ ...p, montant_accorde: e.target.value }))} placeholder="0" />
             </Field>
-            <Field label="Montant reçu (FCFA)">
-              <input className={inp} type="number" min="0" value={form.montant_recu}
-                onChange={e => setForm(p => ({ ...p, montant_recu: e.target.value }))} placeholder="0" />
-            </Field>
             <Field label="Date d'accord">
               <input className={inp} type="date" value={form.date_accord}
                 onChange={e => setForm(p => ({ ...p, date_accord: e.target.value }))} />
@@ -998,6 +1047,46 @@ function SubventionsTab({ year }) {
         </div>
       )}
 
+      {/* Formulaire versement */}
+      {versement && (
+        <div className="bg-card border border-emerald-500/30 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-emerald-500/10">
+            <div>
+              <p className="font-semibold text-foreground text-sm">Enregistrer un versement reçu</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{versement.organisme} · Reste à encaisser : {fmt(versement.reste)}</p>
+            </div>
+            <button onClick={() => setVersement(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-5 grid md:grid-cols-2 gap-4">
+            <Field label="Montant encaissé (FCFA) *">
+              <input className={inp} type="number" min="1" max={versement.reste}
+                value={versement.montant}
+                onChange={e => setVersement(p => ({ ...p, montant: e.target.value }))}
+                placeholder={`Max ${fmt(versement.reste)}`} />
+            </Field>
+            <Field label="Date de réception *">
+              <input className={inp} type="date" value={versement.date}
+                onChange={e => setVersement(p => ({ ...p, date: e.target.value }))} />
+            </Field>
+          </div>
+          <div className="px-5 pb-4">
+            <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
+              <RefreshCw className="w-3.5 h-3.5 flex-shrink-0" />
+              Une recette "Subventions" sera automatiquement créée dans l'onglet Transactions.
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 px-5 pb-5">
+            <button onClick={() => setVersement(null)} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
+            <button onClick={handleVersement} disabled={savingVers}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 disabled:opacity-50">
+              {savingVers && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Confirmer l'encaissement
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Liste */}
       {loading ? (
         <div className="flex items-center gap-3 py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /> Chargement…</div>
@@ -1011,6 +1100,7 @@ function SubventionsTab({ year }) {
           {subs.map(s => {
             const cfg = SUB_STATUT_CFG[s.statut] || SUB_STATUT_CFG.en_attente;
             const pct = s.montant_accorde > 0 ? Math.min(100, Math.round((Number(s.montant_recu) / Number(s.montant_accorde)) * 100)) : 0;
+            const resteAEncaisser = Number(s.montant_accorde) - Number(s.montant_recu);
             return (
               <div key={s.id} className="bg-card border border-border rounded-2xl p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
@@ -1022,32 +1112,37 @@ function SubventionsTab({ year }) {
                     <p className="text-sm text-muted-foreground mt-0.5">{s.objet}</p>
                     {s.notes && <p className="text-xs text-muted-foreground mt-0.5 italic">{s.notes}</p>}
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground flex-wrap">
-                      {s.date_accord    && <span>Accordé le {new Date(s.date_accord).toLocaleDateString("fr-FR")}</span>}
-                      {s.date_echeance  && <span>· Échéance {new Date(s.date_echeance).toLocaleDateString("fr-FR")}</span>}
+                      {s.date_accord   && <span>Accordé le {new Date(s.date_accord).toLocaleDateString("fr-FR")}</span>}
+                      {s.date_echeance && <span>· Échéance {new Date(s.date_echeance).toLocaleDateString("fr-FR")}</span>}
                     </div>
-                    {/* Barre de progression */}
                     <div className="mt-2.5 flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div className={`h-full rounded-full transition-all duration-500 ${pct >= 100 ? "bg-emerald-500" : pct > 0 ? "bg-blue-400" : "bg-muted-foreground/20"}`}
                           style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="text-xs text-muted-foreground w-20 text-right">
+                      <span className="text-xs text-muted-foreground w-24 text-right">
                         {fmt(s.montant_recu)} / {fmt(s.montant_accorde)}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
                     <p className="font-bold text-foreground text-sm">{fmt(s.montant_accorde)}</p>
-                    <p className="text-xs text-muted-foreground">{pct}% reçu</p>
+                    <p className="text-xs text-muted-foreground">{pct}% encaissé</p>
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-border">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+                  {s.statut !== "clôturé" && s.statut !== "reçu" && resteAEncaisser > 0 && (
+                    <button onClick={() => openVersement(s)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors">
+                      <Plus className="w-3 h-3" /> Versement reçu
+                    </button>
+                  )}
                   <button onClick={() => openForm(s)}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted/60 text-muted-foreground hover:bg-muted transition-colors">
                     Modifier
                   </button>
                   <button onClick={() => handleDelete(s.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                    className="ml-auto w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
