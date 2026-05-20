@@ -15,8 +15,9 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap
 } from "lucide-react";
+import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AttestationDialog from "../components/AttestationDialog";
@@ -431,8 +432,9 @@ export default function Dashboard() {
     {
       label: "Communication",
       items: [
-        { key: "circulaire",  label: "Circulaire",   icon: Send },
-        { key: "stats",       label: "Statistiques", icon: TrendingUp },
+        { key: "circulaire",      label: "Circulaire",      icon: Send },
+        { key: "stats",           label: "Statistiques",    icon: TrendingUp },
+        { key: "automatisations", label: "Automatisations", icon: Zap },
       ],
     },
   ];
@@ -449,7 +451,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="dark h-screen flex overflow-hidden bg-background text-foreground">
+    <div className="dark min-h-screen flex bg-[#4a4a4a] text-foreground">
 
       {compose && (
         <ComposeModal
@@ -459,7 +461,7 @@ export default function Dashboard() {
       )}
 
       {/* ── SIDEBAR ── */}
-      <aside className="w-60 flex-shrink-0 h-screen flex flex-col bg-card border-r border-border">
+      <aside className="w-60 flex-shrink-0 sticky top-0 h-screen flex flex-col bg-card border-r border-border">
 
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
@@ -546,7 +548,7 @@ export default function Dashboard() {
       </aside>
 
       {/* ── CONTENU ── */}
-      <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
 
         {/* Topbar */}
         <div className="flex-shrink-0 h-14 flex items-center justify-between px-8 bg-card border-b border-border">
@@ -576,7 +578,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex-1 p-6 md:p-8 overflow-y-auto pb-8">
+        <div className="p-6 md:p-8 pb-16">
 
           {/* ── VUE D'ENSEMBLE ── */}
           {tab === "overview" && (
@@ -597,9 +599,9 @@ export default function Dashboard() {
 
               {/* Notifications navigateur */}
               {notifPermission !== "granted" && notifPermission !== "unsupported" && (
-                <div className="flex items-center gap-3 bg-violet-500/10 border border-violet-500/20 rounded-2xl px-5 py-3.5">
-                  <Bell className="w-4 h-4 text-violet-400 flex-shrink-0" />
-                  <p className="text-sm text-violet-300 flex-1">
+                <div className="flex items-center gap-3 bg-emerald-700/40 border border-emerald-600/50 rounded-2xl px-5 py-3.5">
+                  <Bell className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <p className="text-sm text-emerald-200 flex-1">
                     {notifPermission === "denied"
                       ? "Notifications bloquées — autorisez-les dans les paramètres de votre navigateur."
                       : "Activez les notifications pour recevoir les alertes anniversaires et nouvelles demandes."}
@@ -610,7 +612,7 @@ export default function Dashboard() {
                         const result = await requestNotificationPermission();
                         setNotifPermission(result);
                       }}
-                      className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors">
+                      className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
                       Activer
                     </button>
                   )}
@@ -1225,8 +1227,9 @@ export default function Dashboard() {
           {tab === "assemblees"  && <AssembleesSection />}
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
-          {tab === "circulaire"  && <CirculaireSection />}
-          {tab === "stats"       && <StatsSection />}
+          {tab === "circulaire"      && <CirculaireSection />}
+          {tab === "stats"           && <StatsSection />}
+          {tab === "automatisations" && <AutomatisationsSection />}
           {tab === "communiques" && <CommuniquesSection />}
           {tab === "mediatheque" && <MediathequeSection />}
           {tab === "documents"   && <DocumentsSection />}
