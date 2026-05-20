@@ -285,7 +285,14 @@ export function EvenementsSection() {
             <Field label="Lieu" required><input className={inp} value={form.lieu} onChange={f("lieu")} /></Field>
             <Field label="Type"><select className={sel} value={form.type} onChange={f("type")}>{TYPES.map(t => <option key={t}>{t}</option>)}</select></Field>
             <Field label="Statut"><select className={sel} value={form.statut} onChange={f("statut")}>{STATUTS.map(s => <option key={s}>{s}</option>)}</select></Field>
-            <div className="md:col-span-2"><Field label="Description" required><textarea className={ta} rows={3} value={form.description} onChange={f("description")} /></Field></div>
+            <div className="md:col-span-2">
+              <Field label="Description" required>
+                <textarea className={ta} rows={7} value={form.description} onChange={f("description")} />
+              </Field>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Mise en page Markdown : <code className="bg-muted px-1 rounded">**gras**</code>, <code className="bg-muted px-1 rounded">*italique*</code>, ligne vide = nouveau paragraphe.
+              </p>
+            </div>
             <div className="md:col-span-2"><ImgField label="Image" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
           </div>
         </FormPanel>

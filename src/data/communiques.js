@@ -1,5 +1,67 @@
 ﻿export const communiques = [
   {
+    id: 7,
+    titre: "Invitation — Webinaire : Les essentiels de l'assurance",
+    date: "18 Mai 2026",
+    type: "Invitation",
+    resume: "Ma Belle Promo vous invite à son prochain webinaire sur les fondamentaux de l'assurance, animé par deux directeurs de grandes compagnies togolaises, le vendredi 26 juin 2026 à 18h30 sur Zoom.",
+    url: "",
+    contenu: `INVITATION
+
+Lomé, le 18 mai 2026
+
+WEBINAIRE — LES ESSENTIELS DE L'ASSURANCE
+Comprendre et utiliser l'assurance au quotidien
+
+L'association Ma Belle Promo (MBP) a l'honneur de vous convier à son prochain webinaire :
+
+« Les essentiels de l'assurance »
+
+DATE ET HEURE : Vendredi 26 juin 2026, à partir de 18h30 (heure de Lomé)
+FORMAT : Webinaire en ligne — Plateforme Zoom
+(Lien de connexion transmis sur inscription)
+
+PROGRAMME
+
+18h30 — Ouverture et mot de bienvenue
+         Le Bureau de Ma Belle Promo
+
+18h40 — Thématique 1 : Comprendre les bases de l'assurance
+         Principes fondamentaux, mécanismes et fonctionnement du secteur
+         Mary Jocelyne Bamba Koumagnanou
+         Directeur des prestations — NSIA Assurances Togo
+
+19h15 — Thématique 2 : Types d'assurances et utilité concrète
+         Assurance vie, santé, automobile, habitation — comment choisir et optimiser sa couverture
+         Augustin K. AKATA
+         Directeur Santé — SanlamAllianz Togo
+         Enseignant à l'ISDI, l'UCAO et le CFBT
+
+19h50 — Questions-réponses
+
+20h15 — Clôture
+
+MODÉRATEUR
+
+Georges Kokou KOUTOH
+Directeur Risques d'entreprises & Réassurance — SanlamAllianz Togo
+Expert Agréé en assurance
+
+POURQUOI PARTICIPER ?
+
+Dans un contexte où la couverture assurantielle reste faible en Afrique subsaharienne, ce webinaire vous donnera les clés pour comprendre vos droits, mieux vous protéger et conseiller votre entourage. Deux praticiens du secteur, membres ou proches de notre réseau, partageront leur expertise de manière accessible et concrète.
+
+INSCRIPTION
+
+L'événement est ouvert aux membres de Ma Belle Promo, à leurs familles et à tout professionnel intéressé.
+Merci de confirmer votre participation en écrivant à : contact@mabellepromo.org
+Le lien Zoom sera transmis aux inscrits la veille de l'événement.
+
+---
+l'association Ma Belle Promo (MBP) — Association des diplômés de la Faculté de Droit
+Université de Lomé, Promotion 1994-2000 · www.mabellepromo.org`,
+  },
+  {
     id: 1,
     titre: "Communiqué de presse — Lancement de l'ouvrage numérique sur les métiers du droit",
     date: "24 Mai 2024",

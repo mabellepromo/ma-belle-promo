@@ -1,11 +1,20 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import SEO from "../components/SEO";
 import { Calendar, MapPin, Clock, ArrowRight, ChevronRight } from "lucide-react";
 import TiltCard from "../components/TiltCard";
 import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
+
+const mdComponents = {
+  p:      ({ children }) => <p className="text-muted-foreground text-sm leading-relaxed mb-3 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  em:     ({ children }) => <em className="italic">{children}</em>,
+  ul:     ({ children }) => <ul className="list-disc list-inside text-sm text-muted-foreground mb-3 space-y-1">{children}</ul>,
+  li:     ({ children }) => <li>{children}</li>,
+};
 
 const TYPE_STYLE = {
   "Webinaire":        { badge: "bg-blue-100 text-blue-700",     dot: "bg-blue-500",    border: "border-blue-200" },
@@ -151,7 +160,9 @@ function UpcomingCard({ evt }) {
             <TypeBadge type={evt.type} />
           </div>
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-3 leading-snug">{evt.titre}</h2>
-          <p className="text-muted-foreground text-sm leading-relaxed mb-5">{evt.description}</p>
+          <div className="mb-5">
+            <ReactMarkdown components={mdComponents}>{evt.description || ""}</ReactMarkdown>
+          </div>
           <div className="flex flex-wrap gap-4 text-sm text-foreground font-medium">
             {evt.date && <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" />{evt.date}</span>}
             {evt.heures && <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />{evt.heures}</span>}

@@ -1,5 +1,17 @@
 export const evenements = [
   {
+    id: 1,
+    titre: "Webinaire MBP — Les essentiels de l'assurance",
+    date: "26 Juin 2026",
+    heures: "18h30",
+    lieu: "Plateforme Zoom",
+    type: "Webinaire",
+    statut: "À venir",
+    articleId: null,
+    description: "Webinaire sur les fondamentaux et l'utilité concrète de l'assurance, animé par deux directeurs du secteur au Togo.\n\n**Thématique 1 — Comprendre les bases de l'assurance**\nMary Jocelyne Bamba Koumagnanou, Directeur des prestations – NSIA Assurances Togo\n\n**Thématique 2 — Types d'assurances et utilité concrète**\nAugustin K. AKATA, Directeur Santé – SanlamAllianz Togo ; Enseignant à l'ISDI, l'UCAO et le CFBT\n\n**Modérateur :** Georges Kokou KOUTOH, Directeur Risques d'entreprises & Réassurance – SanlamAllianz Togo, Expert Agréé",
+    image: "",
+  },
+  {
     id: 2,
     titre: "Webinaire — Les enjeux du numérique au Togo",
     date: "11 Décembre 2023",
