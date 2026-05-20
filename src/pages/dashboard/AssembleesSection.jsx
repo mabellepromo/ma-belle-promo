@@ -1,9 +1,10 @@
-﻿import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Plus, Trash2, X, Loader2, ChevronDown, ChevronUp, Check,
   Users, FileText, Vote, Calendar, MapPin, Clock,
+  ShieldCheck, PenLine, Eye, EyeOff,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 
@@ -13,6 +14,12 @@ const STATUT_STYLES = {
   annulee:   "bg-red-500/15 text-red-400",
 };
 const STATUT_LABELS = { planifiee: "Planifiée", tenue: "Tenue", annulee: "Annulée" };
+
+const PV_STATUT_CFG = {
+  brouillon: { label: "Brouillon",  color: "bg-muted text-muted-foreground",       icon: FileText },
+  valide:    { label: "Validé",     color: "bg-blue-500/15 text-blue-400",          icon: ShieldCheck },
+  signe:     { label: "Signé",      color: "bg-emerald-500/15 text-emerald-400",    icon: PenLine },
+};
 
 const emptyForm = {
   titre: "", type: "ordinaire", date: "", heure: "", lieu: "",
@@ -25,14 +32,13 @@ function PresencesTab({ assemblee }) {
   const [presences, setPresences] = useState({});
   const [procurations, setProcurations] = useState({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       const [{ data: mems }, { data: pres }] = await Promise.all([
-        supabase.from("members").select("id, prenom, nom, photo_url").order("nom"),
+        supabase.from("members").select("id, nom, photo").order("nom"),
         supabase.from("assemblee_presences").select("*").eq("assemblee_id", assemblee.id),
       ]);
       setMembers(mems || []);
@@ -49,7 +55,7 @@ function PresencesTab({ assemblee }) {
   }, [assemblee.id]);
 
   const filtered = members.filter(m =>
-    !search || `${m.prenom} ${m.nom}`.toLowerCase().includes(search.toLowerCase())
+    !search || (m.nom || "").toLowerCase().includes(search.toLowerCase())
   );
 
   async function togglePresence(memberId) {
@@ -70,21 +76,20 @@ function PresencesTab({ assemblee }) {
     }, { onConflict: "assemblee_id,member_id" });
   }
 
-  const totalPresents = members.filter(m => presences[m.id]).length;
+  const totalPresents   = members.filter(m => presences[m.id]).length;
   const totalProcurations = members.filter(m => !presences[m.id] && procurations[m.id]).length;
   const votants = totalPresents + totalProcurations;
-  const quorum = members.length > 0 ? Math.round((votants / members.length) * 100) : 0;
+  const quorum  = members.length > 0 ? Math.round((votants / members.length) * 100) : 0;
   const quorumAtteint = quorum >= (assemblee.quorum_requis || 50);
 
   return (
     <div className="space-y-4">
-      {/* Synthèse quorum */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Présents", value: totalPresents, color: "text-emerald-400" },
+          { label: "Présents",     value: totalPresents,   color: "text-emerald-400" },
           { label: "Procurations", value: totalProcurations, color: "text-blue-400" },
-          { label: "Votants", value: votants, color: "text-foreground" },
-          { label: "Quorum", value: `${quorum}%`, color: quorumAtteint ? "text-emerald-400" : "text-red-500",
+          { label: "Votants",      value: votants,         color: "text-foreground" },
+          { label: "Quorum",       value: `${quorum}%`,   color: quorumAtteint ? "text-emerald-400" : "text-red-500",
             sub: quorumAtteint ? "✓ Atteint" : `Requis : ${assemblee.quorum_requis}%` },
         ].map(s => (
           <div key={s.label} className="bg-muted/30 rounded-xl p-3 text-center">
@@ -104,15 +109,15 @@ function PresencesTab({ assemblee }) {
           {filtered.map(m => {
             const present = !!presences[m.id];
             return (
-              <div key={m.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors ${present ? "border-emerald-500/25 bg-emerald-500/15/50" : "border-border bg-card"}`}>
+              <div key={m.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors ${present ? "border-emerald-500/25 bg-emerald-500/5" : "border-border bg-card"}`}>
                 <button type="button" onClick={() => togglePresence(m.id)}
                   className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${present ? "border-emerald-500 bg-emerald-500" : "border-border"}`}>
                   {present && <Check className="w-3 h-3 text-white" />}
                 </button>
-                {m.photo_url
-                  ? <img src={m.photo_url} alt={`${m.prenom || ""} ${m.nom || ""}`.trim() || "Photo du membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                {m.photo
+                  ? <img src={m.photo} alt={m.nom || "Membre"} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                   : <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />}
-                <span className="text-sm font-medium text-foreground flex-1">{m.prenom} {m.nom}</span>
+                <span className="text-sm font-medium text-foreground flex-1">{m.nom}</span>
                 {!present && (
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs text-muted-foreground">Procuration de :</span>
@@ -121,7 +126,7 @@ function PresencesTab({ assemblee }) {
                       onChange={e => setProcuration(m.id, e.target.value)}>
                       <option value="">— Aucune —</option>
                       {members.filter(x => x.id !== m.id && presences[x.id]).map(x => (
-                        <option key={x.id} value={x.id}>{x.prenom} {x.nom}</option>
+                        <option key={x.id} value={x.id}>{x.nom}</option>
                       ))}
                     </select>
                   </div>
@@ -182,7 +187,6 @@ function ResolutionsTab({ assemblee }) {
 
   return (
     <div className="space-y-4">
-      {/* Ajout */}
       <div className="flex gap-2">
         <input className={`${inp} flex-1`} value={newLibelle} onChange={e => setNewLibelle(e.target.value)}
           placeholder="Libellé de la résolution…"
@@ -226,8 +230,8 @@ function ResolutionsTab({ assemblee }) {
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {[
-                    { key: "votes_pour", label: "Pour", color: "text-emerald-400" },
-                    { key: "votes_contre", label: "Contre", color: "text-red-500" },
+                    { key: "votes_pour",  label: "Pour",        color: "text-emerald-400" },
+                    { key: "votes_contre",label: "Contre",      color: "text-red-500" },
                     { key: "abstentions", label: "Abstentions", color: "text-muted-foreground" },
                   ].map(({ key, label, color }) => (
                     <div key={key} className="text-center">
@@ -255,41 +259,124 @@ function ResolutionsTab({ assemblee }) {
   );
 }
 
-// ── Onglet PV ──────────────────────────────────────────────────────────────
+// ── Onglet PV (avec signature et validation) ───────────────────────────────
 function PVTab({ assemblee, onUpdate }) {
-  const [contenu, setContenu] = useState(assemblee.pv_contenu || "");
-  const [publie, setPublie] = useState(assemblee.pv_publie || false);
-  const [saving, setSaving] = useState(false);
+  const [contenu,      setContenu]      = useState(assemblee.pv_contenu || "");
+  const [publie,       setPublie]       = useState(assemblee.pv_publie  || false);
+  const [pvStatut,     setPvStatut]     = useState(assemblee.pv_statut  || "brouillon");
+  const [signataire,   setSignataire]   = useState(assemblee.pv_signataire || "");
+  const [showSignForm, setShowSignForm] = useState(false);
+  const [saving,       setSaving]       = useState(false);
 
-  async function save() {
+  const cfg = PV_STATUT_CFG[pvStatut] || PV_STATUT_CFG.brouillon;
+  const Icon = cfg.icon;
+
+  async function save(extra = {}) {
     setSaving(true);
-    const { error } = await supabase.from("assemblees")
-      .update({ pv_contenu: contenu, pv_publie: publie }).eq("id", assemblee.id);
+    const patch = { pv_contenu: contenu, pv_publie: publie, ...extra };
+    const { error } = await supabase.from("assemblees").update(patch).eq("id", assemblee.id);
     setSaving(false);
     if (error) { toast.error("Erreur : " + error.message); return; }
-    toast.success("PV enregistré.");
-    onUpdate({ ...assemblee, pv_contenu: contenu, pv_publie: publie });
+    const updated = { ...assemblee, ...patch };
+    onUpdate(updated);
+    return true;
+  }
+
+  async function handleValider() {
+    if (!contenu.trim()) { toast.error("Rédigez d'abord le PV avant de le valider."); return; }
+    const ok = await save({ pv_statut: "valide" });
+    if (ok) { setPvStatut("valide"); toast.success("PV validé — prêt pour signature."); }
+  }
+
+  async function handleSigner() {
+    if (!signataire.trim()) { toast.error("Saisissez le nom du signataire."); return; }
+    const ok = await save({ pv_statut: "signe", pv_signataire: signataire.trim(), pv_signe_le: new Date().toISOString() });
+    if (ok) { setPvStatut("signe"); setShowSignForm(false); toast.success("PV signé et verrouillé."); }
   }
 
   return (
     <div className="space-y-4">
+
+      {/* Bandeau statut PV */}
+      <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border ${pvStatut === "signe" ? "border-emerald-500/30 bg-emerald-500/10" : pvStatut === "valide" ? "border-blue-500/30 bg-blue-500/10" : "border-border bg-muted/20"}`}>
+        <div className="flex items-center gap-2">
+          <Icon className="w-4 h-4" />
+          <span className="text-sm font-semibold">Statut PV : {cfg.label}</span>
+          {pvStatut === "signe" && assemblee.pv_signataire && (
+            <span className="text-xs text-muted-foreground">
+              · signé par <strong>{assemblee.pv_signataire}</strong>
+              {assemblee.pv_signe_le && ` le ${new Date(assemblee.pv_signe_le).toLocaleDateString("fr-FR")}`}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {pvStatut === "brouillon" && (
+            <button onClick={handleValider} disabled={saving}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              <ShieldCheck className="w-3.5 h-3.5" /> Valider le PV
+            </button>
+          )}
+          {pvStatut === "valide" && !showSignForm && (
+            <button onClick={() => setShowSignForm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700">
+              <PenLine className="w-3.5 h-3.5" /> Apposer la signature
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Formulaire de signature */}
+      {showSignForm && (
+        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl">
+          <PenLine className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <input
+            className={`${inp} flex-1 text-sm`}
+            placeholder="Nom complet du signataire…"
+            value={signataire}
+            onChange={e => setSignataire(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleSigner(); }}
+            autoFocus
+          />
+          <button onClick={handleSigner} disabled={saving || !signataire.trim()}
+            className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50">
+            Confirmer
+          </button>
+          <button onClick={() => setShowSignForm(false)}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Éditeur PV */}
       <textarea
-        className={`${inp} min-h-64 font-mono text-sm`}
+        className={`${inp} min-h-64 font-mono text-sm ${pvStatut === "signe" ? "opacity-60 cursor-not-allowed" : ""}`}
         value={contenu}
-        onChange={e => setContenu(e.target.value)}
+        onChange={e => { if (pvStatut !== "signe") setContenu(e.target.value); }}
+        readOnly={pvStatut === "signe"}
         placeholder="Rédigez le procès-verbal ici…&#10;&#10;Ordre du jour :&#10;1. …&#10;&#10;Délibérations :&#10;…&#10;&#10;La séance est levée à …"
       />
+      {pvStatut === "signe" && (
+        <p className="text-xs text-muted-foreground italic">Le PV est signé et verrouillé. Contactez l'administrateur pour toute modification.</p>
+      )}
+
+      {/* Publication */}
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input type="checkbox" checked={publie} onChange={e => setPublie(e.target.checked)}
+        <label className={`flex items-center gap-2 select-none ${pvStatut === "brouillon" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
+          <input type="checkbox" checked={publie}
+            disabled={pvStatut === "brouillon"}
+            onChange={e => setPublie(e.target.checked)}
             className="w-4 h-4 rounded accent-primary" />
           <span className="text-sm text-foreground">Publier dans l'espace membre</span>
           {publie && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">Visible</span>}
+          {pvStatut === "brouillon" && <span className="text-xs text-muted-foreground">(validez d'abord le PV)</span>}
         </label>
-        <button onClick={save} disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
-          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Enregistrer le PV
-        </button>
+        {pvStatut !== "signe" && (
+          <button onClick={() => save()} disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
+            {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Enregistrer
+          </button>
+        )}
       </div>
     </div>
   );
@@ -298,12 +385,12 @@ function PVTab({ assemblee, onUpdate }) {
 // ── Composant principal ────────────────────────────────────────────────────
 export default function AssembleesSection() {
   const [assemblees, setAssemblees] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState(null);
-  const [saving, setSaving] = useState(false);
+  const [loading,    setLoading]    = useState(true);
+  const [form,       setForm]       = useState(null);
+  const [saving,     setSaving]     = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [detailTab, setDetailTab] = useState("presences");
-  const [newOdj, setNewOdj] = useState("");
+  const [detailTab,  setDetailTab]  = useState("presences");
+  const [newOdj,     setNewOdj]     = useState("");
 
   async function load() {
     setLoading(true);
@@ -317,7 +404,7 @@ export default function AssembleesSection() {
 
   async function handleSave() {
     if (!form.titre?.trim()) { toast.error("Le titre est obligatoire."); return; }
-    if (!form.date) { toast.error("La date est obligatoire."); return; }
+    if (!form.date)          { toast.error("La date est obligatoire."); return; }
     setSaving(true);
     const payload = {
       titre: form.titre.trim(), type: form.type, date: form.date,
@@ -360,7 +447,7 @@ export default function AssembleesSection() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-heading text-xl font-bold text-foreground">Assemblées Générales</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Présences, résolutions, procès-verbaux</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Présences, résolutions, procès-verbaux avec signature</p>
         </div>
         <button onClick={() => { setForm({ ...emptyForm }); setSelectedId(null); }}
           className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
@@ -403,8 +490,6 @@ export default function AssembleesSection() {
                   onChange={e => setForm(p => ({ ...p, quorum_requis: e.target.value }))} />
               </Field>
             </div>
-
-            {/* Ordre du jour */}
             <div>
               <p className="text-xs font-semibold text-muted-foreground mb-2">Ordre du jour</p>
               <div className="space-y-1.5 mb-2">
@@ -412,10 +497,7 @@ export default function AssembleesSection() {
                   <div key={i} className="flex items-center gap-2 bg-muted/40 rounded-lg px-3 py-2">
                     <span className="text-xs font-bold text-muted-foreground w-5">{i + 1}.</span>
                     <span className="text-sm text-foreground flex-1">{item}</span>
-                    <button onClick={() => removeOdj(i)}
-                      className="w-5 h-5 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500">
-                      <X className="w-3 h-3" />
-                    </button>
+                    <button onClick={() => removeOdj(i)} className="w-5 h-5 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500"><X className="w-3 h-3" /></button>
                   </div>
                 ))}
               </div>
@@ -442,7 +524,7 @@ export default function AssembleesSection() {
       )}
 
       <div className="grid lg:grid-cols-3 gap-4">
-        {/* Liste des AGs */}
+        {/* Liste */}
         <div className="lg:col-span-1 space-y-2">
           {loading ? (
             <div className="flex items-center gap-2 py-10 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Chargement…</div>
@@ -451,41 +533,47 @@ export default function AssembleesSection() {
               <Vote className="w-8 h-8 mx-auto mb-2 opacity-25" />
               <p className="text-sm font-medium">Aucune assemblée.</p>
             </div>
-          ) : assemblees.map(a => (
-            <div key={a.id}
-              className={`bg-card border rounded-xl p-3 cursor-pointer transition-all hover:shadow-sm ${selectedId === a.id ? "border-primary shadow-sm" : "border-border"}`}
-              onClick={() => { setSelectedId(a.id); setDetailTab("presences"); }}>
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${STATUT_STYLES[a.statut]}`}>
-                      {STATUT_LABELS[a.statut]}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{a.type === "extraordinaire" ? "Extraordinaire" : "Ordinaire"}</span>
+          ) : assemblees.map(a => {
+            const pvCfg = PV_STATUT_CFG[a.pv_statut || "brouillon"];
+            return (
+              <div key={a.id}
+                className={`bg-card border rounded-xl p-3 cursor-pointer transition-all hover:shadow-sm ${selectedId === a.id ? "border-primary shadow-sm" : "border-border"}`}
+                onClick={() => { setSelectedId(a.id); setDetailTab("presences"); }}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${STATUT_STYLES[a.statut]}`}>{STATUT_LABELS[a.statut]}</span>
+                      <span className="text-xs text-muted-foreground">{a.type === "extraordinaire" ? "Extraordinaire" : "Ordinaire"}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground leading-tight truncate">{a.titre}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-0.5"><Calendar className="w-3 h-3" />{new Date(a.date).toLocaleDateString("fr-FR")}</span>
+                      {a.lieu && <span className="flex items-center gap-0.5 truncate"><MapPin className="w-3 h-3" />{a.lieu}</span>}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      {a.pv_publie && <span className="text-xs px-1.5 py-0.5 bg-emerald-500/15 text-emerald-400 rounded-full">PV publié</span>}
+                      {a.pv_contenu && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${pvCfg.color}`}>PV {pvCfg.label}</span>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm font-semibold text-foreground leading-tight truncate">{a.titre}</p>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-0.5"><Calendar className="w-3 h-3" />{new Date(a.date).toLocaleDateString("fr-FR")}</span>
-                    {a.lieu && <span className="flex items-center gap-0.5 truncate"><MapPin className="w-3 h-3" />{a.lieu}</span>}
+                  <div className="flex gap-1">
+                    <button onClick={e => { e.stopPropagation(); setForm({ ...a }); }}
+                      className="w-6 h-6 rounded hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
+                      <FileText className="w-3 h-3" />
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); handleDelete(a.id); }}
+                      className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                   </div>
-                </div>
-                <div className="flex gap-1">
-                  <button onClick={e => { e.stopPropagation(); setForm({ ...a }); }}
-                    className="w-6 h-6 rounded hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
-                    <FileText className="w-3 h-3" />
-                  </button>
-                  <button onClick={e => { e.stopPropagation(); handleDelete(a.id); }}
-                    className="w-6 h-6 rounded hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
                 </div>
               </div>
-              {a.pv_publie && <span className="inline-block mt-1.5 text-xs px-1.5 py-0.5 bg-emerald-500/15 text-emerald-400 rounded-full">PV publié</span>}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Détail AG */}
+        {/* Détail */}
         <div className="lg:col-span-2">
           {!selected ? (
             <div className="h-full min-h-48 flex items-center justify-center bg-card border border-border rounded-2xl text-muted-foreground text-sm">
@@ -493,7 +581,6 @@ export default function AssembleesSection() {
             </div>
           ) : (
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              {/* En-tête AG sélectionnée */}
               <div className="px-5 py-4 border-b border-border">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -510,7 +597,6 @@ export default function AssembleesSection() {
                       </div>
                     )}
                   </div>
-                  {/* Changement rapide statut */}
                   <select className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none"
                     value={selected.statut}
                     onChange={e => updateStatut(selected.id, e.target.value)}>
@@ -521,12 +607,11 @@ export default function AssembleesSection() {
                 </div>
               </div>
 
-              {/* Onglets */}
               <div className="flex border-b border-border">
                 {[
-                  { key: "presences", label: "Présences", icon: Users },
-                  { key: "resolutions", label: "Résolutions", icon: Vote },
-                  { key: "pv", label: "Procès-verbal", icon: FileText },
+                  { key: "presences",   label: "Présences",     icon: Users },
+                  { key: "resolutions", label: "Résolutions",   icon: Vote },
+                  { key: "pv",          label: "Procès-verbal", icon: FileText },
                 ].map(({ key, label, icon: Icon }) => (
                   <button key={key} onClick={() => setDetailTab(key)}
                     className={`flex items-center gap-1.5 flex-1 py-3 text-sm font-medium transition-colors ${detailTab === key ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
@@ -536,9 +621,14 @@ export default function AssembleesSection() {
               </div>
 
               <div className="p-5">
-                {detailTab === "presences"  && <PresencesTab assemblee={selected} />}
+                {detailTab === "presences"   && <PresencesTab assemblee={selected} />}
                 {detailTab === "resolutions" && <ResolutionsTab assemblee={selected} />}
-                {detailTab === "pv"          && <PVTab assemblee={selected} onUpdate={updated => setAssemblees(prev => prev.map(a => a.id === updated.id ? updated : a))} />}
+                {detailTab === "pv"          && (
+                  <PVTab
+                    assemblee={selected}
+                    onUpdate={updated => setAssemblees(prev => prev.map(a => a.id === updated.id ? updated : a))}
+                  />
+                )}
               </div>
             </div>
           )}
