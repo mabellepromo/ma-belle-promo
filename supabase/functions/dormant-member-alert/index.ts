@@ -35,24 +35,24 @@ serve(async (_req) => {
     const today = new Date();
     const cutoffYear = today.getUTCFullYear() - Math.ceil(inactivityMonths / 12);
 
-    // Membres actifs qui n'ont pas de cotisation payée depuis cutoffYear
+    // Membres validés qui n'ont pas de cotisation payée depuis cutoffYear
     const { data: membres, error: membresErr } = await db
-      .from("membres")
-      .select("id, prenom, nom, email, created_at")
-      .eq("statut", "actif");
+      .from("members")
+      .select("id, nom, email, created_at")
+      .eq("status", "validated");
 
     if (membresErr) throw new Error(`Lecture membres: ${membresErr.message}`);
 
     // Cotisations payées depuis l'année de référence
     const { data: cotisations, error: cotisErr } = await db
       .from("cotisations")
-      .select("membre_id, annee")
+      .select("member_id, annee")
       .gte("annee", cutoffYear)
-      .eq("statut", "paye");
+      .eq("statut", "payé");
 
     if (cotisErr) throw new Error(`Lecture cotisations: ${cotisErr.message}`);
 
-    const actifIds = new Set((cotisations ?? []).map((c: { membre_id: string }) => c.membre_id));
+    const actifIds = new Set((cotisations ?? []).map((c: { member_id: string }) => c.member_id));
 
     const dormants = (membres ?? []).filter((m: { id: string; created_at: string }) => {
       if (actifIds.has(m.id)) return false;
@@ -74,10 +74,10 @@ serve(async (_req) => {
       return jsonResponse({ skipped: true, reason: "alerte déjà envoyée ce mois" });
     }
 
-    const lignes = dormants.map((m: { prenom: string; nom: string; email: string }) => `
+    const lignes = dormants.map((m: { nom: string; email: string }) => `
       <tr>
         <td style="padding:8px 12px;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;">
-          ${escHtml(`${m.prenom || ""} ${m.nom || ""}`.trim() || "—")}
+          ${escHtml(m.nom || "—")}
         </td>
         <td style="padding:8px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;">
           <a href="mailto:${escHtml(m.email)}" style="color:#14532d;">${escHtml(m.email)}</a>

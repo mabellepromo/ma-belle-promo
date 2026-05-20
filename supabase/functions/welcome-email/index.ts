@@ -1,6 +1,6 @@
 // Automatisation 3 — Mail de bienvenue
 // Déclenché manuellement (trigger) après validation d'un nouveau membre
-// Peut être appelé depuis le dashboard avec { membre_id } dans le body
+// Peut être appelé depuis le dashboard avec { member_id } dans le body
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import {
@@ -28,16 +28,16 @@ serve(async (req) => {
     const apiKey = Deno.env.get("BREVO_API_KEY");
     if (!apiKey) throw new Error("BREVO_API_KEY non configurée");
 
-    let membres: Array<{ id: string; prenom: string; nom: string; email: string }> = [];
+    let membres: Array<{ id: string; nom: string; email: string }> = [];
 
     const body = await req.json().catch(() => ({}));
-    const { membre_id } = body as { membre_id?: string };
+    const { member_id } = body as { member_id?: string };
 
-    if (membre_id) {
+    if (member_id) {
       const { data, error } = await db
-        .from("membres")
-        .select("id, prenom, nom, email")
-        .eq("id", membre_id)
+        .from("members")
+        .select("id, nom, email")
+        .eq("id", member_id)
         .maybeSingle();
       if (error) throw new Error(`Lecture membre: ${error.message}`);
       if (data) membres = [data];
@@ -46,9 +46,9 @@ serve(async (req) => {
       const since = new Date();
       since.setUTCDate(since.getUTCDate() - 1);
       const { data, error } = await db
-        .from("membres")
-        .select("id, prenom, nom, email")
-        .eq("statut", "actif")
+        .from("members")
+        .select("id, nom, email")
+        .eq("status", "validated")
         .gte("created_at", since.toISOString())
         .not("email", "is", null);
       if (error) throw new Error(`Lecture membres récents: ${error.message}`);
@@ -63,7 +63,7 @@ serve(async (req) => {
       const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, m.id, targetKey);
       if (alreadySent) continue;
 
-      const prenom = escHtml(m.prenom || m.nom?.split(" ")[0] || "cher(e) nouveau membre");
+      const prenom = escHtml(m.nom?.split(" ")[0] || m.nom || "cher(e) nouveau membre");
 
       const content = `
         <h2 style="margin:0 0 20px;font-size:20px;color:#111827;">
@@ -101,7 +101,7 @@ serve(async (req) => {
 
       try {
         await sendBrevoEmail(apiKey, {
-          to: [{ email: m.email, name: `${m.prenom || ""} ${m.nom || ""}`.trim() }],
+          to: [{ email: m.email, name: m.nom || "" }],
           subject: "Bienvenue dans l'association Ma Belle Promo ! 🎓",
           htmlContent: wrapHtml(content),
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },

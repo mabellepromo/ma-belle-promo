@@ -1,6 +1,6 @@
 // Automatisation 6 — Reçu de paiement cotisation
 // Déclenché manuellement (trigger) après enregistrement d'un paiement
-// Body attendu : { cotisation_id } ou { membre_id, annee }
+// Body attendu : { cotisation_id } ou { member_id, annee }
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import {
@@ -29,61 +29,61 @@ serve(async (req) => {
     if (!apiKey) throw new Error("BREVO_API_KEY non configurée");
 
     const body = await req.json().catch(() => ({}));
-    const { cotisation_id, membre_id, annee } = body as {
+    const { cotisation_id, member_id, annee } = body as {
       cotisation_id?: string;
-      membre_id?: string;
+      member_id?: string;
       annee?: number;
     };
 
     // Récupère la cotisation selon le paramètre fourni
     let cotisationData: {
       id: string;
-      membre_id: string;
+      member_id: string;
       annee: number;
       montant: number;
       date_paiement: string;
       statut: string;
-      membres: { prenom: string; nom: string; email: string };
+      members: { nom: string; email: string };
     } | null = null;
 
     if (cotisation_id) {
       const { data, error } = await db
         .from("cotisations")
-        .select("id, membre_id, annee, montant, date_paiement, statut, membres(prenom, nom, email)")
+        .select("id, member_id, annee, montant, date_paiement, statut, members(nom, email)")
         .eq("id", cotisation_id)
         .maybeSingle();
       if (error) throw new Error(`Lecture cotisation: ${error.message}`);
       cotisationData = data;
-    } else if (membre_id && annee) {
+    } else if (member_id && annee) {
       const { data, error } = await db
         .from("cotisations")
-        .select("id, membre_id, annee, montant, date_paiement, statut, membres(prenom, nom, email)")
-        .eq("membre_id", membre_id)
+        .select("id, member_id, annee, montant, date_paiement, statut, members(nom, email)")
+        .eq("member_id", member_id)
         .eq("annee", annee)
-        .eq("statut", "paye")
+        .eq("statut", "payé")
         .maybeSingle();
       if (error) throw new Error(`Lecture cotisation membre: ${error.message}`);
       cotisationData = data;
     } else {
-      return jsonResponse({ error: "cotisation_id ou (membre_id + annee) requis" }, 400);
+      return jsonResponse({ error: "cotisation_id ou (member_id + annee) requis" }, 400);
     }
 
     if (!cotisationData) {
       return jsonResponse({ error: "Cotisation introuvable" }, 404);
     }
 
-    const membre = cotisationData.membres;
+    const membre = cotisationData.members;
     if (!membre?.email) {
       return jsonResponse({ error: "Email du membre manquant" }, 422);
     }
 
     const targetKey = `receipt-${cotisationData.annee}`;
-    const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, cotisationData.membre_id, targetKey);
+    const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, cotisationData.member_id, targetKey);
     if (alreadySent) {
       return jsonResponse({ skipped: true, reason: "reçu déjà envoyé" });
     }
 
-    const prenom = escHtml(membre.prenom || membre.nom?.split(" ")[0] || "cher(e) membre");
+    const prenom = escHtml(membre.nom?.split(" ")[0] || membre.nom || "cher(e) membre");
     const montant = cotisationData.montant
       ? new Intl.NumberFormat("fr-FR").format(cotisationData.montant) + " FCFA"
       : "selon barème";
@@ -113,7 +113,7 @@ serve(async (req) => {
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#6b7280;width:140px;">Membre :</td>
             <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:600;">
-              ${escHtml(`${membre.prenom || ""} ${membre.nom || ""}`.trim())}
+              ${escHtml(membre.nom || "")}
             </td>
           </tr>
           <tr>
@@ -149,13 +149,13 @@ serve(async (req) => {
       </p>`;
 
     await sendBrevoEmail(apiKey, {
-      to: [{ email: membre.email, name: `${membre.prenom || ""} ${membre.nom || ""}`.trim() }],
+      to: [{ email: membre.email, name: membre.nom || "" }],
       subject: `[MBP] Reçu de cotisation ${cotisationData.annee} — Merci !`,
       htmlContent: wrapHtml(content),
       replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
     });
 
-    await markAsSent(db, AUTOMATION_ID, cotisationData.membre_id, targetKey);
+    await markAsSent(db, AUTOMATION_ID, cotisationData.member_id, targetKey);
     await updateAutomationStatus(db, AUTOMATION_ID, "success");
 
     return jsonResponse({ success: true, sent: 1 });

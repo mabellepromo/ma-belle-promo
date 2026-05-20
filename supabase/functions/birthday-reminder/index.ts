@@ -36,17 +36,17 @@ serve(async (_req) => {
 
     // Membres dont le mois et le jour de naissance correspondent à aujourd'hui
     const { data: membres, error } = await db
-      .from("membres")
-      .select("id, prenom, nom, email, date_naissance")
-      .not("date_naissance", "is", null)
+      .from("members")
+      .select("id, nom, email, anniversaire")
+      .not("anniversaire", "is", null)
       .not("email", "is", null)
-      .eq("statut", "actif");
+      .eq("status", "validated");
 
     if (error) throw new Error(`Lecture membres: ${error.message}`);
 
-    const anniversaires = (membres ?? []).filter((m: { date_naissance: string }) => {
+    const anniversaires = (membres ?? []).filter((m: { anniversaire: string }) => {
       try {
-        const d = new Date(m.date_naissance);
+        const d = new Date(m.anniversaire);
         return d.getUTCMonth() + 1 === month && d.getUTCDate() === day;
       } catch {
         return false;
@@ -61,7 +61,7 @@ serve(async (_req) => {
       const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, m.id, targetKey);
       if (alreadySent) continue;
 
-      const prenom = escHtml(m.prenom || m.nom?.split(" ")[0] || "cher(e) membre");
+      const prenom = escHtml(m.nom?.split(" ")[0] || m.nom || "cher(e) membre");
 
       const content = `
         <h2 style="margin:0 0 20px;font-size:22px;color:#111827;text-align:center;">
@@ -84,8 +84,8 @@ serve(async (_req) => {
 
       try {
         await sendBrevoEmail(apiKey, {
-          to: [{ email: m.email, name: `${m.prenom || ""} ${m.nom || ""}`.trim() }],
-          subject: `🎂 Joyeux anniversaire, ${m.prenom || m.nom} ! — Ma Belle Promo`,
+          to: [{ email: m.email, name: m.nom || "" }],
+          subject: `🎂 Joyeux anniversaire, ${m.nom?.split(" ")[0] || m.nom} ! — Ma Belle Promo`,
           htmlContent: wrapHtml(content),
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
         });

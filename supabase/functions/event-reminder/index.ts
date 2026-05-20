@@ -55,11 +55,11 @@ serve(async (_req) => {
 
     if (evErr) throw new Error(`Lecture événements: ${evErr.message}`);
 
-    // Membres actifs avec email
+    // Membres validés avec email
     const { data: membres, error: membresErr } = await db
-      .from("membres")
-      .select("id, prenom, nom, email")
-      .eq("statut", "actif")
+      .from("members")
+      .select("id, nom, email")
+      .eq("status", "validated")
       .not("email", "is", null);
 
     if (membresErr) throw new Error(`Lecture membres: ${membresErr.message}`);
@@ -122,7 +122,7 @@ serve(async (_req) => {
 
         try {
           await sendBrevoEmail(apiKey, {
-            to: [{ email: m.email, name: `${m.prenom || ""} ${m.nom || ""}`.trim() }],
+            to: [{ email: m.email, name: m.nom || "" }],
             subject: `[MBP] ${badge} — ${ev.titre}`,
             htmlContent: wrapHtml(content),
             replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },

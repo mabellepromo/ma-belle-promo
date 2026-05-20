@@ -48,11 +48,11 @@ serve(async (_req) => {
 
     if (assErr) throw new Error(`Lecture assemblées: ${assErr.message}`);
 
-    // Membres actifs avec email
+    // Membres validés avec email
     const { data: membres, error: membresErr } = await db
-      .from("membres")
-      .select("id, prenom, nom, email")
-      .eq("statut", "actif")
+      .from("members")
+      .select("id, nom, email")
+      .eq("status", "validated")
       .not("email", "is", null);
 
     if (membresErr) throw new Error(`Lecture membres: ${membresErr.message}`);
@@ -61,7 +61,7 @@ serve(async (_req) => {
     const errors: string[] = [];
 
     for (const ag of (assemblees ?? [])) {
-      const dateStr = formatDateFr(ag.date_assemblee);
+      const dateStr = formatDateFr(ag.date);
       const lieu = ag.lieu ? escHtml(ag.lieu) : "À préciser";
       const odj = ag.ordre_du_jour
         ? (ag.ordre_du_jour as string[]).map((p, i) => `<li style="margin:4px 0;">${i + 1}. ${escHtml(p)}</li>`).join("")
@@ -117,11 +117,11 @@ serve(async (_req) => {
         const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, m.id, targetKey);
         if (alreadySent) continue;
 
-        const prenom = m.prenom || m.nom?.split(" ")[0] || "";
+        const prenom = m.nom?.split(" ")[0] || m.nom || "";
 
         try {
           await sendBrevoEmail(apiKey, {
-            to: [{ email: m.email, name: `${m.prenom || ""} ${m.nom || ""}`.trim() }],
+            to: [{ email: m.email, name: m.nom || "" }],
             subject: `[MBP] Convocation — ${ag.titre || "Assemblée Générale"} — ${dateStr}`,
             htmlContent: wrapHtml(content.replace("Cher(e) membre", prenom ? `Cher(e) ${escHtml(prenom)}` : "Cher(e) membre")),
             replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },

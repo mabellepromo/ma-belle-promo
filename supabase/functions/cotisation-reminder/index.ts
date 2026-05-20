@@ -37,24 +37,24 @@ serve(async (_req) => {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    // Membres actifs sans cotisation payée pour l'année concernée
+    // Membres validés sans cotisation payée pour l'année concernée
     const { data: membres, error: membresErr } = await db
-      .from("membres")
-      .select("id, prenom, nom, email, statut")
-      .eq("statut", "actif")
+      .from("members")
+      .select("id, nom, email, status")
+      .eq("status", "validated")
       .not("email", "is", null);
 
     if (membresErr) throw new Error(`Lecture membres: ${membresErr.message}`);
 
     const { data: cotisationsPagees, error: cotisErr } = await db
       .from("cotisations")
-      .select("membre_id")
+      .select("member_id")
       .eq("annee", anneeRelance)
-      .eq("statut", "paye");
+      .eq("statut", "payé");
 
     if (cotisErr) throw new Error(`Lecture cotisations: ${cotisErr.message}`);
 
-    const payesIds = new Set((cotisationsPagees ?? []).map((c: { membre_id: string }) => c.membre_id));
+    const payesIds = new Set((cotisationsPagees ?? []).map((c: { member_id: string }) => c.member_id));
 
     const membresEnRetard = (membres ?? []).filter((m: { id: string }) => !payesIds.has(m.id));
 
@@ -72,7 +72,7 @@ serve(async (_req) => {
       const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, m.id, targetKey);
       if (alreadySent) continue;
 
-      const prenom = escHtml(m.prenom || m.nom?.split(" ")[0] || "cher(e) membre");
+      const prenom = escHtml(m.nom?.split(" ")[0] || m.nom || "cher(e) membre");
       const urgence = jalon >= 60 ? "⚠️ Dernier rappel" : jalon >= 30 ? "Rappel important" : "Rappel";
 
       const content = `
@@ -107,7 +107,7 @@ serve(async (_req) => {
 
       try {
         await sendBrevoEmail(apiKey, {
-          to: [{ email: m.email, name: `${m.prenom || ""} ${m.nom || ""}`.trim() }],
+          to: [{ email: m.email, name: m.nom || "" }],
           subject: `[MBP] ${urgence} — Cotisation ${anneeRelance}`,
           htmlContent: wrapHtml(content),
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
