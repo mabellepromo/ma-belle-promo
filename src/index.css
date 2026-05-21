@@ -93,9 +93,12 @@
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    overflow-x: clip; /* clip sans scroll-container — contient le débordement Android sans bloquer le scroll iOS */
     max-width: 100%;
     touch-action: pan-y; /* bloque le glissement horizontal sur iOS (toutes versions) */
+  }
+  #root {
+    overflow-x: hidden; /* contient le débordement horizontal sans toucher html — ne bloque pas le scroll vertical */
+    width: 100%;
   }
   body {
     @apply bg-background text-foreground font-body;
