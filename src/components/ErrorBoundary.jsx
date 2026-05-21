@@ -1,6 +1,19 @@
 import { Component } from "react";
 import { AlertCircle } from "lucide-react";
 
+const CHUNK_ERROR_PATTERNS = [
+  "dynamically imported module",
+  "Failed to fetch dynamically",
+  "Importing a module script failed",
+  "Loading chunk",
+  "Loading CSS chunk",
+];
+
+function isChunkError(error) {
+  const msg = error?.message || String(error);
+  return CHUNK_ERROR_PATTERNS.some(p => msg.includes(p));
+}
+
 export default class ErrorBoundary extends Component {
   state = { error: null, info: null };
 
@@ -11,6 +24,13 @@ export default class ErrorBoundary extends Component {
   componentDidCatch(error, info) {
     this.setState({ info });
     console.error("[ErrorBoundary]", error, info?.componentStack);
+
+    // Rechargement automatique sur erreur de chunk obsolète (après déploiement)
+    // sessionStorage évite la boucle infinie si le rechargement échoue aussi
+    if (isChunkError(error) && !sessionStorage.getItem("_chunkReload")) {
+      sessionStorage.setItem("_chunkReload", "1");
+      window.location.reload();
+    }
   }
 
   render() {
@@ -28,7 +48,7 @@ export default class ErrorBoundary extends Component {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => { sessionStorage.removeItem("_chunkReload"); window.location.reload(); }}
               className="px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               Rafraîchir
@@ -40,12 +60,6 @@ export default class ErrorBoundary extends Component {
               Accueil
             </a>
           </div>
-          {import.meta.env.DEV && (
-            <pre className="mt-2 text-xs text-left bg-destructive/10 border border-destructive/20 p-4 rounded-xl max-w-2xl w-full overflow-auto text-destructive whitespace-pre-wrap">
-              {String(this.state.error)}
-              {this.state.info?.componentStack}
-            </pre>
-          )}
         </div>
       );
     }
