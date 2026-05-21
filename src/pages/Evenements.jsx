@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import SEO from "../components/SEO";
@@ -140,40 +140,107 @@ function GridCard({ evt, i }) {
   );
 }
 
-/* ── Carte "À venir" ── */
+/* ── Carte "À venir" — galerie multi-photos ── */
 function UpcomingCard({ evt }) {
+  const photos = [evt.image, ...(evt.photos || [])].filter(Boolean);
+  const [activeIdx, setActiveIdx] = useState(0);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="relative bg-primary/5 border-2 border-primary/20 rounded-3xl p-5 sm:p-8 overflow-hidden"
+      className="relative rounded-3xl overflow-hidden border-2 border-primary/20 bg-primary/5"
     >
-      <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/5 -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              À venir
-            </span>
-            <TypeBadge type={evt.type} />
-          </div>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-3 leading-snug">{evt.titre}</h2>
-          <div className="mb-5">
-            <ReactMarkdown components={mdComponents}>{evt.description || ""}</ReactMarkdown>
-          </div>
-          <div className="flex flex-wrap gap-4 text-sm text-foreground font-medium">
-            {evt.date && <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" />{evt.date}</span>}
-            {evt.heures && <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />{evt.heures}</span>}
-            {evt.lieu && <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" />{evt.lieu}</span>}
-          </div>
-        </div>
-        {evt.image && (
-          <div className="w-full md:w-64 h-44 rounded-2xl overflow-hidden flex-shrink-0">
-            <img src={evt.image} alt={evt.titre} className="w-full h-full object-cover object-top" />
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-primary/5 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col lg:flex-row">
+
+        {/* ── Galerie photos (colonne gauche sur desktop) ── */}
+        {photos.length > 0 && (
+          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col">
+            {/* Photo principale */}
+            <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.img
+                  key={activeIdx}
+                  src={photos[activeIdx]}
+                  alt={evt.titre}
+                  initial={{ opacity: 0, scale: 1.04 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  onError={e => { e.currentTarget.style.display = "none"; }}
+                />
+              </AnimatePresence>
+
+              {/* Badges superposés */}
+              <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 z-10">
+                <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  À venir
+                </span>
+                <TypeBadge type={evt.type} />
+              </div>
+
+              {/* Compteur */}
+              {photos.length > 1 && (
+                <div className="absolute bottom-3 right-3 z-10 bg-black/55 rounded-full px-2.5 py-1 text-xs text-white font-medium">
+                  {activeIdx + 1} / {photos.length}
+                </div>
+              )}
+            </div>
+
+            {/* Bande de vignettes */}
+            {photos.length > 1 && (
+              <div className="flex gap-1.5 p-2.5 overflow-x-auto bg-black/10">
+                {photos.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveIdx(i)}
+                    className={`relative flex-shrink-0 h-12 w-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      i === activeIdx
+                        ? "border-primary opacity-100 shadow-md"
+                        : "border-transparent opacity-45 hover:opacity-75"
+                    }`}
+                  >
+                    <img src={p} alt="" className="w-full h-full object-cover object-top" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
+
+        {/* ── Contenu (colonne droite sur desktop) ── */}
+        <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
+          {/* Badges si pas de photo */}
+          {photos.length === 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                À venir
+              </span>
+              <TypeBadge type={evt.type} />
+            </div>
+          )}
+
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-3 leading-snug">
+            {evt.titre}
+          </h2>
+
+          <div className="mb-6">
+            <ReactMarkdown components={mdComponents}>{evt.description || ""}</ReactMarkdown>
+          </div>
+
+          <div className="flex flex-wrap gap-4 text-sm text-foreground font-medium mt-auto pt-4 border-t border-primary/10">
+            {evt.date   && <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" />{evt.date}</span>}
+            {evt.heures && <span className="flex items-center gap-2"><Clock    className="w-4 h-4 text-primary" />{evt.heures}</span>}
+            {evt.lieu   && <span className="flex items-center gap-2"><MapPin   className="w-4 h-4 text-primary" />{evt.lieu}</span>}
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );
