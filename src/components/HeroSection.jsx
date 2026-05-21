@@ -112,26 +112,50 @@ function WaterBubble({ children }) {
   );
 }
 
-/* ══ BULLE D'EAU — version statique mobile ══ */
+/* ══ BULLE D'EAU — version mobile (animations sans backdropFilter) ══ */
 function WaterBubbleStatic({ children }) {
   const D = 280;
+  const shouldReduce = useReducedMotion();
   return (
     <div style={{ position: "relative", width: D, height: D }}>
+      {!shouldReduce && (
+        <>
+          <style>{`
+            @keyframes bubble-ripple {
+              0%   { transform: scale(1);    opacity: 0.55; }
+              100% { transform: scale(1.30); opacity: 0;    }
+            }
+            .bubble-ripple {
+              position: absolute; inset: 0;
+              border-radius: 50%;
+              border: 1px solid rgba(144,255,180,0.65);
+              pointer-events: none;
+              animation: bubble-ripple 3.5s ease-out infinite;
+            }
+          `}</style>
+          <span className="bubble-ripple" style={{ animationDelay: "0s" }} />
+          <span className="bubble-ripple" style={{ animationDelay: "1.75s" }} />
+        </>
+      )}
       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", overflow: "hidden" }}>
-        <div style={{
-          position: "absolute", inset: 0, borderRadius: "50%",
-          background: `radial-gradient(ellipse at 38% 32%,
-            rgba(255,255,255,0.28) 0%,
-            rgba(180,255,220,0.12) 30%,
-            rgba(0,120,60,0.10) 60%,
-            rgba(0,40,20,0.22) 100%)`,
-          border: "1.5px solid rgba(255,255,255,0.20)",
-          boxShadow: [
-            "inset 0 6px 50px rgba(255,255,255,0.10)",
-            "inset 0 -8px 40px rgba(0,80,40,0.25)",
-            "0 25px 70px rgba(0,0,0,0.35)",
-          ].join(", "),
-        }} />
+        <motion.div
+          animate={shouldReduce ? {} : { scale: [1, 1.015, 1] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            background: `radial-gradient(ellipse at 38% 32%,
+              rgba(255,255,255,0.28) 0%,
+              rgba(180,255,220,0.12) 30%,
+              rgba(0,120,60,0.10) 60%,
+              rgba(0,40,20,0.22) 100%)`,
+            border: "1.5px solid rgba(255,255,255,0.20)",
+            boxShadow: [
+              "inset 0 6px 50px rgba(255,255,255,0.10)",
+              "inset 0 -8px 40px rgba(0,80,40,0.25)",
+              "0 25px 70px rgba(0,0,0,0.35)",
+            ].join(", "),
+          }}
+        />
         <div style={{
           position: "absolute", top: "14%", left: "20%", width: "38%", height: "22%",
           background: "radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.40) 0%, rgba(255,255,255,0.10) 50%, transparent 75%)",
