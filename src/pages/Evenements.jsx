@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import SEO from "../components/SEO";
@@ -140,10 +140,9 @@ function GridCard({ evt, i }) {
   );
 }
 
-/* ── Carte "À venir" — galerie multi-photos ── */
+/* ── Carte "À venir" — toutes les photos empilées ── */
 function UpcomingCard({ evt }) {
   const photos = [evt.image, ...(evt.photos || [])].filter(Boolean);
-  const [activeIdx, setActiveIdx] = useState(0);
 
   return (
     <motion.div
@@ -156,62 +155,33 @@ function UpcomingCard({ evt }) {
 
       <div className="relative z-10 flex flex-col lg:flex-row">
 
-        {/* ── Galerie photos (colonne gauche sur desktop) ── */}
+        {/* ── Colonne photos empilées (gauche sur desktop) ── */}
         {photos.length > 0 && (
-          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-row">
-
-            {/* Colonne de vignettes verticale */}
-            {photos.length > 1 && (
-              <div className="flex flex-col gap-1.5 p-2 overflow-y-auto bg-black/10 w-16 flex-shrink-0">
-                {photos.map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveIdx(i)}
-                    className={`flex-shrink-0 w-12 h-10 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                      i === activeIdx
-                        ? "border-primary opacity-100 shadow-md"
-                        : "border-transparent opacity-45 hover:opacity-75"
-                    }`}
-                  >
-                    <img src={p} alt="" className="w-full h-full object-cover object-top" />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Photo principale */}
-            <div className="relative flex-1 overflow-hidden" style={{ aspectRatio: photos.length > 1 ? undefined : "4/3" }}>
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.img
-                  key={activeIdx}
-                  src={photos[activeIdx]}
-                  alt={evt.titre}
-                  initial={{ opacity: 0, scale: 1.04 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
-                  className={`${photos.length > 1 ? "absolute inset-0" : ""} w-full h-full object-cover object-top`}
+          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col">
+            {photos.map((p, i) => (
+              <div key={i} className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+                <img
+                  src={p}
+                  alt={`${evt.titre} — photo ${i + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover object-top"
                   onError={e => { e.currentTarget.style.display = "none"; }}
                 />
-              </AnimatePresence>
-
-              {/* Badges superposés */}
-              <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 z-10">
-                <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  À venir
-                </span>
-                <TypeBadge type={evt.type} />
+                {/* Badges sur la première photo uniquement */}
+                {i === 0 && (
+                  <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 z-10">
+                    <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                      À venir
+                    </span>
+                    <TypeBadge type={evt.type} />
+                  </div>
+                )}
+                {/* Filet séparateur entre photos */}
+                {i < photos.length - 1 && (
+                  <div className="absolute bottom-0 left-0 right-0 h-px bg-white/10" />
+                )}
               </div>
-
-              {/* Compteur */}
-              {photos.length > 1 && (
-                <div className="absolute bottom-3 right-3 z-10 bg-black/55 rounded-full px-2.5 py-1 text-xs text-white font-medium">
-                  {activeIdx + 1} / {photos.length}
-                </div>
-              )}
-            </div>
-
+            ))}
           </div>
         )}
 
