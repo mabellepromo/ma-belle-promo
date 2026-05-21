@@ -229,7 +229,7 @@ export function EvenementsSection() {
   const [partsList, setPartsList] = useState([]);
   const [loadingParts, setLoadingParts] = useState(false);
 
-  const empty = { titre: "", date: "", heures: "", lieu: "", type: "Conférence", statut: "À venir", description: "", image: "" };
+  const empty = { titre: "", date: "", heures: "", lieu: "", type: "Conférence", statut: "À venir", description: "", image: "", photos: [] };
   const f = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const TYPES = ["Webinaire", "Conférence", "Gala", "Projet éditorial", "Autre"];
   const STATUTS = ["À venir", "En cours", "Passé"];
@@ -293,7 +293,8 @@ export function EvenementsSection() {
                 Mise en page Markdown : <code className="bg-muted px-1 rounded">**gras**</code>, <code className="bg-muted px-1 rounded">*italique*</code>, ligne vide = nouveau paragraphe.
               </p>
             </div>
-            <div className="md:col-span-2"><ImgField label="Image" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
+            <div className="md:col-span-2"><ImgField label="Image de couverture" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
+            <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
           </div>
         </FormPanel>
       )}
@@ -328,7 +329,7 @@ export function EvenementsSection() {
                   {nb} inscrit{nb !== 1 ? "s" : ""}
                 </button>
                 <div className="ml-auto flex items-center gap-1">
-                  <button onClick={() => setForm({ ...e, _editing: e.id })}
+                  <button onClick={() => setForm({ ...e, photos: e.photos || [], _editing: e.id })}
                     className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors">
                     <Edit2 className="w-3.5 h-3.5" /> Modifier
                   </button>
