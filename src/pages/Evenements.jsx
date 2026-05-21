@@ -164,14 +164,22 @@ function UpcomingCard({ evt }) {
           <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col gap-3 p-3 lg:p-4">
             {photoItems.map((item, i) => (
               <div key={i} className="flex flex-col rounded-xl overflow-hidden border border-white/10">
-                {/* Photo */}
+                {/* Photo ou vidéo */}
                 <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                  <img
-                    src={item.url}
-                    alt={item.legende || `${evt.titre} — photo ${i + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                    onError={e => { e.currentTarget.style.display = "none"; }}
-                  />
+                  {item.type === "video"
+                    ? <video
+                        src={item.url}
+                        controls
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover bg-black"
+                      />
+                    : <img
+                        src={item.url}
+                        alt={item.legende || `${evt.titre} — photo ${i + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover object-top"
+                        onError={e => { e.currentTarget.style.display = "none"; }}
+                      />
+                  }
                   {i === 0 && (
                     <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 z-10">
                       <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">

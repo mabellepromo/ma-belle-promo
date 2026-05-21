@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, lazy, Suspense, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { supabase, uploadImage } from "@/lib/supabase";
+import { supabase, uploadImage, uploadVideo } from "@/lib/supabase";
 
 const RichEditor = lazy(() => import("../../components/RichEditor.jsx"));
 import { useArticles, formatDateFr } from "../../hooks/useArticles";
@@ -220,7 +220,7 @@ export function ArticlesSection() {
 }
 
 /* ─── Événements ─── */
-/* Champ photos + légendes — spécifique aux événements */
+/* Champ photos + vidéos + légendes — spécifique aux événements */
 function EventPhotosField({ items = [], onChange }) {
   const fileRef = useRef();
   const [uploading, setUploading] = useState(false);
@@ -229,8 +229,12 @@ function EventPhotosField({ items = [], onChange }) {
     const files = Array.from(e.target.files);
     setUploading(true);
     try {
-      const urls = await Promise.all(files.map(f => uploadImage(f)));
-      onChange([...items, ...urls.map(url => ({ url, legende: "" }))]);
+      const newItems = await Promise.all(files.map(async (f) => {
+        const isVideo = f.type.startsWith("video/");
+        const url = isVideo ? await uploadVideo(f) : await uploadImage(f);
+        return { url, legende: "", type: isVideo ? "video" : "image" };
+      }));
+      onChange([...items, ...newItems]);
     } catch (err) {
       toast.error("Erreur upload : " + (err.message || err));
     } finally {
@@ -247,14 +251,23 @@ function EventPhotosField({ items = [], onChange }) {
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-foreground mb-2">Photos supplémentaires</label>
+      <label className="block text-xs font-semibold text-foreground mb-2">Photos &amp; vidéos</label>
       <div className="space-y-3">
         {items.map((item, i) => (
           <div key={i} className="flex gap-3 items-start bg-muted/50 rounded-xl p-3">
+            {/* Aperçu */}
             <div className="w-24 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-              <img src={item.url} alt="" className="w-full h-full object-cover object-top" />
+              {item.type === "video"
+                ? <video src={item.url} className="w-full h-full object-cover" muted playsInline />
+                : <img src={item.url} alt="" className="w-full h-full object-cover object-top" />}
             </div>
+            {/* Légende + badge type */}
             <div className="flex-1 min-w-0 space-y-1.5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.type === "video" ? "bg-blue-500/15 text-blue-400" : "bg-primary/10 text-primary"}`}>
+                  {item.type === "video" ? "Vidéo" : "Photo"}
+                </span>
+              </div>
               <input
                 className={inp}
                 value={item.legende || ""}
@@ -272,10 +285,10 @@ function EventPhotosField({ items = [], onChange }) {
           className="w-full h-12 rounded-xl border-2 border-dashed border-border hover:border-primary/40 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors disabled:opacity-50">
           {uploading
             ? <><Loader2 className="w-4 h-4 animate-spin" /> Upload…</>
-            : <><Plus className="w-4 h-4" /> Ajouter des photos</>}
+            : <><Plus className="w-4 h-4" /> Ajouter photos ou vidéos</>}
         </button>
       </div>
-      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
+      <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleFiles} />
     </div>
   );
 }
