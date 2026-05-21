@@ -204,7 +204,7 @@ function UpcomingCard({ evt }) {
         {/* ── Contenu (colonne droite sur desktop) ── */}
         <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
           {/* Badges si pas de photo */}
-          {photos.length === 0 && (
+          {photoItems.length === 0 && (
             <div className="flex items-center gap-3 mb-4">
               <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
