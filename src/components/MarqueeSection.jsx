@@ -85,7 +85,7 @@ function Item({ item, gem, gemColor }) {
 function Row({ items, cls, gem, gemColor }) {
   const doubled = [...items, ...items];
   return (
-    <div style={{ overflow: "hidden", display: "flex", transform: "translateZ(0)" }}>
+    <div style={{ overflow: "hidden", display: "flex" }}>
       <div className={cls} style={{ display: "flex", alignItems: "center", width: "max-content", willChange: "transform" }}>
         {doubled.map((item, i) => (
           <Item key={i} item={item} gem={gem} gemColor={gemColor} />
