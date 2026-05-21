@@ -158,9 +158,29 @@ function UpcomingCard({ evt }) {
 
         {/* ── Galerie photos (colonne gauche sur desktop) ── */}
         {photos.length > 0 && (
-          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col">
+          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-row">
+
+            {/* Colonne de vignettes verticale */}
+            {photos.length > 1 && (
+              <div className="flex flex-col gap-1.5 p-2 overflow-y-auto bg-black/10 w-16 flex-shrink-0">
+                {photos.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveIdx(i)}
+                    className={`flex-shrink-0 w-12 h-10 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      i === activeIdx
+                        ? "border-primary opacity-100 shadow-md"
+                        : "border-transparent opacity-45 hover:opacity-75"
+                    }`}
+                  >
+                    <img src={p} alt="" className="w-full h-full object-cover object-top" />
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Photo principale */}
-            <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+            <div className="relative flex-1 overflow-hidden" style={{ aspectRatio: photos.length > 1 ? undefined : "4/3" }}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.img
                   key={activeIdx}
@@ -170,7 +190,7 @@ function UpcomingCard({ evt }) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  className={`${photos.length > 1 ? "absolute inset-0" : ""} w-full h-full object-cover object-top`}
                   onError={e => { e.currentTarget.style.display = "none"; }}
                 />
               </AnimatePresence>
@@ -192,24 +212,6 @@ function UpcomingCard({ evt }) {
               )}
             </div>
 
-            {/* Bande de vignettes */}
-            {photos.length > 1 && (
-              <div className="flex gap-1.5 p-2.5 overflow-x-auto bg-black/10">
-                {photos.map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveIdx(i)}
-                    className={`relative flex-shrink-0 h-12 w-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                      i === activeIdx
-                        ? "border-primary opacity-100 shadow-md"
-                        : "border-transparent opacity-45 hover:opacity-75"
-                    }`}
-                  >
-                    <img src={p} alt="" className="w-full h-full object-cover object-top" />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
