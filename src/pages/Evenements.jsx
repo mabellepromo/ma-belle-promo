@@ -140,9 +140,13 @@ function GridCard({ evt, i }) {
   );
 }
 
-/* ── Carte "À venir" — toutes les photos empilées ── */
+/* ── Carte "À venir" — toutes les photos empilées avec légendes ── */
 function UpcomingCard({ evt }) {
-  const photos = [evt.image, ...(evt.photos || [])].filter(Boolean);
+  /* Accepte { url, legende } ou une simple chaîne (rétrocompat) */
+  const photoItems = [
+    evt.image ? { url: evt.image, legende: "" } : null,
+    ...(evt.photos || []).map(p => typeof p === "string" ? { url: p, legende: "" } : p),
+  ].filter(p => p?.url);
 
   return (
     <motion.div
@@ -156,29 +160,33 @@ function UpcomingCard({ evt }) {
       <div className="relative z-10 flex flex-col lg:flex-row">
 
         {/* ── Colonne photos empilées (gauche sur desktop) ── */}
-        {photos.length > 0 && (
-          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col">
-            {photos.map((p, i) => (
-              <div key={i} className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                <img
-                  src={p}
-                  alt={`${evt.titre} — photo ${i + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover object-top"
-                  onError={e => { e.currentTarget.style.display = "none"; }}
-                />
-                {/* Badges sur la première photo uniquement */}
-                {i === 0 && (
-                  <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 z-10">
-                    <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      À venir
-                    </span>
-                    <TypeBadge type={evt.type} />
+        {photoItems.length > 0 && (
+          <div className="lg:w-5/12 xl:w-2/5 flex-shrink-0 flex flex-col gap-3 p-3 lg:p-4">
+            {photoItems.map((item, i) => (
+              <div key={i} className="flex flex-col rounded-xl overflow-hidden border border-white/10">
+                {/* Photo */}
+                <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+                  <img
+                    src={item.url}
+                    alt={item.legende || `${evt.titre} — photo ${i + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    onError={e => { e.currentTarget.style.display = "none"; }}
+                  />
+                  {i === 0 && (
+                    <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 z-10">
+                      <span className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground shadow-md">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        À venir
+                      </span>
+                      <TypeBadge type={evt.type} />
+                    </div>
+                  )}
+                </div>
+                {/* Légende */}
+                {item.legende && (
+                  <div className="px-3 py-2 text-xs text-muted-foreground italic bg-muted/40 leading-relaxed">
+                    {item.legende}
                   </div>
-                )}
-                {/* Filet séparateur entre photos */}
-                {i < photos.length - 1 && (
-                  <div className="absolute bottom-0 left-0 right-0 h-px bg-white/10" />
                 )}
               </div>
             ))}

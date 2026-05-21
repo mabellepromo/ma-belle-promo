@@ -1,6 +1,6 @@
-﻿import { useState, useMemo, lazy, Suspense, useEffect } from "react";
+﻿import { useState, useMemo, lazy, Suspense, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase, uploadImage } from "@/lib/supabase";
 
 const RichEditor = lazy(() => import("../../components/RichEditor.jsx"));
 import { useArticles, formatDateFr } from "../../hooks/useArticles";
@@ -220,6 +220,66 @@ export function ArticlesSection() {
 }
 
 /* ─── Événements ─── */
+/* Champ photos + légendes — spécifique aux événements */
+function EventPhotosField({ items = [], onChange }) {
+  const fileRef = useRef();
+  const [uploading, setUploading] = useState(false);
+
+  const handleFiles = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploading(true);
+    try {
+      const urls = await Promise.all(files.map(f => uploadImage(f)));
+      onChange([...items, ...urls.map(url => ({ url, legende: "" }))]);
+    } catch (err) {
+      toast.error("Erreur upload : " + (err.message || err));
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const setLegende = (i, val) => {
+    const next = [...items];
+    next[i] = { ...next[i], legende: val };
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-foreground mb-2">Photos supplémentaires</label>
+      <div className="space-y-3">
+        {items.map((item, i) => (
+          <div key={i} className="flex gap-3 items-start bg-muted/50 rounded-xl p-3">
+            <div className="w-24 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+              <img src={item.url} alt="" className="w-full h-full object-cover object-top" />
+            </div>
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <input
+                className={inp}
+                value={item.legende || ""}
+                onChange={e => setLegende(i, e.target.value)}
+                placeholder="Légende (optionnelle)"
+              />
+            </div>
+            <button type="button" onClick={() => onChange(items.filter((_, j) => j !== i))}
+              className="text-muted-foreground hover:text-red-500 transition-colors p-1 flex-shrink-0">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+        <button type="button" onClick={() => fileRef.current.click()} disabled={uploading}
+          className="w-full h-12 rounded-xl border-2 border-dashed border-border hover:border-primary/40 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors disabled:opacity-50">
+          {uploading
+            ? <><Loader2 className="w-4 h-4 animate-spin" /> Upload…</>
+            : <><Plus className="w-4 h-4" /> Ajouter des photos</>}
+        </button>
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
+    </div>
+  );
+}
+
 export function EvenementsSection() {
   const { evenements: items, add, update, remove, loading, isSeeded, seedFromStatic } = useEvenements();
   const [form, setForm] = useState(null);
@@ -294,7 +354,7 @@ export function EvenementsSection() {
               </p>
             </div>
             <div className="md:col-span-2"><ImgField label="Image de couverture" value={form.image} onChange={v => setForm(p => ({ ...p, image: v }))} /></div>
-            <div className="md:col-span-2"><GalerieField photos={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
+            <div className="md:col-span-2"><EventPhotosField items={form.photos || []} onChange={v => setForm(p => ({ ...p, photos: v }))} /></div>
           </div>
         </FormPanel>
       )}
