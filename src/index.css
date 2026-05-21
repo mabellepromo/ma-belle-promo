@@ -93,7 +93,6 @@
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    overflow-x: hidden; /* ancre le viewport horizontal — corrige nav fixe décalée sur Android */
     max-width: 100%;
     touch-action: pan-y; /* bloque le glissement horizontal sur iOS (toutes versions) */
   }

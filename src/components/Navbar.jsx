@@ -445,7 +445,13 @@ export default function Navbar() {
             <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs"
               style={{ background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.30)", color: "#ffffff" }}>
               <User className="w-3 h-3 flex-shrink-0" />
-              <span className="max-w-[72px] truncate">{session.nom.split(" ")[0]}</span>
+              <button
+                onClick={() => navigate("/espace-membre")}
+                className="max-w-[72px] truncate hover:text-white transition-colors"
+                title="Mon espace membre"
+              >
+                {session.nom.split(" ")[0]}
+              </button>
               <button
                 onClick={() => { logout(); navigate("/"); }}
                 title="Se déconnecter"

@@ -74,9 +74,7 @@ export default function Home() {
       {/* Hero + bandeau défilant = exactement un écran */}
       <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <HeroSection />
-        <div className="hidden md:block">
-          <MarqueeSection />
-        </div>
+        <MarqueeSection />
       </div>
       {belowFoldReady && (
         <>
