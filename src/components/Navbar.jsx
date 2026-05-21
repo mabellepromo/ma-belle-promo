@@ -296,7 +296,7 @@ export default function Navbar() {
         </Link>
 
         {/* ── DESKTOP : grille 3 colonnes — logo toujours centré ── */}
-        <div className="hidden md:grid flex-1" style={{ gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}>
+        <div className="hidden md:grid md:flex-1" style={{ gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}>
 
           {/* Gauche — items alignés à droite vers le logo */}
           <div className="flex items-center justify-end gap-0.5">
@@ -469,14 +469,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Backdrop — ferme le menu au tap en dehors */}
-      {open && (
-        <div
-          className="fixed inset-0 z-40 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
       {/* Menu mobile */}
       {open && (
         <motion.div
@@ -582,6 +574,14 @@ export default function Navbar() {
             </button>
           </div>
         </motion.div>
+      )}
+
+      {/* Backdrop — ferme le menu au tap en dehors */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
       )}
     </nav>
   );

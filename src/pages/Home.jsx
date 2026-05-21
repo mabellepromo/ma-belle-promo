@@ -58,6 +58,13 @@ function Fade({ from, to }) {
 }
 
 export default function Home() {
+  const [belowFoldReady, setBelowFoldReady] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setBelowFoldReady(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <SEO path="/" />
@@ -67,18 +74,23 @@ export default function Home() {
       {/* Hero + bandeau défilant = exactement un écran */}
       <div style={{ height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <HeroSection />
-        <MarqueeSection />
+        <div className="hidden md:block">
+          <MarqueeSection />
+        </div>
       </div>
-      <MissionSection />
-      {/* Filet de séparation entre les deux sections sombres */}
-      <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(52,211,153,0.18), rgba(251,191,36,0.12), transparent)" }} />
-      <TestimonialsSection />
-      <CredibiliteSection />
-      <Fade from={dark} to={muted} />
-      <ActualitesSection />
-      <ContactSection />
-      <Fade from={muted} to={dark} />
-      <FooterSection />
+      {belowFoldReady && (
+        <>
+          <MissionSection />
+          <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(52,211,153,0.18), rgba(251,191,36,0.12), transparent)" }} />
+          <TestimonialsSection />
+          <CredibiliteSection />
+          <Fade from={dark} to={muted} />
+          <ActualitesSection />
+          <ContactSection />
+          <Fade from={muted} to={dark} />
+          <FooterSection />
+        </>
+      )}
       <ScrollToTop />
     </div>
   );
