@@ -259,7 +259,7 @@ export default function Navbar() {
         background: "rgba(5,18,11,0.97)",
         boxShadow: scrolled
           ? "0 2px 32px rgba(0,0,0,0.50)"
-          : "0 2px 0 rgba(52,211,153,0.45), 0 4px 24px rgba(0,0,0,0.55)",
+          : "0 4px 24px rgba(0,0,0,0.55)",
         paddingTop: "env(safe-area-inset-top, 0px)",
         paddingLeft: "env(safe-area-inset-left, 0px)",
         paddingRight: "env(safe-area-inset-right, 0px)",

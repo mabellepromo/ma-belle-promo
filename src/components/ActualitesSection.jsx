@@ -110,7 +110,7 @@ export default function ActualitesSection() {
         </div>
 
         {/* Grille bas : Agenda + Plan d'action 2026 */}
-        <div className="mt-12 grid md:grid-cols-2 gap-6">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* ── Prochains événements ── */}
           <motion.div
@@ -118,14 +118,14 @@ export default function ActualitesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-card border border-border rounded-2xl p-6"
+            className="min-w-0 bg-card border border-border rounded-2xl p-6"
           >
-            <div className="flex items-center justify-between mb-5">
-              <div>
+            <div className="flex items-start justify-between gap-3 mb-5">
+              <div className="min-w-0">
                 <span className="eyebrow text-accent">Agenda</span>
                 <h3 className="mt-1 font-heading text-xl font-bold text-foreground">Prochains événements</h3>
               </div>
-              <Link to="/activites/evenements" className="flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all">
+              <Link to="/activites/evenements" className="flex-shrink-0 flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all">
                 Tout voir <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -138,7 +138,7 @@ export default function ActualitesSection() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">{e.titre}</p>
-                      <p className="text-xs text-muted-foreground">{e.date}{e.lieu ? ` · ${e.lieu}` : ""}</p>
+                      <p className="text-xs text-muted-foreground truncate">{e.date}{e.lieu ? ` · ${e.lieu}` : ""}</p>
                     </div>
                   </div>
                 ))}
@@ -162,6 +162,7 @@ export default function ActualitesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.32 }}
+            className="h-full"
           >
             <Link
               to="/activites/plan-action-2026"
@@ -175,11 +176,11 @@ export default function ActualitesSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
               <div className="relative z-10 h-full flex flex-col justify-between p-6">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-accent/90 text-foreground backdrop-blur-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-accent/90 text-foreground">
                     Feuille de route
                   </span>
-                  <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/15 text-white backdrop-blur-sm border border-white/20">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/15 text-white border border-white/20">
                     Adoption mars 2026
                   </span>
                 </div>
