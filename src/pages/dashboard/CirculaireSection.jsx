@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
 import {
   Send, Users, Clock, CheckCircle, X, Loader2, Mail,
-  CalendarDays, Newspaper, Megaphone, LayoutList,
+  CalendarDays, Newspaper, Megaphone, LayoutList, Paperclip,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 
@@ -220,6 +220,7 @@ export default function CirculaireSection() {
   const { allMembers } = useMemberStore({ realtime: false });
   const [activeTab, setActiveTab]   = useState("circulaire");
   const [form, setForm]             = useState({ sujet: "", corps: "", expediteur: "Le Bureau Exécutif" });
+  const [attachments, setAttachments] = useState([]);
   const [filtre, setFiltre]         = useState("tous");
   const [paysFiltre, setPaysFiltre] = useState("");
   const [selected, setSelected]     = useState(null);
@@ -267,6 +268,26 @@ export default function CirculaireSection() {
     });
   }
 
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ name: file.name, content: btoa(reader.result) });
+      reader.onerror = reject;
+      reader.readAsBinaryString(file);
+    });
+  }
+
+  async function handleFileInput(e) {
+    const picked = Array.from(e.target.files || []);
+    const converted = await Promise.all(picked.map(fileToBase64));
+    setAttachments(prev => [...prev, ...converted].slice(0, 5));
+    e.target.value = "";
+  }
+
+  function removeAttachment(i) {
+    setAttachments(prev => prev.filter((_, idx) => idx !== i));
+  }
+
   async function handleSend() {
     if (!form.sujet.trim() || !form.corps.trim()) { toast.error("Sujet et corps obligatoires."); return; }
     if (!destinataires.length) { toast.error("Aucun destinataire sélectionné."); return; }
@@ -281,6 +302,7 @@ export default function CirculaireSection() {
           corps: form.corps,
           expediteur: form.expediteur,
           destinataires,
+          attachments: attachments.length ? attachments : undefined,
         }),
       });
       const result = await resp.json();
@@ -308,6 +330,7 @@ export default function CirculaireSection() {
 
   function reset() {
     setForm({ sujet: "", corps: "", expediteur: "Le Bureau Exécutif" });
+    setAttachments([]);
     setFiltre("tous"); setPaysFiltre(""); setSelected(null); setStep("compose");
   }
 
@@ -394,11 +417,42 @@ export default function CirculaireSection() {
                     />
                   </Field>
 
+                  {/* Pièces jointes */}
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      Pièces jointes {attachments.length > 0 && <span className="text-primary">({attachments.length}/5)</span>}
+                    </p>
+                    {attachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {attachments.map((a, i) => (
+                          <div key={i} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary/8 border border-primary/20 rounded-lg text-xs font-medium text-primary max-w-[220px]">
+                            <Paperclip className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">{a.name}</span>
+                            <button type="button" onClick={() => removeAttachment(i)}
+                              className="ml-1 text-primary/60 hover:text-red-500 transition-colors flex-shrink-0">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {attachments.length < 5 && (
+                      <label className="flex items-center gap-3 p-3 border border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/30 transition-colors">
+                        <Paperclip className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-xs text-muted-foreground">Ajouter un fichier… (max 5, joint à chaque email)</span>
+                        <input type="file" multiple className="hidden" onChange={handleFileInput} />
+                      </label>
+                    )}
+                  </div>
+
                   {step === "preview" && (
                     <div className="bg-muted/30 border border-border rounded-xl p-4 text-sm text-muted-foreground space-y-1">
                       <p><strong className="text-foreground">Destinataires :</strong> {destinataires.length} membre{destinataires.length > 1 ? "s" : ""}</p>
                       <p><strong className="text-foreground">Expéditeur :</strong> {form.expediteur}</p>
                       <p><strong className="text-foreground">Sujet :</strong> {form.sujet}</p>
+                      {attachments.length > 0 && (
+                        <p><strong className="text-foreground">Pièces jointes :</strong> {attachments.map(a => a.name).join(", ")}</p>
+                      )}
                     </div>
                   )}
 

@@ -580,7 +580,7 @@ export default async function handler(req, res) {
 
   // ── Circulaire : email groupé à une liste de membres ──
   if (type === "circulaire") {
-    const { destinataires, sujet, corps, expediteur } = data;
+    const { destinataires, sujet, corps, expediteur, attachments } = data;
     if (!Array.isArray(destinataires) || destinataires.length === 0)
       return res.status(400).json({ error: "Aucun destinataire." });
     if (destinataires.length > 200)
@@ -593,6 +593,9 @@ export default async function handler(req, res) {
     const valides = destinataires.filter(d => isValidEmail(d.email));
     const corps_html = escHtml(corps).replace(/\n/g, "<br>");
     const sender_label = escHtml(expediteur || "Le Bureau Exécutif");
+    const pieceJointes = Array.isArray(attachments) && attachments.length
+      ? attachments.slice(0, 5).map(a => ({ name: a.name, content: a.content }))
+      : null;
 
     const results = await Promise.allSettled(
       valides.map(async d => {
@@ -612,6 +615,7 @@ export default async function handler(req, res) {
           subject: escHtml(sujet),
           htmlContent: wrapHtml(content),
         };
+        if (pieceJointes) payload.attachment = pieceJointes;
         const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
