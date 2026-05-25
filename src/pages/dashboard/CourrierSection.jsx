@@ -193,6 +193,23 @@ const INITIAL = {
 // Hauteur A4 à 96 dpi (297mm)
 const A4_PX = 1123;
 
+// Footer ancré en bas de chaque page imprimée (position:fixed en print = répété sur toutes les pages)
+const PRINT_FOOTER_CSS = `
+  @media print {
+    footer, .footer-zone {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      z-index: 999 !important;
+    }
+    main, .body {
+      padding-bottom: 80px !important;
+    }
+  }
+`;
+
 // Styles injectés en mode compacté : réduit police et interligne du corps
 const COMPACT_CSS = `
   .corps-lettre, .e-corps, .formule-appel, .e-appel, .politesse, .e-politesse {
@@ -265,10 +282,15 @@ function injectValues(html, form, compact = false) {
     el.removeAttribute("contenteditable")
   );
 
+  // Footer fixe en bas de chaque page — injecté systématiquement
+  const printFooterStyle = doc.createElement("style");
+  printFooterStyle.textContent = PRINT_FOOTER_CSS;
+  doc.head.appendChild(printFooterStyle);
+
   if (compact) {
-    const style = doc.createElement("style");
-    style.textContent = COMPACT_CSS;
-    doc.head.appendChild(style);
+    const compactStyle = doc.createElement("style");
+    compactStyle.textContent = COMPACT_CSS;
+    doc.head.appendChild(compactStyle);
   }
 
   return "<!DOCTYPE html>" + doc.documentElement.outerHTML;
