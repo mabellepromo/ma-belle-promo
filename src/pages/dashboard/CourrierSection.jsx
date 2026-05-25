@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, Printer, Loader2 } from "lucide-react";
+import { ChevronLeft, Printer, Loader2, AlertTriangle, CheckCircle2, Minimize2 } from "lucide-react";
 import { inp, Field } from "./shared";
 
 const TEMPLATES = [
@@ -190,19 +190,28 @@ const INITIAL = {
   sigTitre:  "Présidente de l'association",
 };
 
-function injectValues(html, form) {
+// Hauteur A4 à 96 dpi (297mm)
+const A4_PX = 1123;
+
+// Styles injectés en mode compacté : réduit police et interligne du corps
+const COMPACT_CSS = `
+  .corps-lettre, .e-corps, .formule-appel, .e-appel, .politesse, .e-politesse {
+    font-size: 9pt !important;
+    line-height: 1.35 !important;
+  }
+  p { margin-bottom: 0.35em !important; margin-top: 0 !important; }
+`;
+
+function injectValues(html, form, compact = false) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
 
-  // Supprimer la bannière d'info hors impression
   doc.querySelector(".print-hint")?.remove();
 
-  // Ajouter un <base> pour résoudre les chemins relatifs
   const base = doc.createElement("base");
   base.href = window.location.origin + "/";
   doc.head.insertBefore(base, doc.head.firstChild);
 
-  // Corriger le chemin du logo vers l'URL absolue
   doc.querySelectorAll("img").forEach(img => {
     const src = img.getAttribute("src") || "";
     if (src.includes("logo-mbp")) {
@@ -210,52 +219,47 @@ function injectValues(html, form) {
     }
   });
 
-  // Date (data-placeholder contient "aaaa" ou vaut exactement "date")
   const dateEl = doc.querySelector(
     '[contenteditable][data-placeholder*="aaaa"], [contenteditable][data-placeholder="date"]'
   );
   if (dateEl) dateEl.textContent = form.date;
 
-  // Champ "Lomé, le date" présent dans v3
   const villeDateEl = doc.querySelector(".editable-ville-date");
   if (villeDateEl) villeDateEl.textContent = `Lomé, le ${form.date}`;
 
-  // Référence (data-placeholder contient "MBP")
   const refEl = doc.querySelector('[contenteditable][data-placeholder*="MBP"]');
   if (refEl) refEl.textContent = form.ref;
 
-  // Objet
   const objetEl = doc.querySelector(".editable-objet, .objet-band-text, .e-objet");
   if (objetEl) objetEl.textContent = form.objet;
 
-  // Destinataire (multiligne)
   const destEl = doc.querySelector(".editable-dest, .e-dest");
   if (destEl) destEl.innerHTML = form.dest.replace(/\n/g, "<br>");
 
-  // Formule d'appel
   const appelEl = doc.querySelector(".formule-appel, .e-appel");
   if (appelEl) appelEl.textContent = form.appel;
 
-  // Corps du message (multiligne)
   const corpsEl = doc.querySelector(".corps-lettre, .e-corps");
   if (corpsEl) corpsEl.innerHTML = form.corps.replace(/\n/g, "<br>");
 
-  // Formule de politesse
   const polEl = doc.querySelector(".politesse, .e-politesse");
   if (polEl) polEl.textContent = form.politesse;
 
-  // Nom de la signataire
   const sigNomEl = doc.querySelector(".editable-sig-name, .editable-signature, .e-sig-name");
   if (sigNomEl) sigNomEl.textContent = form.sigNom;
 
-  // Titre de la signataire
   const sigTitreEl = doc.querySelector(".editable-sig-titre, .signature-titre, .e-sig-titre");
   if (sigTitreEl) sigTitreEl.textContent = form.sigTitre;
 
-  // Supprimer tous les attributs contenteditable restants
   doc.querySelectorAll("[contenteditable]").forEach(el =>
     el.removeAttribute("contenteditable")
   );
+
+  if (compact) {
+    const style = doc.createElement("style");
+    style.textContent = COMPACT_CSS;
+    doc.head.appendChild(style);
+  }
 
   return "<!DOCTYPE html>" + doc.documentElement.outerHTML;
 }
@@ -265,23 +269,72 @@ export default function CourrierSection() {
   const [template, setTemplate]     = useState(null);
   const [form, setForm]             = useState(INITIAL);
   const [generating, setGenerating] = useState(false);
+  const [pageStatus, setPageStatus] = useState(null); // null | "checking" | "ok" | "overflow"
+  const [compact, setCompact]       = useState(false);
+  const htmlCacheRef                = useRef({});
 
   const f = field => e => setForm(p => ({ ...p, [field]: e.target.value }));
 
   function pick(t) {
     setTemplate(t);
+    setCompact(false);
+    setPageStatus(null);
     setStep("compose");
   }
+
+  // Vérification automatique du dépassement de page (debounce 800ms)
+  useEffect(() => {
+    if (step !== "compose" || !template) return;
+    if (!form.corps.trim()) { setPageStatus(null); return; }
+
+    let cancelled = false;
+    setPageStatus("checking");
+
+    const timer = setTimeout(async () => {
+      try {
+        if (!htmlCacheRef.current[template.file]) {
+          const resp = await fetch(`/docs/${template.file}`);
+          if (!resp.ok) throw new Error();
+          htmlCacheRef.current[template.file] = await resp.text();
+        }
+        const injected = injectValues(htmlCacheRef.current[template.file], form, compact);
+
+        // Iframe hors-écran aux dimensions A4
+        const iframe = document.createElement("iframe");
+        iframe.style.cssText =
+          "position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;border:none;visibility:hidden;pointer-events:none";
+        document.body.appendChild(iframe);
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(injected);
+        iframe.contentDocument.close();
+
+        // Attendre le rendu des polices
+        await new Promise(r => setTimeout(r, 500));
+
+        const bodyEl = iframe.contentDocument?.body;
+        const isOver = bodyEl ? bodyEl.scrollHeight > A4_PX : false;
+        document.body.removeChild(iframe);
+
+        if (!cancelled) setPageStatus(isOver ? "overflow" : "ok");
+      } catch {
+        if (!cancelled) setPageStatus(null);
+      }
+    }, 800);
+
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [form.corps, form.appel, form.politesse, form.dest, form.sigNom, form.sigTitre, template, compact, step]);
 
   async function generate() {
     if (!form.objet.trim()) { toast.error("L'objet du courrier est obligatoire."); return; }
     if (!form.corps.trim()) { toast.error("Le corps du message est obligatoire."); return; }
     setGenerating(true);
     try {
-      const resp = await fetch(`/docs/${template.file}`);
-      if (!resp.ok) throw new Error("Modèle introuvable");
-      const html     = await resp.text();
-      const injected = injectValues(html, form);
+      if (!htmlCacheRef.current[template.file]) {
+        const resp = await fetch(`/docs/${template.file}`);
+        if (!resp.ok) throw new Error("Modèle introuvable");
+        htmlCacheRef.current[template.file] = await resp.text();
+      }
+      const injected = injectValues(htmlCacheRef.current[template.file], form, compact);
       const win = window.open("", "_blank");
       if (!win) {
         toast.error("Popup bloquée — autorisez les popups pour ce site.");
@@ -312,7 +365,7 @@ export default function CourrierSection() {
         </div>
         {step === "compose" && (
           <button
-            onClick={() => setStep("select")}
+            onClick={() => { setStep("select"); setPageStatus(null); setCompact(false); }}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" /> Changer de modèle
@@ -329,11 +382,9 @@ export default function CourrierSection() {
               onClick={() => pick(t)}
               className="group bg-card border border-border rounded-2xl overflow-hidden text-left hover:border-primary hover:shadow-md transition-all"
             >
-              {/* Mini-aperçu */}
               <div className="h-28 bg-white overflow-hidden border-b border-border/60 relative">
                 {t.preview}
               </div>
-              {/* Label */}
               <div className="px-3 py-2.5">
                 <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
                   {t.label}
@@ -384,12 +435,61 @@ export default function CourrierSection() {
               </div>
             </div>
 
-            {/* Corps */}
+            {/* Corps du message */}
             <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-5 py-3 border-b border-border bg-muted/20">
+              <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-foreground">Corps du message</p>
+
+                {/* Indicateur de longueur */}
+                {pageStatus === "checking" && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Vérification…
+                  </span>
+                )}
+                {pageStatus === "ok" && (
+                  <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {compact ? "Compacté — tient sur une page" : "Tient sur une page"}
+                  </span>
+                )}
+                {pageStatus === "overflow" && (
+                  <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    <AlertTriangle className="w-3 h-3" /> Dépasse une page
+                  </span>
+                )}
               </div>
               <div className="p-5 space-y-4">
+
+                {/* Bannière dépassement */}
+                {pageStatus === "overflow" && !compact && (
+                  <div className="flex items-center justify-between gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
+                    <p className="text-xs text-amber-800 dark:text-amber-200">
+                      Le courrier dépasse une page. Réduisez le texte ou utilisez le compactage automatique (police et interligne réduits).
+                    </p>
+                    <button
+                      onClick={() => setCompact(true)}
+                      className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 hover:bg-amber-200 dark:hover:bg-amber-900 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Minimize2 className="w-3 h-3" /> Compacter
+                    </button>
+                  </div>
+                )}
+
+                {/* Bannière mode compact actif */}
+                {compact && (
+                  <div className="flex items-center justify-between gap-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3">
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
+                      Mode compact actif — police 9pt, interligne réduit.
+                    </p>
+                    <button
+                      onClick={() => setCompact(false)}
+                      className="shrink-0 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                )}
+
                 <Field label="Formule d'appel">
                   <input className={inp} value={form.appel} onChange={f("appel")} />
                 </Field>
