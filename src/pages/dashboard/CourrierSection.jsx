@@ -251,6 +251,16 @@ function injectValues(html, form, compact = false) {
   const sigTitreEl = doc.querySelector(".editable-sig-titre, .signature-titre, .e-sig-titre");
   if (sigTitreEl) sigTitreEl.textContent = form.sigTitre;
 
+  // Cachet de la Présidente — inséré entre le label "La Présidente" et le nom
+  const sigLabelEl = doc.querySelector(".sig-role, .sig-function, .signature-label");
+  if (sigLabelEl) {
+    const stamp = doc.createElement("img");
+    stamp.setAttribute("src", window.location.origin + "/images/FDD.webp");
+    stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;opacity:0.9";
+    stamp.setAttribute("alt", "Cachet de la Présidente");
+    sigLabelEl.insertAdjacentElement("afterend", stamp);
+  }
+
   doc.querySelectorAll("[contenteditable]").forEach(el =>
     el.removeAttribute("contenteditable")
   );
