@@ -194,6 +194,7 @@ const INITIAL = {
 const A4_PX = 1123;
 
 // Footer ancré en bas de chaque page imprimée (position:fixed en print = répété sur toutes les pages)
+// Le ::after sur body réserve l'espace du footer sans toucher au flex layout interne des templates
 const PRINT_FOOTER_CSS = `
   @media print {
     footer, .footer-zone {
@@ -204,8 +205,10 @@ const PRINT_FOOTER_CSS = `
       width: 100% !important;
       z-index: 999 !important;
     }
-    main, .body {
-      padding-bottom: 80px !important;
+    body::after {
+      content: '';
+      display: block;
+      height: 80px;
     }
   }
 `;
