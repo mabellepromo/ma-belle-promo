@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -32,6 +32,7 @@ import SondagesSection from "./dashboard/SondagesSection";
 import TresorerieSection from "./dashboard/TresorerieSection";
 import AssembleesSection from "./dashboard/AssembleesSection";
 import CirculaireSection from "./dashboard/CirculaireSection";
+import CourrierSection from "./dashboard/CourrierSection";
 import StatsSection from "./dashboard/StatsSection";
 import ElectionsSection from "./dashboard/ElectionsSection";
 import MandatsSection from "./dashboard/MandatsSection";
@@ -501,6 +502,7 @@ export default function Dashboard() {
       label: "Communication",
       items: [
         { key: "circulaire",      label: "Circulaire",      icon: Send },
+        { key: "courrier",        label: "Courrier",        icon: ScrollText },
         { key: "stats",           label: "Statistiques",    icon: TrendingUp },
         { key: "automatisations", label: "Automatisations", icon: Zap },
       ],
@@ -1310,6 +1312,7 @@ export default function Dashboard() {
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
+          {tab === "courrier"        && <CourrierSection />}
           {tab === "stats"           && <StatsSection />}
           {tab === "automatisations" && <AutomatisationsSection />}
           {tab === "communiques" && <CommuniquesSection />}

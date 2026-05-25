@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête V6 Éco Typographique</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-pale:   hsl(153, 40%, 96%);
+      --dore:        hsl(38,  70%, 55%);
+      --dore-pale:   hsl(38,  65%, 94%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #d4d4d4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #e8f5e9;
+      border: 1px solid #81c784;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 12.5px;
+      color: #2e7d32;
+      max-width: 794px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eco-badge {
+      background: #2e7d32;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    @media print { .print-hint { display: none; } }
+
+    .page {
+      width: 794px;
+      min-height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+    }
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; min-height: 100vh; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       VERSION 6 — Éco Typographique
+       Concept : la typographie EST le design.
+       Cormorant Garamond grand format + ornements SVG fins.
+       Couleurs uniquement sur traits et textes. Zéro fond coloré.
+       Couverture encre estimée : ~10 %
+       ══════════════════════════════════════════════════ */
+
+    /* Bandeau supérieur : une seule ligne fine bicolore */
+    .top-ornament {
+      display: flex;
+      height: 3px;
+    }
+    .to-1 { flex: 1; background: var(--dore); }
+    .to-2 { flex: 4; background: var(--vert-foret); }
+    .to-3 { flex: 1; background: var(--dore); }
+
+    /* ── EN-TÊTE typographique centré ── */
+    .header {
+      padding: 28px 44px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--bordure);
+      position: relative;
+    }
+
+    /* Ligne logo + nom en ligne */
+    .header-main-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* LOGO : juste l'image, pas de fond */
+    .logo-inline img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    /* Nom de l'association en grande typo */
+    .header-name-block { text-align: left; }
+
+    .header-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--texte);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+
+    /* "Belle" en italique doré — effet imprimerie */
+    .header-name .belle {
+      font-style: italic;
+      color: var(--vert-foret);
+    }
+
+    .header-name .promo {
+      font-size: 40px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--dore);
+      letter-spacing: 0.05em;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Sous-titre en small-caps typographique */
+    .header-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11.5px;
+      font-variant: small-caps;
+      letter-spacing: 0.12em;
+      color: var(--texte-muted);
+      text-align: center;
+    }
+
+    /* Ornement central typographique */
+    .ornement-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .orn-rule { flex: 1; height: 1px; background: var(--bordure); }
+    .orn-glyph {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--dore);
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* Méta date / réf — absolue, en haut à droite dans l'en-tête */
+    .header-meta {
+      position: absolute;
+      top: 28px;
+      right: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-end;
+    }
+    .meta-group { display: flex; flex-direction: column; align-items: flex-end; }
+    .meta-lbl {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--texte-muted);
+    }
+    .meta-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      border-bottom: 1px dashed var(--bordure);
+      min-width: 90px;
+      padding: 0 2px;
+    }
+    .meta-val:focus { background: var(--vert-pale); border-bottom-color: var(--vert-foret); border-radius: 3px; }
+
+    /* ── Objet — style grand titre ── */
+    .objet-section {
+      padding: 14px 44px;
+      border-bottom: 1px solid var(--bordure);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .objet-lbl {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--vert-foret);
+      flex-shrink: 0;
+    }
+
+    .editable-objet {
+      flex: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      padding: 1px 4px;
+      border-bottom: 1px solid transparent;
+    }
+    .editable-objet:focus { background: var(--vert-pale); border-bottom-color: var(--vert-foret); border-radius: 3px; }
+
+    /* ── Corps ── */
+    .body {
+      flex: 1;
+      padding: 28px 44px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Destinataire — style lettre, aligné à droite */
+    .dest-wrapper { display: flex; justify-content: flex-end; }
+
+    .dest-bloc {
+      max-width: 240px;
+      padding: 10px 16px;
+      border-right: 2px solid var(--vert-foret);
+      text-align: right;
+    }
+
+    .dest-lbl {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 5px;
+    }
+
+    .editable-dest {
+      display: block;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      min-height: 60px;
+      padding: 2px 0;
+    }
+    .editable-dest:focus { background: var(--vert-pale); border-radius: 3px; padding: 2px 4px; }
+
+    /* Filet ornemental fin */
+    .thin-ornement {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ton-rule { flex: 1; height: 1px; background: var(--bordure); }
+    .ton-diamond {
+      width: 5px;
+      height: 5px;
+      background: var(--dore);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    .formule-appel {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: var(--vert-pale); border-radius: 3px; }
+
+    .corps-lettre {
+      flex: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13.5px;
+      font-style: italic;
+      line-height: 1.80;
+      color: var(--texte);
+      outline: none;
+     
+      padding: 2px 4px;
+      /* Légère indentation de premier paragraphe : style editorial */
+      text-indent: 0;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    .closing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+    }
+
+    .politesse {
+      flex: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14.5px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 52px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: var(--vert-pale); border-radius: 3px; }
+
+    /* Signature — style typographique, pas de fond */
+    .sig-bloc {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+    .sig-role {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      font-variant: small-caps;
+      letter-spacing: 0.14em;
+      color: var(--vert-foret);
+      margin-bottom: 22px;
+    }
+    .sig-rule { width: 100px; height: 1px; background: var(--vert-foret); margin-bottom: 5px; }
+    .editable-sig-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: var(--vert-pale); border-radius: 3px; }
+    .editable-sig-titre {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: var(--vert-pale); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — typographique, aucun fond ══ */
+    .footer {
+      padding: 12px 44px 18px;
+      border-top: 1px solid var(--bordure);
+    }
+
+    /* Filet doré + vert fin */
+    .footer-top-rule {
+      height: 3px;
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .ftr-1 { flex: 1; background: var(--dore); }
+    .ftr-2 { flex: 4; background: var(--vert-foret); }
+    .ftr-3 { flex: 1; background: var(--dore); }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .footer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-variant: small-caps;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      color: var(--vert-foret);
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-item { font-size: 9.5px; color: var(--texte-muted); }
+    .footer-sep { color: var(--dore); }
+
+    /* Placeholder + focus */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.14);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint">
+    <span class="eco-badge">ÉCO</span>
+    <strong>Version 6 — Typographique &amp; Éditoriale.</strong>
+    La typographie fait tout le travail esthétique. Zéro fond coloré. Cormorant Garamond grand format.
+    Couverture encre estimée : ~10 %. · Cliquez pour éditer · <strong>Ctrl+P</strong> pour PDF.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       VERSION 6 — Éco Typographique / Éditoriale
+       Cormorant Garamond en grand + ornements fins
+  ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+    <!-- Bandeau supérieur tricolore fin -->
+    <div class="top-ornament">
+      <div class="to-1"></div>
+      <div class="to-2"></div>
+      <div class="to-3"></div>
+    </div>
+
+    <!-- EN-TÊTE centré -->
+    <header class="header">
+
+      <!-- Méta positionnée en haut à droite -->
+      <div class="header-meta">
+        <div class="meta-group">
+          <span class="meta-lbl">Date</span>
+          <span class="meta-val" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+        </div>
+        <div class="meta-group">
+          <span class="meta-lbl">Réf.</span>
+          <span class="meta-val" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+        </div>
+      </div>
+
+      <!-- Logo + Nom en ligne centrale -->
+      <div class="header-main-row">
+        <!-- LOGO — image seule, pas de fond, encre nulle -->
+        <div class="logo-inline">
+          <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+        </div>
+
+        <div class="header-name-block">
+          <div class="header-name">
+            Ma <span class="belle">Belle</span>
+            <span class="promo">Promo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ornement typographique -->
+      <div class="ornement-line">
+        <div class="orn-rule"></div>
+        <div class="orn-glyph">❧</div>
+        <div class="orn-rule"></div>
+      </div>
+
+      <!-- Sous-titre en small-caps -->
+      <div class="header-sub">
+        Association des Anciens Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994 – 2000
+      </div>
+
+    </header>
+
+    <!-- OBJET -->
+    <div class="objet-section">
+      <span class="objet-lbl">Objet :</span>
+      <span
+        class="editable-objet"
+        contenteditable="true"
+        data-placeholder="Saisissez l'objet du courrier"
+      >Objet du courrier</span>
+    </div>
+
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire — aligné à droite, bordure droite vert -->
+      <div class="dest-wrapper">
+        <div class="dest-bloc">
+          <div class="dest-lbl">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction / Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction / Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <!-- Filet ornemental -->
+      <div class="thin-ornement">
+        <div class="ton-rule"></div>
+        <div class="ton-diamond"></div>
+        <div class="ton-rule"></div>
+      </div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps de la lettre -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="sig-bloc">
+          <div class="sig-role">La Présidente</div>
+          <div class="sig-rule"></div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-top-rule">
+        <div class="ftr-1"></div>
+        <div class="ftr-2"></div>
+        <div class="ftr-3"></div>
+      </div>
+      <div class="footer-inner">
+        <div class="footer-name">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <span class="footer-sep"> ✦ </span>
+          <span class="footer-item">📞 +228 96 09 07 07</span>
+          <span class="footer-sep"> ✦ </span>
+          <span class="footer-item">✉ contact@mabellepromo.org</span>
+          <span class="footer-sep"> ✦ </span>
+          <span class="footer-item">🌐 https://www.facebook.com/mabellepromo/span>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /.page -->
+
+</body>
+</html>
