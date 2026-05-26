@@ -204,6 +204,17 @@ const INJECT_CSS = `
     visibility: visible !important;
   }
 
+  /* Espace au-dessus du bloc politesse+signature */
+  .closing-row, .closing {
+    margin-top: 40px !important;
+  }
+
+  /* Saut de page : jamais à l'intérieur du bloc politesse+signature */
+  .closing-row, .closing {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
   /* Footer ancré en bas de chaque page imprimée */
   @media print {
     footer, .footer-zone {
