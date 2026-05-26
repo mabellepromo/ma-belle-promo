@@ -221,18 +221,10 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* Marge réservée pour le footer sur CHAQUE page imprimée */
-  @page { margin-bottom: 80px; }
-
-  /* Footer ancré en bas de chaque page imprimée */
+  /* Footer en flux normal — pas de position:fixed qui écrase le contenu */
   @media print {
     footer, .footer-zone {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-      z-index: 999 !important;
+      position: static !important;
       background: #fff !important;
     }
   }

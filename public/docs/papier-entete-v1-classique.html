@@ -55,11 +55,11 @@
       position: relative;
       page-break-after: always;
     }
-    @page { margin-bottom: 80px; }
+    
     @media print {
       body { background: none; padding: 0; }
       .page { box-shadow: none; width: 100%; min-height: 100vh; }
-      footer, .footer-zone { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: #fff; }
+      footer, .footer-zone { background: #fff; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
