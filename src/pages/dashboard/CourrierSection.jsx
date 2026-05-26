@@ -221,26 +221,19 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* ─── FOOTER EN BAS DE CHAQUE PAGE IMPRIMÉE ───────────────────────────
-     table-footer-group est la seule technique CSS fiable pour répéter
-     le footer en bas de chaque page sans le sortir du flux (≠ position:fixed
-     qui écrasait le texte). La hauteur:100vh sur .page garantit que pour
-     les lettres courtes le footer reste en bas de la première page.       */
+  /* Footer en flux normal : apparaît une fois après tout le contenu.
+     flex:1 sur .body (défini dans les templates) le pousse en bas
+     de la première page quand la lettre est courte. */
   @media print {
-    .page {
-      display: table !important;
-      width: 100% !important;
-      height: 100vh !important;
-      box-shadow: none !important;
-      min-height: unset !important;
-    }
-    main.body, .body {
-      display: table-row-group !important;
-    }
     footer.footer, .footer-zone {
-      display: table-footer-group !important;
-      background: white !important;
       position: static !important;
+      background: white !important;
+    }
+    .page {
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 100vh !important;
+      box-shadow: none !important;
     }
   }
 `;
