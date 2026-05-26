@@ -355,21 +355,16 @@ async function injectValues(html, form, compact = false) {
   }
 
   // Ancrer le footer en bas de la dernière page :
-  // on calcule l'espace restant sur la dernière page et on le comble
-  // avec du padding sur .body, même si le contenu ne remplit pas la page.
+  // on force min-height du .page à un multiple exact d'une page A4.
+  // Le flex:1 sur .body remplit l'espace et pousse le footer en bas.
   await new Promise(r => setTimeout(r, 120));
   const A4_H = 1123;
   const pageEl = d.querySelector(".page");
-  const bodyEl = d.querySelector("main.body, .body");
-  if (pageEl && bodyEl) {
+  if (pageEl) {
     const h = pageEl.scrollHeight;
     if (h > 0) {
       const pages = Math.ceil(h / A4_H);
-      const extra = pages * A4_H - h;
-      if (extra > 0 && extra < A4_H) {
-        const pb = parseFloat(d.defaultView?.getComputedStyle(bodyEl)?.paddingBottom || "0");
-        bodyEl.style.paddingBottom = Math.round(pb + extra) + "px";
-      }
+      pageEl.style.minHeight = (pages * A4_H) + "px";
     }
   }
 
