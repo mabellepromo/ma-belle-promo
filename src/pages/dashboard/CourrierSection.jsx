@@ -331,6 +331,23 @@ async function injectValues(html, form, compact = false) {
     sigLabelEl.insertAdjacentElement("afterend", stamp);
   }
 
+  // Layout inline : politesse au-dessus de la signature (styles inline > toute règle CSS)
+  const closingEl = d.querySelector(".closing-row, .closing");
+  if (closingEl) {
+    closingEl.style.display = "flex";
+    closingEl.style.flexDirection = "column";
+    closingEl.style.gap = "16px";
+    closingEl.style.marginTop = "24px";
+    closingEl.style.breakInside = "avoid";
+    closingEl.style.pageBreakInside = "avoid";
+  }
+  if (polEl) {
+    polEl.style.flex = "none";
+    polEl.style.width = "100%";
+  }
+  const sigBlocEl = d.querySelector(".sig-bloc, .sig-card, .signature-bloc");
+  if (sigBlocEl) sigBlocEl.style.alignSelf = "flex-end";
+
   const injectStyle = d.createElement("style");
   injectStyle.textContent = INJECT_CSS;
   d.head.appendChild(injectStyle);
