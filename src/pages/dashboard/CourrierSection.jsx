@@ -221,18 +221,24 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* Footer en flux normal : apparaît une fois après tout le contenu.
-     flex:1 sur .body (défini dans les templates) le pousse en bas
-     de la première page quand la lettre est courte. */
+  /* Corps à hauteur naturelle — annule flex:1 des templates qui
+     limitait la hauteur visible et faisait déborder le contenu */
+  main.body, .body {
+    flex: none !important;
+  }
+
+  /* Footer ancré en bas : margin-top:auto consomme l'espace libre
+     dans la colonne flex du .page */
+  footer.footer, .footer-zone {
+    margin-top: auto !important;
+    background: white !important;
+    position: static !important;
+  }
+
   @media print {
-    footer.footer, .footer-zone {
-      position: static !important;
-      background: white !important;
-    }
     .page {
       display: flex !important;
       flex-direction: column !important;
-      min-height: 100vh !important;
       box-shadow: none !important;
     }
   }
@@ -354,9 +360,8 @@ async function injectValues(html, form, compact = false) {
     d.head.appendChild(compactStyle);
   }
 
-  // Ancrer le footer en bas de la dernière page :
-  // on force min-height du .page à un multiple exact d'une page A4.
-  // Le flex:1 sur .body remplit l'espace et pousse le footer en bas.
+  // Force min-height du .page à un multiple exact de A4 : le footer
+  // (margin-top:auto) tombe ainsi à l'exact bas de la dernière page imprimée.
   await new Promise(r => setTimeout(r, 120));
   const A4_H = 1123;
   const pageEl = d.querySelector(".page");
