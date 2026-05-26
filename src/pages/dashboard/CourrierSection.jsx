@@ -195,27 +195,33 @@ const A4_PX = 1123;
 
 // Styles injectés dans tous les documents générés
 const INJECT_CSS = `
-  /* Forcer le mode clair : bloque l'inversion automatique du dark mode système */
+  /* Mode clair forcé */
   :root, html, body { color-scheme: light !important; }
 
-  /* Couleur explicite sur les zones de texte pour garantir la visibilité */
+  /* Couleur du corps de texte */
   .corps-lettre, .e-corps {
     color: hsl(150, 30%, 10%) !important;
     visibility: visible !important;
   }
 
-  /* Espace au-dessus du bloc politesse+signature */
+  /* Politesse au-dessus de la signature — layout vertical */
   .closing-row, .closing {
-    margin-top: 40px !important;
-  }
-
-  /* Saut de page : jamais à l'intérieur du bloc politesse+signature */
-  .closing-row, .closing {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-top: 24px !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+  .politesse, .e-politesse {
+    flex: none !important;
+    width: 100% !important;
+  }
+  .sig-bloc, .sig-card, .signature-bloc {
+    align-self: flex-end !important;
+  }
 
-  /* Footer ancré en bas de chaque page imprimée */
+  /* Footer fixe sur chaque page imprimée */
   @media print {
     footer, .footer-zone {
       position: fixed !important;
@@ -224,6 +230,9 @@ const INJECT_CSS = `
       right: 0 !important;
       width: 100% !important;
       z-index: 999 !important;
+    }
+    main, .body {
+      padding-bottom: 80px !important;
     }
     body::after {
       content: '';
