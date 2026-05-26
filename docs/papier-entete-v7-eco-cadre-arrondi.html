@@ -49,6 +49,9 @@
     @media print {
       body { background: none; padding: 0; }
       .page { box-shadow: none; width: 100%; min-height: 100vh; }
+      footer, .footer-zone { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; }
+      body::after { content: ''; display: block; height: 80px; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -107,7 +110,7 @@
       position: relative;
       z-index: 1;
       flex: 1;
-      padding: 38px 46px 30px;
+      padding: 38px 46px 80px;
       display: flex;
       flex-direction: column;
     }
@@ -207,17 +210,16 @@
     }
     .e-corps:focus { background: hsl(148,38%,99%); border-radius: 3px; }
 
-    .closing { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
+    .closing { display: flex; flex-direction: column; gap: 16px; }
 
     .e-politesse {
-      flex: 1;
       font-family: 'Cormorant Garamond', serif;
       font-size: 14px; font-style: italic; line-height: 1.65;
       color: var(--texte); outline: none; min-height: 48px; padding: 2px 4px;
     }
     .e-politesse:focus { background: var(--pale); border-radius: 3px; }
 
-    .sig-bloc { min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .sig-bloc { min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; align-self: flex-end; }
     .sig-role { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.13em; color: var(--muted); margin-bottom: 28px; }
     .sig-rule { width: 120px; height: 1px; background: var(--vert); margin-bottom: 5px; }
     .e-sig-name {

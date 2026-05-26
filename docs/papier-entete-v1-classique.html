@@ -58,6 +58,9 @@
     @media print {
       body { background: none; padding: 0; }
       .page { box-shadow: none; width: 100%; min-height: 100vh; }
+      footer, .footer-zone { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; }
+      body::after { content: ''; display: block; height: 80px; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -129,7 +132,7 @@
     /* ── Corps de la lettre ── */
     .body {
       flex: 1;
-      padding: 36px 48px;
+      padding: 36px 48px 80px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -268,14 +271,12 @@
     /* Politesse + signature */
     .closing-row {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 32px;
+      flex-direction: column;
+      gap: 16px;
       margin-top: 8px;
     }
 
     .politesse {
-      flex: 1;
       font-family: 'Cormorant Garamond', serif;
       font-size: 14px;
       font-style: italic;
@@ -289,6 +290,7 @@
     .signature-bloc {
       min-width: 200px;
       text-align: right;
+      align-self: flex-end;
     }
     .signature-label {
       font-size: 10px;

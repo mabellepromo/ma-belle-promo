@@ -66,6 +66,9 @@
     @media print {
       body { background: none; padding: 0; }
       .page { box-shadow: none; width: 100%; min-height: 100vh; }
+      footer, .footer-zone { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; }
+      body::after { content: ''; display: block; height: 80px; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -278,7 +281,7 @@
     /* ── Corps ── */
     .body {
       flex: 1;
-      padding: 24px 44px 24px;
+      padding: 24px 44px 80px;
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -337,13 +340,11 @@
 
     .closing-row {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 32px;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .politesse {
-      flex: 1;
       font-family: 'Cormorant Garamond', serif;
       font-size: 14px;
       font-style: italic;
@@ -366,6 +367,7 @@
       align-items: flex-end;
       gap: 3px;
       background: var(--vert-pale2);
+      align-self: flex-end;
     }
     .sig-role {
       font-size: 8.5px;
