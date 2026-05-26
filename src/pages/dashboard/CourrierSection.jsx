@@ -226,10 +226,9 @@ const INJECT_CSS = `
     flex: none !important;
   }
 
-  /* Footer reste en flux normal (le JS le passe en absolu après mesure) */
+  /* Footer : fond blanc. Position gérée par le JS. */
   footer.footer, .footer-zone {
     background: white !important;
-    position: static !important;
   }
 
   @media print {
@@ -375,10 +374,10 @@ async function injectValues(html, form, compact = false) {
       pageEl.style.position = "relative";
       pageEl.style.minHeight = (pages * A4_H) + "px";
       if (footerEl) {
-        footerEl.style.position = "absolute";
-        footerEl.style.bottom = "0";
-        footerEl.style.left = "0";
-        footerEl.style.right = "0";
+        footerEl.style.setProperty("position", "absolute", "important");
+        footerEl.style.setProperty("bottom", "0", "important");
+        footerEl.style.setProperty("left", "0", "important");
+        footerEl.style.setProperty("right", "0", "important");
       }
       if (bodyEl) {
         bodyEl.style.paddingBottom = (footerH + 20) + "px";
