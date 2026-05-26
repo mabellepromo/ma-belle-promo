@@ -221,16 +221,13 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* Corps à hauteur naturelle — annule flex:1 des templates qui
-     limitait la hauteur visible et faisait déborder le contenu */
+  /* Corps à hauteur naturelle — annule flex:1 des templates */
   main.body, .body {
     flex: none !important;
   }
 
-  /* Footer ancré en bas : margin-top:auto consomme l'espace libre
-     dans la colonne flex du .page */
+  /* Footer reste en flux normal (le JS le passe en absolu après mesure) */
   footer.footer, .footer-zone {
-    margin-top: auto !important;
     background: white !important;
     position: static !important;
   }
@@ -360,16 +357,32 @@ async function injectValues(html, form, compact = false) {
     d.head.appendChild(compactStyle);
   }
 
-  // Force min-height du .page à un multiple exact de A4 : le footer
-  // (margin-top:auto) tombe ainsi à l'exact bas de la dernière page imprimée.
+  // Ancre le footer en bas de la dernière page A4 :
+  // 1. mesure le contenu total (footer encore en flux)
+  // 2. force .page à un multiple exact d'A4
+  // 3. passe le footer en position:absolute bottom:0 (hors flux)
+  // 4. ajoute padding-bottom au corps pour que le contenu ne passe pas sous le footer
   await new Promise(r => setTimeout(r, 120));
   const A4_H = 1123;
   const pageEl = d.querySelector(".page");
+  const footerEl = d.querySelector("footer.footer, .footer-zone");
+  const bodyEl = d.querySelector("main.body, .body");
   if (pageEl) {
-    const h = pageEl.scrollHeight;
-    if (h > 0) {
-      const pages = Math.ceil(h / A4_H);
+    const footerH = (footerEl && footerEl.offsetHeight > 0) ? footerEl.offsetHeight : 90;
+    const totalH = pageEl.scrollHeight;
+    if (totalH > 0) {
+      const pages = Math.ceil(totalH / A4_H);
+      pageEl.style.position = "relative";
       pageEl.style.minHeight = (pages * A4_H) + "px";
+      if (footerEl) {
+        footerEl.style.position = "absolute";
+        footerEl.style.bottom = "0";
+        footerEl.style.left = "0";
+        footerEl.style.right = "0";
+      }
+      if (bodyEl) {
+        bodyEl.style.paddingBottom = (footerH + 20) + "px";
+      }
     }
   }
 
