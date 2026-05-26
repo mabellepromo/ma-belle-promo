@@ -193,9 +193,18 @@ const INITIAL = {
 // Hauteur A4 à 96 dpi (297mm)
 const A4_PX = 1123;
 
-// Footer ancré en bas de chaque page imprimée (position:fixed en print = répété sur toutes les pages)
-// Le ::after sur body réserve l'espace du footer sans toucher au flex layout interne des templates
-const PRINT_FOOTER_CSS = `
+// Styles injectés dans tous les documents générés
+const INJECT_CSS = `
+  /* Forcer le mode clair : bloque l'inversion automatique du dark mode système */
+  :root, html, body { color-scheme: light !important; }
+
+  /* Couleur explicite sur les zones de texte pour garantir la visibilité */
+  .corps-lettre, .e-corps {
+    color: hsl(150, 30%, 10%) !important;
+    visibility: visible !important;
+  }
+
+  /* Footer ancré en bas de chaque page imprimée */
   @media print {
     footer, .footer-zone {
       position: fixed !important;
@@ -285,10 +294,10 @@ function injectValues(html, form, compact = false) {
     el.removeAttribute("contenteditable")
   );
 
-  // Footer fixe en bas de chaque page — injecté systématiquement
-  const printFooterStyle = doc.createElement("style");
-  printFooterStyle.textContent = PRINT_FOOTER_CSS;
-  doc.head.appendChild(printFooterStyle);
+  // Styles systématiques : dark mode, visibilité corps, footer print
+  const injectStyle = doc.createElement("style");
+  injectStyle.textContent = INJECT_CSS;
+  doc.head.appendChild(injectStyle);
 
   if (compact) {
     const compactStyle = doc.createElement("style");
@@ -370,14 +379,16 @@ export default function CourrierSection() {
         htmlCacheRef.current[template.file] = await resp.text();
       }
       const injected = injectValues(htmlCacheRef.current[template.file], form, compact);
-      const win = window.open("", "_blank");
+      // Blob URL : plus fiable que document.write, évite les quirks de rendu
+      const blob = new Blob([injected], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, "_blank");
       if (!win) {
         toast.error("Popup bloquée — autorisez les popups pour ce site.");
+        URL.revokeObjectURL(url);
         return;
       }
-      win.document.write(injected);
-      win.document.close();
-      setTimeout(() => win.print(), 900);
+      setTimeout(() => { win.print(); URL.revokeObjectURL(url); }, 1200);
     } catch (e) {
       toast.error("Erreur : " + e.message);
     } finally {
