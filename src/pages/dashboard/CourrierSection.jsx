@@ -231,81 +231,99 @@ const COMPACT_CSS = `
   p { margin-bottom: 0.35em !important; margin-top: 0 !important; }
 `;
 
-function injectValues(html, form, compact = false) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+// Injection via iframe live — plus fiable que DOMParser dont outerHTML
+// ne reflète pas toujours les mutations DOM dans Chrome/Edge
+async function injectValues(html, form, compact = false) {
+  const iframe = document.createElement("iframe");
+  iframe.style.cssText =
+    "position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;" +
+    "border:none;visibility:hidden;pointer-events:none";
+  document.body.appendChild(iframe);
 
-  doc.querySelector(".print-hint")?.remove();
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(html);
+  iframe.contentDocument.close();
 
-  const base = doc.createElement("base");
+  const d = iframe.contentDocument;
+
+  d.querySelector(".print-hint")?.remove();
+
+  const base = d.createElement("base");
   base.href = window.location.origin + "/";
-  doc.head.insertBefore(base, doc.head.firstChild);
+  d.head.insertBefore(base, d.head.firstChild);
 
-  doc.querySelectorAll("img").forEach(img => {
+  d.querySelectorAll("img").forEach(img => {
     const src = img.getAttribute("src") || "";
     if (src.includes("logo-mbp")) {
       img.setAttribute("src", window.location.origin + "/logo-mbp.png");
     }
   });
 
-  const dateEl = doc.querySelector(
-    '[contenteditable][data-placeholder*="aaaa"], [contenteditable][data-placeholder="date"]'
+  d.querySelectorAll("[contenteditable]").forEach(el =>
+    el.removeAttribute("contenteditable")
   );
+
+  function fillText(el, text) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    const lines = text.split("\n");
+    lines.forEach((line, i) => {
+      if (line) el.appendChild(d.createTextNode(line));
+      if (i < lines.length - 1) el.appendChild(d.createElement("br"));
+    });
+  }
+
+  const dateEl = d.querySelector('[data-placeholder*="aaaa"], [data-placeholder="date"]');
   if (dateEl) dateEl.textContent = form.date;
 
-  const villeDateEl = doc.querySelector(".editable-ville-date");
+  const villeDateEl = d.querySelector(".editable-ville-date");
   if (villeDateEl) villeDateEl.textContent = `Lomé, le ${form.date}`;
 
-  const refEl = doc.querySelector('[contenteditable][data-placeholder*="MBP"]');
+  const refEl = d.querySelector('[data-placeholder*="MBP"]');
   if (refEl) refEl.textContent = form.ref;
 
-  const objetEl = doc.querySelector(".editable-objet, .objet-band-text, .e-objet");
+  const objetEl = d.querySelector(".editable-objet, .objet-band-text, .e-objet");
   if (objetEl) objetEl.textContent = form.objet;
 
-  const destEl = doc.querySelector(".editable-dest, .e-dest");
-  if (destEl) destEl.innerHTML = form.dest.replace(/\n/g, "<br>");
+  const destEl = d.querySelector(".editable-dest, .e-dest");
+  if (destEl) fillText(destEl, form.dest);
 
-  const appelEl = doc.querySelector(".formule-appel, .e-appel");
+  const appelEl = d.querySelector(".formule-appel, .e-appel");
   if (appelEl) appelEl.textContent = form.appel;
 
-  const corpsEl = doc.querySelector(".corps-lettre, .e-corps");
-  if (corpsEl) corpsEl.innerHTML = form.corps.replace(/\n/g, "<br>");
+  const corpsEl = d.querySelector(".corps-lettre, .e-corps");
+  if (corpsEl) fillText(corpsEl, form.corps);
 
-  const polEl = doc.querySelector(".politesse, .e-politesse");
+  const polEl = d.querySelector(".politesse, .e-politesse");
   if (polEl) polEl.textContent = form.politesse;
 
-  const sigNomEl = doc.querySelector(".editable-sig-name, .editable-signature, .e-sig-name");
+  const sigNomEl = d.querySelector(".editable-sig-name, .editable-signature, .e-sig-name");
   if (sigNomEl) sigNomEl.textContent = form.sigNom;
 
-  const sigTitreEl = doc.querySelector(".editable-sig-titre, .signature-titre, .e-sig-titre");
+  const sigTitreEl = d.querySelector(".editable-sig-titre, .signature-titre, .e-sig-titre");
   if (sigTitreEl) sigTitreEl.textContent = form.sigTitre;
 
-  // Cachet de la Présidente — inséré entre le label "La Présidente" et le nom
-  const sigLabelEl = doc.querySelector(".sig-role, .sig-function, .signature-label");
+  const sigLabelEl = d.querySelector(".sig-role, .sig-function, .signature-label");
   if (sigLabelEl) {
-    const stamp = doc.createElement("img");
+    const stamp = d.createElement("img");
     stamp.setAttribute("src", window.location.origin + "/images/FDD.webp");
     stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;opacity:0.9";
     stamp.setAttribute("alt", "Cachet de la Présidente");
     sigLabelEl.insertAdjacentElement("afterend", stamp);
   }
 
-  doc.querySelectorAll("[contenteditable]").forEach(el =>
-    el.removeAttribute("contenteditable")
-  );
-
-  // Styles systématiques : dark mode, visibilité corps, footer print
-  const injectStyle = doc.createElement("style");
+  const injectStyle = d.createElement("style");
   injectStyle.textContent = INJECT_CSS;
-  doc.head.appendChild(injectStyle);
+  d.head.appendChild(injectStyle);
 
   if (compact) {
-    const compactStyle = doc.createElement("style");
+    const compactStyle = d.createElement("style");
     compactStyle.textContent = COMPACT_CSS;
-    doc.head.appendChild(compactStyle);
+    d.head.appendChild(compactStyle);
   }
 
-  return "<!DOCTYPE html>" + doc.documentElement.outerHTML;
+  const result = "<!DOCTYPE html>" + d.documentElement.outerHTML;
+  document.body.removeChild(iframe);
+  return result;
 }
 
 export default function CourrierSection() {
@@ -341,7 +359,7 @@ export default function CourrierSection() {
           if (!resp.ok) throw new Error();
           htmlCacheRef.current[template.file] = await resp.text();
         }
-        const injected = injectValues(htmlCacheRef.current[template.file], form, compact);
+        const injected = await injectValues(htmlCacheRef.current[template.file], form, compact);
 
         // Iframe hors-écran aux dimensions A4
         const iframe = document.createElement("iframe");
@@ -378,7 +396,7 @@ export default function CourrierSection() {
         if (!resp.ok) throw new Error("Modèle introuvable");
         htmlCacheRef.current[template.file] = await resp.text();
       }
-      const injected = injectValues(htmlCacheRef.current[template.file], form, compact);
+      const injected = await injectValues(htmlCacheRef.current[template.file], form, compact);
       // Blob URL : plus fiable que document.write, évite les quirks de rendu
       const blob = new Blob([injected], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -547,13 +565,6 @@ export default function CourrierSection() {
                     placeholder={"Nous avons l'honneur de vous informer que…\n\nVotre texte ici."}
                   />
                 </Field>
-                <Field label="Formule de politesse">
-                  <textarea
-                    className={inp + " h-16 resize-none py-2"}
-                    value={form.politesse}
-                    onChange={f("politesse")}
-                  />
-                </Field>
               </div>
             </div>
 
@@ -585,6 +596,22 @@ export default function CourrierSection() {
                     value={form.dest}
                     onChange={f("dest")}
                     placeholder={"M. Jean Dupont\nDirecteur\nOrganisation\nVille"}
+                  />
+                </Field>
+              </div>
+            </div>
+
+            {/* Formule de politesse */}
+            <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-5 py-3 border-b border-border bg-muted/20">
+                <p className="text-sm font-semibold text-foreground">Formule de politesse</p>
+              </div>
+              <div className="p-5">
+                <Field label="">
+                  <textarea
+                    className={inp + " h-16 resize-none py-2"}
+                    value={form.politesse}
+                    onChange={f("politesse")}
                   />
                 </Field>
               </div>
