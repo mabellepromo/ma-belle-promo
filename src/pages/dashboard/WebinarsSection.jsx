@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Video, Plus, Edit2, Trash2, ChevronDown, ChevronUp, Download,
   Copy, Users, Check, X, Loader2, Calendar, Link2, RefreshCw,
-  UserCheck, Clock, Tag, Send, Eye, QrCode
+  UserCheck, Clock, Tag, Send, Eye, QrCode, Upload, FileText, Image, User
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
-import { supabase } from "@/lib/supabase";
+import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
 import { inp, ta, sel, Field } from "./shared";
 
 const STATUS_LABEL = { draft: "Brouillon", open: "Ouvert", closed: "Fermé", archived: "Archivé" };
@@ -29,7 +29,13 @@ const EMPTY_EVENT = {
   event_type:           "webinaire",
   status:               "draft",
   gdpr_consent_required: true,
+  affiche:              "",
+  intervenants:         [],
+  documents:            [],
 };
+
+const EMPTY_INTERVENANT = { nom: "", profession: "", role: "", photo: "" };
+const EMPTY_DOCUMENT    = { nom: "", url: "" };
 
 function fmtDate(iso) {
   if (!iso) return "—";
@@ -201,18 +207,175 @@ function RegistrationsList({ event }) {
   );
 }
 
+// ── Ligne intervenant (avec upload photo) ────────────────────────────────────
+
+function IntervenantRow({ iv, onChange, onRemove }) {
+  const fileRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handlePhoto(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      onChange({ ...iv, photo: url });
+    } catch (err) {
+      toast.error("Erreur upload : " + err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  return (
+    <div className="flex items-start gap-2 p-3 rounded-xl border border-border bg-muted/20">
+      {/* Photo */}
+      <div className="flex-shrink-0">
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="w-12 h-12 rounded-xl border-2 border-dashed border-border bg-muted flex items-center justify-center cursor-pointer hover:border-primary/50 overflow-hidden transition-colors"
+        >
+          {uploading
+            ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            : iv.photo
+              ? <img src={iv.photo} alt="" className="w-full h-full object-cover" />
+              : <User className="w-5 h-5 text-muted-foreground opacity-50" />}
+        </div>
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+      </div>
+
+      {/* Champs */}
+      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <input
+          className={inp} placeholder="Nom complet *"
+          value={iv.nom} onChange={e => onChange({ ...iv, nom: e.target.value })}
+        />
+        <input
+          className={inp} placeholder="Profession / titre"
+          value={iv.profession} onChange={e => onChange({ ...iv, profession: e.target.value })}
+        />
+        <input
+          className={inp} placeholder="Rôle (ex: Modérateur, Panéliste…)"
+          value={iv.role} onChange={e => onChange({ ...iv, role: e.target.value })}
+        />
+      </div>
+
+      <button type="button" onClick={onRemove}
+        className="flex-shrink-0 w-7 h-7 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors mt-0.5">
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}
+
+// ── Ligne document (PDF / affiche) ───────────────────────────────────────────
+
+function DocumentRow({ doc, onChange, onRemove }) {
+  const fileRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      let url;
+      if (file.type.startsWith("image/")) {
+        url = await uploadImage(file);
+      } else {
+        url = await uploadFile(file);
+      }
+      onChange({ ...doc, url, nom: doc.nom || file.name.replace(/\.[^.]+$/, "") });
+    } catch (err) {
+      toast.error("Erreur upload : " + err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border bg-muted/20">
+      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+        {doc.url
+          ? (doc.url.match(/\.(jpg|jpeg|png|webp|gif)$/i)
+              ? <img src={doc.url} alt="" className="w-full h-full object-cover rounded-lg" />
+              : <FileText className="w-4 h-4 text-primary" />)
+          : <FileText className="w-4 h-4 text-muted-foreground opacity-40" />}
+      </div>
+
+      <input
+        className={`${inp} flex-1`} placeholder="Nom du document (ex: Affiche, Programme…)"
+        value={doc.nom} onChange={e => onChange({ ...doc, nom: e.target.value })}
+      />
+
+      <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+        className="flex-shrink-0 flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 transition-colors">
+        {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+        {uploading ? "Upload…" : doc.url ? "Changer" : "Uploader"}
+      </button>
+      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx" className="hidden" onChange={handleFile} />
+
+      <button type="button" onClick={onRemove}
+        className="flex-shrink-0 w-7 h-7 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors">
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}
+
 // ── Formulaire création / édition d'un événement ─────────────────────────────
 
 function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
+  const afficheRef = useRef(null);
+  const [uploadingAffiche, setUploadingAffiche] = useState(false);
   const [form, setForm] = useState({
     ...EMPTY_EVENT,
     ...initial,
-    date_time: fmtDatetimeLocal(initial.date_time),
+    date_time:        fmtDatetimeLocal(initial.date_time),
     max_participants: initial.max_participants || "",
+    intervenants:     Array.isArray(initial.intervenants) ? initial.intervenants : [],
+    documents:        Array.isArray(initial.documents)    ? initial.documents    : [],
   });
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }));
+  }
+
+  function updateIntervenant(i, updated) {
+    const next = [...form.intervenants];
+    next[i] = updated;
+    set("intervenants", next);
+  }
+
+  function removeIntervenant(i) {
+    set("intervenants", form.intervenants.filter((_, j) => j !== i));
+  }
+
+  function updateDocument(i, updated) {
+    const next = [...form.documents];
+    next[i] = updated;
+    set("documents", next);
+  }
+
+  function removeDocument(i) {
+    set("documents", form.documents.filter((_, j) => j !== i));
+  }
+
+  async function handleAffiche(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAffiche(true);
+    try {
+      const url = await uploadImage(file);
+      set("affiche", url);
+    } catch (err) {
+      toast.error("Erreur upload affiche : " + err.message);
+    } finally {
+      setUploadingAffiche(false);
+      e.target.value = "";
+    }
   }
 
   function handleSubmit(e) {
@@ -223,11 +386,16 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
       date_time:        form.date_time ? new Date(form.date_time).toISOString() : null,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
       zoom_link:        form.zoom_link?.trim() || null,
+      affiche:          form.affiche?.trim() || null,
+      intervenants:     form.intervenants.filter(iv => iv.nom.trim()),
+      documents:        form.documents.filter(d => d.nom.trim() || d.url),
     });
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 py-2">
+    <form onSubmit={handleSubmit} className="space-y-5 py-2">
+
+      {/* ── Infos de base ── */}
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="sm:col-span-2">
           <Field label="Titre" required>
@@ -239,7 +407,7 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
         <div className="sm:col-span-2">
           <Field label="Description">
             <textarea className={ta} rows={3} value={form.description} onChange={e => set("description", e.target.value)}
-              placeholder="Présentation du webinaire, intervenants, objectifs…" />
+              placeholder="Présentation du webinaire, programme, objectifs…" />
           </Field>
         </div>
 
@@ -287,7 +455,88 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
         </div>
       </div>
 
-      <div className="flex gap-2 pt-2">
+      {/* ── Affiche / bannière ── */}
+      <div>
+        <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+          <Image className="w-3.5 h-3.5 text-primary" /> Affiche / Bannière
+        </p>
+        <div className="flex items-start gap-3">
+          {form.affiche && (
+            <div className="relative flex-shrink-0">
+              <img src={form.affiche} alt="Affiche"
+                className="h-24 w-auto rounded-xl border border-border object-cover"
+                onError={e => e.target.style.display = "none"} />
+              <button type="button" onClick={() => set("affiche", "")}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center">
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+          <div className="flex-1 space-y-2">
+            <input className={inp} type="url" value={form.affiche}
+              onChange={e => set("affiche", e.target.value)}
+              placeholder="URL de l'image (https://…)" />
+            <button type="button" onClick={() => afficheRef.current?.click()} disabled={uploadingAffiche}
+              className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium rounded-lg border border-border hover:bg-muted disabled:opacity-50 transition-colors text-muted-foreground hover:text-foreground">
+              {uploadingAffiche
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Upload…</>
+                : <><Upload className="w-3.5 h-3.5" /> Uploader une image</>}
+            </button>
+            <input ref={afficheRef} type="file" accept="image/*" className="hidden" onChange={handleAffiche} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Intervenants ── */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-primary" /> Intervenants
+          </p>
+          <button type="button"
+            onClick={() => set("intervenants", [...form.intervenants, { ...EMPTY_INTERVENANT }])}
+            className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+            <Plus className="w-3.5 h-3.5" /> Ajouter
+          </button>
+        </div>
+        {form.intervenants.length === 0 && (
+          <p className="text-xs text-muted-foreground italic">Aucun intervenant — cliquez Ajouter</p>
+        )}
+        <div className="space-y-2">
+          {form.intervenants.map((iv, i) => (
+            <IntervenantRow key={i} iv={iv}
+              onChange={updated => updateIntervenant(i, updated)}
+              onRemove={() => removeIntervenant(i)} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Documents / fiches ── */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-primary" /> Documents & fiches
+          </p>
+          <button type="button"
+            onClick={() => set("documents", [...form.documents, { ...EMPTY_DOCUMENT }])}
+            className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+            <Plus className="w-3.5 h-3.5" /> Ajouter
+          </button>
+        </div>
+        {form.documents.length === 0 && (
+          <p className="text-xs text-muted-foreground italic">Aucun document — cliquez Ajouter</p>
+        )}
+        <div className="space-y-2">
+          {form.documents.map((doc, i) => (
+            <DocumentRow key={i} doc={doc}
+              onChange={updated => updateDocument(i, updated)}
+              onRemove={() => removeDocument(i)} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Boutons ── */}
+      <div className="flex gap-2 pt-1">
         <button type="button" onClick={onCancel}
           className="flex-1 h-9 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:bg-muted transition-colors">
           Annuler
