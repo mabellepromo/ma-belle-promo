@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Video, Plus, Edit2, Trash2, ChevronDown, ChevronUp, Download,
   Copy, Users, Check, X, Loader2, Calendar, Link2, RefreshCw,
-  UserCheck, Clock, Tag, Send, Eye, QrCode, Upload, FileText, Image, User
+  UserCheck, Clock, Tag, Send, Eye, QrCode, Upload, FileText, Image, User, MapPin
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
@@ -20,11 +20,29 @@ const STATUS_COLOR = {
 };
 const TYPE_LABEL = { webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion" };
 
+const FORMAT_LABEL = {
+  en_ligne:   "En ligne",
+  presentiel: "Présentiel",
+  hybride:    "Hybride",
+};
+const FORMAT_COLOR = {
+  en_ligne:   "bg-blue-500/15 text-blue-400",
+  presentiel: "bg-amber-500/15 text-amber-400",
+  hybride:    "bg-violet-500/15 text-violet-400",
+};
+const PLATEFORME_LABEL = {
+  zoom: "Zoom", meet: "Google Meet", teams: "Microsoft Teams",
+  facebook: "Facebook Live", youtube: "YouTube Live", autre: "Autre",
+};
+
 const EMPTY_EVENT = {
   title:                "",
   description:          "",
   date_time:            "",
+  format:               "en_ligne",
   zoom_link:            "",
+  plateforme:           "zoom",
+  lieu:                 "",
   max_participants:     "",
   event_type:           "webinaire",
   status:               "draft",
@@ -381,16 +399,24 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (!form.title.trim()) { toast.error("Le titre est obligatoire."); return; }
+    if ((form.format === "presentiel" || form.format === "hybride") && !form.lieu?.trim()) {
+      toast.error("Le lieu est obligatoire pour un événement présentiel ou hybride.");
+      return;
+    }
     onSave({
       ...form,
       date_time:        form.date_time ? new Date(form.date_time).toISOString() : null,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
       zoom_link:        form.zoom_link?.trim() || null,
+      lieu:             form.lieu?.trim() || null,
       affiche:          form.affiche?.trim() || null,
       intervenants:     form.intervenants.filter(iv => iv.nom.trim()),
       documents:        form.documents.filter(d => d.nom.trim() || d.url),
     });
   }
+
+  const hasOnline     = form.format === "en_ligne"   || form.format === "hybride";
+  const hasPhysical   = form.format === "presentiel" || form.format === "hybride";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 py-2">
@@ -416,12 +442,6 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
             onChange={e => set("date_time", e.target.value)} />
         </Field>
 
-        <Field label="Lien Zoom">
-          <input className={inp} type="url" value={form.zoom_link}
-            onChange={e => set("zoom_link", e.target.value)}
-            placeholder="https://zoom.us/j/…" />
-        </Field>
-
         <Field label="Type d'événement">
           <select className={sel} value={form.event_type} onChange={e => set("event_type", e.target.value)}>
             <option value="webinaire">Webinaire</option>
@@ -429,6 +449,66 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
             <option value="reunion">Réunion</option>
           </select>
         </Field>
+
+        {/* Format */}
+        <div className="sm:col-span-2">
+          <Field label="Format">
+            <div className="flex gap-2">
+              {["en_ligne", "presentiel", "hybride"].map(f => (
+                <button key={f} type="button"
+                  onClick={() => set("format", f)}
+                  className={`flex-1 h-9 rounded-xl text-xs font-semibold border transition-all ${
+                    form.format === f
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}>
+                  {FORMAT_LABEL[f]}
+                </button>
+              ))}
+            </div>
+          </Field>
+        </div>
+
+        {/* Lieu physique — présentiel ou hybride */}
+        {hasPhysical && (
+          <div className="sm:col-span-2">
+            <Field label="Lieu / Adresse" required={form.format === "presentiel"}>
+              <input className={inp} value={form.lieu || ""}
+                onChange={e => set("lieu", e.target.value)}
+                placeholder="Salle de conférence, Université de Lomé, Togo…" />
+            </Field>
+          </div>
+        )}
+
+        {/* Plateforme de diffusion — en ligne ou hybride */}
+        {hasOnline && (
+          <>
+            <Field label="Plateforme de diffusion">
+              <select className={sel} value={form.plateforme || "zoom"}
+                onChange={e => set("plateforme", e.target.value)}>
+                <option value="zoom">Zoom</option>
+                <option value="meet">Google Meet</option>
+                <option value="teams">Microsoft Teams</option>
+                <option value="facebook">Facebook Live</option>
+                <option value="youtube">YouTube Live</option>
+                <option value="autre">Autre</option>
+              </select>
+            </Field>
+
+            <Field label="Lien de diffusion">
+              <input className={inp} type="url" value={form.zoom_link || ""}
+                onChange={e => set("zoom_link", e.target.value)}
+                placeholder={
+                  form.plateforme === "zoom"     ? "https://zoom.us/j/…" :
+                  form.plateforme === "meet"     ? "https://meet.google.com/…" :
+                  form.plateforme === "teams"    ? "https://teams.microsoft.com/…" :
+                  form.plateforme === "facebook" ? "https://facebook.com/live/…" :
+                  form.plateforme === "youtube"  ? "https://youtube.com/live/…" :
+                  "https://…"
+                } />
+            </Field>
+          </>
+        )}
 
         <Field label="Statut">
           <select className={sel} value={form.status} onChange={e => set("status", e.target.value)}>
@@ -767,10 +847,21 @@ export default function WebinarsSection() {
                       <Calendar className="w-3 h-3" /> {fmtDate(event.date_time)}
                     </span>
                   )}
+                  {event.format && (
+                    <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${FORMAT_COLOR[event.format] || "bg-muted text-muted-foreground"}`}>
+                      {FORMAT_LABEL[event.format] || event.format}
+                    </span>
+                  )}
+                  {event.lieu && (
+                    <span className="flex items-center gap-1 text-amber-400">
+                      <MapPin className="w-3 h-3" /> {event.lieu}
+                    </span>
+                  )}
                   {event.zoom_link && (
                     <a href={event.zoom_link} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-1 text-blue-400 hover:underline">
-                      <Video className="w-3 h-3" /> Zoom
+                      <Video className="w-3 h-3" />
+                      {PLATEFORME_LABEL[event.plateforme] || "En ligne"}
                     </a>
                   )}
                   {event.max_participants && (

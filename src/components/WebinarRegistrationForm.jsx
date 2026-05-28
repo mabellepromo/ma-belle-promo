@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Loader2, Mail, User, Phone, Briefcase, Building2, Video, AlertCircle } from "lucide-react";
+import { Check, Loader2, Mail, User, Phone, Briefcase, Building2, Video, AlertCircle, MapPin } from "lucide-react";
 import { registerToWebinar } from "@/hooks/useWebinars";
 import { useLocalAuth } from "@/lib/LocalAuth";
 
@@ -155,16 +155,20 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
           {event.date_time && (
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{fmtDate(event.date_time)}</p>
           )}
-          <div className="flex flex-wrap gap-2 mt-1">
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+            {event.lieu && (
+              <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> {event.lieu}
+              </span>
+            )}
             {event.zoom_link && (
-              <span className="text-xs text-primary flex items-center gap-1">
-                <Video className="w-3 h-3" /> Lien Zoom envoyé par email
+              <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                <Video className="w-3 h-3" />
+                {{zoom:"Zoom",meet:"Google Meet",teams:"Teams",facebook:"Facebook Live",youtube:"YouTube Live"}[event.plateforme] || "En ligne"} — lien envoyé par email
               </span>
             )}
             {event.max_participants && (
-              <span className="text-xs text-muted-foreground">
-                Max. {event.max_participants} places
-              </span>
+              <span className="text-xs text-muted-foreground">Max. {event.max_participants} places</span>
             )}
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, Users, Video, ChevronRight, X, Clock, Tag,
-  Loader2, FileText, Download, User
+  Loader2, FileText, Download, User, MapPin
 } from "lucide-react";
 import { useWebinars } from "@/hooks/useWebinars";
 import WebinarRegistrationForm from "@/components/WebinarRegistrationForm";
@@ -12,6 +12,25 @@ const EVENT_TYPE_COLOR = {
   webinaire: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
   atelier:   "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
   reunion:   "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+};
+
+const FORMAT_LABEL = { en_ligne: "En ligne", presentiel: "Présentiel", hybride: "Hybride" };
+const FORMAT_COLOR = {
+  en_ligne:   "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  presentiel: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  hybride:    "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
+};
+const PLATEFORME_LABEL = {
+  zoom: "Zoom", meet: "Google Meet", teams: "Microsoft Teams",
+  facebook: "Facebook Live", youtube: "YouTube Live", autre: "Lien de diffusion",
+};
+const PLATEFORME_COLOR = {
+  zoom:     "text-blue-600 dark:text-blue-400",
+  meet:     "text-green-600 dark:text-green-400",
+  teams:    "text-indigo-600 dark:text-indigo-400",
+  facebook: "text-blue-800 dark:text-blue-300",
+  youtube:  "text-red-600 dark:text-red-400",
+  autre:    "text-muted-foreground",
 };
 
 function fmtDate(iso) {
@@ -172,21 +191,32 @@ function EventCard({ event, isSelected, isRegistered, onClick }) {
             )}
 
             {/* Meta */}
-            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
               {event.date_time && (
                 <span className="flex items-center gap-1 capitalize">
                   <Calendar className="w-3.5 h-3.5" />
                   {fmtDateShort(event.date_time)} — {fmtTime(event.date_time)}
                 </span>
               )}
-              {event.max_participants && (
-                <span className="flex items-center gap-1">
-                  <Tag className="w-3.5 h-3.5" /> Max. {event.max_participants} places
+              {event.format && event.format !== "en_ligne" && (
+                <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${FORMAT_COLOR[event.format]}`}>
+                  {FORMAT_LABEL[event.format]}
+                </span>
+              )}
+              {event.lieu && (
+                <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                  <MapPin className="w-3.5 h-3.5" /> {event.lieu}
                 </span>
               )}
               {event.zoom_link && (
-                <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                  <Video className="w-3.5 h-3.5" /> En ligne
+                <span className={`flex items-center gap-1 font-medium ${PLATEFORME_COLOR[event.plateforme] || "text-blue-600 dark:text-blue-400"}`}>
+                  <Video className="w-3.5 h-3.5" />
+                  {PLATEFORME_LABEL[event.plateforme] || "En ligne"}
+                </span>
+              )}
+              {event.max_participants && (
+                <span className="flex items-center gap-1">
+                  <Tag className="w-3.5 h-3.5" /> Max. {event.max_participants} places
                 </span>
               )}
               {intervenants.length > 0 && (
@@ -360,6 +390,37 @@ export default function Webinaires() {
                     {/* Description complète */}
                     {selected.description && (
                       <p className="text-sm text-foreground/80 leading-relaxed">{selected.description}</p>
+                    )}
+
+                    {/* Infos pratiques : format, lieu, plateforme */}
+                    {(selected.lieu || selected.zoom_link || selected.format) && (
+                      <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-2.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                          Informations pratiques
+                        </p>
+                        {selected.format && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${FORMAT_COLOR[selected.format] || ""}`}>
+                              {FORMAT_LABEL[selected.format] || selected.format}
+                            </span>
+                          </div>
+                        )}
+                        {selected.lieu && (
+                          <div className="flex items-start gap-2 text-sm">
+                            <MapPin className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                            <span className="text-foreground">{selected.lieu}</span>
+                          </div>
+                        )}
+                        {selected.zoom_link && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Video className={`w-4 h-4 flex-shrink-0 ${PLATEFORME_COLOR[selected.plateforme] || "text-blue-500"}`} />
+                            <a href={selected.zoom_link} target="_blank" rel="noopener noreferrer"
+                              className={`font-semibold hover:underline ${PLATEFORME_COLOR[selected.plateforme] || "text-blue-600 dark:text-blue-400"}`}>
+                              Rejoindre sur {PLATEFORME_LABEL[selected.plateforme] || "la plateforme"}
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {/* Intervenants */}
