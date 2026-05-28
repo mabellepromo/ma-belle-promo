@@ -325,7 +325,7 @@ export default function Webinaires() {
       <div className="relative overflow-hidden bg-gradient-to-br from-[#0a3d28] to-[#14532d] py-16 px-6">
         <div className="relative max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm text-emerald-200 mb-4 font-medium">
-            <Video className="w-4 h-4" /> Événements en ligne
+            <Video className="w-4 h-4" /> Événements
           </div>
           <h1 className="font-heading text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
             Webinaires &amp; Ateliers MBP
