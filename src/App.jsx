@@ -159,7 +159,8 @@ const AuthenticatedApp = () => {
     || location.pathname === '/verifier'
     || location.pathname.startsWith('/sondage/')
     || location.pathname.startsWith('/checkin/')
-    || location.pathname.startsWith('/webinaires/desinscrire/');
+    || location.pathname.startsWith('/webinaires/desinscrire/')
+    || location.pathname === '/activites/webinaires';
 
   return (
     <>
@@ -188,7 +189,6 @@ const AuthenticatedApp = () => {
         <Route path="/association/equipe" element={<Equipe />} />
         <Route path="/association/sponsors" element={<Sponsors />} />
         <Route path="/activites/evenements" element={<Evenements />} />
-        <Route path="/activites/webinaires" element={<Webinaires />} />
         <Route path="/activites/projets" element={<Projets />} />
         <Route path="/activites/projets/:id" element={<ProjetDetail />} />
         <Route path="/activites/programmes" element={<Programmes />} />
@@ -219,6 +219,7 @@ const AuthenticatedApp = () => {
       <Route path="/verifier" element={<Verifier />} />
       <Route path="/sondage/:id" element={<Sondage />} />
       <Route path="/checkin/:id" element={<Checkin />} />
+      <Route path="/activites/webinaires" element={<Webinaires />} />
       <Route path="/webinaires/desinscrire/:token" element={<WebinarDesinscrire />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
