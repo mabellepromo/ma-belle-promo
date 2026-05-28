@@ -97,23 +97,28 @@ function IntervenantsBlock({ intervenants }) {
   if (!Array.isArray(intervenants) || intervenants.length === 0) return null;
   return (
     <div>
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
         Intervenants
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {intervenants.map((iv, i) => (
-          <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-muted/30 border border-border">
+          <div key={i} className="flex flex-col items-center text-center p-4 rounded-2xl bg-muted/30 border border-border gap-3">
+            {/* Photo */}
             {iv.photo
               ? <img src={iv.photo} alt={iv.nom}
-                  className="w-10 h-10 rounded-full object-cover object-top flex-shrink-0 border border-border" />
-              : <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-primary/50" />
+                  className="w-20 h-20 rounded-full object-cover object-top border-2 border-border shadow-sm flex-shrink-0" />
+              : <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-border flex items-center justify-center flex-shrink-0">
+                  <User className="w-9 h-9 text-primary/40" />
                 </div>}
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-foreground truncate leading-tight">{iv.nom}</p>
-              {iv.profession && <p className="text-[11px] text-muted-foreground truncate leading-tight">{iv.profession}</p>}
+
+            {/* Infos */}
+            <div className="space-y-1 w-full">
+              <p className="text-sm font-bold text-foreground leading-snug">{iv.nom}</p>
+              {iv.profession && (
+                <p className="text-xs text-muted-foreground leading-relaxed">{iv.profession}</p>
+              )}
               {iv.role && (
-                <span className="inline-block mt-0.5 text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full leading-none">
+                <span className="inline-block mt-1 text-[11px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
                   {iv.role}
                 </span>
               )}
@@ -250,21 +255,25 @@ function EventCard({ event, isSelected, isRegistered, onClick }) {
 
             {/* Avatars intervenants (aperçu sur la carte) */}
             {intervenants.length > 0 && (
-              <div className="flex items-center gap-1 mt-3">
-                {intervenants.slice(0, 4).map((iv, i) => (
+              <div className="flex items-center mt-3">
+                {intervenants.slice(0, 5).map((iv, i) => (
                   iv.photo
                     ? <img key={i} src={iv.photo} alt={iv.nom}
-                        className="w-7 h-7 rounded-full object-cover object-top border-2 border-card -ml-1 first:ml-0"
-                        title={iv.nom} />
-                    : <div key={i} className="w-7 h-7 rounded-full bg-primary/10 border-2 border-card -ml-1 first:ml-0 flex items-center justify-center">
-                        <User className="w-3.5 h-3.5 text-primary/50" />
+                        className="w-8 h-8 rounded-full object-cover object-top border-2 border-card -ml-2 first:ml-0 shadow-sm"
+                        title={`${iv.nom}${iv.role ? ` · ${iv.role}` : ""}`} />
+                    : <div key={i} title={iv.nom}
+                        className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card -ml-2 first:ml-0 flex items-center justify-center shadow-sm">
+                        <User className="w-4 h-4 text-primary/50" />
                       </div>
                 ))}
-                {intervenants.length > 4 && (
-                  <span className="w-7 h-7 rounded-full bg-muted border-2 border-card -ml-1 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                    +{intervenants.length - 4}
+                {intervenants.length > 5 && (
+                  <span className="w-8 h-8 rounded-full bg-muted border-2 border-card -ml-2 flex items-center justify-center text-[10px] font-bold text-muted-foreground shadow-sm">
+                    +{intervenants.length - 5}
                   </span>
                 )}
+                <span className="ml-2.5 text-xs text-muted-foreground">
+                  {intervenants.length} intervenant{intervenants.length > 1 ? "s" : ""}
+                </span>
               </div>
             )}
           </div>
