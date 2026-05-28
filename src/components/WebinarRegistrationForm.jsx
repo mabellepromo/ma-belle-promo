@@ -143,22 +143,31 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
 
-      {/* Infos event */}
-      <div className="rounded-xl bg-primary/5 border border-primary/15 p-4">
-        <p className="font-semibold text-sm text-foreground">{event.title}</p>
-        {event.date_time && (
-          <p className="text-xs text-muted-foreground mt-0.5 capitalize">{fmtDate(event.date_time)}</p>
-        )}
-        {event.zoom_link && (
-          <p className="text-xs text-primary mt-1 flex items-center gap-1">
-            <Video className="w-3 h-3" /> Lien Zoom envoyé après inscription
-          </p>
-        )}
-        {event.max_participants && (
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Places limitées à {event.max_participants} participants
-          </p>
-        )}
+      {/* Mini-récap event */}
+      <div className="rounded-xl bg-primary/5 border border-primary/15 p-3 flex items-center gap-3">
+        {event.affiche
+          ? <img src={event.affiche} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+          : <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Video className="w-4 h-4 text-primary" />
+            </div>}
+        <div className="min-w-0">
+          <p className="font-semibold text-sm text-foreground leading-tight">{event.title}</p>
+          {event.date_time && (
+            <p className="text-xs text-muted-foreground mt-0.5 capitalize">{fmtDate(event.date_time)}</p>
+          )}
+          <div className="flex flex-wrap gap-2 mt-1">
+            {event.zoom_link && (
+              <span className="text-xs text-primary flex items-center gap-1">
+                <Video className="w-3 h-3" /> Lien Zoom envoyé par email
+              </span>
+            )}
+            {event.max_participants && (
+              <span className="text-xs text-muted-foreground">
+                Max. {event.max_participants} places
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Champs obligatoires */}

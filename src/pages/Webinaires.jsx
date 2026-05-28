@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Users, Video, ChevronRight, X, Clock, Tag, Loader2 } from "lucide-react";
+import {
+  Calendar, Users, Video, ChevronRight, X, Clock, Tag,
+  Loader2, FileText, Download, User
+} from "lucide-react";
 import { useWebinars } from "@/hooks/useWebinars";
 import WebinarRegistrationForm from "@/components/WebinarRegistrationForm";
 
-const EVENT_TYPE_LABEL = {
-  webinaire: "Webinaire",
-  atelier:   "Atelier",
-  reunion:   "Réunion",
-};
-
+const EVENT_TYPE_LABEL = { webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion" };
 const EVENT_TYPE_COLOR = {
   webinaire: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
   atelier:   "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
@@ -23,9 +21,7 @@ function fmtDate(iso) {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
       hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lome",
     }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
+  } catch { return iso; }
 }
 
 function fmtDateShort(iso) {
@@ -34,9 +30,7 @@ function fmtDateShort(iso) {
     return new Intl.DateTimeFormat("fr-FR", {
       day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Lome",
     }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
+  } catch { return iso; }
 }
 
 function fmtTime(iso) {
@@ -45,23 +39,208 @@ function fmtTime(iso) {
     return new Intl.DateTimeFormat("fr-FR", {
       hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lome",
     }).format(new Date(iso));
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function daysUntil(iso) {
   if (!iso) return null;
   const diff = Math.ceil((new Date(iso) - new Date()) / 86400000);
-  if (diff < 0) return null;
+  if (diff < 0)  return null;
   if (diff === 0) return "Aujourd'hui";
   if (diff === 1) return "Demain";
   return `Dans ${diff} jours`;
 }
 
+// ── Bloc intervenants ──────────────────────────────────────────────────────────
+function IntervenantsBlock({ intervenants }) {
+  if (!Array.isArray(intervenants) || intervenants.length === 0) return null;
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+        Intervenants
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {intervenants.map((iv, i) => (
+          <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-muted/30 border border-border">
+            {iv.photo
+              ? <img src={iv.photo} alt={iv.nom}
+                  className="w-10 h-10 rounded-full object-cover object-top flex-shrink-0 border border-border" />
+              : <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-primary/50" />
+                </div>}
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-foreground truncate leading-tight">{iv.nom}</p>
+              {iv.profession && <p className="text-[11px] text-muted-foreground truncate leading-tight">{iv.profession}</p>}
+              {iv.role && (
+                <span className="inline-block mt-0.5 text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full leading-none">
+                  {iv.role}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Bloc documents ─────────────────────────────────────────────────────────────
+function DocumentsBlock({ documents }) {
+  if (!Array.isArray(documents) || documents.length === 0) return null;
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+        Documents & fiches
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {documents.map((doc, i) => (
+          doc.url && (
+            <a key={i} href={doc.url} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-muted/30 hover:bg-muted hover:border-primary/30 text-xs font-medium text-foreground transition-colors">
+              {doc.url.match(/\.(jpg|jpeg|png|webp|gif)$/i)
+                ? <img src={doc.url} alt="" className="w-4 h-4 object-cover rounded" />
+                : <FileText className="w-3.5 h-3.5 text-primary" />}
+              {doc.nom || "Document"}
+              <Download className="w-3 h-3 text-muted-foreground ml-0.5" />
+            </a>
+          )
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Carte événement (résumé) ───────────────────────────────────────────────────
+function EventCard({ event, isSelected, isRegistered, onClick }) {
+  const countdown     = daysUntil(event.date_time);
+  const intervenants  = Array.isArray(event.intervenants) ? event.intervenants : [];
+  const hasAffiche    = !!event.affiche;
+
+  return (
+    <motion.div layout
+      className={`rounded-2xl border bg-card shadow-sm overflow-hidden transition-all cursor-pointer group ${
+        isSelected ? "border-primary shadow-md" : "border-border hover:border-primary/40 hover:shadow-md"
+      }`}
+      onClick={onClick}
+    >
+      {/* Affiche banner */}
+      {hasAffiche && (
+        <div className="relative h-40 overflow-hidden">
+          <img src={event.affiche} alt={event.title}
+            className="w-full h-full object-cover"
+            onError={e => { e.target.parentElement.style.display = "none"; }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {countdown && (
+            <span className="absolute bottom-3 right-3 text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500 text-white shadow">
+              {countdown}
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className={`h-1 w-full bg-primary ${hasAffiche ? "hidden" : ""}`} />
+
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+
+            {/* Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${EVENT_TYPE_COLOR[event.event_type] || EVENT_TYPE_COLOR.webinaire}`}>
+                {EVENT_TYPE_LABEL[event.event_type] || event.event_type}
+              </span>
+              {!hasAffiche && countdown && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  {countdown}
+                </span>
+              )}
+              {isRegistered && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  ✓ Inscrit(e)
+                </span>
+              )}
+            </div>
+
+            <h3 className="font-heading text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
+              {event.title}
+            </h3>
+
+            {event.description && (
+              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
+                {event.description}
+              </p>
+            )}
+
+            {/* Meta */}
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
+              {event.date_time && (
+                <span className="flex items-center gap-1 capitalize">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {fmtDateShort(event.date_time)} — {fmtTime(event.date_time)}
+                </span>
+              )}
+              {event.max_participants && (
+                <span className="flex items-center gap-1">
+                  <Tag className="w-3.5 h-3.5" /> Max. {event.max_participants} places
+                </span>
+              )}
+              {event.zoom_link && (
+                <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <Video className="w-3.5 h-3.5" /> En ligne
+                </span>
+              )}
+              {intervenants.length > 0 && (
+                <span className="flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5" /> {intervenants.length} intervenant{intervenants.length > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+
+            {/* Avatars intervenants (aperçu sur la carte) */}
+            {intervenants.length > 0 && (
+              <div className="flex items-center gap-1 mt-3">
+                {intervenants.slice(0, 4).map((iv, i) => (
+                  iv.photo
+                    ? <img key={i} src={iv.photo} alt={iv.nom}
+                        className="w-7 h-7 rounded-full object-cover object-top border-2 border-card -ml-1 first:ml-0"
+                        title={iv.nom} />
+                    : <div key={i} className="w-7 h-7 rounded-full bg-primary/10 border-2 border-card -ml-1 first:ml-0 flex items-center justify-center">
+                        <User className="w-3.5 h-3.5 text-primary/50" />
+                      </div>
+                ))}
+                {intervenants.length > 4 && (
+                  <span className="w-7 h-7 rounded-full bg-muted border-2 border-card -ml-1 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+                    +{intervenants.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+            isSelected
+              ? "bg-primary text-primary-foreground border-primary rotate-90"
+              : "border-border text-muted-foreground group-hover:border-primary group-hover:text-primary"
+          }`}>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+
+        {!isRegistered && (
+          <div className={`mt-4 pt-3 border-t border-border flex items-center justify-between transition-all ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+            <span className="text-xs text-muted-foreground">Cliquez pour voir le détail et vous inscrire</span>
+            <span className="text-xs font-semibold text-primary">S'inscrire →</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Page principale ────────────────────────────────────────────────────────────
 export default function Webinaires() {
   const { events, loading } = useWebinars({ adminMode: false });
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected]   = useState(null);
   const [registered, setRegistered] = useState(new Set());
 
   const upcoming = events.filter(e => e.status === "open" && new Date(e.date_time) > new Date());
@@ -70,7 +249,7 @@ export default function Webinaires() {
   function openEvent(evt) {
     setSelected(evt);
     setTimeout(() => {
-      document.getElementById("webinar-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("webinar-detail-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
   }
 
@@ -97,18 +276,17 @@ export default function Webinaires() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
+      <div className="max-w-4xl mx-auto px-4 py-12 space-y-10">
 
-        {/* Chargement */}
         {loading && (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-7 h-7 animate-spin text-primary" />
           </div>
         )}
 
-        {/* Événements à venir */}
         {!loading && (
           <>
+            {/* Événements à venir */}
             <section>
               <h2 className="font-heading text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-primary" /> À venir
@@ -118,48 +296,86 @@ export default function Webinaires() {
                 <div className="rounded-2xl border border-border bg-muted/30 p-10 text-center">
                   <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
                   <p className="text-sm text-muted-foreground">Aucun webinaire prévu pour le moment.</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Revenez bientôt ou suivez nos actualités pour être informé(e).
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Revenez bientôt ou suivez nos actualités.</p>
                 </div>
               ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-5">
                   {upcoming.map(evt => (
-                    <EventCard
-                      key={evt.id}
-                      event={evt}
+                    <EventCard key={evt.id} event={evt}
                       isSelected={selected?.id === evt.id}
                       isRegistered={registered.has(evt.id)}
-                      onClick={() => selected?.id === evt.id ? setSelected(null) : openEvent(evt)}
-                    />
+                      onClick={() => selected?.id === evt.id ? setSelected(null) : openEvent(evt)} />
                   ))}
                 </div>
               )}
             </section>
 
-            {/* Zone formulaire */}
+            {/* Détail + formulaire */}
             <AnimatePresence>
-              {selected && !registered.has(selected.id) && (
-                <motion.section
-                  id="webinar-form-section"
-                  key="form"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+              {selected && (
+                <motion.section id="webinar-detail-section" key="detail"
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
+                  className="rounded-2xl border border-primary/30 bg-card shadow-md overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-5">
-                    <h3 className="font-heading text-base font-bold text-foreground">
-                      Inscription — {selected.title}
-                    </h3>
-                    <button
-                      onClick={() => setSelected(null)}
-                      className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                  {/* En-tête affiche */}
+                  {selected.affiche && (
+                    <div className="relative h-52 overflow-hidden">
+                      <img src={selected.affiche} alt={selected.title}
+                        className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      <div className="absolute bottom-4 left-5 right-12">
+                        <p className="text-white font-heading text-xl font-bold leading-snug drop-shadow">
+                          {selected.title}
+                        </p>
+                        {selected.date_time && (
+                          <p className="text-white/80 text-sm mt-1 capitalize">
+                            {fmtDate(selected.date_time)}
+                          </p>
+                        )}
+                      </div>
+                      <button onClick={() => setSelected(null)}
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="p-6 space-y-6">
+                    {/* Titre si pas d'affiche */}
+                    {!selected.affiche && (
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-heading text-lg font-bold text-foreground">{selected.title}</h3>
+                          {selected.date_time && (
+                            <p className="text-sm text-muted-foreground mt-0.5 capitalize">{fmtDate(selected.date_time)}</p>
+                          )}
+                        </div>
+                        <button onClick={() => setSelected(null)}
+                          className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground transition-colors">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Description complète */}
+                    {selected.description && (
+                      <p className="text-sm text-foreground/80 leading-relaxed">{selected.description}</p>
+                    )}
+
+                    {/* Intervenants */}
+                    <IntervenantsBlock intervenants={selected.intervenants} />
+
+                    {/* Documents */}
+                    <DocumentsBlock documents={selected.documents} />
+
+                    {/* Séparateur */}
+                    <div className="border-t border-border pt-5">
+                      <h4 className="font-heading text-base font-bold text-foreground mb-4">
+                        {registered.has(selected.id) ? "Vous êtes inscrit(e) ✓" : "Inscription"}
+                      </h4>
+                      <WebinarRegistrationForm event={selected} onSuccess={onSuccess} />
+                    </div>
                   </div>
-                  <WebinarRegistrationForm event={selected} onSuccess={onSuccess} />
                 </motion.section>
               )}
             </AnimatePresence>
@@ -174,9 +390,11 @@ export default function Webinaires() {
                 <div className="grid gap-3">
                   {past.slice(0, 5).map(evt => (
                     <div key={evt.id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/20 opacity-70">
-                      <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                        <Video className="w-4 h-4 text-muted-foreground" />
-                      </div>
+                      {evt.affiche
+                        ? <img src={evt.affiche} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                        : <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                            <Video className="w-5 h-5 text-muted-foreground" />
+                          </div>}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">{evt.title}</p>
                         {evt.date_time && (
@@ -193,91 +411,5 @@ export default function Webinaires() {
         )}
       </div>
     </div>
-  );
-}
-
-function EventCard({ event, isSelected, isRegistered, onClick }) {
-  const countdown = daysUntil(event.date_time);
-
-  return (
-    <motion.div
-      layout
-      className={`rounded-2xl border bg-card shadow-sm overflow-hidden transition-all cursor-pointer group ${
-        isSelected
-          ? "border-primary shadow-md"
-          : "border-border hover:border-primary/40 hover:shadow-md"
-      }`}
-      onClick={onClick}
-    >
-      <div className="h-1 w-full bg-primary" />
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-
-            {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${EVENT_TYPE_COLOR[event.event_type] || EVENT_TYPE_COLOR.webinaire}`}>
-                {EVENT_TYPE_LABEL[event.event_type] || event.event_type}
-              </span>
-              {countdown && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                  {countdown}
-                </span>
-              )}
-              {isRegistered && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  ✓ Inscrit(e)
-                </span>
-              )}
-            </div>
-
-            <h3 className="font-heading text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
-              {event.title}
-            </h3>
-
-            {event.description && (
-              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
-                {event.description}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
-              {event.date_time && (
-                <span className="flex items-center gap-1 capitalize">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {fmtDateShort(event.date_time)} — {fmtTime(event.date_time)}
-                </span>
-              )}
-              {event.max_participants && (
-                <span className="flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5" />
-                  Max. {event.max_participants} places
-                </span>
-              )}
-              {event.zoom_link && (
-                <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                  <Video className="w-3.5 h-3.5" /> En ligne (Zoom)
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className={`flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
-            isSelected
-              ? "bg-primary text-primary-foreground border-primary rotate-90"
-              : "border-border text-muted-foreground group-hover:border-primary group-hover:text-primary"
-          }`}>
-            <ChevronRight className="w-4 h-4" />
-          </div>
-        </div>
-
-        {!isRegistered && (
-          <div className={`mt-4 pt-3 border-t border-border flex items-center justify-between transition-all ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-            <span className="text-xs text-muted-foreground">Cliquez pour voir le formulaire d'inscription</span>
-            <span className="text-xs font-semibold text-primary">S'inscrire →</span>
-          </div>
-        )}
-      </div>
-    </motion.div>
   );
 }
