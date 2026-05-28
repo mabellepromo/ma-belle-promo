@@ -55,7 +55,7 @@ export default function MaintenanceGate({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6"
-      style={{ background: "linear-gradient(135deg, #0f2a1e 0%, #1a3a28 60%, #0f2a1e 100%)" }}>
+      style={{ background: "linear-gradient(135deg, #0f1724 0%, #1a2236 50%, #0d1520 100%)" }}>
 
       {/* Logo / nom */}
       <div className="mb-8 text-center">
