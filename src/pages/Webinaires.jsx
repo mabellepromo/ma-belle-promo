@@ -70,6 +70,28 @@ function daysUntil(iso) {
   return `Dans ${diff} jours`;
 }
 
+// ── Rendu HTML de la description (issu du RichEditor Tiptap) ─────────────────
+function DescriptionHtml({ html }) {
+  if (!html || html === "<p></p>") return null;
+  return (
+    <div
+      className="
+        [&_h2]:font-heading [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-1.5 [&_h2]:border-b [&_h2]:border-border [&_h2]:pb-1
+        [&_h3]:font-heading [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1
+        [&_p]:text-sm [&_p]:text-foreground/80 [&_p]:leading-relaxed [&_p]:my-1.5
+        [&_strong]:text-foreground [&_strong]:font-semibold
+        [&_em]:italic [&_em]:text-foreground/70
+        [&_u]:underline
+        [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ul]:space-y-0.5
+        [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_ol]:space-y-0.5
+        [&_li]:text-sm [&_li]:text-foreground/80 [&_li]:leading-relaxed
+        [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2
+      "
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
+
 // ── Bloc intervenants ──────────────────────────────────────────────────────────
 function IntervenantsBlock({ intervenants }) {
   if (!Array.isArray(intervenants) || intervenants.length === 0) return null;
@@ -184,10 +206,10 @@ function EventCard({ event, isSelected, isRegistered, onClick }) {
               {event.title}
             </h3>
 
-            {event.description && (
-              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
-                {event.description}
-              </p>
+            {event.description && event.description !== "<p></p>" && (
+              <div className="mt-1.5 line-clamp-2 text-sm text-muted-foreground leading-relaxed">
+                <DescriptionHtml html={event.description} />
+              </div>
             )}
 
             {/* Meta */}
@@ -388,8 +410,8 @@ export default function Webinaires() {
                     )}
 
                     {/* Description complète */}
-                    {selected.description && (
-                      <p className="text-sm text-foreground/80 leading-relaxed">{selected.description}</p>
+                    {selected.description && selected.description !== "<p></p>" && (
+                      <DescriptionHtml html={selected.description} />
                     )}
 
                     {/* Infos pratiques : format, lieu, plateforme */}

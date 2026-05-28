@@ -10,6 +10,7 @@ import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
 import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
 import { inp, ta, sel, Field } from "./shared";
+import RichEditor from "@/components/RichEditor";
 
 const STATUS_LABEL = { draft: "Brouillon", open: "Ouvert", closed: "Fermé", archived: "Archivé" };
 const STATUS_COLOR = {
@@ -432,8 +433,7 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
 
         <div className="sm:col-span-2">
           <Field label="Description">
-            <textarea className={ta} rows={3} value={form.description} onChange={e => set("description", e.target.value)}
-              placeholder="Présentation du webinaire, programme, objectifs…" />
+            <RichEditor value={form.description || ""} onChange={v => set("description", v)} />
           </Field>
         </div>
 
