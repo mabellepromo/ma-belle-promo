@@ -64,17 +64,18 @@ export default function MaintenanceGate({ children }) {
           <img src="/Logo Redesign1.webp" alt="Ma Belle Promo"
             className="w-full h-full object-cover" />
         </div>
-        <h1 className="font-heading text-2xl font-bold text-white tracking-wide">Ma Belle Promo</h1>
-        <p className="text-sm mt-1" style={{ color: "#6ee7b7" }}>
-          Association FDD · Université de Lomé
+        <h1 className="font-heading text-2xl font-bold text-white tracking-wide">Ma Belle Promo (MBP)</h1>
+        <p className="text-sm mt-1 leading-relaxed" style={{ color: "#6ee7b7" }}>
+          Association des anciens étudiants de la Faculté de Droit<br />
+          de l'Université de Lomé · Promotion 1994–2000
         </p>
       </div>
 
       {/* Message */}
       <div className="text-center mb-8 max-w-sm">
         <p className="text-white/80 text-sm leading-relaxed">
-          Notre nouveau site est en cours de finalisation.<br />
-          Entrez le code d'accès pour le prévisualiser.
+          Notre nouveau site est en cours de construction.<br />
+          Merci de revenir plus tard.
         </p>
       </div>
 
