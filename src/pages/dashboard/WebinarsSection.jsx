@@ -68,11 +68,8 @@ function fmtDate(iso) {
 
 function fmtDatetimeLocal(iso) {
   if (!iso) return "";
-  try {
-    const d = new Date(iso);
-    const pad = n => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  } catch { return ""; }
+  // Africa/Lome = UTC+0 toute l'année : on lit directement la valeur UTC
+  return iso.slice(0, 16);
 }
 
 // ── Sous-composant : liste des inscrits pour un événement ────────────────────
@@ -406,7 +403,8 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
     }
     onSave({
       ...form,
-      date_time:        form.date_time ? new Date(form.date_time).toISOString() : null,
+      // Suffixe Z : traiter la valeur saisie comme UTC (= heure de Lomé, UTC+0)
+      date_time:        form.date_time ? new Date(form.date_time + ":00.000Z").toISOString() : null,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
       zoom_link:        form.zoom_link?.trim() || null,
       lieu:             form.lieu?.trim() || null,
