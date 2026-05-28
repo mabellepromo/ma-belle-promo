@@ -549,6 +549,106 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
   });
 }
 
+// ── Email de confirmation webinaire (individuel) ─────────────────────────────
+function buildWebinarConfirmationPayload({ to_email, to_name, event_title, event_date, zoom_link, unregister_token }) {
+  const safeName   = escHtml(to_name || "");
+  const safeTitle  = escHtml(event_title || "Webinaire MBP");
+  const safeDate   = escHtml(event_date || "");
+  const greeting   = safeName ? `Bonjour <strong>${safeName}</strong>,` : "Bonjour,";
+  const unregisterUrl = `https://www.mabellepromo.org/webinaires/desinscrire/${unregister_token}`;
+
+  const content = `
+    <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#14532d;">Votre inscription est confirmée !</p>
+      <p style="margin:0;font-size:13px;color:#374151;">
+        <strong>${safeTitle}</strong><br>
+        ${safeDate ? `<span style="color:#6b7280;">${safeDate} (heure de Lomé)</span>` : ""}
+      </p>
+    </div>
+    ${zoom_link ? `
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${escHtml(zoom_link)}"
+        style="display:inline-block;padding:13px 32px;background:#2563eb;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;">
+        Rejoindre le Zoom
+      </a>
+      <p style="margin:10px 0 0;font-size:11px;color:#9ca3af;">Conservez ce lien — il vous sera nécessaire le jour J.</p>
+    </div>` : `
+    <p style="font-size:13px;color:#374151;">Le lien de connexion Zoom vous sera envoyé avant l'événement.</p>`}
+    <p style="font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:24px;">
+      Pour vous désinscrire, cliquez ici :
+      <a href="${unregisterUrl}" style="color:#dc2626;">Se désinscrire</a>
+    </p>`;
+
+  return {
+    sender: SENDER,
+    to: [{ email: to_email, name: to_name || to_email }],
+    replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+    subject: `Confirmation d'inscription — ${escHtml(event_title)}`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
+// ── Email de rappel webinaire (envoi en masse) ────────────────────────────────
+// Appelé depuis le dashboard : envoie un rappel à tous les inscrits d'un event
+async function handleWebinarReminder(BREVO_API_KEY, data) {
+  const { event_title, event_date, zoom_link, inscrits } = data;
+  if (!Array.isArray(inscrits) || inscrits.length === 0) {
+    return { status: 400, body: { error: "Aucun inscrit." } };
+  }
+  if (inscrits.length > 200) {
+    return { status: 400, body: { error: "Maximum 200 destinataires." } };
+  }
+  if (!zoom_link) {
+    return { status: 400, body: { error: "Lien Zoom manquant." } };
+  }
+
+  const safeTitle = escHtml(event_title || "Webinaire MBP");
+  const safeDate  = escHtml(event_date
+    ? new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(event_date))
+    : "");
+
+  const valides = inscrits.filter(i => isValidEmail(i.email));
+  const results = await Promise.allSettled(
+    valides.map(async inscrit => {
+      const greeting = inscrit.nom_complet ? `Bonjour <strong>${escHtml(inscrit.nom_complet)}</strong>,` : "Bonjour,";
+      const content = `
+        <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">
+          Nous vous rappelons que le webinaire <strong>${safeTitle}</strong> aura lieu
+          ${safeDate ? `<strong>le ${safeDate}</strong> (heure de Lomé)` : "très prochainement"}.
+        </p>
+        <div style="text-align:center;margin:28px 0;">
+          <a href="${escHtml(zoom_link)}"
+            style="display:inline-block;padding:13px 32px;background:#2563eb;color:#fff;font-weight:bold;font-size:14px;text-decoration:none;border-radius:9999px;">
+            Rejoindre le Zoom
+          </a>
+        </div>
+        <p style="margin:0;font-size:13px;color:#6b7280;">
+          Cordialement,<br>
+          <strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+          <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+        </p>`;
+      const payload = {
+        sender: SENDER,
+        to: [{ email: inscrit.email, name: inscrit.nom_complet || inscrit.email }],
+        replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+        subject: `Rappel — ${escHtml(event_title)} · Ma Belle Promo`,
+        htmlContent: wrapHtml(content),
+      };
+      const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || "Brevo error"); }
+    })
+  );
+  const sent   = results.filter(r => r.status === "fulfilled").length;
+  const errors = results.map((r, i) => r.status === "rejected" ? { nom: valides[i].nom_complet, reason: r.reason?.message } : null).filter(Boolean);
+  return { status: 200, body: { success: true, sent, total: valides.length, errors } };
+}
+
 export default async function handler(req, res) {
   const allowedOrigin = getAllowedOrigin(req);
   res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
@@ -562,9 +662,9 @@ export default async function handler(req, res) {
   const { type, ...data } = req.body;
 
   // Rate limiting — max 5 requêtes / IP / 5 minutes
-  // Exemption : order_confirm est un email transactionnel déclenché après achat
+  // Exemption : order_confirm et webinar_confirmation sont des emails transactionnels
   const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
-  if (type !== "order_confirm" && !checkRateLimit(ip)) {
+  if (type !== "order_confirm" && type !== "webinar_confirmation" && !checkRateLimit(ip)) {
     return res.status(429).json({ error: "Trop de requêtes. Réessayez dans quelques minutes." });
   }
 
@@ -573,9 +673,18 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "BREVO_API_KEY not configured" });
   }
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm", "webinar_confirmation", "webinar_reminder"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
+  }
+
+  // ── Rappel webinaire (envoi en masse depuis dashboard) ──
+  if (type === "webinar_reminder") {
+    if (!checkRelanceRateLimit(ip)) {
+      return res.status(429).json({ error: "Un rappel a déjà été envoyé dans la dernière heure." });
+    }
+    const { status, body } = await handleWebinarReminder(BREVO_API_KEY, data);
+    return res.status(status).json(body);
   }
 
   // ── Circulaire : email groupé à une liste de membres ──
@@ -756,6 +865,10 @@ export default async function handler(req, res) {
     if (!isValidConfirmUrl(data.confirm_url)) return res.status(400).json({ error: "URL de confirmation non autorisée." });
   } else if (type === "admin_alert") {
     if (!isValidEmail(data.email)) return res.status(400).json({ error: "Adresse email invalide." });
+  } else if (type === "webinar_confirmation") {
+    if (!isValidEmail(data.to_email)) return res.status(400).json({ error: "Adresse email invalide." });
+    if (!data.event_title) return res.status(400).json({ error: "Titre de l'événement manquant." });
+    if (!data.unregister_token) return res.status(400).json({ error: "Token de désinscription manquant." });
   }
 
   try {
@@ -763,6 +876,7 @@ export default async function handler(req, res) {
     if (type === "contact")              payload = buildContactPayload(data);
     else if (type === "reply")           payload = buildReplyPayload(data);
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
+    else if (type === "webinar_confirmation") payload = buildWebinarConfirmationPayload(data);
     else                                 payload = buildAdminAlertPayload(data);
 
     if (type === "reply" && Array.isArray(data.attachments) && data.attachments.length) {

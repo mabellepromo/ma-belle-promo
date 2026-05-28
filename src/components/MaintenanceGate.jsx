@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ── Contrôlé par la variable Vercel VITE_MAINTENANCE_MODE ──
 // Pour désactiver : repasser à la ligne ci-dessous et redéployer
@@ -7,14 +7,40 @@ export const MAINTENANCE_MODE = true;
 const ACCESS_CODE = "mbp2026";
 const STORAGE_KEY = "mbp_access_granted";
 
+// Chemins accessibles publiquement même en mode maintenance
+const PUBLIC_PATHS = [
+  "/activites/webinaires",
+  "/webinaires/desinscrire/",
+];
+function isPublicPath(pathname) {
+  return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p));
+}
+
 export default function MaintenanceGate({ children }) {
   const [granted, setGranted] = useState(
     () => sessionStorage.getItem(STORAGE_KEY) === "1"
   );
   const [input, setInput] = useState("");
   const [error, setError] = useState(false);
+  const [pathname, setPathname] = useState(() => window.location.pathname);
 
-  if (!MAINTENANCE_MODE || granted) return children;
+  // Suit les navigations React Router (history.pushState / replaceState)
+  // pour bloquer les pages protégées même depuis une page autorisée
+  useEffect(() => {
+    const onNav = () => setPathname(window.location.pathname);
+    window.addEventListener("popstate", onNav);
+    const origPush    = history.pushState.bind(history);
+    const origReplace = history.replaceState.bind(history);
+    history.pushState    = (...args) => { origPush(...args);    onNav(); };
+    history.replaceState = (...args) => { origReplace(...args); onNav(); };
+    return () => {
+      window.removeEventListener("popstate", onNav);
+      history.pushState    = origPush;
+      history.replaceState = origReplace;
+    };
+  }, []);
+
+  if (!MAINTENANCE_MODE || granted || isPublicPath(pathname)) return children;
 
   function handleSubmit(e) {
     e.preventDefault();

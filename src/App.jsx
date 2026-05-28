@@ -17,6 +17,7 @@ const PAGE_TITLES = {
   "/association/equipe":         "Notre Équipe",
   "/association/sponsors":       "Nos Partenaires",
   "/activites/evenements":       "Événements",
+  "/activites/webinaires":       "Webinaires & Ateliers",
   "/activites/projets":          "Nos Réalisations",
   "/activites/programmes":       "Nos Programmes",
   "/activites/plan-action-2026": "Plan d'Action 2026",
@@ -106,6 +107,8 @@ const Verifier           = lazy(() => import('./pages/Verifier'));
 const Sondage            = lazy(() => import('./pages/Sondage'));
 const Boutique           = lazy(() => import('./pages/Boutique'));
 const Checkin            = lazy(() => import('./pages/Checkin'));
+const Webinaires         = lazy(() => import('./pages/Webinaires'));
+const WebinarDesinscrire = lazy(() => import('./pages/WebinarDesinscrire'));
 
 function PageLoader() {
   return (
@@ -155,7 +158,8 @@ const AuthenticatedApp = () => {
     || location.pathname === '/reset-password'
     || location.pathname === '/verifier'
     || location.pathname.startsWith('/sondage/')
-    || location.pathname.startsWith('/checkin/');
+    || location.pathname.startsWith('/checkin/')
+    || location.pathname.startsWith('/webinaires/desinscrire/');
 
   return (
     <>
@@ -184,6 +188,7 @@ const AuthenticatedApp = () => {
         <Route path="/association/equipe" element={<Equipe />} />
         <Route path="/association/sponsors" element={<Sponsors />} />
         <Route path="/activites/evenements" element={<Evenements />} />
+        <Route path="/activites/webinaires" element={<Webinaires />} />
         <Route path="/activites/projets" element={<Projets />} />
         <Route path="/activites/projets/:id" element={<ProjetDetail />} />
         <Route path="/activites/programmes" element={<Programmes />} />
@@ -214,6 +219,7 @@ const AuthenticatedApp = () => {
       <Route path="/verifier" element={<Verifier />} />
       <Route path="/sondage/:id" element={<Sondage />} />
       <Route path="/checkin/:id" element={<Checkin />} />
+      <Route path="/webinaires/desinscrire/:token" element={<WebinarDesinscrire />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
