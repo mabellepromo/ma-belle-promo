@@ -198,11 +198,10 @@ const INJECT_CSS = `
   /* Mode clair forcé */
   :root, html, body { color-scheme: light !important; }
 
-  /* Couleur du corps de texte + annule flex:1 qui gonflait la hauteur mesurée */
+  /* Couleur du corps de texte */
   .corps-lettre, .e-corps {
     color: hsl(150, 30%, 10%) !important;
     visibility: visible !important;
-    flex: 0 0 auto !important;
   }
 
   /* Politesse au-dessus de la signature — layout vertical */
@@ -222,17 +221,8 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* Corps à hauteur naturelle.
-     padding-bottom réduit : l'original (80px) était pour le footer position:fixed.
-     Avec footer en flux normal, 16px suffit et évite de dépasser 1 page. */
-  main.body, .body {
-    flex: none !important;
-    padding-bottom: 16px !important;
-  }
-
-  /* Footer ancré en bas via margin-top:auto (écran) */
+  /* footer fond blanc */
   footer.footer, .footer-zone {
-    margin-top: auto !important;
     background: white !important;
   }
 
@@ -241,18 +231,6 @@ const INJECT_CSS = `
       display: flex !important;
       flex-direction: column !important;
       box-shadow: none !important;
-    }
-    /* Impression : footer fixé en bas de chaque page */
-    footer.footer, .footer-zone {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-    }
-    /* Espace sous le contenu pour ne pas passer sous le footer */
-    main.body, .body {
-      padding-bottom: 100px !important;
     }
   }
 `;
@@ -374,23 +352,6 @@ async function injectValues(html, form, compact = false) {
   }
 
   // Ancre le footer en bas de la dernière page A4 :
-  // 1. mesure le contenu total (footer encore en flux)
-  // Force .page à un multiple exact d'A4 pour que margin-top:auto
-  // sur le footer le place exactement au bas de la dernière page.
-  // contentH = totalH - footerH pour ne pas créer de page fantôme
-  // quand le footer tient encore sur la page du dernier paragraphe.
-  await new Promise(r => setTimeout(r, 120));
-  const A4_H = 1123;
-  const pageEl = d.querySelector(".page");
-  if (pageEl) {
-    const totalH = pageEl.scrollHeight;
-    if (totalH > 0) {
-      const pages = Math.ceil(totalH / A4_H);
-      const targetH = pages * A4_H;
-      pageEl.style.minHeight = targetH + "px";
-    }
-  }
-
   const result = "<!DOCTYPE html>" + d.documentElement.outerHTML;
   document.body.removeChild(iframe);
   return result;
