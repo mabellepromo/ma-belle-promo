@@ -359,30 +359,29 @@ async function injectValues(html, form, compact = false) {
 
   // Ancre le footer en bas de la dernière page A4 :
   // 1. mesure le contenu total (footer encore en flux)
-  // 2. force .page à un multiple exact d'A4
-  // 3. passe le footer en position:absolute bottom:0 (hors flux)
-  // 4. ajoute padding-bottom au corps pour que le contenu ne passe pas sous le footer
+  // Ancre le footer en bas de la dernière page A4 via un espaceur :
+  // 1. mesure footerEl.offsetTop (position exacte du footer dans la page)
+  // 2. calcule le nombre de pages A4 nécessaires
+  // 3. insère un <div> espaceur entre body et footer pour combler l'écart
+  // 4. force min-height du .page à un multiple exact d'A4
   await new Promise(r => setTimeout(r, 120));
   const A4_H = 1123;
   const pageEl = d.querySelector(".page");
   const footerEl = d.querySelector("footer.footer, .footer-zone");
-  const bodyEl = d.querySelector("main.body, .body");
-  if (pageEl) {
-    const footerH = (footerEl && footerEl.offsetHeight > 0) ? footerEl.offsetHeight : 90;
-    const totalH = pageEl.scrollHeight;
-    if (totalH > 0) {
-      // pages basé sur le contenu seul (sans footer) pour ne pas ajouter une
-      // page fantôme quand le footer tient encore sur la page du dernier paragraphe
-      const contentH = Math.max(totalH - footerH, A4_H);
-      const pages = Math.ceil(contentH / A4_H);
-      pageEl.style.position = "relative";
-      pageEl.style.minHeight = (pages * A4_H) + "px";
-      if (footerEl) {
-        footerEl.style.setProperty("position", "absolute", "important");
-        footerEl.style.setProperty("bottom", "0", "important");
-        footerEl.style.setProperty("left", "0", "important");
-        footerEl.style.setProperty("right", "0", "important");
+  if (pageEl && footerEl) {
+    // position:relative sur .page → footerEl.offsetTop = position dans la page
+    pageEl.style.position = "relative";
+    const footerBottom = footerEl.offsetTop + footerEl.offsetHeight;
+    if (footerBottom > 0) {
+      const pages = Math.ceil(footerBottom / A4_H);
+      const targetH = pages * A4_H;
+      const spacerH = targetH - footerBottom;
+      if (spacerH > 0) {
+        const spacer = d.createElement("div");
+        spacer.style.cssText = `height:${spacerH}px;flex-shrink:0`;
+        footerEl.insertAdjacentElement("beforebegin", spacer);
       }
+      pageEl.style.minHeight = targetH + "px";
     }
   }
 
