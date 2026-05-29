@@ -599,7 +599,7 @@ export default function CourrierSection() {
                 </Field>
                 <Field label="Corps *">
                   <textarea
-                    className={inp + " h-64 resize-none py-2"}
+                    className={inp + " !h-64 resize-none py-2"}
                     value={form.corps}
                     onChange={f("corps")}
                     placeholder={"Nous avons l'honneur de vous informer que…\n\nVotre texte ici."}
@@ -632,7 +632,7 @@ export default function CourrierSection() {
               <div className="p-5">
                 <Field label="À l'attention de">
                   <textarea
-                    className={inp + " h-24 resize-none py-2"}
+                    className={inp + " !h-24 resize-none py-2"}
                     value={form.dest}
                     onChange={f("dest")}
                     placeholder={"M. Jean Dupont\nDirecteur\nOrganisation\nVille"}
@@ -649,7 +649,7 @@ export default function CourrierSection() {
               <div className="p-5">
                 <Field label="">
                   <textarea
-                    className={inp + " h-16 resize-none py-2"}
+                    className={inp + " !h-16 resize-none py-2"}
                     value={form.politesse}
                     onChange={f("politesse")}
                   />
