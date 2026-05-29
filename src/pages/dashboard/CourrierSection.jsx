@@ -222,9 +222,12 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* Corps à hauteur naturelle — annule flex:1 des templates */
+  /* Corps à hauteur naturelle.
+     padding-bottom réduit : l'original (80px) était pour le footer position:fixed.
+     Avec footer en flux normal, 16px suffit et évite de dépasser 1 page. */
   main.body, .body {
     flex: none !important;
+    padding-bottom: 16px !important;
   }
 
   /* Footer ancré en bas via margin-top:auto dans la colonne flex */
@@ -369,11 +372,9 @@ async function injectValues(html, form, compact = false) {
   const pageEl = d.querySelector(".page");
   const footerEl = d.querySelector("footer.footer, .footer-zone");
   if (pageEl) {
-    const footerH = (footerEl && footerEl.offsetHeight > 0) ? footerEl.offsetHeight : 90;
     const totalH = pageEl.scrollHeight;
     if (totalH > 0) {
-      const contentH = Math.max(totalH - footerH, A4_H);
-      const pages = Math.ceil(contentH / A4_H);
+      const pages = Math.ceil(totalH / A4_H);
       pageEl.style.minHeight = (pages * A4_H) + "px";
     }
   }
