@@ -347,8 +347,12 @@ async function injectValues(html, form, compact = false) {
     d.head.appendChild(compactStyle);
   }
 
-  // Ancre le footer en bas de la dernière page A4 :
-  await new Promise(r => setTimeout(r, 120));
+  // Attendre le chargement des polices avant de mesurer :
+  // Cormorant Garamond > police de repli → mesure fausse sans fonts.ready
+  await Promise.race([
+    d.fonts.ready,
+    new Promise(r => setTimeout(r, 3000))
+  ]);
   const pageEl = d.querySelector(".page");
   if (pageEl) {
     const h = pageEl.scrollHeight;
