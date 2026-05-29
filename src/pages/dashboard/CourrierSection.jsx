@@ -234,9 +234,7 @@ const INJECT_CSS = `
     background: white !important;
   }
 
-  /* Zone imprimable = A4 complet = 1123px, identique au calcul JS.
-     Sans cette règle Chrome réserve ~76px de marges → zone ~1047px
-     → footer déborde sur la page suivante. */
+  /* Zone imprimable = A4 complet = 1123px, identique au calcul JS */
   @page { margin: 0; }
 
   @media print {
@@ -244,6 +242,18 @@ const INJECT_CSS = `
       display: flex !important;
       flex-direction: column !important;
       box-shadow: none !important;
+    }
+    /* margin-top:auto ne fonctionne pas dans le moteur d'impression Chrome.
+       position:fixed+@page{margin:0} : footer à 1043px, contenu à ~912px → pas d'overlap */
+    footer.footer, .footer-zone {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+    }
+    main.body, .body {
+      padding-bottom: 110px !important;
     }
   }
 `;
