@@ -599,7 +599,7 @@ export default function CourrierSection() {
                 </Field>
                 <Field label="Corps *">
                   <textarea
-                    className={inp + " h-48 resize-none py-2"}
+                    className={inp + " h-64 resize-none py-2"}
                     value={form.corps}
                     onChange={f("corps")}
                     placeholder={"Nous avons l'honneur de vous informer que…\n\nVotre texte ici."}
