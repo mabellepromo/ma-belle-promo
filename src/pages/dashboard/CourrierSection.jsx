@@ -370,12 +370,18 @@ async function injectValues(html, form, compact = false) {
   await new Promise(r => setTimeout(r, 120));
   const A4_H = 1123;
   const pageEl = d.querySelector(".page");
-  const footerEl = d.querySelector("footer.footer, .footer-zone");
   if (pageEl) {
     const totalH = pageEl.scrollHeight;
     if (totalH > 0) {
       const pages = Math.ceil(totalH / A4_H);
-      pageEl.style.minHeight = (pages * A4_H) + "px";
+      const targetH = pages * A4_H;
+      // min-height pour l'écran (flex + margin-top:auto fonctionnent)
+      pageEl.style.minHeight = targetH + "px";
+      // height explicite en @media print : Chrome ignore min-height en impression
+      // et ne distribue pas l'espace libre pour margin-top:auto sans height défini
+      const printStyle = d.createElement("style");
+      printStyle.textContent = `@media print { .page { height: ${targetH}px !important; } }`;
+      d.head.appendChild(printStyle);
     }
   }
 
