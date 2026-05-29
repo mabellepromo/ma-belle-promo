@@ -230,22 +230,29 @@ const INJECT_CSS = `
     padding-bottom: 16px !important;
   }
 
-  /* Footer ancré en bas via margin-top:auto dans la colonne flex */
+  /* Footer ancré en bas via margin-top:auto (écran) */
   footer.footer, .footer-zone {
     margin-top: auto !important;
     background: white !important;
   }
-
-  /* Supprime les marges navigateur en impression : zone imprimable = A4 complet
-     (1123px), identique à notre calcul JS. Sans ça Chrome réduit à ~1047px
-     et le footer déborde sur la page suivante. */
-  @page { margin: 0; }
 
   @media print {
     .page {
       display: flex !important;
       flex-direction: column !important;
       box-shadow: none !important;
+    }
+    /* Impression : footer fixé en bas de chaque page */
+    footer.footer, .footer-zone {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+    }
+    /* Espace sous le contenu pour ne pas passer sous le footer */
+    main.body, .body {
+      padding-bottom: 100px !important;
     }
   }
 `;
