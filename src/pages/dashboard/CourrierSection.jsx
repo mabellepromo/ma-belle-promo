@@ -198,13 +198,12 @@ const INJECT_CSS = `
   /* Mode clair forcé */
   :root, html, body { color-scheme: light !important; }
 
-  /* Couleur du corps de texte */
   .corps-lettre, .e-corps {
     color: hsl(150, 30%, 10%) !important;
     visibility: visible !important;
+    flex: 0 0 auto !important;
   }
 
-  /* Politesse au-dessus de la signature — layout vertical */
   .closing-row, .closing {
     display: flex !important;
     flex-direction: column !important;
@@ -221,7 +220,13 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
+  main.body, .body {
+    flex: none !important;
+    padding-bottom: 16px !important;
+  }
+
   footer.footer, .footer-zone {
+    margin-top: auto !important;
     background: white !important;
   }
 `;
@@ -343,6 +348,15 @@ async function injectValues(html, form, compact = false) {
   }
 
   // Ancre le footer en bas de la dernière page A4 :
+  await new Promise(r => setTimeout(r, 120));
+  const pageEl = d.querySelector(".page");
+  if (pageEl) {
+    const h = pageEl.scrollHeight;
+    if (h > 0) {
+      pageEl.style.minHeight = (Math.ceil(h / 1123) * 1123) + "px";
+    }
+  }
+
   const result = "<!DOCTYPE html>" + d.documentElement.outerHTML;
   document.body.removeChild(iframe);
   return result;
