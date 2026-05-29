@@ -198,10 +198,11 @@ const INJECT_CSS = `
   /* Mode clair forcé */
   :root, html, body { color-scheme: light !important; }
 
-  /* Couleur du corps de texte */
+  /* Couleur + annule flex:1 qui gonfle la hauteur mesurée */
   .corps-lettre, .e-corps {
     color: hsl(150, 30%, 10%) !important;
     visibility: visible !important;
+    flex: 0 0 auto !important;
   }
 
   /* Politesse au-dessus de la signature — layout vertical */
@@ -221,10 +222,22 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
-  /* footer fond blanc */
+  /* Body à hauteur naturelle — annule flex:1 des templates */
+  main.body, .body {
+    flex: none !important;
+    padding-bottom: 16px !important;
+  }
+
+  /* Footer ancré en bas via margin-top:auto (écran et impression) */
   footer.footer, .footer-zone {
+    margin-top: auto !important;
     background: white !important;
   }
+
+  /* Zone imprimable = A4 complet = 1123px, identique au calcul JS.
+     Sans cette règle Chrome réserve ~76px de marges → zone ~1047px
+     → footer déborde sur la page suivante. */
+  @page { margin: 0; }
 
   @media print {
     .page {
@@ -352,6 +365,16 @@ async function injectValues(html, form, compact = false) {
   }
 
   // Ancre le footer en bas de la dernière page A4 :
+  await new Promise(r => setTimeout(r, 120));
+  const pageEl = d.querySelector(".page");
+  if (pageEl) {
+    const totalH = pageEl.scrollHeight;
+    if (totalH > 0) {
+      const pages = Math.ceil(totalH / 1123);
+      pageEl.style.minHeight = (pages * 1123) + "px";
+    }
+  }
+
   const result = "<!DOCTYPE html>" + d.documentElement.outerHTML;
   document.body.removeChild(iframe);
   return result;
