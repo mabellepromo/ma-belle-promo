@@ -54,9 +54,10 @@
       overflow: hidden;
     }
     
+    @page { margin: 0; }
     @media print {
       body { background: none; padding: 0; }
-      .page { box-shadow: none; width: 100%; min-height: 100vh; overflow: visible; }
+      .page { box-shadow: none; width: 100%; min-height: 297mm; overflow: visible; }
       footer, .footer-zone { background: #fff; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }

@@ -47,9 +47,10 @@
       flex-direction: column;
     }
     
+    @page { margin: 0; }
     @media print {
       body { background: none; padding: 0; }
-      .page { box-shadow: none; width: 100%; min-height: 100vh; }
+      .page { box-shadow: none; width: 100%; min-height: 297mm; }
       footer, .footer-zone { background: #fff; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
