@@ -370,7 +370,10 @@ async function injectValues(html, form, compact = false) {
     const footerH = (footerEl && footerEl.offsetHeight > 0) ? footerEl.offsetHeight : 90;
     const totalH = pageEl.scrollHeight;
     if (totalH > 0) {
-      const pages = Math.ceil(totalH / A4_H);
+      // pages basé sur le contenu seul (sans footer) pour ne pas ajouter une
+      // page fantôme quand le footer tient encore sur la page du dernier paragraphe
+      const contentH = Math.max(totalH - footerH, A4_H);
+      const pages = Math.ceil(contentH / A4_H);
       pageEl.style.position = "relative";
       pageEl.style.minHeight = (pages * A4_H) + "px";
       if (footerEl) {
