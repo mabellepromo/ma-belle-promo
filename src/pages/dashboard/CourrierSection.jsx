@@ -198,10 +198,11 @@ const INJECT_CSS = `
   /* Mode clair forcé */
   :root, html, body { color-scheme: light !important; }
 
-  /* Couleur du corps de texte */
+  /* Couleur du corps de texte + annule flex:1 qui gonflait la hauteur mesurée */
   .corps-lettre, .e-corps {
     color: hsl(150, 30%, 10%) !important;
     visibility: visible !important;
+    flex: 0 0 auto !important;
   }
 
   /* Politesse au-dessus de la signature — layout vertical */
@@ -226,7 +227,7 @@ const INJECT_CSS = `
     flex: none !important;
   }
 
-  /* Footer : fond blanc. Position gérée par le JS. */
+  /* Footer : fond blanc. Position absolue appliquée par le JS. */
   footer.footer, .footer-zone {
     background: white !important;
   }
@@ -381,9 +382,6 @@ async function injectValues(html, form, compact = false) {
         footerEl.style.setProperty("bottom", "0", "important");
         footerEl.style.setProperty("left", "0", "important");
         footerEl.style.setProperty("right", "0", "important");
-      }
-      if (bodyEl) {
-        bodyEl.style.paddingBottom = (footerH + 20) + "px";
       }
     }
   }
