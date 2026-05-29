@@ -38,20 +38,24 @@
 
     /* ── Feuille A4 ── */
     .page {
+      display: table;
+      table-layout: fixed;
       width: 794px;
-      min-height: 1123px;
+      height: 1123px;
       background: #fff;
       position: relative;
       box-shadow: 0 6px 40px rgba(0,0,0,0.18);
-      display: flex;
-      flex-direction: column;
     }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; position: relative; z-index: 1; }
     
     @page { margin: 0; }
     @media print {
-      body { background: none; padding: 0; }
-      .page { box-shadow: none; width: 100%; min-height: 297mm; }
-      footer, .footer-zone { background: #fff; }
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
@@ -107,14 +111,9 @@
     /* ══════════════════════════════════════════════════════════
        CONTENU — padding pour rester bien à l'intérieur des cadres
     ══════════════════════════════════════════════════════════ */
-    .content {
-      position: relative;
-      z-index: 1;
-      flex: 1;
-      padding: 38px 46px 80px;
-      display: flex;
-      flex-direction: column;
-    }
+    .page-header .page-cell { padding: 38px 46px 0; }
+    .page-content .page-cell { padding: 0 46px; }
+    .page-footer  .page-cell { padding: 0 46px 38px; }
 
     /* ── EN-TÊTE ── */
     .header {
@@ -385,8 +384,7 @@
   <!-- ══════════════════════════════════════════════════
        CONTENU — à l'intérieur des deux cadres
   ══════════════════════════════════════════════════ -->
-  <div class="content">
-
+  <div class="page-header"><div class="page-cell">
     <!-- EN-TÊTE -->
     <header class="header">
 
@@ -424,7 +422,9 @@
       <span class="objet-lbl">Objet :</span>
       <span class="e-objet" contenteditable="true" data-placeholder="Saisissez l'objet du courrier">Objet du courrier</span>
     </div>
+  </div></div><!-- /page-header -->
 
+  <div class="page-content"><div class="page-cell">
     <!-- CORPS -->
     <main class="body">
 
@@ -459,7 +459,9 @@
       </div>
 
     </main>
+  </div></div><!-- /page-content -->
 
+  <div class="page-footer"><div class="page-cell">
     <!-- PIED DE PAGE -->
     <footer class="footer">
       <div class="footer-rule"></div>
@@ -474,8 +476,7 @@
         </div>
       </div>
     </footer>
-
-  </div><!-- /.content -->
+  </div></div><!-- /page-footer -->
 
 </div><!-- /.page -->
 

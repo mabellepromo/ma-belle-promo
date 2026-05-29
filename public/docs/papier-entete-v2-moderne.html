@@ -42,20 +42,24 @@
     @media print { .print-hint { display: none; } }
 
     .page {
+      display: table;
+      table-layout: fixed;
       width: 794px;
-      min-height: 1123px;
+      height: 1123px;
       background: #fff;
       box-shadow: 0 4px 32px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
       position: relative;
     }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
     
     @page { margin: 0; }
     @media print {
-      body { background: none; padding: 0; }
-      .page { box-shadow: none; width: 100%; min-height: 297mm; }
-      footer, .footer-zone { background: #fff; }
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
@@ -195,7 +199,6 @@
 
     /* ── Corps ── */
     .body {
-      flex: 1;
       padding: 36px 48px 80px 54px;
       display: flex;
       flex-direction: column;
@@ -406,6 +409,7 @@
   <!-- ══════════════════════════════════════════════════ -->
   <div class="page">
 
+  <div class="page-header"><div class="page-cell">
     <!-- EN-TÊTE -->
     <header class="header">
       <div class="header-accent"></div>
@@ -441,7 +445,9 @@
         data-placeholder="Saisissez l'objet du courrier"
       >Objet de votre courrier</div>
     </div>
+  </div></div><!-- /page-header -->
 
+  <div class="page-content"><div class="page-cell">
     <!-- CORPS -->
     <main class="body">
 
@@ -509,7 +515,9 @@
       </div>
 
     </main>
+  </div></div><!-- /page-content -->
 
+  <div class="page-footer"><div class="page-cell">
     <!-- PIED DE PAGE -->
     <footer class="footer">
       <div class="footer-grid">
@@ -523,6 +531,7 @@
         </div>
       </div>
     </footer>
+  </div></div><!-- /page-footer -->
 
   </div><!-- /.page -->
 
