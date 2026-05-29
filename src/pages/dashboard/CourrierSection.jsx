@@ -236,6 +236,11 @@ const INJECT_CSS = `
     background: white !important;
   }
 
+  /* Supprime les marges navigateur en impression : zone imprimable = A4 complet
+     (1123px), identique à notre calcul JS. Sans ça Chrome réduit à ~1047px
+     et le footer déborde sur la page suivante. */
+  @page { margin: 0; }
+
   @media print {
     .page {
       display: flex !important;
@@ -375,13 +380,7 @@ async function injectValues(html, form, compact = false) {
     if (totalH > 0) {
       const pages = Math.ceil(totalH / A4_H);
       const targetH = pages * A4_H;
-      // min-height pour l'écran (flex + margin-top:auto fonctionnent)
       pageEl.style.minHeight = targetH + "px";
-      // height explicite en @media print : Chrome ignore min-height en impression
-      // et ne distribue pas l'espace libre pour margin-top:auto sans height défini
-      const printStyle = d.createElement("style");
-      printStyle.textContent = `@media print { .page { height: ${targetH}px !important; } }`;
-      d.head.appendChild(printStyle);
     }
   }
 
