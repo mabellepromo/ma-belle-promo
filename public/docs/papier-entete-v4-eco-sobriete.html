@@ -54,26 +54,56 @@
     }
     @media print { .print-hint { display: none; } }
 
-    /* ── Feuille A4 ── */
+    /* ============ STRUCTURE PAGE A4 ============ */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
     .page {
       display: table;
-      table-layout: fixed;
-      width: 794px;
-      height: 1123px;
-      background: #fff;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+      width: 210mm;
+      height: 297mm;
+      box-sizing: border-box;
+      page-break-after: always;
+      margin: 0 auto;
     }
-    .page-header { display: table-row; }
-    .page-content { display: table-row; height: 100%; }
-    .page-footer  { display: table-row; }
-    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+
+    .page-header {
+      display: table-row;
+    }
+
+    .page-header-cell {
+      display: table-cell;
+      padding: 20mm 15mm 0 15mm;
+    }
+
+    .page-content {
+      display: table-row;
+      height: 100%;
+    }
+
+    .page-content-cell {
+      display: table-cell;
+      padding: 20mm 15mm 20mm 15mm;
+      vertical-align: top;
+    }
+
+    .page-footer {
+      display: table-row;
+    }
+
+    .page-footer-cell {
+      display: table-cell;
+      padding: 0 15mm 10mm 15mm;
+    }
+    /* ============ FIN STRUCTURE PAGE A4 ============ */
     
-    @page { margin: 20mm; }
+    @page { margin: 0; }
     @media print {
-      html, body { height: 100%; margin: 0; padding: 0; }
       body { background: none; }
-      .page { box-shadow: none; width: 100%; height: 257mm; min-height: 0 !important; }
-      .body { padding-bottom: 20mm; }
+      .page { box-shadow: none; }
       .corps-lettre, .e-corps { orphans: 4; widows: 4; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
@@ -392,7 +422,7 @@
   ══════════════════════════════════════════════════ -->
   <div class="page">
 
-  <div class="page-header"><div class="page-cell">
+  <div class="page-header"><div class="page-header-cell">
     <!-- Triple filet supérieur -->
     <div class="top-rule"></div>
 
@@ -436,7 +466,7 @@
     </div>
   </div></div><!-- /page-header -->
 
-  <div class="page-content"><div class="page-cell">
+  <div class="page-content"><div class="page-content-cell">
     <!-- CORPS -->
     <main class="body">
 
@@ -497,7 +527,7 @@
     </main>
   </div></div><!-- /page-content -->
 
-  <div class="page-footer"><div class="page-cell">
+  <div class="page-footer"><div class="page-footer-cell">
     <!-- PIED DE PAGE -->
     <footer class="footer">
       <div class="footer-accent"></div>

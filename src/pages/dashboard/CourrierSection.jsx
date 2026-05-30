@@ -222,7 +222,6 @@ const INJECT_CSS = `
 
   main.body, .body {
     flex: none !important;
-    padding-bottom: 20mm !important;
   }
 
   footer.footer, .footer-zone {
