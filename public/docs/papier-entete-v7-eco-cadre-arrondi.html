@@ -57,8 +57,6 @@
       body { background: none; }
       .page { box-shadow: none; width: 210mm; height: 297mm; }
       .page-cell { padding: 0; }
-      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; }
-      .page-content .page-cell { overflow: hidden; max-height: 185mm; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 
@@ -116,7 +114,7 @@
     ══════════════════════════════════════════════════════════ */
     .page-header .page-cell { padding: 38px 46px 0; }
     .page-content .page-cell { padding: 0 46px; }
-    .page-footer  .page-cell { padding: 0 46px 38px; text-align: center; vertical-align: bottom; }
+    .page-footer  .page-cell { padding: 0 46px 38px; }
 
     /* ── EN-TÊTE ── */
     .header {
@@ -222,7 +220,7 @@
     }
     .e-politesse:focus { background: var(--pale); border-radius: 3px; }
 
-    .sig-bloc { min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; align-self: flex-end; margin-right: 2cm; }
+    .sig-bloc { min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; align-self: flex-end; }
     .sig-role { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.13em; color: var(--muted); margin-bottom: 28px; }
     .sig-rule { width: 120px; height: 1px; background: var(--vert); margin-bottom: 5px; }
     .e-sig-name {
