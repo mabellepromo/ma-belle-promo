@@ -575,10 +575,21 @@
   }
 
   function makePage(text) {
-    var pg = document.createElement('div'); pg.className = 'page page-dynamic';
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
     var ct = document.createElement('div'); ct.className = 'page-content';
     var cl = document.createElement('div'); cl.className = 'page-cell';
     var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
     var cr = document.createElement('div');
     cr.className = corpsClass();
     cr.contentEditable = 'true';
@@ -586,7 +597,9 @@
     cr.innerHTML = textToHtml(text);
     cr.addEventListener('input', schedule);
     bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
-    pg.appendChild(ct); pg.appendChild(cloneFooter());
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
     return pg;
   }
 
