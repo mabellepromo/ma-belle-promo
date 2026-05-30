@@ -352,13 +352,8 @@ async function injectValues(html, form, compact = false) {
     d.fonts.ready,
     new Promise(r => setTimeout(r, 3000))
   ]);
-  const pageEl = d.querySelector(".page");
-  if (pageEl) {
-    const h = pageEl.scrollHeight;
-    if (h > 0) {
-      pageEl.style.minHeight = (Math.ceil(h / 1123) * 1123) + "px";
-    }
-  }
+  // minHeight intentionally not set here: templates use CSS height:1123px on screen
+  // and @media print height:257mm + min-height:0!important for correct print layout.
 
   const result = "<!DOCTYPE html>" + d.documentElement.outerHTML;
   document.body.removeChild(iframe);
