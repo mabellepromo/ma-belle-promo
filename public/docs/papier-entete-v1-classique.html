@@ -60,11 +60,14 @@
     .page-footer  { display: table-row; }
     .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
     
-    @page { margin: 0; }
+    @page { margin: 20mm 0 0; }
+    @page :first { margin-top: 0; }
     @media print {
       html, body { height: 100%; margin: 0; padding: 0; }
       body { background: none; }
       .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .body { padding-bottom: 20mm; }
+      .corps-lettre, .e-corps { orphans: 4; widows: 4; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
 

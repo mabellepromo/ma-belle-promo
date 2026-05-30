@@ -222,11 +222,10 @@ const INJECT_CSS = `
 
   main.body, .body {
     flex: none !important;
-    padding-bottom: 16px !important;
+    padding-bottom: 20mm !important;
   }
 
   footer.footer, .footer-zone {
-    margin-top: auto !important;
     background: white !important;
   }
 `;
