@@ -605,7 +605,7 @@
 
   /* ── Pagination dynamique MBP ── */
 
-  var PAGE_H = 1123;
+  var PAGE_H;                // mesuré à chaque paginate()
   var CORPS  = '.corps-lettre, .e-corps';
 
   function textToHtml(t) {
@@ -678,6 +678,7 @@
   function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
 
   function paginate() {
+    PAGE_H = document.querySelector('.page').offsetHeight;
     var p1 = document.querySelector('.page:not(.page-dynamic)');
     var c1 = p1.querySelector(CORPS);
     var all = Array.from(document.querySelectorAll(CORPS))
@@ -692,6 +693,14 @@
       var np = makePage(ov);
       cur.insertAdjacentElement('afterend', np);
       cur = np;
+    }
+
+    /* Supprimer la dernière page dynamique si son corps est vide */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lastCorps = last.querySelector(CORPS);
+      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
     }
   }
 
