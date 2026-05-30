@@ -592,5 +592,114 @@
 
   </div><!-- /.page -->
 
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  var PAGE_H = 1123;
+  var CORPS  = '.corps-lettre, .e-corps';
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div'); pg.className = 'page page-dynamic';
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(ct); pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  function paginate() {
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    var c1 = p1.querySelector(CORPS);
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+    c1.innerHTML = textToHtml(all);
+    var cur = p1, guard = 20;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
 </body>
 </html>
