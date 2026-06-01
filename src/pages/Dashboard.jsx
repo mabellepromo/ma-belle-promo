@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useRef, useEffect } from "react";
+﻿import { useState, useMemo, useRef, useEffect, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { compressImage } from "../lib/imageUtils";
 import { genererAttestation, openDocUrl, genererTrombinoscope } from "../lib/documentGenerators";
@@ -15,10 +15,10 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Inbox
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Inbox, Loader2
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
-import BulkEmailComposer from "../components/dashboard/BulkEmailComposer.jsx";
+const BulkEmailComposer = lazy(() => import("../components/dashboard/BulkEmailComposer.jsx"));
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AttestationDialog from "../components/AttestationDialog";
@@ -1353,7 +1353,11 @@ export default function Dashboard() {
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
           {tab === "courrier"        && <CourrierSection />}
-          {tab === "bulk-email"      && <BulkEmailComposer allMembers={allMembers} />}
+          {tab === "bulk-email"      && (
+            <Suspense fallback={<div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>}>
+              <BulkEmailComposer allMembers={allMembers} />
+            </Suspense>
+          )}
           {tab === "stats"           && <StatsSection />}
           {tab === "automatisations" && <AutomatisationsSection />}
           {tab === "communiques" && <CommuniquesSection />}
