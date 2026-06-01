@@ -7,16 +7,9 @@ import {
   Eye, Loader2, Mail, History, Paperclip, FileText,
 } from "lucide-react";
 
-const MAX_TOTAL_MB = 8;
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+const BUCKET = "email-attachments";
+const MAX_FILE_MB = 25;   // limite Brevo
+const MAX_FILES   = 5;
 
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} o`;
@@ -46,6 +39,7 @@ export default function BulkEmailSection() {
   const [previewOpen,   setPreviewOpen]  = useState(false);
   const [logs,          setLogs]         = useState([]);
   const [logsLoading,   setLogsLoading]  = useState(false);
+  // attachments: { name, size, storagePath, uploading }
   const [attachments,   setAttachments]  = useState([]);
   const fileInputRef = useRef(null);
 
@@ -53,33 +47,40 @@ export default function BulkEmailSection() {
 
   async function handleFilePick(e) {
     const files = Array.from(e.target.files || []);
+    e.target.value = "";
     if (!files.length) return;
 
-    const remaining = 5 - attachments.length;
-    if (remaining <= 0) { toast.error("Maximum 5 pièces jointes."); return; }
+    const remaining = MAX_FILES - attachments.filter(f => !f.uploading).length;
+    if (remaining <= 0) { toast.error(`Maximum ${MAX_FILES} pièces jointes.`); return; }
 
-    const toAdd = files.slice(0, remaining);
-    const converted = await Promise.all(
-      toAdd.map(async f => ({
-        name: f.name,
-        type: f.type || "application/octet-stream",
-        size: f.size,
-        content: await fileToBase64(f),
-      }))
-    );
+    for (const file of files.slice(0, remaining)) {
+      if (file.size > MAX_FILE_MB * 1024 * 1024) {
+        toast.error(`${file.name} dépasse la limite de ${MAX_FILE_MB} Mo.`);
+        continue;
+      }
 
-    const newTotal = [...attachments, ...converted].reduce((s, f) => s + f.size, 0);
-    if (newTotal > MAX_TOTAL_MB * 1024 * 1024) {
-      toast.error(`Taille totale des pièces jointes limitée à ${MAX_TOTAL_MB} Mo.`);
-      return;
+      // Chemin unique dans le bucket
+      const storagePath = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+      // Placeholder pendant l'upload
+      setAttachments(prev => [...prev, { name: file.name, size: file.size, storagePath, uploading: true }]);
+
+      const { error } = await supabase.storage.from(BUCKET).upload(storagePath, file);
+
+      if (error) {
+        toast.error(`Erreur upload ${file.name} : ${error.message}`);
+        setAttachments(prev => prev.filter(f => f.storagePath !== storagePath));
+      } else {
+        setAttachments(prev => prev.map(f =>
+          f.storagePath === storagePath ? { ...f, uploading: false } : f
+        ));
+      }
     }
-
-    setAttachments(prev => [...prev, ...converted]);
-    e.target.value = "";
   }
 
-  function removeAttachment(name) {
-    setAttachments(prev => prev.filter(f => f.name !== name));
+  async function removeAttachment(storagePath) {
+    await supabase.storage.from(BUCKET).remove([storagePath]);
+    setAttachments(prev => prev.filter(f => f.storagePath !== storagePath));
   }
 
   // Membres actifs avec email
@@ -185,7 +186,7 @@ export default function BulkEmailSection() {
           htmlContent,
           recipients: recipients.map(m => ({ email: m.email, nom: m.nom || "" })),
           sentBy: session?.user?.email || "admin",
-          attachments: attachments.map(f => ({ name: f.name, content: f.content, type: f.type })),
+          attachments: attachments.filter(f => !f.uploading).map(f => ({ name: f.name, storagePath: f.storagePath })),
         },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -196,7 +197,7 @@ export default function BulkEmailSection() {
       toast.success(`Email envoyé à ${result.sent} destinataire${result.sent > 1 ? "s" : ""} !`);
       setSubject(""); setBody("");
       setSelectedIds(new Set()); setSelectAll(true);
-      setAttachments([]);
+      setAttachments([]); // fichiers supprimés du bucket par la Edge Function
       setPreviewOpen(false);
     } catch (err) {
       toast.error("Erreur envoi : " + err.message);
@@ -386,7 +387,7 @@ export default function BulkEmailSection() {
                       Pièces jointes
                     </label>
                     <span className="text-xs text-muted-foreground">
-                      {attachments.length}/5 · {formatSize(totalAttachmentMB * 1024 * 1024)} / {MAX_TOTAL_MB} Mo
+                      {attachments.filter(f => !f.uploading).length}/{MAX_FILES} · {formatSize(totalAttachmentMB * 1024 * 1024)}
                     </span>
                   </div>
 
@@ -394,37 +395,37 @@ export default function BulkEmailSection() {
                   {attachments.length > 0 && (
                     <div className="space-y-1.5 mb-2">
                       {attachments.map(f => (
-                        <div key={f.name} className="flex items-center gap-2 px-3 py-2 bg-muted/30 rounded-lg border border-border">
-                          <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div key={f.storagePath} className="flex items-center gap-2 px-3 py-2 bg-muted/30 rounded-lg border border-border">
+                          {f.uploading
+                            ? <Loader2 className="w-3.5 h-3.5 text-primary animate-spin flex-shrink-0" />
+                            : <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                          }
                           <span className="text-xs text-foreground truncate flex-1">{f.name}</span>
-                          <span className="text-xs text-muted-foreground flex-shrink-0">{formatSize(f.size)}</span>
-                          <button onClick={() => removeAttachment(f.name)}
-                            className="w-5 h-5 rounded flex items-center justify-center hover:bg-red-500/10 hover:text-red-400 text-muted-foreground transition-colors flex-shrink-0">
-                            <X className="w-3 h-3" />
-                          </button>
+                          <span className="text-xs text-muted-foreground flex-shrink-0">
+                            {f.uploading ? "Upload…" : formatSize(f.size)}
+                          </span>
+                          {!f.uploading && (
+                            <button onClick={() => removeAttachment(f.storagePath)}
+                              className="w-5 h-5 rounded flex items-center justify-center hover:bg-red-500/10 hover:text-red-400 text-muted-foreground transition-colors flex-shrink-0">
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
                   )}
 
                   {/* Bouton ajouter */}
-                  {attachments.length < 5 && (
+                  {attachments.length < MAX_FILES && (
                     <>
                       <input ref={fileInputRef} type="file" multiple className="hidden"
                         onChange={handleFilePick} />
                       <button type="button" onClick={() => fileInputRef.current?.click()}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border text-xs text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors w-full justify-center">
                         <Paperclip className="w-3.5 h-3.5" />
-                        Joindre un fichier (max {MAX_TOTAL_MB} Mo total)
+                        Joindre un fichier (max {MAX_FILE_MB} Mo par fichier)
                       </button>
                     </>
-                  )}
-
-                  {totalAttachmentMB > MAX_TOTAL_MB * 0.8 && (
-                    <p className="text-xs text-amber-400 mt-1.5 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      Taille totale proche de la limite ({MAX_TOTAL_MB} Mo).
-                    </p>
                   )}
                 </div>
               </div>
