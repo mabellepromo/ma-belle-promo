@@ -19,11 +19,18 @@ interface Recipient {
   nom: string;
 }
 
+interface Attachment {
+  name: string;
+  content: string; // base64
+  type: string;
+}
+
 interface RequestBody {
   subject: string;
   htmlContent: string;
   recipients: Recipient[];
   sentBy?: string;
+  attachments?: Attachment[];
 }
 
 serve(async (req) => {
@@ -63,7 +70,7 @@ serve(async (req) => {
     return jsonResponse({ error: "Corps de la requête invalide (JSON attendu)" }, 400);
   }
 
-  const { subject, htmlContent, recipients, sentBy } = body;
+  const { subject, htmlContent, recipients, sentBy, attachments } = body;
 
   if (!subject?.trim()) {
     return jsonResponse({ error: "L'objet (subject) est obligatoire" }, 400);
@@ -110,6 +117,12 @@ serve(async (req) => {
           subject,
           htmlContent: wrappedHtml,
           messageVersions,
+          ...(attachments?.length ? {
+            attachment: attachments.map(f => ({
+              content: f.content,
+              name: f.name,
+            })),
+          } : {}),
         }),
       });
 
