@@ -33,6 +33,7 @@ import TresorerieSection from "./dashboard/TresorerieSection";
 import AssembleesSection from "./dashboard/AssembleesSection";
 import CirculaireSection from "./dashboard/CirculaireSection";
 import CourrierSection from "./dashboard/CourrierSection";
+import BulkEmailSection from "./dashboard/BulkEmailSection";
 import StatsSection from "./dashboard/StatsSection";
 import ElectionsSection from "./dashboard/ElectionsSection";
 import MandatsSection from "./dashboard/MandatsSection";
@@ -505,6 +506,7 @@ export default function Dashboard() {
       items: [
         { key: "circulaire",      label: "Circulaire",      icon: Send },
         { key: "courrier",        label: "Courrier",        icon: ScrollText },
+        { key: "bulk-email",      label: "Email de masse",  icon: Mail },
         { key: "stats",           label: "Statistiques",    icon: TrendingUp },
         { key: "automatisations", label: "Automatisations", icon: Zap },
       ],
@@ -1316,6 +1318,7 @@ export default function Dashboard() {
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
           {tab === "courrier"        && <CourrierSection />}
+          {tab === "bulk-email"      && <BulkEmailSection />}
           {tab === "stats"           && <StatsSection />}
           {tab === "automatisations" && <AutomatisationsSection />}
           {tab === "communiques" && <CommuniquesSection />}
