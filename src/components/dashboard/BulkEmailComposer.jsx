@@ -1,11 +1,10 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useLocalAuth } from "@/lib/LocalAuth";
-import RichEditor from "@/components/RichEditor";
 import {
   Users, Search, X, AlertTriangle, Send,
-  Eye, Loader2, Mail, History, Clock,
+  Eye, Loader2, Mail, History,
 } from "lucide-react";
 
 const INP = "w-full h-9 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:border-primary/50";
@@ -126,7 +125,7 @@ export default function BulkEmailComposer({ allMembers }) {
 
   function validateForm() {
     if (!subject.trim()) { toast.error("L'objet est obligatoire."); return false; }
-    if (!body || body === "<p></p>" || body.trim() === "") { toast.error("Le corps du message est vide."); return false; }
+    if (!body || body.trim() === "") { toast.error("Le corps du message est vide."); return false; }
     if (recipients.length === 0) { toast.error("Aucun destinataire sélectionné."); return false; }
     return true;
   }
@@ -138,10 +137,16 @@ export default function BulkEmailComposer({ allMembers }) {
       const { data: { session: sbSession } } = await supabase.auth.getSession();
       const token = sbSession?.access_token;
 
+      // Convertit le texte brut en HTML (chaque ligne → <p>)
+      const htmlContent = body
+        .split("\n")
+        .map(line => `<p>${line.trim() || "&nbsp;"}</p>`)
+        .join("");
+
       const { data: result, error: fnErr } = await supabase.functions.invoke("send-bulk-email", {
         body: {
           subject: subject.trim(),
-          htmlContent: body,
+          htmlContent,
           recipients: recipients.map(m => ({ email: m.email, nom: m.nom || "" })),
           sentBy: session?.email || sbSession?.user?.email || "admin",
         },
@@ -166,7 +171,10 @@ export default function BulkEmailComposer({ allMembers }) {
 
   // ── Prévisualisation ─────────────────────────────────────────────────────────
   const samplePrenom = recipients[0]?.nom?.split(" ")[0] || "Prénom";
-  const sampleHtml = body.replace(/\{\{prenom\}\}/gi, `<strong>${samplePrenom}</strong>`);
+  const sampleHtml = body
+    .split("\n")
+    .map(line => `<p>${(line.trim() || "&nbsp;").replace(/\{\{prenom\}\}/gi, `<strong>${samplePrenom}</strong>`)}</p>`)
+    .join("");
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
   return (
@@ -392,7 +400,13 @@ export default function BulkEmailComposer({ allMembers }) {
                   <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                     Corps du message *
                   </label>
-                  <RichEditor value={body} onChange={setBody} />
+                  <textarea
+                    value={body}
+                    onChange={e => setBody(e.target.value)}
+                    placeholder={"Rédigez votre message ici…\n\nBonjour {{prenom}},\n\n..."}
+                    rows={10}
+                    className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-y"
+                  />
                   <p className="text-xs text-muted-foreground mt-1.5">
                     Tapez{" "}
                     <code className="bg-muted px-1 rounded text-primary font-mono">{"{{prenom}}"}</code>
