@@ -35,3 +35,9 @@ dist-ssr
 # Dossiers hors projet React
 Extration Site Officiel MBP/
 base44/
+
+# Config MCP locale (contient des tokens personnels)
+.mcp.json
+
+# Supabase CLI — fichiers temporaires de liaison
+supabase/.temp/

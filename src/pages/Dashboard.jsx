@@ -15,9 +15,10 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Inbox
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
+import BulkEmailComposer from "../components/dashboard/BulkEmailComposer.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AttestationDialog from "../components/AttestationDialog";
@@ -69,6 +70,17 @@ export default function Dashboard() {
     return () => nav.removeEventListener("wheel", onWheel);
   }, []);
 
+  useEffect(() => {
+    if (!composeMenuOpen) return;
+    function handleOutside(e) {
+      if (composeMenuRef.current && !composeMenuRef.current.contains(e.target)) {
+        setComposeMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [composeMenuOpen]);
+
   const { articles } = useArticles();
   const { evenements } = useEvenements();
   const currentYear = new Date().getFullYear();
@@ -82,12 +94,14 @@ export default function Dashboard() {
     isSeeded, seedFromStatic, saving: memberSaving,
   } = useMemberStore({ realtime: true });
 
-  const sidebarNavRef = useRef(null);
+  const sidebarNavRef   = useRef(null);
+  const composeMenuRef  = useRef(null);
 
   const [tab,                setTab]               = useState("overview");
   const [sidebarOpen,        setSidebarOpen]       = useState(false);
   const [search,             setSearch]            = useState("");
   const [compose,            setCompose]           = useState(false);
+  const [composeMenuOpen,    setComposeMenuOpen]   = useState(false);
   const [pendingAttachment,  setPendingAttachment] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
   const [addingMember,  setAddingMember]  = useState(null);
@@ -505,6 +519,7 @@ export default function Dashboard() {
       items: [
         { key: "circulaire",      label: "Circulaire",      icon: Send },
         { key: "courrier",        label: "Courrier",        icon: ScrollText },
+        { key: "bulk-email",      label: "Email de masse",  icon: Inbox },
         { key: "stats",           label: "Statistiques",    icon: TrendingUp },
         { key: "automatisations", label: "Automatisations", icon: Zap },
       ],
@@ -553,12 +568,34 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Composer */}
-        <div className="px-3 py-3 flex-shrink-0">
-          <button onClick={() => setCompose(true)}
-            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98]">
-            <PenSquare className="w-3.5 h-3.5" /> Composer
-          </button>
+        {/* Composer — bouton principal + menu déroulant */}
+        <div className="px-3 py-3 flex-shrink-0 relative" ref={composeMenuRef}>
+          <div className="flex rounded-xl overflow-hidden">
+            <button onClick={() => setCompose(true)}
+              className="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98]">
+              <PenSquare className="w-3.5 h-3.5" /> Composer
+            </button>
+            <button onClick={() => setComposeMenuOpen(v => !v)}
+              title="Choisir le type de message"
+              className="px-2.5 py-2 bg-primary/80 text-primary-foreground border-l border-primary-foreground/20 hover:bg-primary/70 transition-all">
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${composeMenuOpen ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+          {composeMenuOpen && (
+            <div className="absolute left-3 right-3 top-full -mt-0.5 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+              <button onClick={() => { setCompose(true); setComposeMenuOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors text-left">
+                <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                Message individuel
+              </button>
+              <div className="h-px bg-border mx-2" />
+              <button onClick={() => { setTab("bulk-email"); setComposeMenuOpen(false); setSidebarOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-foreground hover:bg-muted/40 transition-colors text-left">
+                <Inbox className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                Email de masse
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Navigation */}
@@ -1316,6 +1353,7 @@ export default function Dashboard() {
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
           {tab === "courrier"        && <CourrierSection />}
+          {tab === "bulk-email"      && <BulkEmailComposer allMembers={allMembers} />}
           {tab === "stats"           && <StatsSection />}
           {tab === "automatisations" && <AutomatisationsSection />}
           {tab === "communiques" && <CommuniquesSection />}

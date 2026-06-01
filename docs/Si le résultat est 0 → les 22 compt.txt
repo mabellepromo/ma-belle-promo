@@ -1,0 +1,29 @@
+Si le résultat est 0 → les 22 comptes corrompus sont supprimés, on passe à l'étape suivante.
+
+Ensuite le plan d'action pour les 22 binômes :
+
+Admin → Lien d'accès → bouton Copier pour chaque participant → WhatsApp direct avec ce message type :
+
+Bonjour [Prénom], voici votre lien d'accès personnel au Programme PASSERELLES. Cliquez dessus, choisissez un mot de passe et confirmez. Le lien est valable 24h uniquement : [lien]
+
+Commencez par un ou deux pour tester que ça fonctionne bien, avant de traiter les 22.
+
+je peux vous dire une info, apres vous me donnerez votre avis
+- Toute a l'heure on a supprimé le compte de Gnuitoh et vous m'avez dit de copier le lien et lui envoyer ok ? ce que j'ai fait. 
+- Quand il m'a recontacter pour dire aue c'est bon, je lui demande comment s'il a reussit avec le lien et il me dit qu'il est juste retourné sur login puis premiere fois et par magie cela a marché.
+- Ma deduction : peut etre qu'une fois les compte corrompus supprimés les nouvelles tentatives reussissent non ?
+Votre déduction est exactement correcte et c'est une excellente analyse.
+
+Voici ce qui se passait :
+
+Avant — Le compte corrompu du 12 avril était présent dans auth.users. Quand quelqu'un tentait "Première fois", Supabase trouvait ce compte cassé et échouait silencieusement — impossible de générer un lien, impossible de continuer.
+
+Après suppression — Plus de compte corrompu. Quand GNUITOH est retourné sur "Première fois", Supabase n'a trouvé aucun compte existant → il en a créé un propre, envoyé le magic link, et tout a fonctionné.
+
+Conséquence directe pour vous :
+
+Maintenant que vous avez supprimé les 22 comptes corrompus du 12 avril, vous n'avez pas besoin de copier et envoyer 22 liens manuellement. Il suffit de demander à chaque participant de :
+
+Retournez sur passerelles.vercel.app/login → onglet "Première fois" → saisissez votre email → suivez la procédure habituellement.
+
+Ça devrait fonctionner pour tout le monde maintenant. Testez avec 2-3 personnes d'abord pour confirmer, puis diffusez le message aux 22.

@@ -74,6 +74,8 @@
       body { background: none; }
       .page { box-shadow: none; width: 210mm; height: 297mm; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -453,12 +455,7 @@
 </head>
 <body>
 
-  <div class="print-hint">
-    <span class="eco-badge">ÉCO</span>
-    <strong>Version 5 — En-tête osé, bords arrondis.</strong>
-    La carte en-tête "flotte" sur le blanc. Fond quasi blanc partout.
-    Couverture encre estimée : ~12 %. · Cliquez pour éditer · <strong>Ctrl+P</strong> pour PDF.
-  </div>
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
 
   <!-- ══════════════════════════════════════════════════
        VERSION 5 — Éco Arrondi / En-tête Osé
@@ -597,131 +594,130 @@
 (function () {
   'use strict';
 
-  /* ── Pagination dynamique MBP ── */
+  var HEADER_H = 228;
+  var FOOTER_H = 93;
+  var PAGE_H   = 1123;
+  var AVAIL_P1 = PAGE_H - HEADER_H - FOOTER_H - 40;
+  var AVAIL_PN = PAGE_H - FOOTER_H - 40;
+  var CORPS    = '.corps-lettre';
 
-  var PAGE_H;                // mesuré à chaque paginate()
-  var CORPS  = '.corps-lettre, .e-corps';
-
-  function textToHtml(t) {
-    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  function isOver(corps, avail) {
+    return corps.scrollHeight > avail + 1;
   }
 
-  function availH(page) {
-    var hdr   = page.querySelector('.page-header');
-    var ftr   = page.querySelector('.page-footer');
-    var corps = page.querySelector(CORPS);
-    var body  = corps && corps.parentElement;
-    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
-    if (body) {
-      var s   = getComputedStyle(body);
-      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
-      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
-      used   += gap * Math.max(0, body.children.length - 1);
-      Array.from(body.children).forEach(function (c) {
-        if (c !== corps) used += c.offsetHeight;
-      });
-    }
-    return PAGE_H - used;
-  }
-
-  function isOver(page) {
-    var c = page.querySelector(CORPS);
-    return !!c && c.scrollHeight > availH(page) + 1;
-  }
-
-  function split(corps, page) {
-    var tokens = (corps.innerText || '').split(/(\s+)/);
-    var lo = 1, hi = tokens.length, best = 0;
+  function split(corps, avail) {
+    var words = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = words.length, best = 0;
     corps.style.visibility = 'hidden';
     while (lo <= hi) {
       var mid = lo + ((hi - lo) >> 1);
-      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
-      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+      corps.innerText = words.slice(0, mid).join('');
+      if (corps.scrollHeight > avail + 1) { hi = mid - 1; }
+      else { best = mid; lo = mid + 1; }
     }
-    var over = tokens.slice(best).join('').replace(/^\s+/, '');
-    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    var overflow = words.slice(best).join('').replace(/^\s+/, '');
+    corps.innerText = words.slice(0, best).join('');
     corps.style.visibility = '';
-    return over;
+    return overflow;
   }
 
   function cloneFooter() {
     return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
   }
 
-  function corpsClass() {
-    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
-  }
-
   function makePage(text) {
     var pg = document.createElement('div');
     pg.className = 'page page-dynamic';
-    /* Faux header vide pour maintenir la structure table à 3 rows */
-    var fakeHdr = document.createElement('div');
-    fakeHdr.className = 'page-header';
-    var fakeHdrCell = document.createElement('div');
-    fakeHdrCell.className = 'page-cell';
-    fakeHdrCell.style.padding = '0';
-    fakeHdrCell.style.height = '0';
-    fakeHdr.appendChild(fakeHdrCell);
-    /* Contenu */
-    var ct = document.createElement('div'); ct.className = 'page-content';
-    var cl = document.createElement('div'); cl.className = 'page-cell';
-    var bd = document.createElement('main'); bd.className = 'body';
-    bd.style.paddingTop = '24px';
+    pg.style.cssText = [
+      'width:794px',
+      'height:1123px',
+      'background:#fff',
+      'display:flex',
+      'flex-direction:column',
+      'justify-content:space-between',
+      'box-sizing:border-box'
+    ].join(';');
+
+    var ct = document.createElement('div');
+    ct.style.cssText = 'flex:1; overflow:hidden; padding:24px 44px 0;';
+
     var cr = document.createElement('div');
-    cr.className = corpsClass();
+    cr.className = 'corps-lettre';
     cr.contentEditable = 'true';
     cr.dataset.placeholder = 'Suite du courrier…';
-    cr.innerHTML = textToHtml(text);
+    cr.innerText = text;
+    cr.style.cssText = 'min-height:unset;';
     cr.addEventListener('input', schedule);
-    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
-    pg.appendChild(fakeHdr);
+
+    ct.appendChild(cr);
     pg.appendChild(ct);
     pg.appendChild(cloneFooter());
     return pg;
   }
 
   var _t;
-  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 80); }
 
   function paginate() {
-    PAGE_H = document.querySelector('.page').offsetHeight;
-    var p1 = document.querySelector('.page:not(.page-dynamic)');
-    var c1 = p1.querySelector(CORPS);
+    var p1  = document.querySelector('.page:not(.page-dynamic)');
+    var c1  = p1.querySelector(CORPS);
+
+    var closing = p1.querySelector('.closing-row');
+    if (closing) closing.remove();
+
     var all = Array.from(document.querySelectorAll(CORPS))
-      .map(function (e) { return e.innerText || ''; })
+      .map(function(e) { return e.innerText || ''; })
       .filter(Boolean).join('\n');
-    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
-    c1.innerHTML = textToHtml(all);
-    var cur = p1, guard = 20;
-    while (isOver(cur) && guard-- > 0) {
-      var ov = split(cur.querySelector(CORPS), cur);
+
+    document.querySelectorAll('.page-dynamic').forEach(function(p) { p.remove(); });
+
+    c1.innerText = all;
+
+    var cur = p1;
+    var avail = AVAIL_P1;
+    var guard = 20;
+
+    while (isOver(c1, avail) && guard-- > 0) {
+      var ov = split(c1, avail);
       if (!ov.trim()) break;
       var np = makePage(ov);
       cur.insertAdjacentElement('afterend', np);
+      c1 = np.querySelector(CORPS);
       cur = np;
+      avail = AVAIL_PN;
     }
 
-    /* Supprimer la dernière page dynamique si son corps est vide */
-    var dynPages = document.querySelectorAll('.page-dynamic');
-    if (dynPages.length > 0) {
-      var last = dynPages[dynPages.length - 1];
-      var lastCorps = last.querySelector(CORPS);
-      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
-    }
+    var lastPage = document.querySelector('.page-dynamic:last-of-type') || p1;
+    var lastBody = lastPage.querySelector('.body') || lastPage.querySelector('[style*="flex"]');
+    if (closing && lastBody) lastBody.appendChild(closing);
   }
 
   function init() {
     var c = document.querySelector(CORPS);
     if (!c) return;
     c.addEventListener('input', schedule);
-    setTimeout(paginate, 150);
+    setTimeout(paginate, 200);
   }
 
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', init)
     : init();
 })();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
 </script>
 </body>
 </html>

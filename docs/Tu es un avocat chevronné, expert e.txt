@@ -1,0 +1,53 @@
+Tu es un avocat chevronné, expert en droit associatif, ONG, partenariats institutionnels, protection juridique, gouvernance, données personnelles, et réputation organisationnelle.
+
+Sur la base des standards professionnels en vigueur dans le secteur associatif et ONG, et en tenant compte du contexte suivant :
+
+L’association Ma Belle Promo (MBP) et son programme PASSERELLES accompagnent des jeunes diplômés.
+
+L’association opère entre Suisse et Togo, avec des enjeux de conformité, d’éthique, de confidentialité et de réputation.
+
+Le contrat doit protéger fortement l’association, tout en restant équilibré et professionnel.
+
+Le document doit être clair, structuré, complet, et rédigé dans un style juridique moderne, précis et sans ambiguïté.
+
+Ta mission :
+
+Rédige un modèle complet de Convention de Partenariat prêt à l’emploi, incluant au minimum :
+
+Objet du partenariat
+
+Engagements de l’association
+
+Engagements du partenaire
+
+Gouvernance et modalités opérationnelles
+
+Confidentialité et protection des données (RGPD + lois locales)
+
+Propriété intellectuelle et usage des logos
+
+Responsabilité et limitation de responsabilité
+
+Indépendance des parties
+
+Résiliation et manquements graves
+
+Droit applicable et résolution des litiges
+
+Clauses protectrices renforcées pour MBP
+
+Annexes éventuelles
+
+Exigences supplémentaires :
+
+Ton juridique professionnel, clair, protecteur.
+
+Aucune clause inutile ou décorative.
+
+Prévoir des formulations standards mais robustes, adaptées aux ONG.
+
+Prévoir des champs personnalisables (ex. : [Nom du partenaire], [Durée], [Ville], etc.).
+
+Le document doit être directement utilisable pour signature.
+
+Génère la version finale complète, prête à être adaptée et signée.

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+oph<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -54,26 +54,16 @@
     @media print { .print-hint { display: none; } }
 
     .page {
-      display: table;
-      table-layout: fixed;
       width: 794px;
-      height: 1123px;
+      min-height: 1123px;
       background: #fff;
       box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
     }
-    .page-header { display: table-row; }
-    .page-content { display: table-row; height: 100%; }
-    .page-footer  { display: table-row; }
-    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
-    
-    @page { margin: 0; }
     @media print {
-      html, body { height: 100%; margin: 0; padding: 0; }
-      body { background: none; }
-      .page { box-shadow: none; width: 210mm; height: 297mm; }
-      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
-      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
-      .page-content { margin-bottom: 93px; }
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; min-height: 100vh; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -235,7 +225,8 @@
 
     /* ── Corps ── */
     .body {
-      padding: 28px 44px 80px;
+      flex: 1;
+      padding: 28px 44px 24px;
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -314,11 +305,13 @@
 
     .closing-row {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
     }
 
     .politesse {
+      flex: 1;
       font-family: 'Cormorant Garamond', serif;
       font-size: 14.5px;
       font-style: italic;
@@ -337,7 +330,6 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 3px;
-      align-self: flex-end;
     }
     .sig-role {
       font-family: 'Cormorant Garamond', serif;
@@ -429,7 +421,12 @@
 </head>
 <body>
 
-  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+  <div class="print-hint">
+    <span class="eco-badge">ÉCO</span>
+    <strong>Version 6 — Typographique &amp; Éditoriale.</strong>
+    La typographie fait tout le travail esthétique. Zéro fond coloré. Cormorant Garamond grand format.
+    Couverture encre estimée : ~10 %. · Cliquez pour éditer · <strong>Ctrl+P</strong> pour PDF.
+  </div>
 
   <!-- ══════════════════════════════════════════════════
        VERSION 6 — Éco Typographique / Éditoriale
@@ -437,7 +434,6 @@
   ══════════════════════════════════════════════════ -->
   <div class="page">
 
-  <div class="page-header"><div class="page-cell">
     <!-- Bandeau supérieur tricolore fin -->
     <div class="top-ornament">
       <div class="to-1"></div>
@@ -498,9 +494,7 @@
         data-placeholder="Saisissez l'objet du courrier"
       >Objet du courrier</span>
     </div>
-  </div></div><!-- /page-header -->
 
-  <div class="page-content"><div class="page-cell">
     <!-- CORPS -->
     <main class="body">
 
@@ -569,9 +563,7 @@
       </div>
 
     </main>
-  </div></div><!-- /page-content -->
 
-  <div class="page-footer"><div class="page-cell">
     <!-- PIED DE PAGE -->
     <footer class="footer">
       <div class="footer-top-rule">
@@ -591,155 +583,8 @@
         </div>
       </div>
     </footer>
-  </div></div><!-- /page-footer -->
 
   </div><!-- /.page -->
 
-
-<script>
-(function () {
-  'use strict';
-
-  /* ── Pagination dynamique MBP ── */
-
-  var PAGE_H;                // mesuré à chaque paginate()
-  var CORPS  = '.corps-lettre, .e-corps';
-
-  function textToHtml(t) {
-    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-  }
-
-  function availH(page) {
-    var hdr   = page.querySelector('.page-header');
-    var ftr   = page.querySelector('.page-footer');
-    var corps = page.querySelector(CORPS);
-    var body  = corps && corps.parentElement;
-    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
-    if (body) {
-      var s   = getComputedStyle(body);
-      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
-      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
-      used   += gap * Math.max(0, body.children.length - 1);
-      Array.from(body.children).forEach(function (c) {
-        if (c !== corps) used += c.offsetHeight;
-      });
-    }
-    return PAGE_H - used;
-  }
-
-  function isOver(page) {
-    var c = page.querySelector(CORPS);
-    return !!c && c.scrollHeight > availH(page) + 1;
-  }
-
-  function split(corps, page) {
-    var tokens = (corps.innerText || '').split(/(\s+)/);
-    var lo = 1, hi = tokens.length, best = 0;
-    corps.style.visibility = 'hidden';
-    while (lo <= hi) {
-      var mid = lo + ((hi - lo) >> 1);
-      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
-      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
-    }
-    var over = tokens.slice(best).join('').replace(/^\s+/, '');
-    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
-    corps.style.visibility = '';
-    return over;
-  }
-
-  function cloneFooter() {
-    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
-  }
-
-  function corpsClass() {
-    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
-  }
-
-  function makePage(text) {
-    var pg = document.createElement('div');
-    pg.className = 'page page-dynamic';
-    /* Faux header vide pour maintenir la structure table à 3 rows */
-    var fakeHdr = document.createElement('div');
-    fakeHdr.className = 'page-header';
-    var fakeHdrCell = document.createElement('div');
-    fakeHdrCell.className = 'page-cell';
-    fakeHdrCell.style.padding = '0';
-    fakeHdrCell.style.height = '0';
-    fakeHdr.appendChild(fakeHdrCell);
-    /* Contenu */
-    var ct = document.createElement('div'); ct.className = 'page-content';
-    var cl = document.createElement('div'); cl.className = 'page-cell';
-    var bd = document.createElement('main'); bd.className = 'body';
-    bd.style.paddingTop = '24px';
-    var cr = document.createElement('div');
-    cr.className = corpsClass();
-    cr.contentEditable = 'true';
-    cr.dataset.placeholder = 'Suite du courrier…';
-    cr.innerHTML = textToHtml(text);
-    cr.addEventListener('input', schedule);
-    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
-    pg.appendChild(fakeHdr);
-    pg.appendChild(ct);
-    pg.appendChild(cloneFooter());
-    return pg;
-  }
-
-  var _t;
-  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
-
-  function paginate() {
-    PAGE_H = document.querySelector('.page').offsetHeight;
-    var p1 = document.querySelector('.page:not(.page-dynamic)');
-    var c1 = p1.querySelector(CORPS);
-    var all = Array.from(document.querySelectorAll(CORPS))
-      .map(function (e) { return e.innerText || ''; })
-      .filter(Boolean).join('\n');
-    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
-    c1.innerHTML = textToHtml(all);
-    var cur = p1, guard = 20;
-    while (isOver(cur) && guard-- > 0) {
-      var ov = split(cur.querySelector(CORPS), cur);
-      if (!ov.trim()) break;
-      var np = makePage(ov);
-      cur.insertAdjacentElement('afterend', np);
-      cur = np;
-    }
-
-    /* Supprimer la dernière page dynamique si son corps est vide */
-    var dynPages = document.querySelectorAll('.page-dynamic');
-    if (dynPages.length > 0) {
-      var last = dynPages[dynPages.length - 1];
-      var lastCorps = last.querySelector(CORPS);
-      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
-    }
-  }
-
-  function init() {
-    var c = document.querySelector(CORPS);
-    if (!c) return;
-    c.addEventListener('input', schedule);
-    setTimeout(paginate, 150);
-  }
-
-  document.readyState === 'loading'
-    ? document.addEventListener('DOMContentLoaded', init)
-    : init();
-})();
-</script>
-<script>
-async function generatePDF() {
-  const res = await fetch('http://localhost:3000/generate-pdf', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ html: document.documentElement.outerHTML })
-  });
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'courrier-mbp.pdf';
-  a.click();
-}
-</script>
 </body>
 </html>

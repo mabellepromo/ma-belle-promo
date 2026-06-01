@@ -1,0 +1,15 @@
+Pour paramétrer une PWA sur l’écran d’accueil d’un Android ou d’un iPhone, il faut surtout rendre l’appli installable puis guider l’utilisateur vers l’ajout manuel sur iOS, ou l’invite d’installation sur Android.
+
+Sur Android
+Ouvre la PWA dans Chrome ou un navigateur compatible, puis utilise le menu du navigateur pour choisir Installer ou Ajouter à l’écran d’accueil selon l’appareil.
+
+Si la PWA respecte les prérequis, Android peut afficher une invite d’installation automatique ou une option d’installation plus visible.
+
+Une fois ajoutée, l’icône apparaît sur l’écran d’accueil et l’application peut s’ouvrir en mode “plein écran” comme une appli native.
+
+Sur iPhone
+iOS ne propose pas d’invite d’installation automatique comme Android ; il faut passer par le menu Partager de Safari.
+
+Ensuite, il faut toucher Ajouter à l’écran d’accueil puis valider le nom du raccourci.
+
+Sur iOS, la PWA reste une “web app sur l’écran d’accueil”, donc l’expérience dépend de Safari et d’une installation manuelle

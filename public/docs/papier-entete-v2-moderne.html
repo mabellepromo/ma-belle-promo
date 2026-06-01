@@ -61,6 +61,8 @@
       body { background: none; }
       .page { box-shadow: none; width: 210mm; height: 297mm; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -398,10 +400,7 @@
 </head>
 <body>
 
-  <div class="print-hint">
-    <strong>Mode édition :</strong> cliquez sur n'importe quelle zone pour la modifier.
-    <strong>Ctrl + P</strong> pour imprimer / exporter en PDF.
-  </div>
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
 
   <!-- ══════════════════════════════════════════════════ -->
   <!--  VERSION 2 — Moderne / Épurée                      -->
@@ -665,6 +664,21 @@
     ? document.addEventListener('DOMContentLoaded', init)
     : init();
 })();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
 </script>
 </body>
 </html>
