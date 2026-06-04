@@ -110,6 +110,15 @@ const TOOLS: any[] = [
   {
     type: "function",
     function: {
+      name: "get_membres_bureau",
+      description:
+        "Liste nominative des membres du bureau (nom, fonction/rôle, ville, profession). Ne renvoie pas d'email ni de téléphone.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "get_cotisations_status",
       description:
         "État des cotisations pour une année donnée : nombre de payés, partiels, en attente, exemptés, taux de paiement et montant total perçu.",
@@ -210,6 +219,24 @@ const TOOL_HANDLERS: Record<
       dormants,
       au_bureau: auBureau,
       annee_reference: yr,
+    };
+  },
+
+  async get_membres_bureau(_args, db) {
+    const { data } = await db
+      .from("members")
+      .select("nom, role, ville, profession")
+      .eq("status", "validated")
+      .eq("bureau", true)
+      .order("nom");
+    return {
+      count: (data ?? []).length,
+      membres: (data ?? []).map((m) => ({
+        nom: m.nom,
+        fonction: m.role,
+        ville: m.ville,
+        profession: m.profession,
+      })),
     };
   },
 
