@@ -115,6 +115,8 @@ Règles :
   cotisations, trésorerie, assemblées, mandats, factures, bénévoles, sondages), utilise consulter_contenu.
 - Pour des décomptes ou statistiques, privilégie les fonctions dédiées (get_membres_stats,
   get_cotisations_status, get_tresorerie, get_repartition_geographique).
+- Pour les anniversaires à venir (« qui fête bientôt son anniversaire »), utilise
+  get_prochains_anniversaires.
 - Pour les coordonnées d'un membre (email, téléphone, fonction), utilise search_membres
   ou consulter_contenu avec rubrique "membres" — ces informations SONT disponibles.
 - Quand consulter_contenu ne renvoie qu'un aperçu (articles, projets, communiqués, documents…),
@@ -276,6 +278,21 @@ const TOOLS: any[] = [
       name: "get_repartition_geographique",
       description: "Répartition des membres validés par pays.",
       parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_prochains_anniversaires",
+      description:
+        "Membres dont l'anniversaire approche, triés du plus proche au plus lointain, avec le nombre de jours restants.",
+      parameters: {
+        type: "object",
+        properties: {
+          jours: { type: "integer", description: "Fenêtre en jours à considérer (défaut 60)" },
+        },
+        required: [],
+      },
     },
   },
   {
@@ -455,6 +472,37 @@ const TOOL_HANDLERS: Record<
       .sort((a, b) => b[1] - a[1])
       .map(([pays, count]) => ({ pays, count }));
     return { total_membres: valides.length, repartition };
+  },
+
+  async get_prochains_anniversaires(args, db) {
+    const fenetre = Number(args?.jours) || 60;
+    const { data } = await db
+      .from("members")
+      .select("nom, anniversaire, ville")
+      .eq("status", "validated");
+    const MOIS_FR: Record<string, number> = {
+      janvier: 0, février: 1, fevrier: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+      juillet: 6, août: 7, aout: 7, septembre: 8, octobre: 9, novembre: 10,
+      décembre: 11, decembre: 11,
+    };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const liste = (data ?? [])
+      .map((m) => {
+        if (!m.anniversaire) return null;
+        const parts = String(m.anniversaire).trim().split(/\s+/);
+        const jour = parseInt(parts[0], 10);
+        const mois = MOIS_FR[parts.slice(1).join(" ").toLowerCase()];
+        if (isNaN(jour) || mois === undefined) return null;
+        let date = new Date(today.getFullYear(), mois, jour);
+        if (date < today) date = new Date(today.getFullYear() + 1, mois, jour);
+        const dansJours = Math.ceil((date.getTime() - today.getTime()) / 86400000);
+        return { nom: m.nom, date: m.anniversaire, ville: m.ville, dans_jours: dansJours };
+      })
+      .filter((x): x is { nom: string; date: string; ville: string; dans_jours: number } => x !== null)
+      .filter((x) => x.dans_jours <= fenetre)
+      .sort((a, b) => a.dans_jours - b.dans_jours);
+    return { fenetre_jours: fenetre, count: liste.length, anniversaires: liste.slice(0, 15) };
   },
 
   async search_membres(args, db) {
