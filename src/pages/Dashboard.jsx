@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useRef, useEffect } from "react";
+﻿import { useState, useMemo, useRef, useEffect, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { genererAttestation, openDocUrl, genererTrombinoscope } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
@@ -16,44 +16,68 @@ import {
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
   Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool
 } from "lucide-react";
-import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AttestationDialog from "../components/AttestationDialog";
+// ComposeModal est rendu hors onglets (bouton « Composer ») -> reste statique,
+// ce qui charge aussi MessagesSection depuis le même module : on le garde statique.
 import { MessagesSection, ComposeModal } from "./dashboard/MessagesSection.jsx";
-import AccesSection from "./dashboard/AccesSection.jsx";
-import CotisationsSection from "./dashboard/CotisationsSection.jsx";
-import RapportAnnuel from "./dashboard/RapportAnnuel.jsx";
 import { useCotisations } from "../hooks/useCotisations";
 import { useMultiYearCotisations } from "../hooks/useMultiYearCotisations";
 import { useNotifications, requestNotificationPermission } from "../hooks/useNotifications";
-import SondagesSection from "./dashboard/SondagesSection";
-import TresorerieSection from "./dashboard/TresorerieSection";
-import AssembleesSection from "./dashboard/AssembleesSection";
-import CirculaireSection from "./dashboard/CirculaireSection";
-import CourrierSection from "./dashboard/CourrierSection";
-import BulkEmailSection from "./dashboard/BulkEmailSection";
-import NewsletterEmailSection from "./dashboard/NewsletterEmailSection";
-import StatsSection from "./dashboard/StatsSection";
-import ElectionsSection from "./dashboard/ElectionsSection";
-import MandatsSection from "./dashboard/MandatsSection";
-import {
-  ArticlesSection, EvenementsSection, ProjetsSection, ProgrammesSection,
-  EquipeSection, SponsorsSection, CommuniquesSection, MediathequeSection,
-  DocumentsSection, RessourcesSection, GaleriesSection,
-} from "./dashboard/CrudSections.jsx";
-import FacturesSection from "./dashboard/FacturesSection";
-import VentesSection from "./dashboard/VentesSection";
-import RegistreLegalSection from "./dashboard/RegistreLegalSection";
-import BenevolesSection from "./dashboard/BenevolesSection";
-import CheckinSection from "./dashboard/CheckinSection";
-import WebinarsSection from "./dashboard/WebinarsSection";
-import AssistantIA from "./dashboard/AssistantIA";
 import WorldMembersMap from "../components/dashboard/WorldMembersMap.jsx";
-import ConventionsSection from "./dashboard/ConventionsSection.jsx";
-import OpportunitesSection from "./dashboard/OpportunitesSection.jsx";
-import MemoireSection from "./dashboard/MemoireSection.jsx";
-import SignaturesSection from "./dashboard/SignaturesSection.jsx";
+
+// ── Sections chargées à la demande (code-splitting) ──
+// Chaque module n'est téléchargé qu'à l'ouverture de son onglet : la première
+// ouverture du dashboard reste légère (important sur connexion mobile lente).
+const AutomatisationsSection = lazy(() => import("./dashboard/AutomatisationsSection.jsx"));
+const AccesSection           = lazy(() => import("./dashboard/AccesSection.jsx"));
+const CotisationsSection     = lazy(() => import("./dashboard/CotisationsSection.jsx"));
+const RapportAnnuel          = lazy(() => import("./dashboard/RapportAnnuel.jsx"));
+const SondagesSection        = lazy(() => import("./dashboard/SondagesSection"));
+const TresorerieSection      = lazy(() => import("./dashboard/TresorerieSection"));
+const AssembleesSection      = lazy(() => import("./dashboard/AssembleesSection"));
+const CirculaireSection      = lazy(() => import("./dashboard/CirculaireSection"));
+const CourrierSection        = lazy(() => import("./dashboard/CourrierSection"));
+const BulkEmailSection       = lazy(() => import("./dashboard/BulkEmailSection"));
+const NewsletterEmailSection = lazy(() => import("./dashboard/NewsletterEmailSection"));
+const StatsSection           = lazy(() => import("./dashboard/StatsSection"));
+const ElectionsSection       = lazy(() => import("./dashboard/ElectionsSection"));
+const MandatsSection         = lazy(() => import("./dashboard/MandatsSection"));
+const FacturesSection        = lazy(() => import("./dashboard/FacturesSection"));
+const VentesSection          = lazy(() => import("./dashboard/VentesSection"));
+const RegistreLegalSection   = lazy(() => import("./dashboard/RegistreLegalSection"));
+const BenevolesSection       = lazy(() => import("./dashboard/BenevolesSection"));
+const CheckinSection         = lazy(() => import("./dashboard/CheckinSection"));
+const WebinarsSection        = lazy(() => import("./dashboard/WebinarsSection"));
+const AssistantIA            = lazy(() => import("./dashboard/AssistantIA"));
+const ConventionsSection     = lazy(() => import("./dashboard/ConventionsSection.jsx"));
+const OpportunitesSection    = lazy(() => import("./dashboard/OpportunitesSection.jsx"));
+const MemoireSection         = lazy(() => import("./dashboard/MemoireSection.jsx"));
+const SignaturesSection      = lazy(() => import("./dashboard/SignaturesSection.jsx"));
+
+// CrudSections regroupe 11 sections dans un seul fichier : on charge ce module
+// une seule fois, au premier de ces onglets ouvert.
+const ArticlesSection    = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.ArticlesSection })));
+const EvenementsSection  = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.EvenementsSection })));
+const ProjetsSection     = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.ProjetsSection })));
+const ProgrammesSection  = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.ProgrammesSection })));
+const EquipeSection      = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.EquipeSection })));
+const SponsorsSection    = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.SponsorsSection })));
+const CommuniquesSection = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.CommuniquesSection })));
+const MediathequeSection = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.MediathequeSection })));
+const DocumentsSection   = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.DocumentsSection })));
+const RessourcesSection  = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.RessourcesSection })));
+const GaleriesSection    = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.GaleriesSection })));
+
+// Spinner affiché le temps qu'une section se télécharge.
+function SectionLoader() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -1416,6 +1440,7 @@ export default function Dashboard() {
             </div>
           )}
 
+          <Suspense fallback={<SectionLoader />}>
           {tab === "messages"    && <MessagesSection />}
           {tab === "articles"    && <ArticlesSection />}
           {tab === "evenements"  && <EvenementsSection />}
@@ -1453,6 +1478,7 @@ export default function Dashboard() {
           {tab === "cotisations" && <CotisationsSection members={allMembers} />}
           {tab === "rapport"     && <RapportAnnuel members={allMembers} />}
           {tab === "acces"       && <AccesSection />}
+          </Suspense>
 
         </div>
       </div>
