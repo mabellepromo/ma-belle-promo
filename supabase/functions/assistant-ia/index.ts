@@ -51,33 +51,57 @@ async function callLLM(messages: ChatMessage[], tools?: any[]): Promise<ChatMess
   const apiKey = Deno.env.get("GROQ_API_KEY");
   if (!apiKey) throw new LLMError("GROQ_API_KEY non configurée", 500);
 
-  const res = await fetch(LLM_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: LLM_MODEL,
-      messages,
-      ...(tools ? { tools, tool_choice: "auto" } : {}),
-      temperature: 0.3,
-      max_tokens: 1024,
-    }),
+  const payload = JSON.stringify({
+    model: LLM_MODEL,
+    messages,
+    ...(tools ? { tools, tool_choice: "auto" } : {}),
+    temperature: 0.3,
+    max_tokens: 1024,
   });
 
-  if (res.status === 429) {
-    throw new LLMError("Quota du moteur IA atteint. Réessayez dans quelques minutes.", 429);
-  }
-  if (!res.ok) {
+  // Réattente automatique sur la limite par minute (HTTP 429) du palier gratuit.
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const res = await fetch(LLM_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: payload,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const message = data?.choices?.[0]?.message;
+      if (!message) throw new LLMError("Réponse vide du moteur IA", 502);
+      return message as ChatMessage;
+    }
+
+    // 429 = trop de requêtes/tokens dans la minute → on patiente et on réessaie.
+    if (res.status === 429 && attempt < MAX_ATTEMPTS) {
+      const retryAfter = Number(res.headers.get("retry-after")) || 0;
+      const waitMs = Math.min((retryAfter > 0 ? retryAfter : attempt * 4) * 1000, 15000);
+      await new Promise((r) => setTimeout(r, waitMs));
+      continue;
+    }
+    if (res.status === 429) {
+      throw new LLMError("Le moteur IA est très sollicité en ce moment. Réessayez dans une minute.", 429);
+    }
+
+    // 413 = une seule requête dépasse la limite par minute → réessayer n'aide pas.
+    if (res.status === 413) {
+      throw new LLMError(
+        "Votre demande portait sur trop de données d'un coup. Posez une question plus précise (ex. une rubrique ou une année à la fois).",
+        413,
+      );
+    }
+
     const detail = await res.text().catch(() => "");
     throw new LLMError(`Moteur IA — HTTP ${res.status} ${detail}`.trim(), 502);
   }
 
-  const data = await res.json();
-  const message = data?.choices?.[0]?.message;
-  if (!message) throw new LLMError("Réponse vide du moteur IA", 502);
-  return message as ChatMessage;
+  throw new LLMError("Le moteur IA est indisponible. Réessayez dans un instant.", 502);
 }
 
 // ── System prompts par mode ───────────────────────────────────────────────────
