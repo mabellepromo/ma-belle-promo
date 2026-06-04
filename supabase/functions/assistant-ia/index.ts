@@ -8,8 +8,10 @@
 //   • Vérification JWT puis vérification du rôle (admin | bureau) CÔTÉ SERVEUR → 403 sinon.
 //   • La clé du moteur IA reste un secret Supabase, jamais exposée au frontend.
 //   • Les tools sont des requêtes Supabase prédéfinies en lecture seule : l'IA ne génère jamais de SQL.
-//   • Minimisation RGPD : les tools de comptage ne renvoient que des agrégats ;
-//     search_membres ne renvoie pas d'email ni de téléphone.
+//     consulter_contenu n'accepte qu'un nom de rubrique pris dans une LISTE BLANCHE (RUBRIQUES).
+//   • Périmètre des données (décision du bureau, juin 2026) : l'assistant peut consulter le détail
+//     des rubriques de gestion (membres avec coordonnées, cotisations, trésorerie…). Seul le champ
+//     confidentiel notes_internes reste exclu.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -83,7 +85,12 @@ const SYSTEM_DATA = `Tu es l'assistant interne de l'association FDD Ma Belle Pro
 association des diplômés de la Faculté de Droit de l'Université de Lomé (promotion 1994-2000).
 Tu réponds aux questions du bureau en consultant EXCLUSIVEMENT les données réelles via les fonctions fournies.
 Règles :
-- N'invente jamais un chiffre. Appelle toujours la fonction adaptée avant de répondre.
+- N'invente jamais une information. Appelle toujours la fonction adaptée avant de répondre.
+- Pour toute question sur le contenu du site (articles, projets, équipe, partenaires, communiqués,
+  événements, programmes, documents, galeries, webinaires…) ou sur des listes détaillées (membres,
+  cotisations, trésorerie, assemblées, mandats, factures, bénévoles, sondages), utilise consulter_contenu.
+- Pour des décomptes ou statistiques, privilégie les fonctions dédiées (get_membres_stats,
+  get_cotisations_status, get_tresorerie, get_repartition_geographique).
 - Si l'information n'est pas disponible via les fonctions, dis-le clairement.
 - Réponds en français, de façon concise, factuelle et chaleureuse.
 - Les montants sont en francs CFA (FCFA).`;
@@ -94,6 +101,55 @@ Tu rédiges en français des contenus institutionnels : résumés de procès-ver
 emails, circulaires, à partir de la consigne ou du texte fourni.
 Ton : professionnel, chaleureux et fédérateur. Structure claire. Pas de données chiffrées inventées : \
 si un chiffre manque, laisse un champ à compléter entre crochets, ex : [montant].`;
+
+// ── Liste blanche des rubriques consultables (lecture seule) ──────────────────
+// L'IA ne fournit qu'un NOM de rubrique ; le code décide de la table et des colonnes.
+// Ajouter une rubrique = ajouter une ligne ici.
+interface RubriqueConfig {
+  table: string;
+  columns: string;
+  order?: string;
+  ascending?: boolean;
+  limit: number;
+}
+const RUBRIQUES: Record<string, RubriqueConfig> = {
+  // Contenu public du site
+  articles:    { table: "articles",       columns: "*", order: "created_at", ascending: false, limit: 30 },
+  projets:     { table: "projets",        columns: "*", limit: 30 },
+  evenements:  { table: "evenements",     columns: "*", limit: 30 },
+  equipe:      { table: "equipe",         columns: "*", limit: 30 },
+  partenaires: { table: "sponsors",       columns: "*", limit: 30 },
+  communiques: { table: "communiques",    columns: "*", order: "created_at", ascending: false, limit: 30 },
+  programmes:  { table: "programmes",     columns: "*", limit: 30 },
+  ressources:  { table: "ressources",     columns: "*", limit: 30 },
+  documents:   { table: "documents",      columns: "*", limit: 30 },
+  galeries:    { table: "galeries",       columns: "*", limit: 30 },
+  videos:      { table: "media_videos",   columns: "*", limit: 30 },
+  photos:      { table: "media_photos",   columns: "*", limit: 30 },
+  webinaires:  { table: "webinar_events", columns: "*", limit: 30 },
+  // Gestion / données détaillées (notes_internes exclu)
+  membres:     { table: "members",        columns: "nom, profession, ville, pays, email, telephone, anniversaire, role, bureau, status", order: "nom", limit: 200 },
+  cotisations: { table: "cotisations",    columns: "*", order: "annee", ascending: false, limit: 300 },
+  tresorerie:  { table: "tresorerie_transactions", columns: "*", order: "date", ascending: false, limit: 300 },
+  assemblees:  { table: "assemblees",     columns: "*", limit: 30 },
+  mandats:     { table: "mandats",        columns: "*", limit: 30 },
+  factures:    { table: "factures",       columns: "*", limit: 100 },
+  benevoles:   { table: "benevoles",      columns: "*", limit: 100 },
+  sondages:    { table: "sondages",       columns: "*", limit: 30 },
+};
+
+// Tronque les chaînes très longues pour ne pas saturer le contexte du moteur IA.
+// deno-lint-ignore no-explicit-any
+function compactRows(rows: any[]): any[] {
+  return (rows ?? []).map((row) => {
+    // deno-lint-ignore no-explicit-any
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(row)) {
+      out[k] = typeof v === "string" && v.length > 400 ? v.slice(0, 400) + "…" : v;
+    }
+    return out;
+  });
+}
 
 // ── Définition des tools (format function calling compatible OpenAI) ──────────
 // deno-lint-ignore no-explicit-any
@@ -174,6 +230,29 @@ const TOOLS: any[] = [
           critere: { type: "string", description: "Terme recherché : nom, ville ou profession" },
         },
         required: ["critere"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "consulter_contenu",
+      description:
+        "Consulte une rubrique du site ou de la gestion et renvoie ses éléments (lecture seule). " +
+        "À utiliser pour toute question portant sur le contenu : articles/actualités, projets, équipe, " +
+        "partenaires, communiqués, événements, programmes, ressources, documents, galeries, vidéos, photos, " +
+        "webinaires, ou les données détaillées (membres, cotisations, trésorerie, assemblées, mandats, " +
+        "factures, bénévoles, sondages).",
+      parameters: {
+        type: "object",
+        properties: {
+          rubrique: {
+            type: "string",
+            enum: Object.keys(RUBRIQUES),
+            description: "La rubrique à consulter.",
+          },
+        },
+        required: ["rubrique"],
       },
     },
   },
@@ -329,6 +408,21 @@ const TOOL_HANDLERS: Record<
       .or(`nom.ilike.%${critere}%,ville.ilike.%${critere}%,profession.ilike.%${critere}%`)
       .limit(10);
     return { count: (data ?? []).length, resultats: data ?? [] };
+  },
+
+  async consulter_contenu(args, db) {
+    const key = String(args?.rubrique ?? "").toLowerCase().trim();
+    const cfg = RUBRIQUES[key];
+    if (!cfg) {
+      return {
+        error: `Rubrique inconnue : "${key}". Rubriques disponibles : ${Object.keys(RUBRIQUES).join(", ")}.`,
+      };
+    }
+    let query = db.from(cfg.table).select(cfg.columns).limit(cfg.limit);
+    if (cfg.order) query = query.order(cfg.order, { ascending: cfg.ascending ?? true });
+    const { data, error } = await query;
+    if (error) return { error: `Lecture de la rubrique "${key}" impossible : ${error.message}` };
+    return { rubrique: key, count: (data ?? []).length, elements: compactRows(data ?? []) };
   },
 };
 
