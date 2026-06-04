@@ -116,7 +116,9 @@ Règles :
 - Pour des décomptes ou statistiques, privilégie les fonctions dédiées (get_membres_stats,
   get_cotisations_status, get_tresorerie, get_repartition_geographique).
 - Pour les anniversaires à venir (« qui fête bientôt son anniversaire »), utilise
-  get_prochains_anniversaires.
+  get_prochains_anniversaires ; pour les anniversaires d'un mois précis, get_anniversaires_mois.
+- Pour la liste des membres dormants, utilise get_membres_dormants ; pour les membres pas à jour
+  de cotisation d'une année, get_membres_impayes.
 - Pour les coordonnées d'un membre (email, téléphone, fonction), utilise search_membres
   ou consulter_contenu avec rubrique "membres" — ces informations SONT disponibles.
 - Quand consulter_contenu ne renvoie qu'un aperçu (articles, projets, communiqués, documents…),
@@ -292,6 +294,44 @@ const TOOLS: any[] = [
           jours: { type: "integer", description: "Fenêtre en jours à considérer (défaut 60)" },
         },
         required: [],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_membres_dormants",
+      description:
+        "Liste nominative des membres dormants : aucune cotisation payée ou partielle sur les 3 dernières années.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_membres_impayes",
+      description:
+        "Liste nominative des membres pas à jour de cotisation pour une année (ni payé, ni exempté), avec leur statut.",
+      parameters: {
+        type: "object",
+        properties: {
+          annee: { type: "integer", description: "Année concernée (défaut : année en cours)" },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_anniversaires_mois",
+      description: "Liste des membres dont l'anniversaire tombe dans un mois donné.",
+      parameters: {
+        type: "object",
+        properties: {
+          mois: { type: "string", description: 'Mois en toutes lettres (ex. "juin") ou nombre 1-12' },
+        },
+        required: ["mois"],
       },
     },
   },
@@ -503,6 +543,67 @@ const TOOL_HANDLERS: Record<
       .filter((x) => x.dans_jours <= fenetre)
       .sort((a, b) => a.dans_jours - b.dans_jours);
     return { fenetre_jours: fenetre, count: liste.length, anniversaires: liste.slice(0, 15) };
+  },
+
+  async get_membres_dormants(_args, db) {
+    const yr = currentYear();
+    const yrs3 = [yr - 2, yr - 1, yr];
+    const [{ data: members }, { data: cots }] = await Promise.all([
+      db.from("members").select("id, nom, ville, profession, status"),
+      db.from("cotisations").select("member_id, statut, annee"),
+    ]);
+    const actifs = new Set(
+      (cots ?? [])
+        .filter((c) => yrs3.includes(c.annee) && (c.statut === "payé" || c.statut === "partiel"))
+        .map((c) => String(c.member_id)),
+    );
+    const dormants = (members ?? [])
+      .filter((m) => m.status === "validated" && !actifs.has(String(m.id)))
+      .map((m) => ({ nom: m.nom, ville: m.ville, profession: m.profession }));
+    return { periode: `${yr - 2}-${yr}`, count: dormants.length, membres: dormants };
+  },
+
+  async get_membres_impayes(args, db) {
+    const annee = Number(args?.annee) || currentYear();
+    const [{ data: members }, { data: cots }] = await Promise.all([
+      db.from("members").select("id, nom, ville, status"),
+      db.from("cotisations").select("member_id, statut").eq("annee", annee),
+    ]);
+    const statutParId = new Map((cots ?? []).map((c) => [String(c.member_id), c.statut]));
+    const impayes = (members ?? [])
+      .filter((m) => m.status === "validated")
+      .map((m) => ({ nom: m.nom, ville: m.ville, statut: statutParId.get(String(m.id)) ?? "aucun" }))
+      .filter((m) => m.statut !== "payé" && m.statut !== "exempté");
+    return { annee, count: impayes.length, membres: impayes };
+  },
+
+  async get_anniversaires_mois(args, db) {
+    const MOIS_FR: Record<string, number> = {
+      janvier: 0, février: 1, fevrier: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+      juillet: 6, août: 7, aout: 7, septembre: 8, octobre: 9, novembre: 10,
+      décembre: 11, decembre: 11,
+    };
+    const raw = String(args?.mois ?? "").toLowerCase().trim();
+    const moisIndex = /^\d+$/.test(raw) ? parseInt(raw, 10) - 1 : MOIS_FR[raw];
+    if (moisIndex === undefined || isNaN(moisIndex) || moisIndex < 0 || moisIndex > 11) {
+      return { error: `Mois invalide : "${raw}". Donne un mois en toutes lettres (ex. "juin") ou un nombre 1-12.` };
+    }
+    const { data } = await db
+      .from("members")
+      .select("nom, anniversaire, ville")
+      .eq("status", "validated");
+    const liste = (data ?? [])
+      .map((m) => {
+        if (!m.anniversaire) return null;
+        const parts = String(m.anniversaire).trim().split(/\s+/);
+        const jour = parseInt(parts[0], 10);
+        const mois = MOIS_FR[parts.slice(1).join(" ").toLowerCase()];
+        if (isNaN(jour) || mois === undefined || mois !== moisIndex) return null;
+        return { nom: m.nom, date: m.anniversaire, ville: m.ville, jour };
+      })
+      .filter((x): x is { nom: string; date: string; ville: string; jour: number } => x !== null)
+      .sort((a, b) => a.jour - b.jour);
+    return { mois: moisIndex + 1, count: liste.length, anniversaires: liste };
   },
 
   async search_membres(args, db) {
