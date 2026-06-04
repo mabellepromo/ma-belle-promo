@@ -25,7 +25,6 @@ export function useMultiYearCotisations(years) {
         setData(map);
         setLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [years.join(",")]);
 
   return { data, loading };

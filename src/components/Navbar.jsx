@@ -3,7 +3,7 @@ import {
   Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut,
   BookOpen, Users, Building2,
   Calendar, FolderOpen, Newspaper,
-  UserPlus, Heart,
+  UserPlus,
   Film, MessageSquare, Mail, ShoppingCart, ShoppingBag,
 } from "lucide-react";
 import MagneticButton from "@/components/MagneticButton";

@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Video, Plus, Edit2, Trash2, ChevronDown, ChevronUp, Download,
-  Copy, Users, Check, X, Loader2, Calendar, Link2, RefreshCw,
-  UserCheck, Clock, Tag, Send, Eye, QrCode, Upload, FileText, Image, User, MapPin
+  Copy, Users, X, Loader2, Calendar, Link2, RefreshCw,
+  UserCheck, Tag, Send, QrCode, Upload, FileText, Image, User, MapPin
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
 import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
-import { inp, ta, sel, Field } from "./shared";
+import { inp, sel, Field } from "./shared";
 import RichEditor from "@/components/RichEditor";
 
 const STATUS_LABEL = { draft: "Brouillon", open: "Ouvert", closed: "Fermé", archived: "Archivé" };

@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
 import {
   Send, Users, Clock, CheckCircle, X, Loader2, Mail,
-  CalendarDays, Newspaper, Megaphone, LayoutList, Paperclip,
+  CalendarDays, Newspaper, Megaphone, Paperclip,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 

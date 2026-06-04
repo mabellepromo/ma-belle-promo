@@ -1,6 +1,5 @@
 ﻿import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { compressImage } from "../lib/imageUtils";
 import { genererAttestation, openDocUrl, genererTrombinoscope } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
@@ -12,8 +11,8 @@ import { useEvenements } from "../hooks/useEvenements";
 import {
   Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock,
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
-  LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
-  UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
+  LogOut, AlertTriangle, Briefcase, Edit2, Trash2, Globe,
+  UserCheck, Plus, Upload, Calendar, Tag,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
   Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool
 } from "lucide-react";
@@ -217,7 +216,7 @@ export default function Dashboard() {
         return s === "payé" || s === "partiel";
       });
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [allMembers, multiYearData]);
 
   const repartitionGeo = useMemo(() => {
@@ -283,7 +282,7 @@ export default function Dashboard() {
       total, enRetard, retardPct, engagementPct, engagedCount,
       tauxCur: cur.taux, tauxPrev: prev.taux, tauxDelta, nouveauxMois,
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [allMembers, multiYearData, currentYear]);
 
   const agendaCombine = useMemo(() => {

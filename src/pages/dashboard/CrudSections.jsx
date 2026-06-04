@@ -16,8 +16,7 @@ import { useMediaPhotos } from "../../hooks/useMediaPhotos";
 import { useProgrammes } from "../../hooks/useProgrammes";
 import { useSponsors } from "../../hooks/useSponsors";
 import { articles as articlesStatic } from "../../data/articles.js";
-import { slugify } from "../../lib/localStore";
-import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus, Eye, EyeOff, Tag, Users, X, Loader2 } from "lucide-react";
+import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus, Eye, EyeOff, Users, X, Loader2 } from "lucide-react";
 import {
   inp, ta, sel,
   Field, ImgField, GalerieField, VideoField, FileField,

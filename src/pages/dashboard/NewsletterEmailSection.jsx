@@ -5,7 +5,7 @@ import { useMemberStore } from "@/lib/memberStore";
 import {
   Users, Search, X, AlertTriangle, Send,
   Eye, Loader2, Mail, History, Paperclip, FileText,
-  Save, Pencil, Trash2, UserCheck,
+  Save, Pencil, Trash2,
 } from "lucide-react";
 
 const BUCKET = "email-attachments";

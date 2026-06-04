@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
-import { CheckCircle2, ArrowRight, ChevronRight, User, Mail, Phone, Briefcase, MapPin, GraduationCap, FileText, Heart, Upload, CreditCard } from "lucide-react";
+import { CheckCircle2, ArrowRight, ChevronRight, User, Briefcase, MapPin, GraduationCap, Heart, Upload, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, X, Loader2, Calendar, Video, AlertCircle } from "lucide-react";
+import { Check, X, Loader2, Calendar, AlertCircle } from "lucide-react";
 import { getRegistrationByToken, unregisterByToken } from "@/hooks/useWebinars";
 
 function fmtDate(iso) {

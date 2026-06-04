@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
-  Plus, Trash2, X, Loader2, ChevronDown, ChevronUp, Check,
-  Users, FileText, Vote, Calendar, MapPin, Clock,
-  ShieldCheck, PenLine, Eye, EyeOff,
+  Plus, Trash2, X, Loader2, Check,
+  Users, FileText, Vote, Calendar, MapPin,
+  ShieldCheck, PenLine,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";

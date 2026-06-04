@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { Printer, BarChart2, Calendar, Users, FileText, TrendingUp, Banknote } from "lucide-react";
+import { Printer, BarChart2, Calendar, Users, Banknote } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";
 import { useArticles } from "../../hooks/useArticles";
 import { useEvenements } from "../../hooks/useEvenements";

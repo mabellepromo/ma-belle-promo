@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { genererFactureBoutique } from "@/lib/documentGenerators";
-import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2, Eye, FileText } from "lucide-react";
+import { TrendingUp, ShoppingBag, CreditCard, Download, RefreshCw, CheckCircle, XCircle, Loader, Trash2, Eye } from "lucide-react";
 
 const fmt = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
 

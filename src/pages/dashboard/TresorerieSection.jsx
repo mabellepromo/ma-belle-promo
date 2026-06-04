@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Plus, Trash2, Download, TrendingUp, TrendingDown, Wallet,
-  X, Loader2, RefreshCw, Lock, FileText, Target, BarChart2, Receipt, Landmark
+  X, Loader2, RefreshCw, Lock, FileText, Target, Receipt, Landmark
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { genererRapportTresorerie } from "@/lib/documentGenerators";

@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useMemberStore } from "@/lib/memberStore";
-import { Plus, Trash2, Users, Vote, ChevronRight, X, Loader2, CheckCircle, Lock } from "lucide-react";
+import { Plus, Trash2, Vote, X, Loader2, CheckCircle, Lock } from "lucide-react";
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";
 

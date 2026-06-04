@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, Fragment } from "react";
 import { toast } from "sonner";
 import {
-  Check, Clock, X, Download, Search, Banknote, Users, ShieldOff,
+  Check, Clock, X, Download, Search, Banknote, Users,
   Mail, Send, AlertTriangle, Plus, CreditCard, FileText, BarChart2, TrendingUp,
 } from "lucide-react";
 import { useCotisations } from "../../hooks/useCotisations";

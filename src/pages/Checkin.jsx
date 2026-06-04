@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { CheckCircle, MapPin, Calendar, Clock, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, MapPin, Calendar, Loader2, AlertCircle } from "lucide-react";
 
 export default function Checkin() {
   const { id } = useParams();

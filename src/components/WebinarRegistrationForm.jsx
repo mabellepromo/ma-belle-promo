@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Check, Loader2, Mail, User, Phone, Briefcase, Building2, Video, AlertCircle, MapPin } from "lucide-react";
 import { registerToWebinar } from "@/hooks/useWebinars";
 import { useLocalAuth } from "@/lib/LocalAuth";

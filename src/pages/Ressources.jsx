@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { useRessources } from "../hooks/useRessources";
 import {
-  FileText, Download, Search, Lock, Tag, BookOpen, X, Plus
+  FileText, Download, Search, Lock, Tag, BookOpen, X
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PageHero from "../components/PageHero";

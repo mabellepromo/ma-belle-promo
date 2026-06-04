@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SEO from "../components/SEO";
 import PageHero from "../components/PageHero";
-import { Heart, Phone, Mail, CheckCircle2 } from "lucide-react";
+import { Heart, Phone, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";

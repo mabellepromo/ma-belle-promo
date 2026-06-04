@@ -6,8 +6,8 @@ import { useArticles } from "@/hooks/useArticles";
 import * as XLSX from "xlsx";
 import { genererRapportStats } from "@/lib/documentGenerators";
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { TrendingUp, Users, Globe, Banknote, Download, FileText } from "lucide-react";
 
