@@ -95,6 +95,7 @@ const MerciDon       = lazy(() => import('./pages/MerciDon'));
 const EspaceMembre   = lazy(() => import('./pages/EspaceMembre'));
 const AnnuaireMembres = lazy(() => import('./pages/AnnuaireMembres'));
 const Ressources     = lazy(() => import('./pages/Ressources'));
+const Opportunites   = lazy(() => import('./pages/Opportunites'));
 const Dashboard      = lazy(() => import('./pages/Dashboard'));
 const Galeries       = lazy(() => import('./pages/Galeries'));
 const GalerieDetail  = lazy(() => import('./pages/GalerieDetail'));
@@ -209,6 +210,7 @@ const AuthenticatedApp = () => {
         <Route path="/blog" element={<Navigate to="/informations/actualites" replace />} />
         <Route path="/annuaire" element={<PrivateRoute><AnnuaireMembres /></PrivateRoute>} />
         <Route path="/ressources" element={<PrivateRoute><Ressources /></PrivateRoute>} />
+        <Route path="/opportunites" element={<PrivateRoute><Opportunites /></PrivateRoute>} />
         <Route path="/galeries" element={<Galeries />} />
         <Route path="/galeries/:id" element={<GalerieDetail />} />
         <Route path="/mentions-legales" element={<MentionsLegales />} />

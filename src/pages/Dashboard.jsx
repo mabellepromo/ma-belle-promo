@@ -52,6 +52,7 @@ import WebinarsSection from "./dashboard/WebinarsSection";
 import AssistantIA from "./dashboard/AssistantIA";
 import WorldMembersMap from "../components/dashboard/WorldMembersMap.jsx";
 import ConventionsSection from "./dashboard/ConventionsSection.jsx";
+import OpportunitesSection from "./dashboard/OpportunitesSection.jsx";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -533,6 +534,7 @@ export default function Dashboard() {
         { key: "programmes",  label: "Programmes",  icon: Tag },
         { key: "communiques", label: "Communiqués", icon: Mail },
         { key: "sondages",    label: "Sondages",    icon: Vote },
+        { key: "opportunites", label: "Opportunités", icon: Briefcase },
       ],
     },
     {
@@ -1421,6 +1423,7 @@ export default function Dashboard() {
           {tab === "equipe"      && <EquipeSection />}
           {tab === "sponsors"    && <SponsorsSection />}
           {tab === "conventions" && <ConventionsSection />}
+          {tab === "opportunites" && <OpportunitesSection />}
           {tab === "ventes"      && <VentesSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
           {tab === "factures"    && <FacturesSection />}

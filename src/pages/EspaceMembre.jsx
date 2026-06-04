@@ -7,7 +7,7 @@ import {
   Download, Shield, Clock, CheckCircle, AlertCircle, Trash2,
   ShieldCheck, Linkedin, BookOpen, ChevronDown, ChevronRight,
   CreditCard, Vote, Calendar, UserPlus, UserMinus, CalendarCheck,
-  Eye, Image, ExternalLink,
+  Eye, Image, ExternalLink, Briefcase,
 } from "lucide-react";
 import { useDocuments } from "../hooks/useDocuments";
 import { Input } from "@/components/ui/input";
@@ -315,6 +315,11 @@ export default function EspaceMembre() {
             className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-xl text-sm font-medium text-foreground hover:border-primary/30 hover:shadow-sm transition-all">
             <Image className="w-4 h-4 text-primary" />
             Galeries photos
+          </Link>
+          <Link to="/opportunites"
+            className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-xl text-sm font-medium text-foreground hover:border-primary/30 hover:shadow-sm transition-all">
+            <Briefcase className="w-4 h-4 text-primary" />
+            Opportunités
           </Link>
         </div>
 

@@ -4,7 +4,7 @@ import { supabase } from "../../lib/supabase";
 import {
   Zap, Play, Clock, CheckCircle2, XCircle, AlertCircle,
   ChevronDown, ChevronUp, RefreshCw, Info, Mail, Settings2,
-  Calendar, CreditCard, Users, PartyPopper, Bell, ReceiptText, UserX, Handshake
+  Calendar, CreditCard, Users, PartyPopper, Bell, ReceiptText, UserX, Handshake, Briefcase
 } from "lucide-react";
 
 // Métadonnées statiques de chaque automatisation
@@ -72,6 +72,14 @@ const AUTOMATION_META = {
     border: "border-amber-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+  },
+  opportunite_notification: {
+    icon: Briefcase,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    cron: "Déclenchement manuel",
+    type: "trigger",
   },
 };
 
