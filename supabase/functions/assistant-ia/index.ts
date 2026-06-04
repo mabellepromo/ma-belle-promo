@@ -117,6 +117,10 @@ Règles :
   get_cotisations_status, get_tresorerie, get_repartition_geographique).
 - Pour les coordonnées d'un membre (email, téléphone, fonction), utilise search_membres
   ou consulter_contenu avec rubrique "membres" — ces informations SONT disponibles.
+- Quand consulter_contenu ne renvoie qu'un aperçu (articles, projets, communiqués, documents…),
+  ajoute pour chaque élément cité un lien « En savoir plus » au format Markdown en utilisant son
+  champ "lien", ex. : [Titre de l'élément](https://…). Si un élément n'a pas de champ "lien",
+  propose en fin de réponse le lien de la rubrique (champ "lien_rubrique").
 - Si l'information n'est pas disponible via les fonctions, dis-le clairement.
 - Réponds en français, de façon concise, factuelle et chaleureuse.
 - Les montants sont en francs CFA (FCFA).`;
@@ -163,6 +167,35 @@ const RUBRIQUES: Record<string, RubriqueConfig> = {
   factures:    { table: "factures",       columns: "*", limit: 30 },
   benevoles:   { table: "benevoles",      columns: "*", limit: 30 },
   sondages:    { table: "sondages",       columns: "*", limit: 15 },
+};
+
+// URL publique du site — sert à proposer des liens « En savoir plus ».
+const SITE_URL = "https://www.mabellepromo.org";
+
+// Lien vers la page de détail d'un élément, quand une telle page existe.
+// deno-lint-ignore no-explicit-any
+const LIEN_ELEMENT: Record<string, (row: any) => string | null> = {
+  articles:    (r) => (r.id ? `${SITE_URL}/actualites/${r.id}` : null),
+  projets:     (r) => (r.id ? `${SITE_URL}/activites/projets/${r.id}` : null),
+  galeries:    (r) => (r.id ? `${SITE_URL}/galeries/${r.id}` : null),
+  communiques: (r) => r.url || `${SITE_URL}/informations/communiques`,
+  documents:   (r) => r.url || `${SITE_URL}/informations/documents`,
+};
+
+// Lien vers la page de la rubrique (aperçu / liste complète sur le site).
+const LIEN_RUBRIQUE: Record<string, string> = {
+  articles:    `${SITE_URL}/informations/actualites`,
+  projets:     `${SITE_URL}/activites/projets`,
+  evenements:  `${SITE_URL}/activites/evenements`,
+  equipe:      `${SITE_URL}/association/equipe`,
+  partenaires: `${SITE_URL}/association/sponsors`,
+  communiques: `${SITE_URL}/informations/communiques`,
+  programmes:  `${SITE_URL}/activites/programmes`,
+  documents:   `${SITE_URL}/informations/documents`,
+  galeries:    `${SITE_URL}/galeries`,
+  ressources:  `${SITE_URL}/ressources`,
+  webinaires:  `${SITE_URL}/activites/webinaires`,
+  membres:     `${SITE_URL}/annuaire`,
 };
 
 // Tronque les chaînes longues pour rester sous la limite de tokens/minute du moteur IA.
@@ -449,7 +482,18 @@ const TOOL_HANDLERS: Record<
     if (cfg.order) query = query.order(cfg.order, { ascending: cfg.ascending ?? true });
     const { data, error } = await query;
     if (error) return { error: `Lecture de la rubrique "${key}" impossible : ${error.message}` };
-    return { rubrique: key, count: (data ?? []).length, elements: compactRows(data ?? []) };
+
+    let elements = compactRows(data ?? []);
+    const buildLien = LIEN_ELEMENT[key];
+    if (buildLien) {
+      elements = elements.map((row) => ({ ...row, lien: buildLien(row) }));
+    }
+    return {
+      rubrique: key,
+      count: elements.length,
+      lien_rubrique: LIEN_RUBRIQUE[key] ?? null,
+      elements,
+    };
   },
 };
 
