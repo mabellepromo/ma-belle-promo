@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -54,6 +54,7 @@ import WorldMembersMap from "../components/dashboard/WorldMembersMap.jsx";
 import ConventionsSection from "./dashboard/ConventionsSection.jsx";
 import OpportunitesSection from "./dashboard/OpportunitesSection.jsx";
 import MemoireSection from "./dashboard/MemoireSection.jsx";
+import SignaturesSection from "./dashboard/SignaturesSection.jsx";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -553,6 +554,7 @@ export default function Dashboard() {
         { key: "equipe",      label: "Équipe",       icon: UserCheck },
         { key: "sponsors",    label: "Partenaires",  icon: Globe },
         { key: "conventions", label: "Conventions",  icon: Handshake },
+        { key: "signatures",  label: "Signatures",   icon: PenTool },
         { key: "ventes",      label: "Ventes",       icon: ShoppingBag },
         { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
         { key: "factures",    label: "Factures",     icon: Receipt },
@@ -1427,6 +1429,7 @@ export default function Dashboard() {
           {tab === "conventions" && <ConventionsSection />}
           {tab === "opportunites" && <OpportunitesSection />}
           {tab === "memoire"     && <MemoireSection />}
+          {tab === "signatures"  && <SignaturesSection />}
           {tab === "ventes"      && <VentesSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
           {tab === "factures"    && <FacturesSection />}
