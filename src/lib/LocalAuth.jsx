@@ -2,7 +2,9 @@
  * Authentification via Supabase Auth — l'association Ma Belle Promo (MBP)
  * Nom de fichier conservé pour éviter de toucher les imports existants.
  * Exporte la même API que l'ancien système : { session, login, logout }
- * Le champ session.role est lu depuis user.user_metadata.role (Supabase).
+ * Le champ session.role est lu en priorité depuis user.app_metadata.role
+ * (non falsifiable, posé côté serveur), avec repli sur user_metadata.role
+ * le temps de la migration de sécurité.
  */
 import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "./supabase";
@@ -16,7 +18,7 @@ function mapSession(supabaseSession) {
     id: u.id,
     nom: u.user_metadata?.nom || u.user_metadata?.full_name || u.email?.split("@")[0] || u.email,
     email: u.email,
-    role: u.user_metadata?.role || "invite",
+    role: u.app_metadata?.role || u.user_metadata?.role || "invite",
     photo: u.user_metadata?.photo || "",
     loggedAt: u.last_sign_in_at,
   };

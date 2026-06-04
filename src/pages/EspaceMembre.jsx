@@ -148,14 +148,20 @@ export default function EspaceMembre() {
     setSaving(true);
     // 1. Mettre à jour les métadonnées Auth
     await supabase.auth.updateUser({ data: profile });
-    // 2. Répercuter dans la table members (annuaire, dashboard, tout est synchronisé)
+    // 2. Répercuter dans la table members via la RPC sécurisée (champs sûrs uniquement,
+    //    sur sa propre fiche). L'écriture directe n'est plus autorisée par la RLS.
     if (member?.id) {
-      await supabase.from("members").update({
-        telephone:  profile.phone,
-        ville:      profile.city,
-        pays:       profile.country,
-        profession: profile.profession,
-      }).eq("id", member.id);
+      const { error } = await supabase.rpc("update_my_profile", {
+        p_telephone:  profile.phone,
+        p_ville:      profile.city,
+        p_pays:       profile.country,
+        p_profession: profile.profession,
+      });
+      if (error) {
+        setSaving(false);
+        toast.error("Erreur lors de l'enregistrement : " + error.message);
+        return;
+      }
       setMember(p => ({ ...p, ...profile, telephone: profile.phone, ville: profile.city, pays: profile.country }));
     }
     setUser(u => ({ ...u, ...profile }));
