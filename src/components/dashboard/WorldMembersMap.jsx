@@ -1,7 +1,21 @@
-import { Component, useMemo } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
+import { Component, useMemo, useEffect } from "react";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Globe } from "lucide-react";
+
+// Recalcule la taille de la carte une fois la mise en page stabilisée.
+// Sans ça, Leaflet s'initialise parfois sur un conteneur de taille 0 (surtout
+// sur mobile / dans une zone qui défile) et n'affiche que du vide.
+function InvalidateSizeOnMount() {
+  const map = useMap();
+  useEffect(() => {
+    const fix = () => map.invalidateSize();
+    const t = setTimeout(fix, 250);
+    window.addEventListener("resize", fix);
+    return () => { clearTimeout(t); window.removeEventListener("resize", fix); };
+  }, [map]);
+  return null;
+}
 
 /*
  * Carte mondiale interactive des membres (remplace les barres « Répartition géographique »).
@@ -116,6 +130,7 @@ export default function WorldMembersMap({ data = [] }) {
           style={{ height: "100%", width: "100%", background: "#0a1f12" }}
           attributionControl={false}
         >
+          <InvalidateSizeOnMount />
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             attribution='&copy; OpenStreetMap &copy; CARTO'
