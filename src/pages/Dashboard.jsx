@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -34,6 +34,7 @@ import AssembleesSection from "./dashboard/AssembleesSection";
 import CirculaireSection from "./dashboard/CirculaireSection";
 import CourrierSection from "./dashboard/CourrierSection";
 import BulkEmailSection from "./dashboard/BulkEmailSection";
+import NewsletterEmailSection from "./dashboard/NewsletterEmailSection";
 import StatsSection from "./dashboard/StatsSection";
 import ElectionsSection from "./dashboard/ElectionsSection";
 import MandatsSection from "./dashboard/MandatsSection";
@@ -48,6 +49,7 @@ import RegistreLegalSection from "./dashboard/RegistreLegalSection";
 import BenevolesSection from "./dashboard/BenevolesSection";
 import CheckinSection from "./dashboard/CheckinSection";
 import WebinarsSection from "./dashboard/WebinarsSection";
+import AssistantIA from "./dashboard/AssistantIA";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -417,7 +419,8 @@ export default function Dashboard() {
 
   useNotifications(allMembers, pendingMembers);
 
-  if (!session || session.role !== "admin") {
+  // Accès réservé au bureau de l'association (admin ou bureau)
+  if (!session || (session.role !== "admin" && session.role !== "bureau")) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
@@ -425,7 +428,7 @@ export default function Dashboard() {
             <Lock className="w-8 h-8 text-red-500" />
           </div>
           <h2 className="font-heading text-2xl font-bold text-foreground mb-2">Accès refusé</h2>
-          <p className="text-muted-foreground mb-6">Tableau de bord réservé aux administrateurs.</p>
+          <p className="text-muted-foreground mb-6">Tableau de bord réservé au bureau de l'association.</p>
           <button onClick={() => navigate("/login")}
             className="px-6 py-2.5 bg-primary text-primary-foreground rounded-full font-semibold text-sm">
             Se connecter
@@ -507,8 +510,10 @@ export default function Dashboard() {
         { key: "circulaire",      label: "Circulaire",      icon: Send },
         { key: "courrier",        label: "Courrier",        icon: ScrollText },
         { key: "bulk-email",      label: "Email de masse",  icon: Mail },
+        { key: "newsletter-email", label: "Newsletter",      icon: UserCheck },
         { key: "stats",           label: "Statistiques",    icon: TrendingUp },
         { key: "automatisations", label: "Automatisations", icon: Zap },
+        { key: "assistant-ia",    label: "Assistant IA",    icon: Sparkles },
       ],
     },
   ];
@@ -1318,9 +1323,11 @@ export default function Dashboard() {
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
           {tab === "courrier"        && <CourrierSection />}
-          {tab === "bulk-email"      && <BulkEmailSection />}
+          {tab === "bulk-email"       && <BulkEmailSection />}
+          {tab === "newsletter-email" && <NewsletterEmailSection />}
           {tab === "stats"           && <StatsSection />}
           {tab === "automatisations" && <AutomatisationsSection />}
+          {tab === "assistant-ia"    && <AssistantIA />}
           {tab === "communiques" && <CommuniquesSection />}
           {tab === "mediatheque" && <MediathequeSection />}
           {tab === "documents"   && <DocumentsSection />}

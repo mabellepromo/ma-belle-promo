@@ -38,6 +38,42 @@ Le fichier LocalAuth.jsx utilise désormais Supabase Auth réel
 (signInWithPassword, getSession, onAuthStateChange, JWT).
 Le nom "LocalAuth" est conservé pour ne pas casser les imports.
 
+## Module Assistant IA (dashboard)
+
+Module « Assistant IA » dans la sidebar (section COMMUNICATION),
+réservé au bureau (rôle `admin` ou `bureau`). Deux modes : questions
+sur les données réelles (function calling en lecture seule) et
+génération de contenu (PV, communiqués, emails, circulaires).
+
+Architecture :
+- Edge Function `supabase/functions/assistant-ia/index.ts` (Deno).
+  Vérifie le JWT puis le rôle CÔTÉ SERVEUR (403 sinon). Le moteur IA
+  est isolé dans la fonction `callLLM()` pour rester agnostique du
+  fournisseur (basculer vers Claude Haiku = réécrire cette fonction).
+- Composant `src/pages/dashboard/AssistantIA.jsx`.
+
+Moteur par défaut : Groq (free tier), modèle `llama-3.3-70b-versatile`.
+
+### Configurer le secret GROQ_API_KEY (obligatoire)
+
+La clé n'est JAMAIS côté frontend. Elle vit en secret Supabase :
+
+```
+# 1. Créer une clé gratuite sur https://console.groq.com/keys
+# 2. La poser comme secret (CLI Supabase) :
+supabase secrets set GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx --project-ref zbimhhgefmhliqiuwzvb
+
+# (optionnel) changer de modèle sans redéployer le code :
+supabase secrets set LLM_MODEL=llama-3.3-70b-versatile --project-ref zbimhhgefmhliqiuwzvb
+
+# 3. Déployer la fonction :
+supabase functions deploy assistant-ia --project-ref zbimhhgefmhliqiuwzvb
+```
+
+On peut aussi poser le secret dans le dashboard Supabase →
+Edge Functions → Secrets. `SUPABASE_URL`, `SUPABASE_ANON_KEY` et
+`SUPABASE_SERVICE_ROLE_KEY` sont déjà injectés automatiquement.
+
 ## Comportement attendu de Claude Code
 
 ### Posture générale
