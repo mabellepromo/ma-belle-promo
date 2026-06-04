@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -53,6 +53,7 @@ import AssistantIA from "./dashboard/AssistantIA";
 import WorldMembersMap from "../components/dashboard/WorldMembersMap.jsx";
 import ConventionsSection from "./dashboard/ConventionsSection.jsx";
 import OpportunitesSection from "./dashboard/OpportunitesSection.jsx";
+import MemoireSection from "./dashboard/MemoireSection.jsx";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -559,6 +560,7 @@ export default function Dashboard() {
         { key: "elections",     label: "Élections",      icon: Vote },
         { key: "mandats",       label: "Mandats",        icon: Shield },
         { key: "registre",      label: "Registre légal", icon: BookOpen },
+        { key: "memoire",       label: "Mémoire / Passation", icon: ClipboardList },
         { key: "benevoles",     label: "Bénévoles",      icon: Briefcase },
       ],
     },
@@ -1424,6 +1426,7 @@ export default function Dashboard() {
           {tab === "sponsors"    && <SponsorsSection />}
           {tab === "conventions" && <ConventionsSection />}
           {tab === "opportunites" && <OpportunitesSection />}
+          {tab === "memoire"     && <MemoireSection />}
           {tab === "ventes"      && <VentesSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
           {tab === "factures"    && <FacturesSection />}
