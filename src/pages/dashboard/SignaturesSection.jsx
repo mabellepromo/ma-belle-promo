@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useLocalAuth } from "../../lib/LocalAuth";
 import {
-  PenTool, X, Trash2, Download, Send, Clock, CheckCircle2, FileSignature, Info, UserPlus,
+  PenTool, X, Trash2, ExternalLink, Send, Clock, CheckCircle2, FileSignature, Info, UserPlus, Edit2,
 } from "lucide-react";
 import { useSignatures } from "../../hooks/useSignatures";
-import { FormPanel, Field, CrudHeader, SectionLoader, inp } from "./shared.jsx";
+import { FormPanel, Field, CrudHeader, SectionLoader, inp, sel } from "./shared.jsx";
 
 const STATUT = {
   brouillon: { label: "Brouillon", cls: "bg-muted text-muted-foreground", icon: Clock },
@@ -20,10 +21,14 @@ function formatDate(iso) {
 }
 
 export default function SignaturesSection() {
-  const { items, send, openDocument, remove, loading } = useSignatures();
+  const { session } = useLocalAuth();
+  const { items, add, update, remove, loading } = useSignatures();
   const [form, setForm] = useState(null);
 
-  const empty = { document_titre: "", template_id: "", signataires: [{ name: "", email: "" }] };
+  const empty = {
+    document_titre: "", signataires: [{ name: "", email: "" }],
+    statut: "envoye", date_signature: "", signed_url: "",
+  };
 
   function setSig(i, k, v) {
     setForm(p => ({ ...p, signataires: p.signataires.map((s, j) => j === i ? { ...s, [k]: v } : s) }));
@@ -31,13 +36,30 @@ export default function SignaturesSection() {
   function addSig() { setForm(p => ({ ...p, signataires: [...p.signataires, { name: "", email: "" }] })); }
   function removeSig(i) { setForm(p => ({ ...p, signataires: p.signataires.filter((_, j) => j !== i) })); }
 
-  async function doSend() {
+  async function doSave() {
     if (!form.document_titre.trim()) { toast.error("Titre du document requis"); return; }
-    if (!form.template_id.trim()) { toast.error("ID du modèle DocuSeal requis"); return; }
-    const signataires = form.signataires.filter(s => s.email.trim());
-    if (signataires.length === 0) { toast.error("Au moins un signataire avec email"); return; }
-    const ok = await send({ document_titre: form.document_titre, template_id: form.template_id, signataires });
-    if (ok) setForm(null);
+    const signataires = form.signataires.filter(s => s.name.trim() || s.email.trim());
+    const payload = {
+      document_titre: form.document_titre.trim(),
+      signataires,
+      statut: form.statut,
+      date_signature: form.statut === "signe" ? (form.date_signature || new Date().toISOString().slice(0, 10)) : null,
+      signed_url: form.signed_url.trim() || null,
+    };
+    if (form._editing) await update(form._editing, payload);
+    else await add({ ...payload, created_by: session?.email || null });
+    setForm(null);
+  }
+
+  function openEdit(s) {
+    setForm({
+      _editing: s.id,
+      document_titre: s.document_titre || "",
+      signataires: (s.signataires?.length ? s.signataires : [{ name: "", email: "" }]),
+      statut: s.statut || "envoye",
+      date_signature: s.date_signature ? s.date_signature.slice(0, 10) : "",
+      signed_url: s.signed_url || "",
+    });
   }
 
   if (loading) return <SectionLoader />;
@@ -48,23 +70,26 @@ export default function SignaturesSection() {
 
       <div className="flex items-start gap-2 mb-6 px-4 py-3 rounded-2xl bg-primary/5 border border-primary/15">
         <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Signature via <strong>DocuSeal</strong> (open-source, auto-hébergé). Préparez d'abord vos
-          modèles (Convention, PV, statuts) dans DocuSeal en y plaçant les champs de signature, puis
-          renseignez ici l'<strong>ID du modèle</strong>. Voir le guide de déploiement
-          <code className="text-primary mx-1">docs/docuseal-oracle-deploiement.md</code>.
-        </p>
+        <div className="text-xs text-muted-foreground leading-relaxed">
+          <p className="mb-1">
+            <strong>Comment ça marche</strong> — la signature se fait sur <strong>DocuSeal Cloud</strong> (gratuit,
+            jusqu'à 10 documents/mois, aucune installation) ; ce registre garde la trace centralisée.
+          </p>
+          <ol className="list-decimal list-inside space-y-0.5">
+            <li>Créez et envoyez le document à signer sur
+              <a href="https://docuseal.com" target="_blank" rel="noreferrer" className="text-primary font-semibold hover:underline mx-1 inline-flex items-center gap-0.5">DocuSeal Cloud <ExternalLink className="w-3 h-3" /></a>
+            </li>
+            <li>Une fois signé, téléchargez le PDF (ou copiez son lien de partage).</li>
+            <li>Enregistrez ici le suivi : document, signataires, statut, et le lien du PDF signé.</li>
+          </ol>
+        </div>
       </div>
 
       {form && (
-        <FormPanel title="Envoyer en signature" onClose={() => setForm(null)} onSave={doSend}>
+        <FormPanel title={form._editing ? "Modifier le suivi" : "Nouveau suivi de signature"} onClose={() => setForm(null)} onSave={doSave}>
           <Field label="Titre du document" required>
             <input className={inp} value={form.document_titre} onChange={e => setForm(p => ({ ...p, document_titre: e.target.value }))}
               placeholder="Ex : Convention de partenariat — Cabinet X" />
-          </Field>
-          <Field label="ID du modèle DocuSeal" required>
-            <input className={inp} value={form.template_id} onChange={e => setForm(p => ({ ...p, template_id: e.target.value }))}
-              placeholder="Ex : 1000001" />
           </Field>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -77,7 +102,7 @@ export default function SignaturesSection() {
               {form.signataires.map((s, i) => (
                 <div key={i} className="flex gap-2">
                   <input className={inp + " flex-1"} placeholder="Nom" value={s.name} onChange={e => setSig(i, "name", e.target.value)} />
-                  <input className={inp + " flex-1"} type="email" placeholder="email@…" value={s.email} onChange={e => setSig(i, "email", e.target.value)} />
+                  <input className={inp + " flex-1"} placeholder="email (optionnel)" value={s.email} onChange={e => setSig(i, "email", e.target.value)} />
                   {form.signataires.length > 1 && (
                     <button type="button" onClick={() => removeSig(i)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-border hover:bg-muted flex-shrink-0">
                       <X className="w-4 h-4" />
@@ -87,13 +112,31 @@ export default function SignaturesSection() {
               ))}
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Statut">
+              <select className={sel} value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value }))}>
+                <option value="brouillon">Brouillon</option>
+                <option value="envoye">Envoyé en signature</option>
+                <option value="signe">Signé</option>
+              </select>
+            </Field>
+            {form.statut === "signe" && (
+              <Field label="Date de signature">
+                <input type="date" className={inp} value={form.date_signature} onChange={e => setForm(p => ({ ...p, date_signature: e.target.value }))} />
+              </Field>
+            )}
+          </div>
+          <Field label="Lien du document signé (PDF)">
+            <input className={inp} type="url" value={form.signed_url} onChange={e => setForm(p => ({ ...p, signed_url: e.target.value }))}
+              placeholder="https://… (lien DocuSeal ou PDF téléversé)" />
+          </Field>
         </FormPanel>
       )}
 
       {items.length === 0 && (
         <div className="text-center py-16">
           <FileSignature className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">Aucune demande de signature.</p>
+          <p className="text-muted-foreground text-sm">Aucun document suivi. Cliquez sur « Ajouter » après avoir signé un document sur DocuSeal Cloud.</p>
         </div>
       )}
 
@@ -111,9 +154,9 @@ export default function SignaturesSection() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-foreground">{s.document_titre}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {(s.signataires || []).map(x => x.name || x.email).join(", ")}
-                    </p>
+                    {s.signataires?.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{s.signataires.map(x => x.name || x.email).filter(Boolean).join(", ")}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-1">
                       Créé le {formatDate(s.created_at)}{s.date_signature ? ` · signé le ${formatDate(s.date_signature)}` : ""}
                     </p>
@@ -124,12 +167,16 @@ export default function SignaturesSection() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 pt-3 mt-3 border-t border-border/60 justify-end">
-                {s.statut === "signe" && (
-                  <button onClick={() => openDocument(s.id)}
+                {s.signed_url && (
+                  <a href={s.signed_url} target="_blank" rel="noreferrer"
                     className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-500/15 transition-colors">
-                    <Download className="w-3.5 h-3.5" /> Document signé
-                  </button>
+                    <ExternalLink className="w-3.5 h-3.5" /> Document signé
+                  </a>
                 )}
+                <button onClick={() => openEdit(s)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-lg hover:bg-primary/8 transition-colors">
+                  <Edit2 className="w-3.5 h-3.5" /> Modifier
+                </button>
                 <button onClick={() => remove(s.id)}
                   className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-500/15 transition-colors">
                   <Trash2 className="w-3.5 h-3.5" /> Supprimer

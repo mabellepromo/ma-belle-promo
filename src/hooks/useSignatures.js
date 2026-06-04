@@ -3,14 +3,19 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
 /**
- * Suivi des demandes de signature DocuSeal.
- * La création et la récupération du document passent par l'Edge Function `docuseal`
- * (la clé API DocuSeal n'est jamais exposée au frontend).
+ * Registre de suivi des signatures (mode manuel — DocuSeal Cloud gratuit).
+ * Le bureau réalise la signature dans DocuSeal Cloud (interface web, sans serveur
+ * à gérer) puis consigne ici le suivi : document, signataires, statut, lien du PDF
+ * signé. CRUD Supabase direct (RLS réservée admin), aucune clé API requise.
+ *
+ * NB : les Edge Functions `docuseal` / `docuseal-webhook` restent déployées mais
+ * inertes — elles serviront si l'association passe un jour à DocuSeal auto-hébergé
+ * (envoi automatique depuis le dashboard).
  */
 export function useSignatures() {
   const [items,   setItems]   = useState(/** @type {any[]} */([]));
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
+  const [saving,  setSaving]  = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -24,43 +29,36 @@ export function useSignatures() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Envoie une demande de signature via DocuSeal
-  async function send({ document_titre, template_id, signataires }) {
-    setSending(true);
+  async function add(item) {
+    setSaving(true);
     try {
-      const { data, error } = await supabase.functions.invoke("docuseal", {
-        body: { action: "send", document_titre, template_id, signataires },
-      });
-      if (error || data?.error) {
-        toast.error("Erreur DocuSeal : " + (data?.error || error.message));
-        return false;
-      }
-      toast.success("Demande de signature envoyée !");
-      await load();
-      return true;
-    } finally {
-      setSending(false);
-    }
+      const { error } = await supabase.from("signatures").insert(item);
+      if (error) toast.error("Erreur ajout : " + error.message);
+      else { toast.success("Suivi enregistré !"); await load(); }
+    } finally { setSaving(false); }
   }
 
-  // Récupère une URL fraîche du document signé (les URLs DocuSeal expirent)
-  async function openDocument(signatureId) {
-    const { data, error } = await supabase.functions.invoke("docuseal", {
-      body: { action: "document", signature_id: signatureId },
-    });
-    if (error || data?.error || !data?.url) {
-      toast.error("Document indisponible : " + (data?.error || error?.message || "URL introuvable"));
-      return;
-    }
-    window.open(data.url, "_blank", "noopener,noreferrer");
+  async function update(id, item) {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("signatures")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) toast.error("Erreur mise à jour : " + error.message);
+      else { toast.success("Suivi mis à jour !"); await load(); }
+    } finally { setSaving(false); }
   }
 
   async function remove(id) {
-    if (!confirm("Supprimer ce suivi de signature ? (le document reste dans DocuSeal)")) return;
-    const { error } = await supabase.from("signatures").delete().eq("id", id);
-    if (error) toast.error("Erreur : " + error.message);
-    else { toast.success("Suivi supprimé."); await load(); }
+    if (!confirm("Supprimer ce suivi de signature ?")) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("signatures").delete().eq("id", id);
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Suivi supprimé."); await load(); }
+    } finally { setSaving(false); }
   }
 
-  return { items, loading, sending, send, openDocument, remove, reload: load };
+  return { items, loading, saving, add, update, remove, reload: load };
 }

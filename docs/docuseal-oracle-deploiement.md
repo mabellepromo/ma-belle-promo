@@ -1,4 +1,16 @@
-# Déploiement DocuSeal sur Oracle Cloud Always Free
+# Déploiement DocuSeal sur Oracle Cloud Always Free (montée en puissance OPTIONNELLE)
+
+> **Mode actuel : registre manuel + DocuSeal Cloud gratuit.** Le module « Signatures »
+> fonctionne aujourd'hui sans aucun serveur : la signature se fait sur DocuSeal Cloud
+> (gratuit, ≤ 10 docs/mois) et le bureau consigne le suivi dans le dashboard.
+>
+> **Ce guide n'est utile QUE si l'association veut un jour passer à l'auto-hébergé**
+> (envoi automatique depuis le dashboard, volume illimité). Le code des Edge Functions
+> `docuseal` / `docuseal-webhook` est déjà déployé et prêt pour ce scénario ; il suffira
+> de monter l'instance ci-dessous, de poser les 3 secrets, et de rebrancher la section
+> sur l'API. À réserver à quelqu'un d'à l'aise avec le terminal.
+
+---
 
 Guide pour héberger gratuitement l'instance de signature électronique **DocuSeal**
 (open-source, AGPL) utilisée par le module « Signatures » du dashboard MBP.
