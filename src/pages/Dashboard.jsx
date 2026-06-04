@@ -15,7 +15,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Eye, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag, ChevronDown,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles
 } from "lucide-react";
 import AutomatisationsSection from "./dashboard/AutomatisationsSection.jsx";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
@@ -229,6 +229,59 @@ export default function Dashboard() {
       .map(([pays, count]) => ({ pays, count, pct: Math.round((count / total) * 100) }));
   }, [allMembers]);
 
+  /*
+   * Indicateurs décisionnels (pilotage). Tous calculés depuis des données RÉELLES :
+   *   - cotisations : profondeur historique réelle (annee + statut sur 3 ans via multiYearData)
+   *   - created_at  : ATTENTION, les 48 membres ont été importés le même jour (base44).
+   *     Le delta « nouveaux ce mois » vaut donc 0 aujourd'hui ; il deviendra exact dès les
+   *     prochaines validations. On l'affiche tel quel — aucune valeur inventée.
+   */
+  const pilotage = useMemo(() => {
+    const md    = multiYearData || {};
+    const total = allMembers?.length || 0;
+    const statut = (m, yr) => md[String(m.id)]?.[yr]?.statut;
+
+    // Taux de cotisation d'une année donnée (payés / effectif hors exemptés)
+    const tauxYear = (yr) => {
+      const exempts = (allMembers ?? []).filter(m => statut(m, yr) === "exempté").length;
+      const payes   = (allMembers ?? []).filter(m => statut(m, yr) === "payé").length;
+      const effectif = total - exempts;
+      return { payes, exempts, effectif, taux: effectif > 0 ? Math.round((payes / effectif) * 100) : 0 };
+    };
+
+    // Cotisations en retard sur l'année courante (ni payé ni exempté)
+    const cur      = tauxYear(currentYear);
+    const enRetard = Math.max(0, cur.effectif - cur.payes);
+    const retardPct = cur.effectif > 0 ? Math.round((enRetard / cur.effectif) * 100) : 0;
+
+    // Taux d'engagement (métrique documentée) : part des membres ayant payé OU partiellement
+    // payé au moins une cotisation sur les 3 dernières années. C'est l'inverse des « dormants ».
+    const engagedCount = (allMembers ?? []).filter(m =>
+      [currentYear - 2, currentYear - 1, currentYear].some(
+        yr => statut(m, yr) === "payé" || statut(m, yr) === "partiel"
+      )
+    ).length;
+    const engagementPct = total > 0 ? Math.round((engagedCount / total) * 100) : 0;
+
+    // Évolution du taux de cotisation vs année précédente (seul delta historiquement fiable)
+    const prev      = tauxYear(currentYear - 1);
+    const tauxDelta = cur.taux - prev.taux;
+
+    // Nouveaux membres ce mois (created_at réel — vaut 0 tant qu'aucune validation récente)
+    const now = new Date();
+    const nouveauxMois = (allMembers ?? []).filter(m => {
+      if (!m.created_at) return false;
+      const d = new Date(m.created_at);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+
+    return {
+      total, enRetard, retardPct, engagementPct, engagedCount,
+      tauxCur: cur.taux, tauxPrev: prev.taux, tauxDelta, nouveauxMois,
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allMembers, multiYearData, currentYear]);
+
   const agendaCombine = useMemo(() => {
     const now = new Date(); now.setHours(0, 0, 0, 0);
     const items = [];
@@ -440,7 +493,7 @@ export default function Dashboard() {
   }
 
   const stats = [
-    { label: "Membres",    value: allMembers.length,     icon: Users,        color: "bg-blue-500/15 text-blue-400",   sub: `${allMembers.filter(m => m.bureau).length} au bureau`, onClick: () => setTab("membres") },
+    { label: "Membres",    value: allMembers.length,     icon: Users,        color: "bg-blue-500/15 text-blue-400",   sub: `${allMembers.filter(m => m.bureau).length} au bureau`, trend: { value: pilotage.nouveauxMois, label: "ce mois" }, onClick: () => setTab("membres") },
     { label: "En attente", value: pendingMembers.length, icon: Clock,        color: "bg-amber-500/15 text-amber-400", sub: "à valider", alert: pendingMembers.length > 0, onClick: () => setTab("pending") },
     { label: "Articles",   value: articles.length, icon: FileText, color: "bg-emerald-500/15 text-emerald-400", sub: "publications", onClick: () => setTab("articles") },
     { label: "Événements", value: evenements.length, icon: Calendar, color: "bg-indigo-500/15 text-indigo-400", sub: "planifiés", onClick: () => setTab("evenements") },
@@ -712,7 +765,7 @@ export default function Dashboard() {
 
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {stats.map(({ label, value, icon: Icon, sub, alert, onClick }, i) => (
+                {stats.map(({ label, value, icon: Icon, sub, alert, trend, onClick }, i) => (
                   <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                     onClick={onClick}
                     className={`bg-card rounded-2xl overflow-hidden border border-border shadow-sm group ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
@@ -725,9 +778,72 @@ export default function Dashboard() {
                       <div className="font-heading text-3xl font-black tracking-tight text-foreground">{value}</div>
                       <div className="text-sm font-semibold mt-0.5 text-foreground">{label}</div>
                       <div className="text-xs mt-0.5 text-muted-foreground">{sub}</div>
+                      {trend && (
+                        <div className={`flex items-center gap-1 text-xs font-semibold mt-1 ${trend.value > 0 ? "text-emerald-400" : "text-muted-foreground"}`}>
+                          {trend.value > 0 ? <TrendingUp className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                          {trend.value > 0 ? `+${trend.value}` : trend.value} {trend.label}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
+              </div>
+
+              {/* Indicateurs décisionnels — du constat à la décision */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {(() => {
+                  const retardAlerte = pilotage.retardPct > 50 ? "rouge" : pilotage.retardPct > 30 ? "ambre" : "ok";
+                  const retardCls = retardAlerte === "rouge"
+                    ? "border-red-500/30 bg-red-500/5"
+                    : retardAlerte === "ambre"
+                      ? "border-amber-500/30 bg-amber-500/5"
+                      : "border-border";
+                  const retardTxt = retardAlerte === "rouge"
+                    ? "text-red-400"
+                    : retardAlerte === "ambre" ? "text-amber-400" : "text-foreground";
+                  const engageBas = pilotage.engagementPct < 50;
+                  return (
+                    <>
+                      {/* Cotisations en retard */}
+                      <div className={`rounded-2xl border p-4 shadow-sm bg-card ${retardCls}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <AlertTriangle className={`w-4 h-4 ${retardTxt}`} />
+                          <p className="text-xs font-semibold text-muted-foreground">Cotisations en retard {currentYear}</p>
+                        </div>
+                        <div className={`font-heading text-2xl font-black ${retardTxt}`}>{pilotage.retardPct}%</div>
+                        <p className="text-xs text-muted-foreground mt-0.5">{pilotage.enRetard} membre{pilotage.enRetard > 1 ? "s" : ""} concerné{pilotage.enRetard > 1 ? "s" : ""}</p>
+                      </div>
+
+                      {/* Taux d'engagement */}
+                      <div className={`rounded-2xl border p-4 shadow-sm bg-card ${engageBas ? "border-amber-500/30 bg-amber-500/5" : "border-border"}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Users className={`w-4 h-4 ${engageBas ? "text-amber-400" : "text-emerald-400"}`} />
+                          <p className="text-xs font-semibold text-muted-foreground" title="Part des membres ayant payé ou partiellement payé au moins une cotisation sur les 3 dernières années.">
+                            Taux d'engagement (3 ans)
+                          </p>
+                        </div>
+                        <div className={`font-heading text-2xl font-black ${engageBas ? "text-amber-400" : "text-emerald-400"}`}>{pilotage.engagementPct}%</div>
+                        <p className="text-xs text-muted-foreground mt-0.5">{pilotage.engagedCount} / {pilotage.total} membres actifs</p>
+                      </div>
+
+                      {/* Évolution du taux de cotisation */}
+                      <div className="rounded-2xl border border-border p-4 shadow-sm bg-card">
+                        <div className="flex items-center gap-2 mb-1">
+                          <BarChart2 className="w-4 h-4 text-cyan-400" />
+                          <p className="text-xs font-semibold text-muted-foreground">Cotisations vs {currentYear - 1}</p>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <div className="font-heading text-2xl font-black text-foreground">{pilotage.tauxCur}%</div>
+                          <span className={`flex items-center gap-0.5 text-xs font-semibold ${pilotage.tauxDelta > 0 ? "text-emerald-400" : pilotage.tauxDelta < 0 ? "text-red-400" : "text-muted-foreground"}`}>
+                            {pilotage.tauxDelta > 0 ? <TrendingUp className="w-3 h-3" /> : pilotage.tauxDelta < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                            {pilotage.tauxDelta > 0 ? `+${pilotage.tauxDelta}` : pilotage.tauxDelta} pts
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">contre {pilotage.tauxPrev}% l'an dernier</p>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               {pendingMembers.length > 0 && (
