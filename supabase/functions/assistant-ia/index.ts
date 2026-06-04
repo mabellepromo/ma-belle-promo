@@ -91,6 +91,8 @@ Règles :
   cotisations, trésorerie, assemblées, mandats, factures, bénévoles, sondages), utilise consulter_contenu.
 - Pour des décomptes ou statistiques, privilégie les fonctions dédiées (get_membres_stats,
   get_cotisations_status, get_tresorerie, get_repartition_geographique).
+- Pour les coordonnées d'un membre (email, téléphone, fonction), utilise search_membres
+  ou consulter_contenu avec rubrique "membres" — ces informations SONT disponibles.
 - Si l'information n'est pas disponible via les fonctions, dis-le clairement.
 - Réponds en français, de façon concise, factuelle et chaleureuse.
 - Les montants sont en francs CFA (FCFA).`;
@@ -112,40 +114,41 @@ interface RubriqueConfig {
   ascending?: boolean;
   limit: number;
 }
+// Limites volontairement basses : le palier gratuit Groq plafonne à ~12 000 tokens/minute.
 const RUBRIQUES: Record<string, RubriqueConfig> = {
   // Contenu public du site
-  articles:    { table: "articles",       columns: "*", order: "created_at", ascending: false, limit: 30 },
-  projets:     { table: "projets",        columns: "*", limit: 30 },
-  evenements:  { table: "evenements",     columns: "*", limit: 30 },
-  equipe:      { table: "equipe",         columns: "*", limit: 30 },
-  partenaires: { table: "sponsors",       columns: "*", limit: 30 },
-  communiques: { table: "communiques",    columns: "*", order: "created_at", ascending: false, limit: 30 },
-  programmes:  { table: "programmes",     columns: "*", limit: 30 },
-  ressources:  { table: "ressources",     columns: "*", limit: 30 },
-  documents:   { table: "documents",      columns: "*", limit: 30 },
-  galeries:    { table: "galeries",       columns: "*", limit: 30 },
-  videos:      { table: "media_videos",   columns: "*", limit: 30 },
-  photos:      { table: "media_photos",   columns: "*", limit: 30 },
-  webinaires:  { table: "webinar_events", columns: "*", limit: 30 },
+  articles:    { table: "articles",       columns: "id, titre, extrait, categorie, date, statut, auteur, created_at", order: "created_at", ascending: false, limit: 15 },
+  projets:     { table: "projets",        columns: "*", limit: 15 },
+  evenements:  { table: "evenements",     columns: "id, titre, date, lieu, type, statut", limit: 15 },
+  equipe:      { table: "equipe",         columns: "*", limit: 20 },
+  partenaires: { table: "sponsors",       columns: "*", limit: 20 },
+  communiques: { table: "communiques",    columns: "id, titre, date, type, resume, url, created_at", order: "created_at", ascending: false, limit: 15 },
+  programmes:  { table: "programmes",     columns: "*", limit: 15 },
+  ressources:  { table: "ressources",     columns: "*", limit: 15 },
+  documents:   { table: "documents",      columns: "*", limit: 20 },
+  galeries:    { table: "galeries",       columns: "*", limit: 20 },
+  videos:      { table: "media_videos",   columns: "*", limit: 20 },
+  photos:      { table: "media_photos",   columns: "*", limit: 20 },
+  webinaires:  { table: "webinar_events", columns: "*", limit: 15 },
   // Gestion / données détaillées (notes_internes exclu)
-  membres:     { table: "members",        columns: "nom, profession, ville, pays, email, telephone, anniversaire, role, bureau, status", order: "nom", limit: 200 },
-  cotisations: { table: "cotisations",    columns: "*", order: "annee", ascending: false, limit: 300 },
-  tresorerie:  { table: "tresorerie_transactions", columns: "*", order: "date", ascending: false, limit: 300 },
-  assemblees:  { table: "assemblees",     columns: "*", limit: 30 },
-  mandats:     { table: "mandats",        columns: "*", limit: 30 },
-  factures:    { table: "factures",       columns: "*", limit: 100 },
-  benevoles:   { table: "benevoles",      columns: "*", limit: 100 },
-  sondages:    { table: "sondages",       columns: "*", limit: 30 },
+  membres:     { table: "members",        columns: "nom, profession, ville, pays, email, telephone, anniversaire, role, bureau, status", order: "nom", limit: 60 },
+  cotisations: { table: "cotisations",    columns: "member_id, annee, montant, statut, date_paiement, mode_paiement", order: "annee", ascending: false, limit: 80 },
+  tresorerie:  { table: "tresorerie_transactions", columns: "type, categorie, libelle, montant, date, annee", order: "date", ascending: false, limit: 80 },
+  assemblees:  { table: "assemblees",     columns: "*", limit: 15 },
+  mandats:     { table: "mandats",        columns: "*", limit: 20 },
+  factures:    { table: "factures",       columns: "*", limit: 30 },
+  benevoles:   { table: "benevoles",      columns: "*", limit: 30 },
+  sondages:    { table: "sondages",       columns: "*", limit: 15 },
 };
 
-// Tronque les chaînes très longues pour ne pas saturer le contexte du moteur IA.
+// Tronque les chaînes longues pour rester sous la limite de tokens/minute du moteur IA.
 // deno-lint-ignore no-explicit-any
 function compactRows(rows: any[]): any[] {
   return (rows ?? []).map((row) => {
     // deno-lint-ignore no-explicit-any
     const out: Record<string, any> = {};
     for (const [k, v] of Object.entries(row)) {
-      out[k] = typeof v === "string" && v.length > 400 ? v.slice(0, 400) + "…" : v;
+      out[k] = typeof v === "string" && v.length > 160 ? v.slice(0, 160) + "…" : v;
     }
     return out;
   });
@@ -223,7 +226,7 @@ const TOOLS: any[] = [
     function: {
       name: "search_membres",
       description:
-        "Recherche de membres par nom, ville ou profession (10 résultats max). Ne renvoie pas d'email ni de téléphone.",
+        "Recherche un membre par nom, ville ou profession (10 résultats max) et renvoie ses coordonnées (email, téléphone, fonction). À utiliser pour retrouver un membre précis ou ses coordonnées.",
       parameters: {
         type: "object",
         properties: {
@@ -403,7 +406,7 @@ const TOOL_HANDLERS: Record<
     if (!critere) return { count: 0, resultats: [] };
     const { data } = await db
       .from("members")
-      .select("nom, profession, ville, pays, bureau")
+      .select("nom, profession, ville, pays, email, telephone, role, bureau")
       .eq("status", "validated")
       .or(`nom.ilike.%${critere}%,ville.ilike.%${critere}%,profession.ilike.%${critere}%`)
       .limit(10);
@@ -475,9 +478,11 @@ serve(async (req) => {
   }
 
   const mode = body.mode === "content" ? "content" : "data";
-  const userMessages = (body.messages ?? []).filter(
-    (m) => m.role === "user" || m.role === "assistant",
-  );
+  // On ne garde que les 8 derniers messages : limite la taille envoyée au moteur IA
+  // (palier gratuit Groq plafonné en tokens/minute).
+  const userMessages = (body.messages ?? [])
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .slice(-8);
   if (userMessages.length === 0) {
     return jsonResponse({ error: "Aucun message fourni" }, 400);
   }
