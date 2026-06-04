@@ -50,6 +50,7 @@ import BenevolesSection from "./dashboard/BenevolesSection";
 import CheckinSection from "./dashboard/CheckinSection";
 import WebinarsSection from "./dashboard/WebinarsSection";
 import AssistantIA from "./dashboard/AssistantIA";
+import WorldMembersMap from "../components/dashboard/WorldMembersMap.jsx";
 
 export default function Dashboard() {
   const { session, logout } = useLocalAuth();
@@ -222,9 +223,9 @@ export default function Dashboard() {
       counts[key] = (counts[key] || 0) + 1;
     });
     const total = allMembers.length || 1;
+    // On renvoie tous les pays (la carte mondiale les exploite tous) triés par effectif décroissant
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
       .map(([pays, count]) => ({ pays, count, pct: Math.round((count / total) * 100) }));
   }, [allMembers]);
 
@@ -992,21 +993,9 @@ export default function Dashboard() {
                       <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
                         <Globe className="w-4 h-4 text-cyan-400" />
                       </div>
-                      <p className="text-sm font-bold text-foreground">Répartition géographique</p>
+                      <p className="text-sm font-bold text-foreground">Rayonnement géographique</p>
                     </div>
-                    <div className="space-y-2.5">
-                      {repartitionGeo.map(({ pays, count, pct }) => (
-                        <div key={pays}>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="font-medium text-foreground truncate">{pays}</span>
-                            <span className="text-muted-foreground ml-2 flex-shrink-0">{count} ({pct}%)</span>
-                          </div>
-                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <WorldMembersMap data={repartitionGeo} />
                   </div>
                 </div>
 
