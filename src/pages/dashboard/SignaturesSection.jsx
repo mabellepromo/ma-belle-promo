@@ -14,6 +14,20 @@ const STATUT = {
   signe:     { label: "Signé",     cls: "bg-emerald-500/15 text-emerald-400", icon: CheckCircle2 },
 };
 
+// Types de documents que l'association fait signer
+const TYPES = [
+  "Convention / Partenariat",
+  "PV d'Assemblée",
+  "Statuts / Règlement intérieur",
+  "Attestation / Contrat",
+  "Courrier",
+  "Bulletin d'adhésion",
+  "Demande de subvention",
+  "Convention de bénévolat",
+  "Facture",
+  "Autre",
+];
+
 function formatDate(iso) {
   if (!iso) return "—";
   try { return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" }); }
@@ -24,11 +38,14 @@ export default function SignaturesSection() {
   const { session } = useLocalAuth();
   const { items, add, update, remove, loading } = useSignatures();
   const [form, setForm] = useState(null);
+  const [filtreType, setFiltreType] = useState("Tous");
 
   const empty = {
-    document_titre: "", signataires: [{ name: "", email: "" }],
-    statut: "envoye", date_signature: "", signed_url: "",
+    document_titre: "", type: "Convention / Partenariat", signataires: [{ name: "", email: "" }],
+    statut: "envoye", date_signature: "", source_url: "", signed_url: "",
   };
+
+  const filtered = filtreType === "Tous" ? items : items.filter(s => s.type === filtreType);
 
   function setSig(i, k, v) {
     setForm(p => ({ ...p, signataires: p.signataires.map((s, j) => j === i ? { ...s, [k]: v } : s) }));
@@ -41,9 +58,11 @@ export default function SignaturesSection() {
     const signataires = form.signataires.filter(s => s.name.trim() || s.email.trim());
     const payload = {
       document_titre: form.document_titre.trim(),
+      type: form.type || null,
       signataires,
       statut: form.statut,
       date_signature: form.statut === "signe" ? (form.date_signature || new Date().toISOString().slice(0, 10)) : null,
+      source_url: form.source_url.trim() || null,
       signed_url: form.signed_url.trim() || null,
     };
     if (form._editing) await update(form._editing, payload);
@@ -55,9 +74,11 @@ export default function SignaturesSection() {
     setForm({
       _editing: s.id,
       document_titre: s.document_titre || "",
+      type: s.type || "Convention / Partenariat",
       signataires: (s.signataires?.length ? s.signataires : [{ name: "", email: "" }]),
       statut: s.statut || "envoye",
       date_signature: s.date_signature ? s.date_signature.slice(0, 10) : "",
+      source_url: s.source_url || "",
       signed_url: s.signed_url || "",
     });
   }
@@ -87,9 +108,20 @@ export default function SignaturesSection() {
 
       {form && (
         <FormPanel title={form._editing ? "Modifier le suivi" : "Nouveau suivi de signature"} onClose={() => setForm(null)} onSave={doSave}>
-          <Field label="Titre du document" required>
-            <input className={inp} value={form.document_titre} onChange={e => setForm(p => ({ ...p, document_titre: e.target.value }))}
-              placeholder="Ex : Convention de partenariat — Cabinet X" />
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Titre du document" required>
+              <input className={inp} value={form.document_titre} onChange={e => setForm(p => ({ ...p, document_titre: e.target.value }))}
+                placeholder="Ex : Convention — Cabinet X" />
+            </Field>
+            <Field label="Type de document">
+              <select className={sel} value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
+                {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </Field>
+          </div>
+          <Field label="Document à signer (lien vers l'original)">
+            <input className={inp} type="url" value={form.source_url} onChange={e => setForm(p => ({ ...p, source_url: e.target.value }))}
+              placeholder="https://… (PDF vierge à faire signer)" />
           </Field>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -133,6 +165,16 @@ export default function SignaturesSection() {
         </FormPanel>
       )}
 
+      {items.length > 1 && (
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xs text-muted-foreground">Filtrer :</span>
+          <select className={sel + " max-w-[220px] h-8"} value={filtreType} onChange={e => setFiltreType(e.target.value)}>
+            <option value="Tous">Tous les types</option>
+            {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+      )}
+
       {items.length === 0 && (
         <div className="text-center py-16">
           <FileSignature className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
@@ -140,8 +182,12 @@ export default function SignaturesSection() {
         </div>
       )}
 
+      {items.length > 0 && filtered.length === 0 && (
+        <p className="text-center py-10 text-sm text-muted-foreground">Aucun document de ce type.</p>
+      )}
+
       <div className="space-y-3">
-        {items.map(s => {
+        {filtered.map(s => {
           const st = STATUT[s.statut] || STATUT.brouillon;
           const StIcon = st.icon;
           return (
@@ -153,7 +199,10 @@ export default function SignaturesSection() {
                     <PenTool className="w-5 h-5 text-primary" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-foreground">{s.document_titre}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-foreground">{s.document_titre}</p>
+                      {s.type && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/8 text-primary">{s.type}</span>}
+                    </div>
                     {s.signataires?.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-0.5">{s.signataires.map(x => x.name || x.email).filter(Boolean).join(", ")}</p>
                     )}
@@ -167,6 +216,12 @@ export default function SignaturesSection() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 pt-3 mt-3 border-t border-border/60 justify-end">
+                {s.source_url && (
+                  <a href={s.source_url} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-lg hover:bg-primary/8 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" /> À signer
+                  </a>
+                )}
                 {s.signed_url && (
                   <a href={s.signed_url} target="_blank" rel="noreferrer"
                     className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-500/15 transition-colors">
