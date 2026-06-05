@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "../../lib/supabase";
 import { useLocalAuth } from "../../lib/LocalAuth";
 import {
   BookOpen, ClipboardList, Search, Edit2, Trash2, History, X, Plus,
-  CheckCircle2, Circle, FileText, Tag, FileDown, Lock, Check, RotateCcw, PenTool,
+  CheckCircle2, Circle, FileText, Tag, FileDown, Lock, Check, RotateCcw, PenTool, Send,
 } from "lucide-react";
 import {
   useProcedures, usePassationModeles, usePassations,
@@ -255,6 +255,9 @@ function PassationTab({ members, session }) {
   const [addItem, setAddItem]       = useState(null);
   // Édition du libellé d'un item : { paId, idx, libelle }
   const [editItem, setEditItem]     = useState(null);
+  // Choix de la méthode de signature (passation) / capture in-app (passation)
+  const [signFor, setSignFor]       = useState(null);
+  const [padFor, setPadFor]         = useState(null);
 
   /* — Modèles — */
   async function saveModele() {
@@ -520,7 +523,7 @@ function PassationTab({ members, session }) {
                       className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-primary/8">
                       <FileDown className="w-3.5 h-3.5" /> PV PDF
                     </button>
-                    <button onClick={() => envoyerEnSignature(pa)} title="Créer un suivi de signature du PV dans le module Signatures"
+                    <button onClick={() => setSignFor(pa)} title="Signer le PV (électronique ou DocuSeal)"
                       className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-primary/8">
                       <PenTool className="w-3.5 h-3.5" /> Signer
                     </button>
@@ -634,7 +637,122 @@ function PassationTab({ members, session }) {
           {categoriesConnues.map(c => <option key={c} value={c} />)}
         </datalist>
       </div>
+
+      {/* Choix de la méthode de signature */}
+      {signFor && (
+        <Modal title="Signer le PV de passation" onClose={() => setSignFor(null)}>
+          <p className="text-xs text-muted-foreground mb-4">Deux manières de signer ce procès-verbal :</p>
+          <div className="space-y-3">
+            <button onClick={() => { setPadFor(signFor); setSignFor(null); }}
+              className="w-full text-left p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all">
+              <div className="flex items-center gap-2 font-semibold text-foreground"><PenTool className="w-4 h-4 text-primary" /> Signature électronique sur le PV</div>
+              <p className="text-xs text-muted-foreground mt-1">Signez directement ici (doigt / stylet / souris). Les signatures sont intégrées au PV PDF à imprimer. Gratuit, immédiat, idéal en présentiel.</p>
+            </button>
+            <button onClick={() => { envoyerEnSignature(signFor); setSignFor(null); }}
+              className="w-full text-left p-4 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all">
+              <div className="flex items-center gap-2 font-semibold text-foreground"><Send className="w-4 h-4 text-primary" /> Envoyer via DocuSeal</div>
+              <p className="text-xs text-muted-foreground mt-1">Crée un suivi dans le module Signatures pour une signature à distance via DocuSeal Cloud (trace formelle, ≤ 10 docs/mois gratuits).</p>
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Capture des signatures pour le PV imprimé */}
+      {padFor && <SignPVModal passation={padFor} onClose={() => setPadFor(null)} />}
     </div>
+  );
+}
+
+/* ── Pavé de signature tactile (canvas, sans dépendance) ── */
+function SignaturePad({ label, onChange }) {
+  const ref     = useRef(null);
+  const drawing = useRef(false);
+  const inked   = useRef(false);
+
+  useEffect(() => {
+    const ctx = ref.current.getContext("2d");
+    ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#0a1f12";
+  }, []);
+
+  const pos = (e) => {
+    const c = ref.current, r = c.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * (c.width / r.width), y: (e.clientY - r.top) * (c.height / r.height) };
+  };
+  const down = (e) => {
+    e.preventDefault(); drawing.current = true;
+    ref.current.setPointerCapture?.(e.pointerId);
+    const ctx = ref.current.getContext("2d"); const { x, y } = pos(e);
+    ctx.beginPath(); ctx.moveTo(x, y);
+  };
+  const move = (e) => {
+    if (!drawing.current) return; e.preventDefault();
+    const ctx = ref.current.getContext("2d"); const { x, y } = pos(e);
+    ctx.lineTo(x, y); ctx.stroke(); inked.current = true;
+  };
+  const up = () => {
+    if (!drawing.current) return; drawing.current = false;
+    onChange(inked.current ? ref.current.toDataURL("image/png") : null);
+  };
+  const clear = () => {
+    const c = ref.current; c.getContext("2d").clearRect(0, 0, c.width, c.height);
+    inked.current = false; onChange(null);
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-semibold text-foreground">{label}</span>
+        <button type="button" onClick={clear} className="text-xs text-muted-foreground hover:text-red-500">Effacer</button>
+      </div>
+      <canvas ref={ref} width={600} height={160}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up}
+        className="w-full h-32 rounded-xl border border-border bg-white cursor-crosshair touch-none" />
+    </div>
+  );
+}
+
+/* ── Modale de capture des signatures du PV (signature électronique « sur impression ») ── */
+function SignPVModal({ passation, onClose }) {
+  const [sortantNom, setSortantNom] = useState("");
+  const [entrantNom, setEntrantNom] = useState("");
+  const sortantImg = useRef(null);
+  const entrantImg = useRef(null);
+  const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+  function generate() {
+    genererPVPassation(passation, {
+      signatures: {
+        sortant: sortantImg.current ? { image: sortantImg.current, nom: sortantNom, date: dateStr } : (sortantNom ? { nom: sortantNom } : null),
+        entrant: entrantImg.current ? { image: entrantImg.current, nom: entrantNom, date: dateStr } : (entrantNom ? { nom: entrantNom } : null),
+      },
+    });
+    onClose();
+  }
+
+  return (
+    <Modal title="Signature électronique du PV" onClose={onClose}>
+      <p className="text-xs text-muted-foreground mb-4">
+        Faites signer le/la président(e) sortant(e) puis entrant(e) ci-dessous (doigt, stylet ou souris).
+        Les signatures sont intégrées au PV PDF à imprimer. <strong>Rien n'est enregistré en base</strong> :
+        signez, puis générez le PV.
+      </p>
+      <div className="space-y-5">
+        <div>
+          <input className={inp + " mb-2"} placeholder="Nom du/de la président(e) sortant(e)" value={sortantNom} onChange={e => setSortantNom(e.target.value)} />
+          <SignaturePad label="Signature — bureau sortant" onChange={v => { sortantImg.current = v; }} />
+        </div>
+        <div>
+          <input className={inp + " mb-2"} placeholder="Nom du/de la président(e) entrant(e)" value={entrantNom} onChange={e => setEntrantNom(e.target.value)} />
+          <SignaturePad label="Signature — bureau entrant" onChange={v => { entrantImg.current = v; }} />
+        </div>
+      </div>
+      <div className="flex justify-end gap-2 mt-6">
+        <button onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground">Annuler</button>
+        <button onClick={generate} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90">
+          <FileDown className="w-4 h-4" /> Générer le PV signé
+        </button>
+      </div>
+    </Modal>
   );
 }
 

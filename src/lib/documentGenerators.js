@@ -2270,7 +2270,9 @@ export function genererRapportStats(annee, members, cotData, geoData, proData) {
 // ── PV de passation de bureau ────────────────────────────────────────────────
 // passation : { titre, date_passation, date_cloture, bureau_sortant, bureau_entrant,
 //               statut, notes, taches: [{ categorie, libelle, responsable, fait, date_fait, notes }] }
-export function genererPVPassation(passation) {
+// opts.signatures : { sortant: { image, nom, date }, entrant: { image, nom, date } }
+//   image = dataURL PNG d'une signature manuscrite capturée dans l'app (optionnel).
+export function genererPVPassation(passation, opts = {}) {
   const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const fmtDate = (iso) => {
     if (!iso) return "—";
@@ -2323,6 +2325,26 @@ export function genererPVPassation(passation) {
         <table class="cat-table"><tbody>${lignes}</tbody></table>
       </div>`;
   }).join("");
+
+  // Colonne de signature : image manuscrite capturée si fournie, sinon ligne vierge
+  const sigCol = (label, sig, roleFallback, bureauFallback) => {
+    const hasImg = sig && sig.image;
+    const inner = hasImg
+      ? `<img src="${sig.image}" alt="Signature" style="max-height:74px;max-width:100%;object-fit:contain;display:block;" />`
+      : `<span>${esc(bureauFallback || "")}</span>`;
+    const nom = (sig && sig.nom) || roleFallback;
+    const dateLine = hasImg && sig.date
+      ? `<span class="sig-title" style="color:#1b6b45;font-style:italic;">Signé électroniquement le ${esc(sig.date)}</span>`
+      : "";
+    return `
+      <div class="signature-col">
+        <span class="sig-label">${esc(label)}</span>
+        <div class="sig-area">${inner}</div>
+        <span class="sig-name">${esc(nom)}</span>
+        <span class="sig-title">L'association Ma Belle Promo (MBP)</span>
+        ${dateLine}
+      </div>`;
+  };
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -2419,18 +2441,8 @@ export function genererPVPassation(passation) {
       </div>
 
       <div class="signature-block">
-        <div class="signature-col">
-          <span class="sig-label">Pour le bureau sortant</span>
-          <div class="sig-area"><span>${esc(passation.bureau_sortant || "")}</span></div>
-          <span class="sig-name">Le/La Président(e) sortant(e)</span>
-          <span class="sig-title">L'association Ma Belle Promo (MBP)</span>
-        </div>
-        <div class="signature-col">
-          <span class="sig-label">Pour le bureau entrant</span>
-          <div class="sig-area"><span>${esc(passation.bureau_entrant || "")}</span></div>
-          <span class="sig-name">Le/La Président(e) entrant(e)</span>
-          <span class="sig-title">L'association Ma Belle Promo (MBP)</span>
-        </div>
+        ${sigCol("Pour le bureau sortant", opts.signatures?.sortant, "Le/La Président(e) sortant(e)", passation.bureau_sortant)}
+        ${sigCol("Pour le bureau entrant", opts.signatures?.entrant, "Le/La Président(e) entrant(e)", passation.bureau_entrant)}
       </div>
 
     </div><!-- /doc-body -->
