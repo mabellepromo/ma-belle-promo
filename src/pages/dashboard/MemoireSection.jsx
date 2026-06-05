@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabase";
 import { useLocalAuth } from "../../lib/LocalAuth";
 import {
   BookOpen, ClipboardList, Search, Edit2, Trash2, History, X, Plus,
-  CheckCircle2, Circle, FileText, Tag, FileDown, Lock, Check, RotateCcw,
+  CheckCircle2, Circle, FileText, Tag, FileDown, Lock, Check, RotateCcw, PenTool,
 } from "lucide-react";
 import {
   useProcedures, usePassationModeles, usePassations,
@@ -244,7 +244,7 @@ function ProceduresTab({ assemblees, session }) {
 }
 
 /* ════════════════════ Onglet Passation ════════════════════ */
-function PassationTab({ members }) {
+function PassationTab({ members, session }) {
   const modeles = usePassationModeles();
   const passations = usePassations();
   const [modeleForm, setModeleForm] = useState(null);
@@ -340,6 +340,27 @@ function PassationTab({ members }) {
       statut: cloturee ? "en_cours" : "cloturee",
       date_cloture: cloturee ? null : new Date().toISOString().slice(0, 10),
     });
+  }
+
+  // Crée un suivi de signature du PV dans le module Signatures (DocuSeal Cloud)
+  async function envoyerEnSignature(pa) {
+    const titre = `PV de passation — ${pa.titre}`;
+    const { data: existing } = await supabase
+      .from("signatures").select("id").eq("document_titre", titre).limit(1);
+    if (existing?.length && !confirm("Un suivi de signature existe déjà pour ce PV. En créer un nouveau ?")) return;
+    const signataires = [
+      { name: pa.bureau_sortant ? `Président(e) sortant(e) — ${pa.bureau_sortant}` : "Président(e) sortant(e)", email: "" },
+      { name: pa.bureau_entrant ? `Président(e) entrant(e) — ${pa.bureau_entrant}` : "Président(e) entrant(e)", email: "" },
+    ];
+    const { error } = await supabase.from("signatures").insert({
+      document_titre: titre,
+      type: "PV de Passation",
+      signataires,
+      statut: "brouillon",
+      created_by: session?.email || null,
+    });
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success("Suivi créé dans le module Signatures. Générez le PV PDF, faites-le signer sur DocuSeal, puis consignez le lien.");
   }
 
   // Catégories connues (modèles + passations) pour le datalist d'ajout d'item
@@ -498,6 +519,10 @@ function PassationTab({ members }) {
                     <button onClick={() => genererPVPassation(pa)} title="Générer le PV de passation (PDF)"
                       className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-primary/8">
                       <FileDown className="w-3.5 h-3.5" /> PV PDF
+                    </button>
+                    <button onClick={() => envoyerEnSignature(pa)} title="Créer un suivi de signature du PV dans le module Signatures"
+                      className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-primary/8">
+                      <PenTool className="w-3.5 h-3.5" /> Signer
                     </button>
                     <button onClick={() => toggleCloture(pa)} title={cloturee ? "Rouvrir" : "Clôturer"}
                       className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-emerald-600 px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10">
@@ -667,7 +692,7 @@ export default function MemoireSection() {
       </div>
 
       {tab === "procedures" && <ProceduresTab assemblees={assemblees} session={session} />}
-      {tab === "passation"  && <PassationTab members={members} />}
+      {tab === "passation"  && <PassationTab members={members} session={session} />}
     </div>
   );
 }

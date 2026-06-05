@@ -18,6 +18,7 @@ const STATUT = {
 const TYPES = [
   "Convention / Partenariat",
   "PV d'Assemblée",
+  "PV de Passation",
   "Statuts / Règlement intérieur",
   "Attestation / Contrat",
   "Courrier",
