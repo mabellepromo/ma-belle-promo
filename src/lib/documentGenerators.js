@@ -2266,3 +2266,189 @@ export function genererRapportStats(annee, members, cotData, geoData, proData) {
 
   openDoc(html, `Rapport-Stats-${annee}.html`);
 }
+
+// ── PV de passation de bureau ────────────────────────────────────────────────
+// passation : { titre, date_passation, date_cloture, bureau_sortant, bureau_entrant,
+//               statut, notes, taches: [{ categorie, libelle, responsable, fait, date_fait, notes }] }
+export function genererPVPassation(passation) {
+  const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const fmtDate = (iso) => {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); }
+    catch { return iso; }
+  };
+
+  const ref     = refNumber("PV-PASS", new Date(passation.date_passation || Date.now()).getFullYear().toString());
+  const taches  = Array.isArray(passation.taches) ? passation.taches : [];
+  const total   = taches.length;
+  const done    = taches.filter(t => t.fait).length;
+  const pct     = total > 0 ? Math.round((done / total) * 100) : 0;
+  const cloturee = passation.statut === "cloturee";
+
+  // Regroupement par catégorie, dans l'ordre d'apparition
+  const ordre = [];
+  const groupes = {};
+  taches.forEach((t) => {
+    const cat = t.categorie || "Divers";
+    if (!groupes[cat]) { groupes[cat] = []; ordre.push(cat); }
+    groupes[cat].push(t);
+  });
+
+  const blocsCategories = ordre.map((cat) => {
+    const items = groupes[cat];
+    const catDone = items.filter(t => t.fait).length;
+    const catPct  = items.length > 0 ? Math.round((catDone / items.length) * 100) : 0;
+
+    const lignes = items.map((t) => {
+      const meta = [];
+      if (t.responsable) meta.push(`Responsable : <strong>${esc(t.responsable)}</strong>`);
+      if (t.fait && t.date_fait) meta.push(`Fait le ${fmtDate(t.date_fait)}`);
+      if (t.notes) meta.push(esc(t.notes));
+      return `
+        <tr>
+          <td style="padding:6px 8px;width:18px;vertical-align:top;font-size:11pt;color:${t.fait ? "#059669" : "#cbd5e1"};">${t.fait ? "☑" : "☐"}</td>
+          <td style="padding:6px 8px;font-size:9.5pt;color:#1a1a1a;">
+            <span style="${t.fait ? "" : "color:#475569;"}">${esc(t.libelle)}</span>
+            ${meta.length ? `<div style="font-size:8pt;color:#64748b;margin-top:2px;line-height:1.5;">${meta.join(" · ")}</div>` : ""}
+          </td>
+        </tr>`;
+    }).join("");
+
+    return `
+      <div class="cat-block">
+        <div class="cat-head">
+          <span class="cat-name">${esc(cat)}</span>
+          <span class="cat-count">${catDone}/${items.length} · ${catPct}%</span>
+        </div>
+        <table class="cat-table"><tbody>${lignes}</tbody></table>
+      </div>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PV de passation — ${esc(passation.titre || "MBP")}</title>
+  <style>${MBP_STYLE}</style>
+  <style>
+    /* La checklist peut dépasser une page : on autorise la pagination naturelle */
+    .a4 { overflow: visible; height: auto; }
+    .doc-body { gap: 16px; }
+    .cat-block { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4px; }
+    .cat-head {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #0a3d28; color: #fff; padding: 6px 12px; border-radius: 6px 6px 0 0;
+    }
+    .cat-name { font-family:'Cormorant Garamond',serif; font-size:11.5pt; font-weight:700; letter-spacing:0.02em; }
+    .cat-count { font-family:'Lato',sans-serif; font-size:8pt; font-weight:700; color:#e6b84a; }
+    .cat-table { width:100%; border-collapse:collapse; border:1px solid #e2e8f0; border-top:none; }
+    .cat-table tr:not(:last-child) td { border-bottom:1px solid #eef2f6; }
+    .global-bar-wrap { background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden; }
+    .global-bar { height:100%; background:linear-gradient(to right,#1b6b45,#1a7a4e); border-radius:4px; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Procès-verbal de passation</div>
+        <div class="doc-ref">Réf. ${ref} · Édité le ${today()}</div>
+      </div>
+
+      <p class="intro-text">
+        Le présent procès-verbal constate la <strong>transmission des responsabilités, des accès et des
+        documents</strong> de l'association entre le bureau sortant et le bureau entrant. Il fait foi de la
+        remise effective des éléments cochés ci-dessous.
+      </p>
+
+      <div class="info-box">
+        <div class="info-row">
+          <span class="info-label">Objet de la passation</span>
+          <span class="info-value">${esc(passation.titre || "—")}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Statut</span>
+          <span class="info-value">${cloturee ? "Clôturée" : "En cours"}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Bureau sortant</span>
+          <span class="info-value">${esc(passation.bureau_sortant || "—")}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Bureau entrant</span>
+          <span class="info-value">${esc(passation.bureau_entrant || "—")}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date de début</span>
+          <span class="info-value">${fmtDate(passation.date_passation)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date de clôture</span>
+          <span class="info-value">${fmtDate(passation.date_cloture)}</span>
+        </div>
+        <div class="info-row full-width">
+          <span class="info-label">Progression globale — ${done}/${total} éléments transmis (${pct}%)</span>
+          <span class="info-value"></span>
+          <div class="global-bar-wrap" style="margin-top:4px;"><div class="global-bar" style="width:${pct}%;"></div></div>
+        </div>
+      </div>
+
+      ${blocsCategories || `<p class="intro-text">Aucun élément dans cette passation.</p>`}
+
+      ${passation.notes ? `<div class="notice-box"><p>${esc(passation.notes)}</p></div>` : ""}
+
+      <div class="notice-box">
+        <p>
+          <strong>Confidentialité —</strong> aucun mot de passe ni identifiant n'est consigné dans ce document.
+          Les cases « accès » attestent uniquement que la remise des identifiants a eu lieu de la main à la main.
+        </p>
+      </div>
+
+      <div class="signature-block">
+        <div class="signature-col">
+          <span class="sig-label">Pour le bureau sortant</span>
+          <div class="sig-area"><span>${esc(passation.bureau_sortant || "")}</span></div>
+          <span class="sig-name">Le/La Président(e) sortant(e)</span>
+          <span class="sig-title">L'association Ma Belle Promo (MBP)</span>
+        </div>
+        <div class="signature-col">
+          <span class="sig-label">Pour le bureau entrant</span>
+          <div class="sig-area"><span>${esc(passation.bureau_entrant || "")}</span></div>
+          <span class="sig-name">Le/La Président(e) entrant(e)</span>
+          <span class="sig-title">L'association Ma Belle Promo (MBP)</span>
+        </div>
+      </div>
+
+    </div><!-- /doc-body -->
+
+    <div class="doc-footer">
+      <div class="footer-text">
+        L'association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right">
+        Document interne de passation<br/>
+        Réf. ${ref}
+      </div>
+    </div>
+
+  </div><!-- /a4 -->
+</body>
+</html>`;
+
+  openDoc(html, `PV-Passation-MBP-${(passation.titre || "passation").replace(/\s+/g, "-")}.html`);
+}
