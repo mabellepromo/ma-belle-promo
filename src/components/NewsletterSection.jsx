@@ -16,21 +16,28 @@ export default function NewsletterSection() {
     if (!email || !email.includes("@")) { toast.error("Veuillez entrer une adresse email valide."); return; }
     setLoading(true);
     try {
-      const { error } = await supabase.from("newsletter_subscribers").insert({
-        email,
-        name: name || null,
-        source: "home",
-        subscribed_at: new Date().toISOString(),
+      const { data: token, error } = await supabase.rpc("subscribe_newsletter", {
+        p_email:  email,
+        p_name:   name || null,
+        p_source: "home",
       });
-      if (error && error.code === "23505") {
-        // email déjà inscrit — pas une erreur bloquante
+      if (error) throw error;
+
+      if (token === "already_confirmed") {
         setDone(true);
         toast.success("Vous êtes déjà inscrit(e) à notre newsletter !");
         return;
       }
-      if (error) throw error;
+
+      const confirm_url = `${window.location.origin}/newsletter/confirmer?token=${token}`;
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "newsletter_confirm", email, token, confirm_url }),
+      });
+
       setDone(true);
-      toast.success("Inscription confirmée ! Merci de votre soutien.");
+      toast.success("Vérifiez votre email pour confirmer votre inscription !");
     } catch {
       toast.error("Une erreur est survenue. Veuillez réessayer.");
     } finally {
@@ -70,8 +77,8 @@ export default function NewsletterSection() {
             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
-            <p className="text-white font-semibold text-lg">Merci ! Votre inscription est confirmée.</p>
-            <p className="text-white/60 text-sm">Vous recevrez bientôt nos prochaines actualités.</p>
+            <p className="text-white font-semibold text-lg">Vérifiez votre boîte email !</p>
+            <p className="text-white/60 text-sm">Cliquez sur le lien de confirmation pour finaliser votre inscription.</p>
           </motion.div>
         ) : (
           <motion.form

@@ -28,12 +28,20 @@ export default function FooterSection() {
   const handleNewsletter = async (e) => {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
-    const token = crypto.randomUUID();
-    const { error } = await supabase
-      .from("newsletter_subscribers")
-      .insert({ email, source: "footer", active: false, token });
-    // 23505 = email déjà inscrit → on re-envoie quand même le lien de confirmation
-    if (error && error.code !== "23505") { toast.error("Une erreur est survenue."); return; }
+
+    const { data: token, error } = await supabase.rpc("subscribe_newsletter", {
+      p_email:  email,
+      p_name:   null,
+      p_source: "footer",
+    });
+    if (error) { toast.error("Une erreur est survenue."); return; }
+
+    if (token === "already_confirmed") {
+      setDone(true);
+      toast.success("Vous êtes déjà inscrit(e) à notre newsletter !");
+      return;
+    }
+
     const confirm_url = `${window.location.origin}/newsletter/confirmer?token=${token}`;
     await fetch("/api/send-email", {
       method: "POST",
