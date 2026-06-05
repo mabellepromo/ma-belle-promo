@@ -35,6 +35,7 @@ const PLATEFORME_LABEL = {
   zoom: "Zoom", meet: "Google Meet", teams: "Microsoft Teams",
   facebook: "Facebook Live", youtube: "YouTube Live", autre: "Autre",
 };
+const MODE_LABEL = { presentiel: "Présentiel", en_ligne: "En ligne" };
 
 const EMPTY_EVENT = {
   title:                "",
@@ -79,10 +80,11 @@ function RegistrationsList({ event }) {
 
   function exportCSV() {
     if (!registrations.length) { toast("Aucune inscription à exporter."); return; }
-    const headers = ["Nom", "Email", "Téléphone", "Profession", "Organisation", "Raison", "Newsletter", "Statut", "Date inscription"];
+    const headers = ["Nom", "Email", "Téléphone", "Profession", "Organisation", "Raison", "Participation", "Newsletter", "Statut", "Date inscription"];
     const rows = registrations.map(r => [
       r.nom_complet, r.email, r.telephone || "", r.profession || "",
       r.organisation || "", r.raison_participation || "",
+      MODE_LABEL[r.mode_participation] || "",
       r.newsletter_opt_in ? "Oui" : "Non",
       r.status,
       new Date(r.registration_date).toLocaleDateString("fr-FR"),
@@ -165,6 +167,7 @@ function RegistrationsList({ event }) {
                 <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground">Email</th>
                 <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground hidden md:table-cell">Profession</th>
                 <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground hidden lg:table-cell">Raison</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground hidden sm:table-cell">Participation</th>
                 <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground">Statut</th>
                 <th className="text-left px-3 py-2.5 font-semibold text-muted-foreground hidden sm:table-cell">Date</th>
                 <th className="px-3 py-2.5" />
@@ -179,6 +182,22 @@ function RegistrationsList({ event }) {
                   </td>
                   <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell">{r.profession || "—"}</td>
                   <td className="px-3 py-2.5 text-muted-foreground hidden lg:table-cell capitalize">{r.raison_participation || "—"}</td>
+                  <td className="px-3 py-2.5 hidden sm:table-cell">
+                    {r.mode_participation ? (
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        r.mode_participation === "presentiel"
+                          ? "bg-amber-500/10 text-amber-400"
+                          : "bg-blue-500/10 text-blue-400"
+                      }`}>
+                        {r.mode_participation === "presentiel"
+                          ? <MapPin className="w-2.5 h-2.5" />
+                          : <Video className="w-2.5 h-2.5" />}
+                        {MODE_LABEL[r.mode_participation]}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2.5">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       r.status === "attended"     ? "bg-primary/10 text-primary" :

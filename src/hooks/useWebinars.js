@@ -153,6 +153,7 @@ export async function registerToWebinar(eventId, formData) {
       profession:           formData.profession?.trim() || null,
       organisation:         formData.organisation?.trim() || null,
       raison_participation: formData.raison_participation || null,
+      mode_participation:   formData.mode_participation || null,
       gdpr_consent:         formData.gdpr_consent,
       newsletter_opt_in:    formData.newsletter_opt_in ?? false,
     })

@@ -14,6 +14,7 @@ const EMPTY_FORM = {
   profession:           "",
   organisation:         "",
   raison_participation: "",
+  mode_participation:   "",
   gdpr_consent:         false,
   newsletter_opt_in:    false,
 };
@@ -44,6 +45,13 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
 
   const isClosed = event.status === "closed";
 
+  // Un événement hybride propose les deux modes : on laisse l'inscrit choisir.
+  // Sinon le mode est déduit du format de l'événement.
+  const isHybride = event.format === "hybride";
+  const autoMode  = event.format === "presentiel" ? "presentiel"
+                  : event.format === "en_ligne"   ? "en_ligne"
+                  : null;
+
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }));
   }
@@ -59,6 +67,10 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
       toast.error("Le nom complet est obligatoire.");
       return;
     }
+    if (isHybride && !form.mode_participation) {
+      toast.error("Merci d'indiquer si vous participez en présentiel ou en ligne.");
+      return;
+    }
     if (event.gdpr_consent_required && !form.gdpr_consent) {
       toast.error("Vous devez accepter la politique de confidentialité.");
       return;
@@ -66,7 +78,11 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
 
     setSubmitting(true);
     try {
-      const result = await registerToWebinar(event.id, form);
+      // Mode choisi pour un hybride, sinon déduit du format de l'événement
+      const result = await registerToWebinar(event.id, {
+        ...form,
+        mode_participation: isHybride ? form.mode_participation : autoMode,
+      });
       setToken(result.unregistration_token);
 
       // Email de confirmation
@@ -271,6 +287,60 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
           </select>
         </div>
       </div>
+
+      {/* Mode de participation — uniquement pour les événements hybrides */}
+      {isHybride && (
+        <div>
+          <label className="block text-xs font-semibold text-foreground mb-1.5">
+            Comment souhaitez-vous participer ? <span className="text-red-500">*</span>
+          </label>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => set("mode_participation", "presentiel")}
+              className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                form.mode_participation === "presentiel"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 hover:bg-muted/40"
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                form.mode_participation === "presentiel" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+              }`}>
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground leading-tight">En présentiel</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                  {event.lieu || "Sur place"}
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => set("mode_participation", "en_ligne")}
+              className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                form.mode_participation === "en_ligne"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 hover:bg-muted/40"
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                form.mode_participation === "en_ligne" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+              }`}>
+                <Video className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground leading-tight">En ligne</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                  Diffusion {{zoom:"Zoom",meet:"Google Meet",teams:"Teams",facebook:"Facebook Live",youtube:"YouTube Live"}[event.plateforme] || "en ligne"} — lien par email
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* RGPD */}
       {event.gdpr_consent_required && (
