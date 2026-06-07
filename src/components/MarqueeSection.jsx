@@ -116,11 +116,11 @@ export default function MarqueeSection() {
         background: `linear-gradient(to left, ${BG}, transparent)`,
       }} />
 
-      {/* Trapèze rouge — angle droit à gauche, côté droit oblique */}
+      {/* Trapèze or — angle droit à gauche, côté droit oblique */}
       <div style={{
         position: "absolute", top: 0, left: 0, bottom: 0, zIndex: 4,
         width: 186,
-        background: "#dc2626",
+        background: "#fbbf24",
         clipPath: "polygon(0 0, calc(100% - 22px) 0, 100% 100%, 0 100%)",
         display: "flex", alignItems: "center",
         paddingLeft: 14, paddingRight: 28,
@@ -132,7 +132,7 @@ export default function MarqueeSection() {
           fontWeight: 900,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
-          color: "#fff",
+          color: "#0a2218",
           lineHeight: 1.5,
           whiteSpace: "nowrap",
         }}>
