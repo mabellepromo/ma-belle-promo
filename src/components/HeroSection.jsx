@@ -613,8 +613,12 @@ export default function HeroSection() {
             transition={{ duration: 1, delay: 0.3, ease: [0.34, 1.1, 0.64, 1] }}
             className="relative hidden lg:flex flex-col items-center"
           >
-            <div className="absolute top-8 right-3 left-3 bottom-0 rounded-3xl"
-              style={{ background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.18)" }} />
+            {/* Premier anneau : rotation lente et continue (désactivée si l'utilisateur réduit les animations) */}
+            <motion.div
+              animate={shouldReduce ? {} : { rotate: 360 }}
+              transition={shouldReduce ? {} : { duration: 28, repeat: Infinity, ease: "linear" }}
+              className="absolute top-8 right-3 left-3 bottom-0 rounded-3xl"
+              style={{ background: "rgba(52,211,153,0.10)", border: "1px solid rgba(52,211,153,0.18)", transformOrigin: "center" }} />
             <div className="absolute -top-1 right-0 left-6 bottom-4 rounded-3xl"
               style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }} />
 
