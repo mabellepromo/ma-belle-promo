@@ -48,7 +48,7 @@ const MILESTONES = [
   {
     year: "Aujourd'hui",
     label: "Le Réseau",
-    desc: "La Nuit du Droit, des webinaires, des actions terrain : un réseau vivant dans 6+ pays, au service de ses membres et des étudiants de la FDD.",
+    desc: "Des webinaires, des actions terrain : un réseau vivant dans 6+ pays, au service de ses membres et des étudiants de la FDD.",
     color: "#34d399",
     glowBg: "rgba(52,211,153,0.10)",
     border: "rgba(52,211,153,0.30)",
