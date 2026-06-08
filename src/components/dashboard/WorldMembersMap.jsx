@@ -19,9 +19,10 @@ function InvalidateSizeOnMount() {
 
 /*
  * Carte mondiale interactive des membres (remplace les barres « Répartition géographique »).
- * - Tuiles CartoDB Dark Matter : gratuites, sans clé API, cohérentes avec la charte sombre.
- * - Un cercle ambre (#f0a030) par pays, rayon ∝ √(effectif) pour éviter qu'un gros pays
- *   n'écrase visuellement les autres.
+ * - Tuiles CartoDB Voyager : gratuites, sans clé API. Fond clair avec frontières et noms
+ *   de pays nets → on distingue clairement chaque pays.
+ * - Un cercle ambre (#f0a030) par pays, contour foncé pour bien ressortir sur le fond clair,
+ *   rayon ∝ √(effectif) pour éviter qu'un gros pays n'écrase visuellement les autres.
  * - Fallback automatique vers les barres si Leaflet échoue à charger (ErrorBoundary interne).
  */
 
@@ -45,6 +46,13 @@ const COUNTRY_COORDS = {
   "belgique":  [50.5039, 4.4699],
   "gabon":     [-0.8037, 11.6094],
   "maroc":     [31.7917, -7.0926],
+  // Royaume-Uni : la base stocke « United Kingdom », mais on couvre aussi les
+  // variantes françaises saisies à la main (normalizePays transforme les tirets en espaces).
+  "united kingdom":  [54.0000, -2.0000],
+  "royaume uni":     [54.0000, -2.0000],
+  "angleterre":      [54.0000, -2.0000],
+  "uk":              [54.0000, -2.0000],
+  "grande bretagne": [54.0000, -2.0000],
 };
 
 // Normalise un nom de pays saisi à la main (accents, casse, espaces/tirets parasites)
@@ -127,12 +135,12 @@ export default function WorldMembersMap({ data = [] }) {
           maxZoom={6}
           scrollWheelZoom={false}
           worldCopyJump
-          style={{ height: "100%", width: "100%", background: "#0a1f12" }}
+          style={{ height: "100%", width: "100%", background: "#e8e4dc" }}
           attributionControl={false}
         >
           <InvalidateSizeOnMount />
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             attribution='&copy; OpenStreetMap &copy; CARTO'
           />
           {markers.map(m => (
@@ -141,10 +149,10 @@ export default function WorldMembersMap({ data = [] }) {
               center={m.coords}
               radius={radiusFor(m.count)}
               pathOptions={{
-                color: "#f0a030",
-                weight: 1.5,
+                color: "#92400e",
+                weight: 2,
                 fillColor: "#f0a030",
-                fillOpacity: 0.55,
+                fillOpacity: 0.85,
               }}
             >
               <Tooltip direction="top" offset={[0, -4]} opacity={1}>
