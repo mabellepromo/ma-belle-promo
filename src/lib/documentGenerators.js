@@ -600,7 +600,7 @@ function _createOverlayShell(filename) {
 }
 
 // ── Ouvre un document HTML généré (attestation, reçu…) ──────────────────────
-function openDoc(html, filename = "document-mbp.html") {
+export function openDoc(html, filename = "document-mbp.html") {
   const origin = window.location.origin;
   const resolved = html
     .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)

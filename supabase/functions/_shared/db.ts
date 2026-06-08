@@ -16,6 +16,8 @@ export interface Automation {
   name: string;
   enabled: boolean;
   config: Record<string, unknown>;
+  // Message éditable depuis le dashboard ({ subject, body }), ou null = repli sur le code.
+  message_template: { subject?: string; body?: string } | null;
 }
 
 export async function getAutomation(
@@ -24,7 +26,7 @@ export async function getAutomation(
 ): Promise<Automation | null> {
   const { data, error } = await client
     .from("automations")
-    .select("id, name, enabled, config")
+    .select("id, name, enabled, config, message_template")
     .eq("id", id)
     .maybeSingle();
 

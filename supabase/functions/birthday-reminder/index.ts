@@ -15,6 +15,7 @@ import {
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
 import { parseDayMonthFr } from "../_shared/dates.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "birthday_reminder";
 
@@ -65,8 +66,10 @@ serve(async (_req) => {
       const alreadySent = await wasAlreadySent(db, AUTOMATION_ID, m.id, targetKey);
       if (alreadySent) continue;
 
-      const prenom = escHtml(m.nom?.split(" ")[0] || m.nom || "cher(e) membre");
+      const prenomRaw = m.nom?.split(" ")[0] || m.nom || "cher(e) membre";
+      const prenom = escHtml(prenomRaw);
 
+      // Modèle codé en dur : sert de repli si aucun message n'est défini en base.
       const content = `
         <h2 style="margin:0 0 20px;font-size:22px;color:#111827;text-align:center;">
           🎂 Joyeux anniversaire, ${prenom} !
@@ -86,11 +89,21 @@ serve(async (_req) => {
           <strong style="color:#111827;">Le Bureau Exécutif — Ma Belle Promo</strong>
         </p>`;
 
+      // Utilise le message éditable s'il existe, sinon le modèle codé en dur ci-dessus.
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        { prenom: prenomRaw, nom: m.nom || "", annee: String(year) },
+        {
+          subject: `🎂 Joyeux anniversaire, ${prenomRaw} ! — Ma Belle Promo`,
+          htmlContent: wrapHtml(content),
+        },
+      );
+
       try {
         await sendBrevoEmail(apiKey, {
           to: [{ email: m.email, name: m.nom || "" }],
-          subject: `🎂 Joyeux anniversaire, ${m.nom?.split(" ")[0] || m.nom} ! — Ma Belle Promo`,
-          htmlContent: wrapHtml(content),
+          subject,
+          htmlContent,
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
         });
         await markAsSent(db, AUTOMATION_ID, m.id, targetKey);

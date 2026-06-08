@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../lib/supabase";
+import { openDoc } from "../../lib/documentGenerators";
 import {
   Zap, Play, Clock, CheckCircle2, XCircle, AlertCircle,
   ChevronDown, ChevronUp, RefreshCw, Info, Mail, Settings2,
   Calendar, CreditCard, Users, PartyPopper, Bell, ReceiptText, UserX, Handshake, Briefcase,
-  Video, PenLine, FileText, BarChart3, MailCheck, MessageSquare, UserPlus, Newspaper, CalendarClock
+  Video, PenLine, FileText, BarChart3, MailCheck, MessageSquare, UserPlus, Newspaper, CalendarClock,
+  Eye, RotateCcw, Type
 } from "lucide-react";
 
 // Métadonnées statiques de chaque automatisation
@@ -17,6 +19,11 @@ const AUTOMATION_META = {
     border: "border-pink-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "prenom", label: "Prénom du membre", sample: "Awa" },
+      { key: "nom",    label: "Nom complet",       sample: "Awa KOFFI" },
+      { key: "annee",  label: "Année en cours",    sample: String(new Date().getFullYear()) },
+    ],
   },
   cotisation_reminder: {
     icon: CreditCard,
@@ -276,11 +283,177 @@ function ConfigEditor({ automationId, config, onSaved }) {
   );
 }
 
+// Échappe le HTML pour l'aperçu (texte saisi + valeurs d'exemple)
+function escPreview(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+}
+
+// Construit un aperçu fidèle de l'email (en-tête/pied identiques au rendu serveur),
+// avec les variables remplacées par des valeurs d'exemple.
+function buildPreviewHtml(subject, body, variables) {
+  const samples = {};
+  (variables || []).forEach((v) => { samples[v.key] = v.sample ?? `{{${v.key}}}`; });
+  const fill = (text, escape) =>
+    String(text ?? "").replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, k) =>
+      escape ? escPreview(samples[k] ?? "") : (samples[k] ?? ""));
+
+  const subjectFilled = fill(subject, false);
+  const bodyFilled = fill(escPreview(body).replace(/\r?\n/g, "<br>"), true);
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Aperçu du message</title></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <div style="padding:12px 16px;background:#e5e7eb;font-size:12px;color:#374151;">
+    <strong>Objet :</strong> ${escPreview(subjectFilled)}
+  </div>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);">
+        <tr><td style="background:#14532d;padding:28px 32px;text-align:center;">
+          <img src="https://media.base44.com/images/public/69da5bf6442b31e7eee54888/42e641694_LogoRedesign1.png" width="56" height="56" alt="MBP" style="border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:block;margin:0 auto 12px;" />
+          <div style="color:#fff;font-size:18px;font-weight:bold;letter-spacing:0.3px;">Association Ma Belle Promo (MBP)</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:4px;">FDD · Université de Lomé · Promotion 1994–2000</div>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;font-size:15px;color:#374151;line-height:1.8;">${bodyFilled}</td></tr>
+        <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;">
+          <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>contact@mabellepromo.org · www.mabellepromo.org</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+// Éditeur de message : objet + corps en texte simple, variables {{...}} insérables,
+// aperçu fidèle et possibilité de rétablir le message codé par défaut.
+function MessageEditor({ automationId, variables, template, onSaved }) {
+  const [subject, setSubject] = useState(template?.subject ?? "");
+  const [body, setBody]       = useState(template?.body ?? "");
+  const [saving, setSaving]   = useState(false);
+  const bodyRef = useRef(null);
+
+  const insertVar = (key) => {
+    const token = `{{${key}}}`;
+    const el = bodyRef.current;
+    if (!el) { setBody((b) => b + token); return; }
+    const start = el.selectionStart ?? body.length;
+    const end = el.selectionEnd ?? body.length;
+    setBody(body.slice(0, start) + token + body.slice(end));
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + token.length;
+      el.setSelectionRange(pos, pos);
+    });
+  };
+
+  const save = async () => {
+    if (!subject.trim() || !body.trim()) {
+      toast.error("L'objet et le corps du message sont requis.");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("automations")
+      .update({ message_template: { subject, body } }).eq("id", automationId);
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success("Message enregistré");
+    onSaved({ subject, body });
+  };
+
+  const resetDefault = async () => {
+    setSaving(true);
+    const { error } = await supabase.from("automations")
+      .update({ message_template: null }).eq("id", automationId);
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    setSubject(""); setBody("");
+    toast.success("Message par défaut rétabli");
+    onSaved(null);
+  };
+
+  const inputCls = "w-full px-3 py-2 rounded-lg border border-border bg-background text-sm " +
+    "text-foreground focus:outline-none focus:border-primary/50";
+
+  return (
+    <div className="mt-3 space-y-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-1">Objet de l'email</label>
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} />
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-1">Corps du message</label>
+        <textarea
+          ref={bodyRef}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          spellCheck
+          className={`${inputCls} h-40 resize-none leading-relaxed`}
+        />
+        <p className="text-[11px] text-muted-foreground mt-1">
+          L'en-tête et le pied de page MBP sont ajoutés automatiquement. Les retours à la ligne sont conservés.
+        </p>
+      </div>
+
+      {variables?.length > 0 && (
+        <div>
+          <p className="text-xs text-muted-foreground mb-1.5">Variables (cliquer pour insérer) :</p>
+          <div className="flex flex-wrap gap-1.5">
+            {variables.map((v) => (
+              <button
+                key={v.key}
+                type="button"
+                onClick={() => insertVar(v.key)}
+                title={v.label}
+                className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-mono
+                  border border-primary/20 hover:bg-primary/20 transition-colors"
+              >
+                {`{{${v.key}}}`}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 flex-wrap pt-1">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold
+            hover:opacity-90 disabled:opacity-50 transition-opacity"
+        >
+          {saving ? "Sauvegarde…" : "Enregistrer"}
+        </button>
+        <button
+          onClick={() => openDoc(buildPreviewHtml(subject, body, variables), "Apercu-message.html")}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+            bg-muted hover:bg-accent text-foreground border border-border transition-colors"
+        >
+          <Eye className="w-3 h-3" /> Aperçu
+        </button>
+        <button
+          onClick={resetDefault}
+          disabled={saving}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+            text-muted-foreground hover:text-foreground hover:bg-muted border border-border
+            disabled:opacity-50 transition-colors"
+        >
+          <RotateCcw className="w-3 h-3" /> Message par défaut
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function AutomationCard({ auto, onToggle, onTest }) {
   const [expanded, setExpanded]   = useState(false);
   const [editConfig, setEditConfig] = useState(false);
   const [testing, setTesting]     = useState(false);
   const [localConfig, setLocalConfig] = useState(auto.config);
+  const [showMessage, setShowMessage]     = useState(false);
+  const [localTemplate, setLocalTemplate] = useState(auto.message_template);
 
   const meta = AUTOMATION_META[auto.id] || {
     icon: Zap, color: "text-foreground", bg: "bg-muted", border: "border-border", cron: "—", type: "cron",
@@ -369,7 +542,7 @@ function AutomationCard({ auto, onToggle, onTest }) {
         </button>
 
         <button
-          onClick={() => { setExpanded(v => !v); setEditConfig(false); }}
+          onClick={() => { setExpanded(v => !v); setEditConfig(false); setShowMessage(false); }}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
             text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors"
         >
@@ -377,6 +550,18 @@ function AutomationCard({ auto, onToggle, onTest }) {
           Config
           {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
+
+        {meta.variables && (
+          <button
+            onClick={() => { setShowMessage(v => !v); setExpanded(false); }}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
+              text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors"
+          >
+            <Type className="w-3 h-3" />
+            Message
+            {showMessage ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+        )}
 
         {auto.last_error && (
           <span className="text-xs text-red-400 truncate ml-1" title={auto.last_error}>
@@ -418,6 +603,22 @@ function AutomationCard({ auto, onToggle, onTest }) {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Panneau Message dépliable (uniquement pour les automatisations à message éditable) */}
+      {showMessage && meta.variables && (
+        <div className="border-t border-border px-4 py-3 bg-muted/30">
+          <div className="flex items-center gap-2 mb-1">
+            <Type className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-semibold text-foreground">Message envoyé aux destinataires</span>
+          </div>
+          <MessageEditor
+            automationId={auto.id}
+            variables={meta.variables}
+            template={localTemplate}
+            onSaved={(t) => setLocalTemplate(t)}
+          />
         </div>
       )}
     </div>
