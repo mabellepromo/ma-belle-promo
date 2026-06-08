@@ -32,6 +32,12 @@ const AUTOMATION_META = {
     border: "border-amber-500/20",
     cron: "Chaque jour à 9h",
     type: "cron",
+    variables: [
+      { key: "prenom",  label: "Prénom du membre",        sample: "Awa" },
+      { key: "annee",   label: "Année de cotisation",     sample: "2025" },
+      { key: "jours",   label: "Jours depuis l'échéance", sample: "30" },
+      { key: "urgence", label: "Niveau d'urgence",        sample: "Rappel important" },
+    ],
   },
   welcome_email: {
     icon: Users,
@@ -48,6 +54,12 @@ const AUTOMATION_META = {
     border: "border-blue-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "titre", label: "Titre de l'événement", sample: "Assemblée de rentrée" },
+      { key: "date",  label: "Date",                 sample: "vendredi 26 juin 2026" },
+      { key: "lieu",  label: "Lieu",                 sample: "Lomé, Togo" },
+      { key: "jours", label: "Jours avant",          sample: "1" },
+    ],
   },
   ag_convocation: {
     icon: Calendar,
@@ -56,6 +68,13 @@ const AUTOMATION_META = {
     border: "border-violet-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "prenom",        label: "Prénom du membre", sample: "Awa" },
+      { key: "titre",         label: "Titre de l'AG",    sample: "Assemblée Générale Ordinaire" },
+      { key: "date",          label: "Date",             sample: "8 juillet 2026" },
+      { key: "lieu",          label: "Lieu",             sample: "Lomé, Togo" },
+      { key: "ordre_du_jour", label: "Ordre du jour",    sample: "1. Rapport moral\n2. Rapport financier" },
+    ],
   },
   payment_receipt: {
     icon: ReceiptText,
@@ -80,6 +99,12 @@ const AUTOMATION_META = {
     border: "border-amber-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "partenaire", label: "Nom du partenaire",      sample: "Cabinet Juridis" },
+      { key: "objet",      label: "Objet de la convention", sample: "formation juridique" },
+      { key: "date",       label: "Date d'échéance",        sample: "31 décembre 2026" },
+      { key: "jours",      label: "Jours avant échéance",   sample: "15" },
+    ],
   },
   opportunite_notification: {
     icon: Briefcase,
@@ -96,6 +121,12 @@ const AUTOMATION_META = {
     border: "border-sky-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "titre",  label: "Titre du webinaire",  sample: "Les fondamentaux de l'assurance" },
+      { key: "date",   label: "Date et heure",       sample: "vendredi 26 juin 2026 à 18:30" },
+      { key: "prenom", label: "Prénom de l'inscrit", sample: "Awa" },
+      { key: "lien",   label: "Lien de connexion",   sample: "https://zoom.us/j/123456" },
+    ],
   },
   signature_reminder: {
     icon: PenLine,

@@ -15,6 +15,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "convention_reminder";
 
@@ -108,11 +109,23 @@ serve(async (_req) => {
           <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
         </p>`;
 
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        {
+          partenaire: c.partenaire_nom,
+          objet: c.objet || "",
+          date: formatDateFr(c.date_echeance!),
+          jours: String(joursAvant),
+          palier: String(palierDu),
+        },
+        { subject: `[MBP] Convention — échéance le ${formatDateFr(c.date_echeance!)} (J-${palierDu})`, htmlContent: wrapHtml(content) },
+      );
+
       try {
         await sendBrevoEmail(apiKey, {
           to: [{ email: c.contact_email!, name: c.partenaire_nom }],
-          subject: `[MBP] Convention — échéance le ${formatDateFr(c.date_echeance!)} (J-${palierDu})`,
-          htmlContent: wrapHtml(content),
+          subject,
+          htmlContent,
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
         });
         await markAsSent(db, AUTOMATION_ID, c.id, targetKey);

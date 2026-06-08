@@ -14,6 +14,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "ag_convocation";
 
@@ -71,6 +72,9 @@ serve(async (_req) => {
       const odj = ag.ordre_du_jour
         ? (ag.ordre_du_jour as string[]).map((p, i) => `<li style="margin:4px 0;">${i + 1}. ${escHtml(p)}</li>`).join("")
         : "<li>Ordre du jour à définir</li>";
+      const odjText = ag.ordre_du_jour
+        ? (ag.ordre_du_jour as string[]).map((p, i) => `${i + 1}. ${p}`).join("\n")
+        : "Ordre du jour à définir";
 
       const content = `
         <div style="display:inline-block;padding:4px 14px;background:#14532d;color:#fff;font-size:11px;font-weight:bold;border-radius:9999px;margin-bottom:16px;">
@@ -124,11 +128,27 @@ serve(async (_req) => {
 
         const prenom = m.nom?.split(" ")[0] || m.nom || "";
 
+        const { subject, htmlContent } = renderTemplate(
+          automation.message_template,
+          {
+            prenom: prenom || "cher(e) membre",
+            titre: ag.titre || "Assemblée Générale",
+            date: dateStr,
+            lieu: ag.lieu || "À préciser",
+            jours: String(daysBefore),
+            ordre_du_jour: odjText,
+          },
+          {
+            subject: `[MBP] Convocation — ${ag.titre || "Assemblée Générale"} — ${dateStr}`,
+            htmlContent: wrapHtml(content.replace("Cher(e) membre", prenom ? `Cher(e) ${escHtml(prenom)}` : "Cher(e) membre")),
+          },
+        );
+
         try {
           await sendBrevoEmail(apiKey, {
             to: [{ email: m.email, name: m.nom || "" }],
-            subject: `[MBP] Convocation — ${ag.titre || "Assemblée Générale"} — ${dateStr}`,
-            htmlContent: wrapHtml(content.replace("Cher(e) membre", prenom ? `Cher(e) ${escHtml(prenom)}` : "Cher(e) membre")),
+            subject,
+            htmlContent,
             replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
           });
           await markAsSent(db, AUTOMATION_ID, m.id, targetKey);
