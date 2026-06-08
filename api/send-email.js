@@ -115,7 +115,7 @@ function wrapHtml(content) {
         <tr>
           <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;">
             <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">
-              Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>
+              Ma Belle Promo<br>
               <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;text-decoration:none;">contact@mabellepromo.org</a>
               &nbsp;·&nbsp;
               <a href="https://www.mabellepromo.org" style="color:#16a34a;text-decoration:none;">www.mabellepromo.org</a>
@@ -542,7 +542,7 @@ function generateInvoicePdf({ reference, nom, email, methode, total, lignes }) {
     doc.rect(0, 800, W, 42).fill("#0a3d28");
     doc.moveTo(0, 800).lineTo(W, 800).stroke("#b8861a").lineWidth(1);
     doc.fillColor("#fff").fontSize(8).font("Helvetica")
-       .text("Ma Belle Promo  ·  12 BP 335 Baguida, Lomé, Togo  ·  contact@mabellepromo.org  ·  www.mabellepromo.org",
+       .text("Ma Belle Promo  ·  contact@mabellepromo.org  ·  www.mabellepromo.org",
          0, 814, { width: W, align: "center" });
 
     doc.end();

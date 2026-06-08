@@ -318,7 +318,7 @@ function buildPreviewHtml(subject, body, variables) {
         </td></tr>
         <tr><td style="padding:32px 32px 24px;font-size:15px;color:#374151;line-height:1.8;">${bodyFilled}</td></tr>
         <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;">
-          <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>contact@mabellepromo.org · www.mabellepromo.org</p>
+          <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">Ma Belle Promo<br>contact@mabellepromo.org · www.mabellepromo.org</p>
         </td></tr>
       </table>
     </td></tr>

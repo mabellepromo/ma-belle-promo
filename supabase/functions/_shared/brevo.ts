@@ -45,7 +45,7 @@ export function wrapHtml(content: string): string {
         <tr>
           <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;">
             <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">
-              Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>
+              Ma Belle Promo<br>
               <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;text-decoration:none;">contact@mabellepromo.org</a>
               &nbsp;·&nbsp;
               <a href="https://www.mabellepromo.org" style="color:#16a34a;text-decoration:none;">www.mabellepromo.org</a>

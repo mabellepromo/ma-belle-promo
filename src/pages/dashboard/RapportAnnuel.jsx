@@ -182,7 +182,7 @@ export default function RapportAnnuel({ members }) {
   ` : ""}
 
   <div class="footer">
-    Ma Belle Promo · 12 BP 335 Baguida, Lomé, Togo<br>
+    Ma Belle Promo<br>
     contact@mabellepromo.org · www.mabellepromo.org<br>
     © ${annee} Association Ma Belle Promo — Tous droits réservés
   </div>
