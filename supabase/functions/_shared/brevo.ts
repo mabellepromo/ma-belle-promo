@@ -67,7 +67,35 @@ export interface EmailPayload {
   replyTo?: { email: string; name?: string };
 }
 
+// Mémoire courte (mode test) : évite que les automatisations qui bouclent sur tous
+// les membres envoient des dizaines de copies identiques à l'adresse de test.
+// Clé = sujet + contenu ; on ignore un doublon vu il y a moins de 2 minutes.
+const recentTestSends = new Map<string, number>();
+const TEST_DEDUP_WINDOW_MS = 120_000;
+
 export async function sendBrevoEmail(apiKey: string, payload: EmailPayload): Promise<void> {
+  // Mode test : si le secret TEST_REDIRECT_EMAIL est défini, TOUS les emails sont
+  // redirigés vers cette unique adresse (les vrais destinataires ne reçoivent rien).
+  // Le sujet est préfixé par le destinataire réel pour garder la traçabilité.
+  // Pour désactiver : supprimer le secret (supabase secrets unset TEST_REDIRECT_EMAIL).
+  const testRedirect = Deno.env.get("TEST_REDIRECT_EMAIL");
+  if (testRedirect) {
+    // Dédoublonnage : un même contenu (ex. rappel d'événement adressé à 48 membres)
+    // ne part qu'une seule fois vers l'adresse de test.
+    const dedupKey = `${payload.subject}::${payload.htmlContent}`;
+    const now = Date.now();
+    const last = recentTestSends.get(dedupKey);
+    if (last && now - last < TEST_DEDUP_WINDOW_MS) return;
+    recentTestSends.set(dedupKey, now);
+
+    const originalRecipients = payload.to.map((r) => r.email).join(", ");
+    payload = {
+      ...payload,
+      to: [{ email: testRedirect, name: "TEST" }],
+      subject: `[TEST → ${originalRecipients}] ${payload.subject}`,
+    };
+  }
+
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
