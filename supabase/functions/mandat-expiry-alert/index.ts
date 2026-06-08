@@ -15,6 +15,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "mandat_expiry_alert";
 
@@ -94,11 +95,17 @@ serve(async (_req) => {
           </a>
         </div>`;
 
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        { poste: m.poste || "", titulaire: nom, date: m.date_fin ? formatDateFr(m.date_fin) : "—" },
+        { subject: `[MBP] Fin de mandat à venir — ${m.poste || ""}${nom ? ` (${nom})` : ""}`, htmlContent: wrapHtml(content) },
+      );
+
       try {
         await sendBrevoEmail(apiKey, {
           to: [{ email: alertEmail, name: "Bureau MBP" }],
-          subject: `[MBP] Fin de mandat à venir — ${m.poste || ""}${nom ? ` (${nom})` : ""}`,
-          htmlContent: wrapHtml(content),
+          subject,
+          htmlContent,
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
         });
         await markAsSent(db, AUTOMATION_ID, String(m.id), key);

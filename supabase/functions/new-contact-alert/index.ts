@@ -15,6 +15,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "new_contact_alert";
 
@@ -77,11 +78,17 @@ serve(async (_req) => {
           </a>
         </div>`;
 
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        { expediteur: m.name || "", email: m.email || "", sujet: m.sujet || "(sans sujet)", message: extrait },
+        { subject: `[MBP] Nouveau contact — ${m.sujet || m.name || "message"}`, htmlContent: wrapHtml(content) },
+      );
+
       try {
         await sendBrevoEmail(apiKey, {
           to: [{ email: alertEmail, name: "Bureau MBP" }],
-          subject: `[MBP] Nouveau contact — ${m.sujet || m.name || "message"}`,
-          htmlContent: wrapHtml(content),
+          subject,
+          htmlContent,
           replyTo: m.email ? { email: m.email, name: m.name || "" } : undefined,
         });
         await markAsSent(db, AUTOMATION_ID, idStr, "alert");

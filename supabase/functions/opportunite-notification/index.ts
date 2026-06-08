@@ -14,6 +14,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "opportunite_notification";
 
@@ -97,7 +98,17 @@ serve(async (req) => {
         <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
       </p>`;
 
-    const html = wrapHtml(content);
+    const { subject, htmlContent } = renderTemplate(
+      automation.message_template,
+      {
+        titre: opp.titre || "",
+        type: TYPE_LABEL[opp.type] || opp.type || "",
+        structure: opp.structure || "",
+        lieu,
+        specialite: opp.specialite || "",
+      },
+      { subject: `[MBP] Nouvelle opportunité — ${opp.titre}`, htmlContent: wrapHtml(content) },
+    );
     let sent = 0;
     const errors: string[] = [];
 
@@ -107,8 +118,8 @@ serve(async (req) => {
       try {
         await sendBrevoEmail(apiKey, {
           to: lot.map((m: { email: string; nom: string }) => ({ email: m.email, name: m.nom || "" })),
-          subject: `[MBP] Nouvelle opportunité — ${opp.titre}`,
-          htmlContent: html,
+          subject,
+          htmlContent,
           replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
         });
         sent += lot.length;

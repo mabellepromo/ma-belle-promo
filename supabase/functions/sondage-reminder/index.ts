@@ -16,6 +16,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "sondage_reminder";
 
@@ -92,7 +93,16 @@ serve(async (_req) => {
           <strong style="color:#111827;">Le Bureau Exécutif</strong><br>
           <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
         </p>`;
-      const html = wrapHtml(content);
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        {
+          titre: s.titre || "",
+          description: s.description ? String(s.description) : "",
+          date: s.expires_at ? formatDateFr(s.expires_at) : "",
+          lien: `https://www.mabellepromo.org/sondage/${s.id}`,
+        },
+        { subject: `[MBP] Sondage à compléter — ${s.titre}`, htmlContent: wrapHtml(content) },
+      );
 
       let sondageSent = 0;
       for (let i = 0; i < destinataires.length; i += 50) {
@@ -100,8 +110,8 @@ serve(async (_req) => {
         try {
           await sendBrevoEmail(apiKey, {
             to: lot.map((m: { email: string; nom: string }) => ({ email: m.email, name: m.nom || "" })),
-            subject: `[MBP] Sondage à compléter — ${s.titre}`,
-            htmlContent: html,
+            subject,
+            htmlContent,
             replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
           });
           sondageSent += lot.length;

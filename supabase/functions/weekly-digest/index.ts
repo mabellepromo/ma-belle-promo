@@ -17,6 +17,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "weekly_digest";
 
@@ -156,10 +157,27 @@ serve(async (_req) => {
         <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
       </p>`;
 
+    const webText = webItems.length > 0 ? webItems.map(e => `${e.when} — ${e.name}`).join("\n") : "Aucun cette semaine";
+    const agText  = agItems.length > 0 ? agItems.map(e => `${e.when} — ${e.name}`).join("\n") : "Aucune cette semaine";
+    const { subject, htmlContent } = renderTemplate(
+      automation.message_template,
+      {
+        semaine: weekKey,
+        pending: String(pendingMembers ?? 0),
+        messages: String(unreadMessages ?? 0),
+        opportunites: String(newOpportunites),
+        inscrits: String(newSubscribers),
+        cotisations: `${cotisCount} (${cotisSum.toLocaleString("fr-FR")} FCFA)`,
+        webinaires: webText,
+        assemblees: agText,
+      },
+      { subject: `[MBP] Récapitulatif hebdomadaire — ${weekKey}`, htmlContent: wrapHtml(content) },
+    );
+
     await sendBrevoEmail(apiKey, {
       to: [{ email: alertEmail, name: "Bureau MBP" }],
-      subject: `[MBP] Récapitulatif hebdomadaire — ${weekKey}`,
-      htmlContent: wrapHtml(content),
+      subject,
+      htmlContent,
       replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
     });
     await markAsSent(db, AUTOMATION_ID, weekKey, "digest");

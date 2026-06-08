@@ -13,6 +13,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "payment_receipt";
 
@@ -88,7 +89,8 @@ serve(async (req) => {
       return jsonResponse({ skipped: true, reason: "reçu déjà envoyé" });
     }
 
-    const prenom = escHtml(membre.nom?.split(" ")[0] || membre.nom || "cher(e) membre");
+    const prenomRaw = membre.nom?.split(" ")[0] || membre.nom || "cher(e) membre";
+    const prenom = escHtml(prenomRaw);
     const montant = cotisationData.montant
       ? new Intl.NumberFormat("fr-FR").format(cotisationData.montant) + " FCFA"
       : "selon barème";
@@ -153,10 +155,16 @@ serve(async (req) => {
         <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
       </p>`;
 
+    const { subject, htmlContent } = renderTemplate(
+      automation.message_template,
+      { prenom: prenomRaw, nom: membre.nom || "", annee: String(cotisationData.annee), montant, date: datePaiement },
+      { subject: `[MBP] Reçu de cotisation ${cotisationData.annee} — Merci !`, htmlContent: wrapHtml(content) },
+    );
+
     await sendBrevoEmail(apiKey, {
       to: [{ email: membre.email, name: membre.nom || "" }],
-      subject: `[MBP] Reçu de cotisation ${cotisationData.annee} — Merci !`,
-      htmlContent: wrapHtml(content),
+      subject,
+      htmlContent,
       replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
     });
 

@@ -15,6 +15,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "new_adhesion_alert";
 
@@ -84,11 +85,17 @@ serve(async (_req) => {
           </a>
         </div>`;
 
+      const { subject, htmlContent } = renderTemplate(
+        automation.message_template,
+        { nom: m.nom || "", email: m.email || "", telephone: m.telephone || "", profession: m.profession || "", lieu },
+        { subject: `[MBP] Nouvelle adhésion à valider — ${m.nom || ""}`, htmlContent: wrapHtml(content) },
+      );
+
       try {
         await sendBrevoEmail(apiKey, {
           to: [{ email: alertEmail, name: "Bureau MBP" }],
-          subject: `[MBP] Nouvelle adhésion à valider — ${m.nom || ""}`,
-          htmlContent: wrapHtml(content),
+          subject,
+          htmlContent,
           replyTo: m.email ? { email: m.email, name: m.nom || "" } : undefined,
         });
         await markAsSent(db, AUTOMATION_ID, String(m.id), "alert");

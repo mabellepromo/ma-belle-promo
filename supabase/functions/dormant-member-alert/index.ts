@@ -14,6 +14,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "dormant_member_alert";
 
@@ -126,10 +127,20 @@ serve(async (_req) => {
         Rapport généré automatiquement le ${new Date().toLocaleDateString("fr-FR")} — Module Automatisations MBP
       </p>`;
 
+    const liste = dormants.map((m: { nom: string; email: string }) => `${m.nom || "—"} — ${m.email}`).join("\n");
+    const { subject, htmlContent } = renderTemplate(
+      automation.message_template,
+      { nombre: String(dormants.length), mois: String(inactivityMonths), liste },
+      {
+        subject: `[MBP] ⚠️ ${dormants.length} membre${dormants.length > 1 ? "s" : ""} dormant${dormants.length > 1 ? "s" : ""} — Rapport mensuel`,
+        htmlContent: wrapHtml(content),
+      },
+    );
+
     await sendBrevoEmail(apiKey, {
       to: [{ email: alertEmail, name: "Trésorier MBP" }],
-      subject: `[MBP] ⚠️ ${dormants.length} membre${dormants.length > 1 ? "s" : ""} dormant${dormants.length > 1 ? "s" : ""} — Rapport mensuel`,
-      htmlContent: wrapHtml(content),
+      subject,
+      htmlContent,
       replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
     });
 

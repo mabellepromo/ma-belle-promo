@@ -46,6 +46,10 @@ const AUTOMATION_META = {
     border: "border-emerald-500/20",
     cron: "Déclenchement manuel",
     type: "trigger",
+    variables: [
+      { key: "prenom", label: "Prénom du nouveau membre", sample: "Awa" },
+      { key: "nom",    label: "Nom complet",              sample: "Awa KOFFI" },
+    ],
   },
   event_reminder: {
     icon: Bell,
@@ -83,6 +87,13 @@ const AUTOMATION_META = {
     border: "border-teal-500/20",
     cron: "Déclenchement manuel",
     type: "trigger",
+    variables: [
+      { key: "prenom",  label: "Prénom du membre", sample: "Awa" },
+      { key: "nom",     label: "Nom complet",      sample: "Awa KOFFI" },
+      { key: "annee",   label: "Exercice payé",    sample: "2026" },
+      { key: "montant", label: "Montant",          sample: "15 000 FCFA" },
+      { key: "date",    label: "Date de paiement", sample: "8 juin 2026" },
+    ],
   },
   dormant_member_alert: {
     icon: UserX,
@@ -91,6 +102,11 @@ const AUTOMATION_META = {
     border: "border-red-500/20",
     cron: "1er de chaque mois",
     type: "cron",
+    variables: [
+      { key: "nombre", label: "Nombre de membres dormants", sample: "5" },
+      { key: "mois",   label: "Mois d'inactivité",          sample: "12" },
+      { key: "liste",  label: "Liste (nom — email)",        sample: "Awa KOFFI — awa@example.com\nJoël AGBEMELO — joel@example.com" },
+    ],
   },
   convention_reminder: {
     icon: Handshake,
@@ -113,6 +129,13 @@ const AUTOMATION_META = {
     border: "border-emerald-500/20",
     cron: "Déclenchement manuel",
     type: "trigger",
+    variables: [
+      { key: "titre",      label: "Titre de l'offre", sample: "Stage juridique" },
+      { key: "type",       label: "Type",             sample: "Stage" },
+      { key: "structure",  label: "Structure",        sample: "Cabinet Juridis" },
+      { key: "lieu",       label: "Ville, pays",      sample: "Lomé, Togo" },
+      { key: "specialite", label: "Spécialité",       sample: "Droit des affaires" },
+    ],
   },
   webinaire_reminder: {
     icon: Video,
@@ -135,6 +158,12 @@ const AUTOMATION_META = {
     border: "border-amber-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "prenom", label: "Prénom du signataire", sample: "Awa" },
+      { key: "titre",  label: "Titre du document",    sample: "Convention de partenariat" },
+      { key: "type",   label: "Type de document",     sample: "Convention" },
+      { key: "lien",   label: "Lien de signature",    sample: "https://docuseal…/s/abc" },
+    ],
   },
   facture_reminder: {
     icon: FileText,
@@ -143,6 +172,13 @@ const AUTOMATION_META = {
     border: "border-rose-500/20",
     cron: "Chaque jour à 9h",
     type: "cron",
+    variables: [
+      { key: "client",  label: "Nom du client",  sample: "Cabinet Juridis" },
+      { key: "numero",  label: "Numéro de facture", sample: "F-2026-014" },
+      { key: "objet",   label: "Objet",          sample: "Prestation de service" },
+      { key: "montant", label: "Montant TTC",    sample: "150 000 FCFA" },
+      { key: "date",    label: "Date d'échéance", sample: "31 mai 2026" },
+    ],
   },
   sondage_reminder: {
     icon: BarChart3,
@@ -151,6 +187,12 @@ const AUTOMATION_META = {
     border: "border-violet-500/20",
     cron: "Chaque jour à 8h",
     type: "cron",
+    variables: [
+      { key: "titre",       label: "Titre du sondage", sample: "Satisfaction 2026" },
+      { key: "description", label: "Description",      sample: "Votre avis sur nos activités." },
+      { key: "date",        label: "Date de clôture",  sample: "30 juin 2026" },
+      { key: "lien",        label: "Lien du sondage",  sample: "https://www.mabellepromo.org/sondage/…" },
+    ],
   },
   newsletter_confirm_reminder: {
     icon: MailCheck,
@@ -159,6 +201,10 @@ const AUTOMATION_META = {
     border: "border-teal-500/20",
     cron: "Chaque jour à 10h",
     type: "cron",
+    variables: [
+      { key: "prenom", label: "Prénom de l'inscrit", sample: "Awa" },
+      { key: "lien",   label: "Lien de confirmation", sample: "https://www.mabellepromo.org/newsletter/confirmer?token=…" },
+    ],
   },
   new_contact_alert: {
     icon: MessageSquare,
@@ -167,6 +213,12 @@ const AUTOMATION_META = {
     border: "border-blue-500/20",
     cron: "Chaque heure",
     type: "cron",
+    variables: [
+      { key: "expediteur", label: "Nom de l'expéditeur", sample: "Awa KOFFI" },
+      { key: "email",      label: "Email de l'expéditeur", sample: "awa@example.com" },
+      { key: "sujet",      label: "Sujet du message",    sample: "Demande d'information" },
+      { key: "message",    label: "Contenu du message",  sample: "Bonjour, je souhaiterais…" },
+    ],
   },
   new_adhesion_alert: {
     icon: UserPlus,
@@ -175,6 +227,13 @@ const AUTOMATION_META = {
     border: "border-emerald-500/20",
     cron: "Chaque heure",
     type: "cron",
+    variables: [
+      { key: "nom",        label: "Nom du demandeur", sample: "Awa KOFFI" },
+      { key: "email",      label: "Email",            sample: "awa@example.com" },
+      { key: "telephone",  label: "Téléphone",        sample: "+228 90 00 00 00" },
+      { key: "profession", label: "Profession",       sample: "Juriste" },
+      { key: "lieu",       label: "Ville, pays",      sample: "Lomé, Togo" },
+    ],
   },
   weekly_digest: {
     icon: Newspaper,
@@ -183,6 +242,16 @@ const AUTOMATION_META = {
     border: "border-indigo-500/20",
     cron: "Chaque lundi à 7h",
     type: "cron",
+    variables: [
+      { key: "semaine",      label: "Semaine ISO",            sample: "2026-W24" },
+      { key: "pending",      label: "Adhésions en attente",   sample: "2" },
+      { key: "messages",     label: "Messages non lus",       sample: "3" },
+      { key: "opportunites", label: "Nouvelles opportunités", sample: "1" },
+      { key: "inscrits",     label: "Nouveaux inscrits NL",   sample: "4" },
+      { key: "cotisations",  label: "Cotisations encaissées", sample: "5 (75 000 FCFA)" },
+      { key: "webinaires",   label: "Webinaires à venir",     sample: "26 juin 18:30 — Assurance" },
+      { key: "assemblees",   label: "Assemblées à venir",     sample: "8 juil. — AG ordinaire" },
+    ],
   },
   mandat_expiry_alert: {
     icon: CalendarClock,
@@ -191,6 +260,11 @@ const AUTOMATION_META = {
     border: "border-orange-500/20",
     cron: "1er de chaque mois",
     type: "cron",
+    variables: [
+      { key: "poste",     label: "Poste / mandat",    sample: "Trésorier" },
+      { key: "titulaire", label: "Titulaire",         sample: "Awa KOFFI" },
+      { key: "date",      label: "Date de fin",       sample: "31 décembre 2026" },
+    ],
   },
 };
 

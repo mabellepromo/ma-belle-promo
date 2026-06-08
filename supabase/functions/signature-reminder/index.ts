@@ -16,6 +16,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { renderTemplate } from "../_shared/template.ts";
 
 const AUTOMATION_ID = "signature_reminder";
 
@@ -80,11 +81,22 @@ serve(async (_req) => {
             <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
           </p>`;
 
+        const { subject, htmlContent } = renderTemplate(
+          automation.message_template,
+          {
+            prenom: s.name?.split(" ")[0] || "",
+            titre: doc.document_titre || "",
+            type: doc.type || "",
+            lien: doc.source_url || "",
+          },
+          { subject: `[MBP] Rappel — signature en attente : ${doc.document_titre}`, htmlContent: wrapHtml(content) },
+        );
+
         try {
           await sendBrevoEmail(apiKey, {
             to: [{ email: s.email, name: s.name || "" }],
-            subject: `[MBP] Rappel — signature en attente : ${doc.document_titre}`,
-            htmlContent: wrapHtml(content),
+            subject,
+            htmlContent,
             replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
           });
           await markAsSent(db, AUTOMATION_ID, doc.id as string, s.email);
