@@ -63,6 +63,25 @@ export function nextMonthlyRun(): Date {
   return d;
 }
 
+// Calcule la prochaine heure pleine (cron horaire)
+export function nextHourlyRun(): Date {
+  const d = new Date();
+  d.setUTCHours(d.getUTCHours() + 1, 0, 0, 0);
+  return d;
+}
+
+// Calcule la prochaine occurrence d'un jour de semaine donné à une heure UTC.
+// dayOfWeek : 0 = dimanche … 1 = lundi … 6 = samedi
+export function nextWeeklyRun(dayOfWeek = 1, hourUTC = 7): Date {
+  const d = new Date();
+  d.setUTCHours(hourUTC, 0, 0, 0);
+  let diff = (dayOfWeek - d.getUTCDay() + 7) % 7;
+  // Si on est le bon jour mais l'heure est déjà passée, viser la semaine suivante
+  if (diff === 0 && d.getTime() <= Date.now()) diff = 7;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d;
+}
+
 export async function wasAlreadySent(
   client: SupabaseServiceClient,
   automationId: string,

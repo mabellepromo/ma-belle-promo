@@ -4,7 +4,8 @@ import { supabase } from "../../lib/supabase";
 import {
   Zap, Play, Clock, CheckCircle2, XCircle, AlertCircle,
   ChevronDown, ChevronUp, RefreshCw, Info, Mail, Settings2,
-  Calendar, CreditCard, Users, PartyPopper, Bell, ReceiptText, UserX, Handshake, Briefcase
+  Calendar, CreditCard, Users, PartyPopper, Bell, ReceiptText, UserX, Handshake, Briefcase,
+  Video, PenLine, FileText, BarChart3, MailCheck, MessageSquare, UserPlus, Newspaper, CalendarClock
 } from "lucide-react";
 
 // Métadonnées statiques de chaque automatisation
@@ -81,6 +82,78 @@ const AUTOMATION_META = {
     cron: "Déclenchement manuel",
     type: "trigger",
   },
+  webinaire_reminder: {
+    icon: Video,
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
+    border: "border-sky-500/20",
+    cron: "Chaque jour à 8h",
+    type: "cron",
+  },
+  signature_reminder: {
+    icon: PenLine,
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+    cron: "Chaque jour à 8h",
+    type: "cron",
+  },
+  facture_reminder: {
+    icon: FileText,
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+    cron: "Chaque jour à 9h",
+    type: "cron",
+  },
+  sondage_reminder: {
+    icon: BarChart3,
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+    border: "border-violet-500/20",
+    cron: "Chaque jour à 8h",
+    type: "cron",
+  },
+  newsletter_confirm_reminder: {
+    icon: MailCheck,
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
+    border: "border-teal-500/20",
+    cron: "Chaque jour à 10h",
+    type: "cron",
+  },
+  new_contact_alert: {
+    icon: MessageSquare,
+    color: "text-blue-400",
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20",
+    cron: "Chaque heure",
+    type: "cron",
+  },
+  new_adhesion_alert: {
+    icon: UserPlus,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    cron: "Chaque heure",
+    type: "cron",
+  },
+  weekly_digest: {
+    icon: Newspaper,
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10",
+    border: "border-indigo-500/20",
+    cron: "Chaque lundi à 7h",
+    type: "cron",
+  },
+  mandat_expiry_alert: {
+    icon: CalendarClock,
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
+    border: "border-orange-500/20",
+    cron: "1er de chaque mois",
+    type: "cron",
+  },
 };
 
 // Nom de la fonction Supabase correspondante
@@ -130,12 +203,15 @@ function ConfigDisplay({ config }) {
   if (entries.length === 0) return null;
 
   const labels = {
-    email_enabled:      "Email",
-    whatsapp_enabled:   "WhatsApp",
-    delays_days:        "Jalons (jours)",
-    days_before:        "Délai avant (jours)",
-    inactivity_months:  "Inactivité (mois)",
-    alert_email:        "Email d'alerte",
+    email_enabled:       "Email",
+    whatsapp_enabled:    "WhatsApp",
+    delays_days:         "Jalons (jours)",
+    days_before:         "Délai avant (jours)",
+    days_after:          "Délai après (jours)",
+    inactivity_months:   "Inactivité (mois)",
+    alert_email:         "Email d'alerte",
+    confirm_after_hours: "Relance après (heures)",
+    lookback_days:       "Fenêtre de scan (jours)",
   };
 
   return (
