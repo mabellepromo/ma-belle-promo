@@ -14,6 +14,7 @@ import {
   corsHeaders,
 } from "../_shared/db.ts";
 import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { parseDayMonthFr } from "../_shared/dates.ts";
 
 const AUTOMATION_ID = "birthday_reminder";
 
@@ -49,13 +50,11 @@ serve(async (_req) => {
 
     if (error) throw new Error(`Lecture membres: ${error.message}`);
 
+    // anniversaire est du texte FR libre (« 09 août ») ou parfois de l'ISO :
+    // parseDayMonthFr gère les deux et renvoie null si illisible.
     const anniversaires = (membres ?? []).filter((m: { anniversaire: string }) => {
-      try {
-        const d = new Date(m.anniversaire);
-        return d.getUTCMonth() + 1 === month && d.getUTCDate() === day;
-      } catch {
-        return false;
-      }
+      const parsed = parseDayMonthFr(m.anniversaire);
+      return parsed !== null && parsed.month === month && parsed.day === day;
     });
 
     let sent = 0;

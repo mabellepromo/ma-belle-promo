@@ -13,7 +13,8 @@ import {
   jsonResponse,
   corsHeaders,
 } from "../_shared/db.ts";
-import { sendBrevoEmail, wrapHtml, escHtml, formatDateFr } from "../_shared/brevo.ts";
+import { sendBrevoEmail, wrapHtml, escHtml } from "../_shared/brevo.ts";
+import { parseFullDateFr } from "../_shared/dates.ts";
 
 const AUTOMATION_ID = "event_reminder";
 
@@ -39,24 +40,13 @@ serve(async (_req) => {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    // Dates cibles : événements qui auront lieu dans exactement daysBefore[i] jours
-    const targetDates = daysBefore.map(d => {
-      const t = new Date(today);
-      t.setUTCDate(t.getUTCDate() + d);
-      return { jours: d, date: t };
-    });
-
-    // Récupère les événements publiés dans la fenêtre de rappel
-    const minDate = targetDates[targetDates.length - 1].date;
-    const maxDate = targetDates[0].date;
-    maxDate.setUTCDate(maxDate.getUTCDate() + 1);
-
+    // La colonne evenements.date contient du texte FR libre (« vendredi 26 juin 2026 »)
+    // et non une date ISO : impossible de filtrer en SQL. On récupère tout (peu de lignes)
+    // puis on parse et on filtre en JS via parseFullDateFr. Les événements passés ou trop
+    // lointains sont écartés naturellement par le test sur joursRestants.
     const { data: evenements, error: evErr } = await db
       .from("evenements")
-      .select("id, titre, date_debut, lieu, description, statut")
-      .eq("statut", "publie")
-      .gte("date_debut", minDate.toISOString())
-      .lt("date_debut", maxDate.toISOString());
+      .select("id, titre, date, lieu, description, statut");
 
     if (evErr) throw new Error(`Lecture événements: ${evErr.message}`);
 
@@ -73,14 +63,15 @@ serve(async (_req) => {
     const errors: string[] = [];
 
     for (const ev of (evenements ?? [])) {
-      const evDate = new Date(ev.date_debut);
+      const evDate = parseFullDateFr(ev.date);
+      if (!evDate) continue; // date illisible ou vide → on ignore
       evDate.setUTCHours(0, 0, 0, 0);
       const joursRestants = Math.round((evDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       if (!daysBefore.includes(joursRestants)) continue;
 
       const targetKey = `J-${joursRestants}`;
-      const dateStr = formatDateFr(ev.date_debut);
+      const dateStr = escHtml(ev.date); // le texte FR est déjà lisible tel quel
       const lieu = ev.lieu ? escHtml(ev.lieu) : null;
       const badge = joursRestants === 1 ? "⏰ Demain !" : `Dans ${joursRestants} jours`;
 
