@@ -78,6 +78,7 @@ function fmtDatetimeLocal(iso) {
 
 function RegistrationsList({ event }) {
   const { registrations, registered, attended, loading, markAttended, unregister, reload } = useWebinarRegistrations(event.id);
+  const [sending, setSending] = useState(null); // "zoom" | "qr" | null
 
   function exportCSV() {
     if (!registrations.length) { toast("Aucune inscription à exporter."); return; }
@@ -120,6 +121,67 @@ function RegistrationsList({ event }) {
 
   // Le mode présentiel n'existe que pour les formats « presentiel » et « hybride »
   const hasPresentiel = event.format === "presentiel" || event.format === "hybride";
+  // Le mode en ligne n'existe que pour les formats « en_ligne » et « hybride »
+  const hasOnline = event.format === "en_ligne" || event.format === "hybride";
+
+  // Envoi des billets/liens via l'Edge Function webinaire-billet.
+  // channel "zoom" → lien de connexion aux inscrits en ligne
+  // channel "qr"   → billet QR aux inscrits présentiel
+  async function sendBillets(channel) {
+    // Destinataires éligibles côté client (pour le décompte et la confirmation)
+    const wantedMode = channel === "zoom" ? "en_ligne" : "presentiel";
+    const cibles = registrations.filter(
+      r => r.status === "registered" && r.mode_participation === wantedMode && r.email,
+    );
+
+    // Pré-conditions
+    if (channel === "zoom" && !event.zoom_link) {
+      toast.error("Ajoutez d'abord le lien Zoom à l'événement (bouton Modifier).");
+      return;
+    }
+    if (channel === "qr" && !event.lieu) {
+      toast.error("Cet événement n'a pas de lieu : le billet QR n'est pas applicable.");
+      return;
+    }
+    if (!cibles.length) {
+      toast(channel === "zoom"
+        ? "Aucun inscrit en ligne à notifier."
+        : "Aucun inscrit en présentiel à notifier.");
+      return;
+    }
+
+    // Confirmation systématique (emails réels), détaillée si envoi de masse
+    const libelle = channel === "zoom" ? "le lien de connexion" : "le billet QR";
+    const ok = window.confirm(
+      `Envoyer ${libelle} à ${cibles.length} participant(s) ${
+        channel === "zoom" ? "en ligne" : "en présentiel"
+      } ?\n\nCette action envoie de vrais emails.`,
+    );
+    if (!ok) return;
+
+    setSending(channel);
+    try {
+      const { data, error } = await supabase.functions.invoke("webinaire-billet", {
+        body: { event_id: event.id, channel },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      const nb = data?.sent ?? 0;
+      const echecs = (data?.results || []).filter(x => String(x.status).startsWith("erreur"));
+      if (echecs.length) {
+        toast.warning(`${nb} envoyé(s), ${echecs.length} en échec. Voir le détail dans la console.`);
+        console.warn("[webinaire-billet] échecs :", echecs);
+      } else {
+        toast.success(`${nb} ${channel === "zoom" ? "lien(s)" : "billet(s)"} envoyé(s).`);
+      }
+      await reload(); // rafraîchit les indicateurs zoom_sent / qr_sent
+    } catch (err) {
+      toast.error("Erreur d'envoi : " + err.message);
+    } finally {
+      setSending(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -162,6 +224,22 @@ function RegistrationsList({ event }) {
             title="Feuille d'émargement des participants sur place"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors">
             <MapPin className="w-3.5 h-3.5" /> Liste présentiel (PDF)
+          </button>
+        )}
+        {hasOnline && (
+          <button onClick={() => sendBillets("zoom")} disabled={sending !== null}
+            title="Envoyer le lien de connexion aux inscrits en ligne"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 disabled:opacity-50 transition-colors">
+            {sending === "zoom" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Video className="w-3.5 h-3.5" />}
+            Envoyer lien Zoom
+          </button>
+        )}
+        {hasPresentiel && (
+          <button onClick={() => sendBillets("qr")} disabled={sending !== null}
+            title="Envoyer le billet QR aux inscrits en présentiel"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50 transition-colors">
+            {sending === "qr" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+            Envoyer billet QR
           </button>
         )}
         <button onClick={reload}
@@ -209,20 +287,32 @@ function RegistrationsList({ event }) {
                   <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell">{r.profession || "—"}</td>
                   <td className="px-3 py-2.5 text-muted-foreground hidden lg:table-cell capitalize">{r.raison_participation || "—"}</td>
                   <td className="px-3 py-2.5 hidden sm:table-cell">
-                    {r.mode_participation ? (
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        r.mode_participation === "presentiel"
-                          ? "bg-amber-500/10 text-amber-400"
-                          : "bg-blue-500/10 text-blue-400"
-                      }`}>
-                        {r.mode_participation === "presentiel"
-                          ? <MapPin className="w-2.5 h-2.5" />
-                          : <Video className="w-2.5 h-2.5" />}
-                        {MODE_LABEL[r.mode_participation]}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
+                    <div className="flex flex-col gap-1">
+                      {r.mode_participation ? (
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold w-fit ${
+                          r.mode_participation === "presentiel"
+                            ? "bg-amber-500/10 text-amber-400"
+                            : "bg-blue-500/10 text-blue-400"
+                        }`}>
+                          {r.mode_participation === "presentiel"
+                            ? <MapPin className="w-2.5 h-2.5" />
+                            : <Video className="w-2.5 h-2.5" />}
+                          {MODE_LABEL[r.mode_participation]}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                      {r.mode_participation === "en_ligne" && r.zoom_sent && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
+                          <Send className="w-2.5 h-2.5" /> Lien envoyé
+                        </span>
+                      )}
+                      {r.mode_participation === "presentiel" && r.qr_sent && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
+                          <QrCode className="w-2.5 h-2.5" /> Billet envoyé
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-3 py-2.5">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
