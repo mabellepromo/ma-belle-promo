@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
+import { genererListePresentiel } from "@/lib/documentGenerators";
 import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
 import { inp, sel, Field } from "./shared";
 import RichEditor from "@/components/RichEditor";
@@ -102,6 +103,24 @@ function RegistrationsList({ event }) {
     toast.success(`${rows.length} inscrit(s) exporté(s).`);
   }
 
+  // Génère la feuille d'émargement PDF des participants en présentiel.
+  // Disponible uniquement pour les événements présentiel ou hybride.
+  function exportPresentielPDF() {
+    const candidats = registrations.filter(r => {
+      if (r.status === "unregistered" || r.status === "cancelled") return false;
+      if (event.format === "hybride") return r.mode_participation === "presentiel";
+      return true; // présentiel pur
+    });
+    if (!candidats.length) {
+      toast("Aucun participant en présentiel à exporter.");
+      return;
+    }
+    genererListePresentiel(event, registrations);
+  }
+
+  // Le mode présentiel n'existe que pour les formats « presentiel » et « hybride »
+  const hasPresentiel = event.format === "presentiel" || event.format === "hybride";
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-6">
@@ -138,6 +157,13 @@ function RegistrationsList({ event }) {
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border hover:bg-muted transition-colors">
           <Download className="w-3.5 h-3.5" /> Exporter CSV
         </button>
+        {hasPresentiel && (
+          <button onClick={exportPresentielPDF}
+            title="Feuille d'émargement des participants sur place"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors">
+            <MapPin className="w-3.5 h-3.5" /> Liste présentiel (PDF)
+          </button>
+        )}
         <button onClick={reload}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-muted transition-colors text-muted-foreground">
           <RefreshCw className="w-3.5 h-3.5" /> Rafraîchir
