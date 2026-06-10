@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Video, Plus, Edit2, Trash2, ChevronDown, ChevronUp, Download,
   Copy, Users, X, Loader2, Calendar, Link2, RefreshCw,
-  UserCheck, Tag, Send, QrCode, Upload, FileText, Image, User, MapPin
+  UserCheck, Tag, Send, QrCode, Upload, FileText, Image, User, MapPin,
+  Search, Check
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
@@ -183,6 +184,87 @@ function RegistrationsList({ event }) {
     }
   }
 
+  // ── Recherche / filtre / compteurs par mode ──
+  const [search, setSearch]         = useState("");
+  const [modeFilter, setModeFilter] = useState("all"); // all | presentiel | en_ligne | indefini
+  const [adding, setAdding]         = useState(false);
+  const [savingAdd, setSavingAdd]   = useState(false);
+
+  const cPres   = registered.filter(r => r.mode_participation === "presentiel").length;
+  const cOnline = registered.filter(r => r.mode_participation === "en_ligne").length;
+  const cIndef  = registered.filter(r => !r.mode_participation).length;
+
+  const filtered = registrations.filter(r => {
+    if (modeFilter === "indefini" && r.mode_participation) return false;
+    if (modeFilter !== "all" && modeFilter !== "indefini" && r.mode_participation !== modeFilter) return false;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      return (r.nom_complet || "").toLowerCase().includes(q) || (r.email || "").toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  // Ajout manuel d'un participant (insertion directe dans webinar_registrations)
+  async function addParticipant(form) {
+    const nom = form.nom_complet.trim();
+    const email = form.email.trim().toLowerCase();
+    if (!nom) { toast.error("Le nom complet est obligatoire."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Email invalide."); return; }
+    setSavingAdd(true);
+    try {
+      const { error } = await supabase.from("webinar_registrations").insert({
+        event_id:           event.id,
+        nom_complet:        nom,
+        email,
+        telephone:          form.telephone?.trim() || null,
+        mode_participation: form.mode_participation || null,
+        status:             "registered",
+        gdpr_consent:       true, // ajout par le bureau, consentement recueilli hors ligne
+      });
+      if (error) {
+        if (error.code === "23505") toast.error("Cet email est déjà inscrit à ce webinaire.");
+        else toast.error("Erreur ajout : " + error.message);
+        return;
+      }
+      toast.success("Participant ajouté.");
+      setAdding(false);
+      await reload();
+    } finally {
+      setSavingAdd(false);
+    }
+  }
+
+  // Mise à jour d'un participant (nom, email, téléphone, mode)
+  async function saveParticipant(id, patch) {
+    const email = patch.email.trim().toLowerCase();
+    if (!patch.nom_complet.trim()) { toast.error("Le nom complet est obligatoire."); return false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Email invalide."); return false; }
+    const { error } = await supabase.from("webinar_registrations").update({
+      nom_complet:        patch.nom_complet.trim(),
+      email,
+      telephone:          patch.telephone?.trim() || null,
+      mode_participation: patch.mode_participation || null,
+    }).eq("id", id);
+    if (error) {
+      if (error.code === "23505") toast.error("Cet email est déjà utilisé sur ce webinaire.");
+      else toast.error("Erreur modification : " + error.message);
+      return false;
+    }
+    toast.success("Participant modifié.");
+    await reload();
+    return true;
+  }
+
+  // Suppression définitive d'un participant (la ligne est conservée si l'opération échoue)
+  async function deleteParticipant(r) {
+    const ok = window.confirm(`Supprimer ${r.nom_complet} ?\n\nCette action est irréversible.`);
+    if (!ok) return;
+    const { error } = await supabase.from("webinar_registrations").delete().eq("id", r.id);
+    if (error) { toast.error("Erreur suppression : " + error.message); return; }
+    toast.success("Participant supprimé.");
+    await reload();
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-6">
@@ -193,12 +275,29 @@ function RegistrationsList({ event }) {
 
   return (
     <div className="space-y-4">
-      {/* KPIs */}
-      <div className="flex flex-wrap gap-3">
+      {/* KPIs — compteurs globaux et par mode */}
+      <div className="flex flex-wrap gap-2">
         <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-1.5">
           <Users className="w-3.5 h-3.5 text-emerald-400" />
           <span className="text-sm font-semibold text-emerald-400">{registered.length} inscrits</span>
         </div>
+        {hasPresentiel && (
+          <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-1.5">
+            <MapPin className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-sm font-semibold text-amber-400">{cPres} présentiel</span>
+          </div>
+        )}
+        {hasOnline && (
+          <div className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-xl px-3 py-1.5">
+            <Video className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-sm font-semibold text-blue-400">{cOnline} en ligne</span>
+          </div>
+        )}
+        {cIndef > 0 && (
+          <div className="flex items-center gap-1.5 bg-muted border border-border rounded-xl px-3 py-1.5">
+            <span className="text-sm font-semibold text-muted-foreground">{cIndef} indéfini(s)</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-xl px-3 py-1.5">
           <UserCheck className="w-3.5 h-3.5 text-primary" />
           <span className="text-sm font-semibold text-primary">{attended.length} présents</span>
@@ -215,6 +314,10 @@ function RegistrationsList({ event }) {
 
       {/* Actions */}
       <div className="flex flex-wrap gap-2">
+        <button onClick={() => setAdding(v => !v)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+          <Plus className="w-3.5 h-3.5" /> Ajouter un participant
+        </button>
         <button onClick={exportCSV}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border hover:bg-muted transition-colors">
           <Download className="w-3.5 h-3.5" /> Exporter CSV
@@ -257,10 +360,54 @@ function RegistrationsList({ event }) {
         </button>
       </div>
 
+      {/* Formulaire d'ajout manuel */}
+      {adding && (
+        <AddParticipantForm
+          hasPresentiel={hasPresentiel} hasOnline={hasOnline}
+          saving={savingAdd}
+          onSave={addParticipant} onCancel={() => setAdding(false)}
+        />
+      )}
+
+      {/* Recherche + filtre par mode */}
+      {registrations.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[180px]">
+            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <input
+              value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher un nom ou un email…"
+              className="w-full h-8 pl-8 pr-3 text-xs rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            {[
+              { key: "all",       label: "Tous" },
+              ...(hasPresentiel ? [{ key: "presentiel", label: "Présentiel" }] : []),
+              ...(hasOnline     ? [{ key: "en_ligne",   label: "En ligne" }]   : []),
+              { key: "indefini", label: "Indéfini" },
+            ].map(f => (
+              <button key={f.key} onClick={() => setModeFilter(f.key)}
+                className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                  modeFilter === f.key
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border text-muted-foreground hover:bg-muted"
+                }`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Tableau des inscrits */}
       {registrations.length === 0 ? (
         <div className="text-center py-6 text-sm text-muted-foreground">
           Aucune inscription pour le moment.
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-6 text-sm text-muted-foreground">
+          Aucun participant ne correspond à la recherche.
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
@@ -278,83 +425,197 @@ function RegistrationsList({ event }) {
               </tr>
             </thead>
             <tbody>
-              {registrations.map(r => (
-                <tr key={r.id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
-                  <td className="px-3 py-2.5 font-medium text-foreground">{r.nom_complet}</td>
-                  <td className="px-3 py-2.5 text-muted-foreground">
-                    <a href={`mailto:${r.email}`} className="hover:text-primary transition-colors">{r.email}</a>
-                  </td>
-                  <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell">{r.profession || "—"}</td>
-                  <td className="px-3 py-2.5 text-muted-foreground hidden lg:table-cell capitalize">{r.raison_participation || "—"}</td>
-                  <td className="px-3 py-2.5 hidden sm:table-cell">
-                    <div className="flex flex-col gap-1">
-                      {r.mode_participation ? (
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold w-fit ${
-                          r.mode_participation === "presentiel"
-                            ? "bg-amber-500/10 text-amber-400"
-                            : "bg-blue-500/10 text-blue-400"
-                        }`}>
-                          {r.mode_participation === "presentiel"
-                            ? <MapPin className="w-2.5 h-2.5" />
-                            : <Video className="w-2.5 h-2.5" />}
-                          {MODE_LABEL[r.mode_participation]}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                      {r.mode_participation === "en_ligne" && r.zoom_sent && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
-                          <Send className="w-2.5 h-2.5" /> Lien envoyé
-                        </span>
-                      )}
-                      {r.mode_participation === "presentiel" && r.qr_sent && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
-                          <QrCode className="w-2.5 h-2.5" /> Billet envoyé
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      r.status === "attended"     ? "bg-primary/10 text-primary" :
-                      r.status === "registered"   ? "bg-emerald-500/10 text-emerald-400" :
-                      "bg-muted/60 text-muted-foreground line-through"
-                    }`}>
-                      {r.status === "attended" ? "Présent" : r.status === "registered" ? "Inscrit" : "Désinscrit"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 text-muted-foreground hidden sm:table-cell">
-                    {new Date(r.registration_date).toLocaleDateString("fr-FR")}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <div className="flex items-center gap-1 justify-end">
-                      {r.status === "registered" && (
-                        <button
-                          onClick={() => markAttended(r.id)}
-                          title="Marquer présent"
-                          className="w-6 h-6 rounded-md bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors"
-                        >
-                          <UserCheck className="w-3 h-3" />
-                        </button>
-                      )}
-                      {r.status === "registered" && (
-                        <button
-                          onClick={() => unregister(r.id)}
-                          title="Désinscrire"
-                          className="w-6 h-6 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+              {filtered.map(r => (
+                <ParticipantRow
+                  key={r.id} r={r}
+                  hasPresentiel={hasPresentiel} hasOnline={hasOnline}
+                  onSave={saveParticipant} onDelete={deleteParticipant}
+                  onMarkAttended={markAttended} onUnregister={unregister}
+                />
               ))}
             </tbody>
           </table>
         </div>
       )}
     </div>
+  );
+}
+
+// ── Formulaire d'ajout manuel d'un participant ───────────────────────────────
+
+function AddParticipantForm({ hasPresentiel, hasOnline, saving, onSave, onCancel }) {
+  const [form, setForm] = useState({ nom_complet: "", email: "", telephone: "", mode_participation: "" });
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  return (
+    <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+      <p className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
+        <Plus className="w-3.5 h-3.5 text-primary" /> Nouveau participant
+      </p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <input className={inp} placeholder="Nom complet *"
+          value={form.nom_complet} onChange={e => set("nom_complet", e.target.value)} />
+        <input className={inp} type="email" placeholder="Email *"
+          value={form.email} onChange={e => set("email", e.target.value)} />
+        <input className={inp} placeholder="Téléphone"
+          value={form.telephone} onChange={e => set("telephone", e.target.value)} />
+        <select className={sel} value={form.mode_participation}
+          onChange={e => set("mode_participation", e.target.value)}>
+          <option value="">Mode : indéfini</option>
+          {hasPresentiel && <option value="presentiel">Présentiel</option>}
+          {hasOnline     && <option value="en_ligne">En ligne</option>}
+        </select>
+      </div>
+      <div className="flex gap-2 mt-3">
+        <button type="button" onClick={onCancel}
+          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors">
+          Annuler
+        </button>
+        <button type="button" onClick={() => onSave(form)} disabled={saving}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors">
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+          Ajouter
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Ligne participant : affichage + édition inline ───────────────────────────
+
+function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkAttended, onUnregister }) {
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy]       = useState(false);
+  const [form, setForm]       = useState({
+    nom_complet: r.nom_complet || "", email: r.email || "",
+    telephone: r.telephone || "", mode_participation: r.mode_participation || "",
+  });
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  function startEdit() {
+    setForm({
+      nom_complet: r.nom_complet || "", email: r.email || "",
+      telephone: r.telephone || "", mode_participation: r.mode_participation || "",
+    });
+    setEditing(true);
+  }
+
+  async function save() {
+    setBusy(true);
+    const ok = await onSave(r.id, form);
+    setBusy(false);
+    if (ok) setEditing(false);
+  }
+
+  // ── Mode édition : une seule cellule sur toute la largeur ──
+  if (editing) {
+    return (
+      <tr className="border-b border-border bg-muted/20">
+        <td colSpan={8} className="px-3 py-3">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <input className={inp} placeholder="Nom complet *"
+              value={form.nom_complet} onChange={e => set("nom_complet", e.target.value)} />
+            <input className={inp} type="email" placeholder="Email *"
+              value={form.email} onChange={e => set("email", e.target.value)} />
+            <input className={inp} placeholder="Téléphone"
+              value={form.telephone} onChange={e => set("telephone", e.target.value)} />
+            <select className={sel} value={form.mode_participation}
+              onChange={e => set("mode_participation", e.target.value)}>
+              <option value="">Indéfini</option>
+              {hasPresentiel && <option value="presentiel">Présentiel</option>}
+              {hasOnline     && <option value="en_ligne">En ligne</option>}
+            </select>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <button onClick={() => setEditing(false)}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors">
+              Annuler
+            </button>
+            <button onClick={save} disabled={busy}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors">
+              {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              Enregistrer
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  // ── Mode affichage ──
+  return (
+    <tr className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
+      <td className="px-3 py-2.5 font-medium text-foreground">{r.nom_complet}</td>
+      <td className="px-3 py-2.5 text-muted-foreground">
+        <a href={`mailto:${r.email}`} className="hover:text-primary transition-colors">{r.email}</a>
+      </td>
+      <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell">{r.profession || "—"}</td>
+      <td className="px-3 py-2.5 text-muted-foreground hidden lg:table-cell capitalize">{r.raison_participation || "—"}</td>
+      <td className="px-3 py-2.5 hidden sm:table-cell">
+        <div className="flex flex-col gap-1">
+          {r.mode_participation ? (
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold w-fit ${
+              r.mode_participation === "presentiel"
+                ? "bg-amber-500/10 text-amber-400"
+                : "bg-blue-500/10 text-blue-400"
+            }`}>
+              {r.mode_participation === "presentiel"
+                ? <MapPin className="w-2.5 h-2.5" />
+                : <Video className="w-2.5 h-2.5" />}
+              {MODE_LABEL[r.mode_participation]}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+          {r.mode_participation === "en_ligne" && r.zoom_sent && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
+              <Send className="w-2.5 h-2.5" /> Lien envoyé
+            </span>
+          )}
+          {r.mode_participation === "presentiel" && r.qr_sent && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 w-fit">
+              <QrCode className="w-2.5 h-2.5" /> Billet envoyé
+            </span>
+          )}
+        </div>
+      </td>
+      <td className="px-3 py-2.5">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+          r.status === "attended"     ? "bg-primary/10 text-primary" :
+          r.status === "registered"   ? "bg-emerald-500/10 text-emerald-400" :
+          "bg-muted/60 text-muted-foreground line-through"
+        }`}>
+          {r.status === "attended" ? "Présent" : r.status === "registered" ? "Inscrit" : "Désinscrit"}
+        </span>
+      </td>
+      <td className="px-3 py-2.5 text-muted-foreground hidden sm:table-cell">
+        {new Date(r.registration_date).toLocaleDateString("fr-FR")}
+      </td>
+      <td className="px-3 py-2.5">
+        <div className="flex items-center gap-1 justify-end">
+          {r.status === "registered" && (
+            <button onClick={() => onMarkAttended(r.id)} title="Marquer présent"
+              className="w-6 h-6 rounded-md bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors">
+              <UserCheck className="w-3 h-3" />
+            </button>
+          )}
+          <button onClick={startEdit} title="Modifier"
+            className="w-6 h-6 rounded-md bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70 flex items-center justify-center transition-colors">
+            <Edit2 className="w-3 h-3" />
+          </button>
+          {r.status === "registered" && (
+            <button onClick={() => onUnregister(r.id)} title="Désinscrire (conserve la ligne)"
+              className="w-6 h-6 rounded-md bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 flex items-center justify-center transition-colors">
+              <X className="w-3 h-3" />
+            </button>
+          )}
+          <button onClick={() => onDelete(r)} title="Supprimer définitivement"
+            className="w-6 h-6 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors">
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }
 
