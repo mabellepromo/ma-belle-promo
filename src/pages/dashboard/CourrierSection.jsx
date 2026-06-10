@@ -193,6 +193,12 @@ const INITIAL = {
 // Hauteur A4 à 96 dpi (297mm)
 const A4_PX = 1123;
 
+// Anti-cache pour le fetch du template /docs/ : les fichiers statiques
+// peuvent rester en cache HTTP/CDN et servir une vieille version du modèle.
+// Évalué une fois par chargement de page → un rechargement récupère le
+// dernier template (et htmlCacheRef évite les re-fetch dans la session).
+const TEMPLATE_CB = Date.now();
+
 // Styles injectés dans tous les documents générés
 const INJECT_CSS = `
   /* Mode clair forcé */
@@ -558,7 +564,7 @@ export default function CourrierSection() {
     const timer = setTimeout(async () => {
       try {
         if (!htmlCacheRef.current[template.file]) {
-          const resp = await fetch(`/docs/${template.file}`);
+          const resp = await fetch(`/docs/${template.file}?v=${TEMPLATE_CB}`);
           if (!resp.ok) throw new Error();
           htmlCacheRef.current[template.file] = await resp.text();
         }
@@ -595,7 +601,7 @@ export default function CourrierSection() {
     setGenerating(true);
     try {
       if (!htmlCacheRef.current[template.file]) {
-        const resp = await fetch(`/docs/${template.file}`);
+        const resp = await fetch(`/docs/${template.file}?v=${TEMPLATE_CB}`);
         if (!resp.ok) throw new Error("Modèle introuvable");
         htmlCacheRef.current[template.file] = await resp.text();
       }
