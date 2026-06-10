@@ -71,40 +71,35 @@
     .page-footer  { display: table-row; }
     .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
     
-    /* La marge BASSE de @page (24mm ≈ pied 74px + respiration) réserve,
-       sur CHAQUE feuille imprimée, la bande où se loge le pied fixe.
-       C'est ce qui empêche le contenu de chevaucher le pied — l'ancien
-       @page { margin:0 } ne réservait rien, d'où le débordement.
-       NB : @page n'accepte pas les var() CSS → valeur littérale. */
-    @page { size: A4; margin: 0 0 24mm 0; }
+    @page { size: A4; margin: 0; }
     @media print {
       html, body { margin: 0; padding: 0; }
       body { background: none; }
-      /* On neutralise la hauteur fixe (et le minHeight injecté par
-         CourrierSection) : la pagination est gérée par @page, pas par
-         une hauteur forcée qui déborderait sur la zone réservée. */
+      /* min-height: 100vh = au moins une feuille pleine → sur un courrier
+         court, le tableau remplit la page et pousse le pied (tfoot) tout
+         en bas (collé au bord). Sur un courrier long, 100vh est dépassé :
+         la pagination se fait naturellement. On force cette valeur pour
+         neutraliser le minHeight (multi-feuilles) injecté par
+         CourrierSection, qui sinon fausserait la répétition du pied. */
       .page {
         box-shadow: none;
         width: var(--mbp-page-w);
         height: auto !important;
-        min-height: 0 !important;
+        min-height: 100vh !important;
       }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
 
-      /* Pied flottant : le navigateur le répète en bas de chaque feuille
-         imprimée, dans la bande réservée par la marge basse de @page. */
-      .page-footer {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-      }
-      /* position:fixed « blockifie » le pied ; sa cellule (table-cell)
-         créerait sinon un tableau anonyme qui se rétracte à la largeur
-         du contenu → bande tronquée. On la repasse en bloc pleine
-         largeur pour que le fond du pied couvre toute la feuille. */
-      .page-footer .page-cell {
-        display: block;
-        width: 100%;
-      }
+      /* ── Pied collé au bas de chaque feuille, sans chevauchement ──
+         On bascule les 3 rangées du tableau en groupes natifs :
+         - table-footer-group : le navigateur place le pied au BAS de
+           chaque feuille imprimée, le RÉPÈTE sur chaque page et réserve
+           sa hauteur (le contenu ne le recouvre jamais).
+         - L'en-tête en row-group : rendu une seule fois, page 1.
+         NB : sur une dernière page partielle, le pied suit le contenu
+         (comportement standard d'un tfoot). */
+      .page-header  { display: table-row-group; }
+      .page-content { display: table-row-group; }
+      .page-footer  { display: table-footer-group; }
     }
 
     /* ══════════════════════════════════════════════════

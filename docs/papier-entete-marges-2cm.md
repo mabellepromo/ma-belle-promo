@@ -85,37 +85,55 @@ le contenu coulait jusqu'au bord et passait sous le pied.
 La tentative `margin-bottom` sur `.page-content` était inopérante
 (les marges sont ignorées sur un `display: table-row`).
 
-### Correctif (vérifié au rendu PDF réel, Chrome headless)
+### Correctif retenu (vérifié au rendu PDF réel, Chrome headless)
+
+Le pied utilise les **groupes natifs de tableau** : il se cale au bas
+PHYSIQUE de chaque feuille, se répète et réserve sa hauteur. C'est ce qui
+le « colle au bas de page » — un pied `position: fixed` en était
+incapable (toujours décalé de la marge `@page`, jamais au ras du bord).
+
 ```css
-/* @page n'accepte pas les var() → valeur littérale.
-   24mm ≈ pied (74px ≈ 19,6mm) + respiration. */
-@page { size: A4; margin: 0 0 24mm 0; }
+@page { size: A4; margin: 0; }
 
 @media print {
-  /* neutralise la hauteur forcée ET le minHeight injecté par
-     CourrierSection, qui déborderaient sur la bande réservée */
-  .page { height: auto !important; min-height: 0 !important; }
+  /* min-height:100vh → un courrier COURT remplit la feuille et pousse le
+     pied (tfoot) tout en bas ; un courrier LONG dépasse 100vh et pagine
+     normalement. Neutralise aussi le minHeight injecté par CourrierSection. */
+  .page { height: auto !important; min-height: 100vh !important; }
 
-  /* pied répété en bas de chaque feuille, dans la marge réservée */
-  .page-footer { position: fixed; bottom: 0; left: 0; right: 0; }
-
-  /* position:fixed « blockifie » le pied : sa cellule table-cell
-     se rétracterait → on la repasse en bloc pleine largeur */
-  .page-footer .page-cell { display: block; width: 100%; }
+  /* En-tête rendu une seule fois ; pied au bas de chaque feuille, répété,
+     hauteur réservée (pas de chevauchement). */
+  .page-header  { display: table-row-group; }
+  .page-content { display: table-row-group; }
+  .page-footer  { display: table-footer-group; }
 }
 ```
 
-Validation : PDF généré via Puppeteer (chemin identique à Ctrl+P,
-`preferCSSPageSize`). Courrier **court** → 1 page propre ; courrier
-**long** → 3 pages, en-tête une seule fois, pied pleine largeur répété
-en bas de chaque page, **zéro chevauchement**.
+Validation : PDF via Puppeteer (chemin identique à Ctrl+P,
+`preferCSSPageSize`), pipeline `injectValues` reproduit fidèlement.
+- **Court** → 1 page, pied **collé au bord inférieur**.
+- **Long** → 3 pages, en-tête une seule fois, pied collé en bas de chaque
+  page pleine, **zéro chevauchement**.
+
+**Limite connue acceptée :** sur une dernière page PARTIELLE d'un courrier
+multi-pages, le pied suit le contenu (au lieu d'être au ras du bas) —
+comportement standard d'un `tfoot`, rare en pratique (courriers 1 page).
+
+### Pièges écartés (ne pas y revenir)
+- `position: fixed; bottom: 0` + `@page margin-bottom` → laisse un blanc
+  sous le pied (le fixed est prisonnier de la zone de contenu).
+- `bottom: -24mm` → éjecte le pied sur la page suivante.
+- `transform: translateY(24mm)` sur le pied fixe → pied clippé / déplacé.
+- `table-footer-group` AVEC `height: 297mm` ou `minHeight` forcé → casse
+  la pagination du tableau (pied bloqué au milieu). D'où `min-height:100vh`
+  + `height:auto`.
 
 ### Repère pour V2 → V7
-- **Hauteur naturelle du pied V1 : 74 px** ; réservation retenue : **24 mm**.
-- La recette est portable telle quelle sur tout modèle dont le pied est
-  `position: fixed` : il suffit d'une **marge basse `@page`** ≥ hauteur
-  du pied, + neutralisation des hauteurs forcées. Adapter la valeur
-  `24mm` à la hauteur réelle du pied de chaque modèle.
+- **Hauteur naturelle du pied V1 : 74 px.**
+- Recette portable sur tout modèle en `display: table` : passer en-tête →
+  `table-row-group`, contenu → `table-row-group`, pied → `table-footer-group`,
+  `@page margin:0`, `.page { height:auto; min-height:100vh }`. Les modèles
+  bâtis en **flex** doivent d'abord être restructurés en tableau.
 
 ## Plan pour décliner V2 → V7 (séance suivante)
 
