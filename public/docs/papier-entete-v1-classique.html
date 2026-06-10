@@ -80,27 +80,30 @@
       body { background: none; display: block; }
       /* Refonte pagination : CHAQUE .page = exactement une feuille A4.
          Le script JS scinde le contenu pour qu'il tienne sur chaque
-         feuille, et le pied (table-row) est poussé au bas de chaque
-         feuille par la rangée de contenu (height:100%). Résultat : pied
-         collé au bas de TOUTES les feuilles, dernière incluse, sans
-         page parasite. min-height:0 neutralise le minHeight injecté par
-         CourrierSection (qui ferait déborder la feuille). */
+         feuille. En IMPRESSION on passe la .page en FLEX colonne (plus
+         fiable que display:table+height:100% selon les navigateurs) : le
+         contenu prend flex:1 et POUSSE le pied tout en bas de chaque
+         feuille — dernière incluse. */
       .page {
         box-shadow: none;
         width: var(--mbp-page-w);
         /* 296mm (un poil < 297mm) : évite le débordement sous-pixel qui,
-           avec une feuille pile à 297mm, créait des feuilles blanches.
-           Le pied reste calé au bas via la rangée de contenu height:100%
-           (≈1mm au-dessus du bord physique, visuellement au ras). */
+           à 297mm pile, créait des feuilles blanches. */
         height: 296mm;
         min-height: 0 !important;
-        /* On annule le page-break-after:always de base (qui, sur un
-           élément pleine feuille, insère une feuille blanche). */
+        display: flex !important;
+        flex-direction: column !important;
         page-break-after: auto;
       }
-      /* Chaque page suivante (dynamique) démarre sur une nouvelle feuille
-         via break-BEFORE → pas de chevauchement de frontière, pas de
-         feuille blanche finale. */
+      .page-header  { display: block !important; flex: 0 0 auto !important; }
+      .page-content { display: block !important; flex: 1 1 auto !important; }
+      .page-footer  { display: block !important; flex: 0 0 auto !important; }
+      .page-cell    { display: block !important; }
+      /* Pas de texte de remplacement fantôme à l'impression (les pages
+         dynamiques recréent un corps contenteditable avec placeholder). */
+      [contenteditable]:empty::before { content: "" !important; }
+      /* Chaque page suivante démarre sur une nouvelle feuille via
+         break-BEFORE (pas break-after, qui insère un blanc). */
       .page-dynamic { page-break-before: always; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
     }
@@ -584,6 +587,10 @@
      Valeur FIXE (on ne mesure plus la page, qui débordée renvoyait une
      hauteur géante → aucune scission). */
   var PAGE_H = 1080;
+  /* Hauteur réservée pour le bloc politesse+signature pendant la scission
+     du corps, afin qu'il reste collé à la fin du corps (et ne parte pas
+     seul sur une page). Recalculée dans paginate(). */
+  var RESERVE = 0;
   var CORPS  = '.corps-lettre, .e-corps';  // classe selon version
 
   function textToHtml(t) {
@@ -606,7 +613,7 @@
         if (c !== corps) used += c.offsetHeight;
       });
     }
-    return PAGE_H - used;
+    return PAGE_H - used - RESERVE;
   }
 
   function isOver(page) {
@@ -688,8 +695,14 @@
       .filter(Boolean).join('\n');
 
     /* Détacher le bloc politesse + signature : il doit terminer sur la
-       DERNIÈRE feuille, après tout le corps (et non rester en page 1). */
-    var closing = p1.querySelector('.closing-row, .closing');
+       DERNIÈRE feuille, après le corps. On le cherche N'IMPORTE OÙ
+       (idempotence : au 2e passage de pagination il est déjà sur la
+       dernière page) et on le détache AVANT de purger les pages
+       dynamiques, sinon il serait détruit avec elles. */
+    var closing = document.querySelector('.closing-row, .closing');
+    /* Mémoriser sa hauteur AVANT détachement (pour réserver sa place sur
+       la dernière feuille). +24 ≈ marge haute du bloc. */
+    var closingH = closing ? closing.offsetHeight + 24 : 0;
     if (closing && closing.parentNode) closing.parentNode.removeChild(closing);
 
     /* Supprimer les pages dynamiques précédentes */
@@ -698,7 +711,8 @@
     /* Remettre le texte complet dans la page 1 */
     c1.innerHTML = textToHtml(all);
 
-    /* Scinder le corps sur des feuilles successives */
+    /* 1) Scinder le corps sur des feuilles successives (sans réserve). */
+    RESERVE = 0;
     var cur = p1, guard = 40;
     while (isOver(cur) && guard-- > 0) {
       var ov = split(cur.querySelector(CORPS), cur);
@@ -708,11 +722,25 @@
       cur = np;
     }
 
-    /* Réinsérer politesse + signature à la fin de la dernière feuille.
-       Si ça la fait déborder, les pousser sur une feuille de plus. */
+    /* 2) Réserver la place de la signature SUR LA DERNIÈRE FEUILLE : si le
+       corps de cette feuille + la signature déborde, on repousse le surplus
+       de corps sur de nouvelles feuilles → la signature reste collée à la
+       fin du corps (et non seule, en haut d'une page presque vide). */
     if (closing) {
+      RESERVE = closingH;
+      var guard2 = 40;
+      while (isOver(cur) && guard2-- > 0) {
+        var ov2 = split(cur.querySelector(CORPS), cur);
+        if (!ov2.trim()) break;
+        var np2 = makePage(ov2);
+        cur.insertAdjacentElement('afterend', np2);
+        cur = np2;
+      }
+      RESERVE = 0;
+
+      /* 3) Réinsérer politesse + signature à la fin de la dernière feuille. */
       bodyOf(cur).appendChild(closing);
-      if (isOver(cur)) {
+      if (isOver(cur)) { // garde-fou ultime
         if (closing.parentNode) closing.parentNode.removeChild(closing);
         var npc = makePage('');
         bodyOf(npc).appendChild(closing);
@@ -735,6 +763,16 @@
   function init() {
     var c = document.querySelector(CORPS);
     if (!c) return;
+    /* Normalisations pour une pagination fiable :
+       - corps min-height:0 (sinon le min-height:280px de l'écran gonfle la
+         mesure d'un corps court → scissions prématurées) ;
+       - cachet à hauteur fixe (image chargée en asynchrone → sinon mesure
+         instable du bloc signature). */
+    var st = document.createElement('style');
+    st.textContent =
+      '.corps-lettre, .e-corps { min-height: 0 !important; }' +
+      'img[alt^="Cachet"] { height: 90px !important; width: auto !important; }';
+    document.head.appendChild(st);
     c.addEventListener('input', schedule);
     setTimeout(paginate, 150);
   }

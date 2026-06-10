@@ -109,27 +109,48 @@ pied (`table-row`) est poussé au bas par la rangée de contenu
   feuilles, puis **réinsère la signature à la fin de la dernière feuille**
   (sur une feuille de plus si ça déborde).
 
+**Autres points clés du JS :**
+- Au démarrage, on injecte `.corps-lettre { min-height: 0 }` (sinon le
+  `min-height:280px` d'écran gonfle la mesure d'un corps court → scissions
+  prématurées, courrier 1 page qui passait à 2) et `img[alt^="Cachet"] {
+  height:90px }` (cachet chargé en async → mesure stable du bloc signature).
+- La signature est cherchée **n'importe où** dans le document (pas que
+  page 1) puis détachée AVANT de purger les pages dynamiques → idempotent
+  au 2ᵉ passage de pagination (CourrierSection pagine 2 fois).
+- Sa hauteur est **réservée sur la dernière feuille** : si corps+signature
+  déborde, on repousse le surplus de corps → la signature reste **collée à
+  la fin du corps** (et ne part pas seule, haut d'une page presque vide).
+
 **Points clés du CSS `@media print` :**
 ```css
 @page { size: A4; margin: 0; }
 @media print {
   body { display: block; }          /* sinon flex+gap:24px insère des feuilles */
-  .page { height: 296mm; min-height: 0 !important; page-break-after: auto; }
+  /* .page en FLEX colonne (plus fiable que table+height:100% selon le
+     navigateur) → le contenu pousse le pied tout en bas de chaque feuille */
+  .page { height: 296mm; min-height: 0 !important; display: flex; flex-direction: column; }
+  .page-header  { flex: 0 0 auto; }
+  .page-content { flex: 1 1 auto; }   /* prend la place → pied en bas */
+  .page-footer  { flex: 0 0 auto; }
+  .page-cell    { display: block; }
   .page-dynamic { page-break-before: always; } /* chaque page suivante sur sa feuille */
+  [contenteditable]:empty::before { content: "" !important; } /* pas de placeholder fantôme */
 }
 ```
-- `body { display: block }` : INDISPENSABLE — à l'écran le body est
-  `flex` avec `gap:24px` (espacement des feuilles) ; en impression ce gap
-  décalait tout et créait des feuilles parasites.
-- `.page { height: 296mm }` (un poil < 297mm) : évite le débordement
-  sous-pixel qui, à 297mm pile, créait des feuilles blanches.
+- `body { display: block }` : INDISPENSABLE (sinon `gap:24px` du flex →
+  feuilles parasites).
+- `.page` en **flex colonne** + `.page-content { flex:1 }` : pousse le pied
+  au bas de chaque feuille de façon fiable (le `display:table+height:100%`
+  marchait sous Chrome mais pas partout).
+- `.page { height: 296mm }` (< 297mm) : anti-débordement sous-pixel.
 - `.page-dynamic { page-break-before: always }` : `break-BEFORE`, pas
-  `break-after` (qui, sur un élément pleine feuille, insère un blanc).
+  `break-after` (qui insère un blanc sur un élément pleine feuille).
 
-Validation PDF (Puppeteer, pipeline `injectValues` fidèle) : court → 1
-feuille, moyen → 2, long → 3. **DOM .page == feuilles PDF** (aucune
-parasite), pied **au ras du bas de chaque feuille**, signature sur la
-dernière, zéro chevauchement.
+Validation PDF (Puppeteer, pipeline **deux passes** `injectValues` fidèle,
+cachet inclus) : court → 1 feuille, moyen → 2, long → 3, « corps qui
+remplit presque une page » → 2. **DOM .page == feuilles PDF** (aucune
+parasite), pied **au ras du bas de chaque feuille**, signature **collée au
+corps** sur la dernière, zéro chevauchement, pas de placeholder.
 
 ### Pièges écartés (ne pas y revenir)
 - `position: fixed` + `@page margin-bottom` → blanc sous le pied.
