@@ -47,6 +47,13 @@ serve(async (req) => {
   }).auth.getUser();
   if (authErr || !user) return jsonResponse({ error: "Token invalide ou expiré" }, 401);
 
+  // Vérification du rôle CÔTÉ SERVEUR (admin ou bureau uniquement) — aligné sur assistant-ia.
+  // Sans ce contrôle, n'importe quel membre authentifié pourrait déclencher un envoi de masse.
+  const role = (user.user_metadata as Record<string, unknown> | null)?.role;
+  if (role !== "admin" && role !== "bureau") {
+    return jsonResponse({ error: "Accès réservé au bureau de l'association." }, 403);
+  }
+
   const apiKey = Deno.env.get("BREVO_API_KEY");
   if (!apiKey) return jsonResponse({ error: "BREVO_API_KEY non configurée" }, 500);
 
@@ -60,6 +67,11 @@ serve(async (req) => {
   if (!htmlContent?.trim()) return jsonResponse({ error: "Corps obligatoire" }, 400);
   if (!recipients?.length) return jsonResponse({ error: "Aucun destinataire" }, 400);
   if (recipients.length > 300) return jsonResponse({ error: "Max 300 destinataires" }, 400);
+
+  // NB : la newsletter va TOUJOURS aux abonnés réels (envoi délibéré du bureau).
+  // On n'applique volontairement PAS le détournement TEST_REDIRECT_EMAIL ici, contrairement
+  // aux automatisations (cf. _shared/brevo.ts) : une campagne ne doit jamais être silencieusement
+  // redirigée vers l'adresse de test tant que ce secret est posé pour tester les automatisations.
 
   const db = getServiceClient();
 

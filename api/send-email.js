@@ -215,8 +215,7 @@ function buildNewsletterConfirmPayload({ email, token, confirm_url }) {
       </a>
     </div>
     <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-      Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.<br>
-      Ce lien est valable 48 heures.
+      Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.
     </p>`;
   return {
     sender: SENDER,
