@@ -244,6 +244,9 @@ function RegistrationsList({ event }) {
       email,
       telephone:          patch.telephone?.trim() || null,
       mode_participation: patch.mode_participation || null,
+      status:             patch.status,
+      // Passage en désinscrit : on horodate ; retour vers inscrit/présent : on efface
+      unregistration_date: patch.status === "unregistered" ? new Date().toISOString() : null,
     }).eq("id", id);
     if (error) {
       if (error.code === "23505") toast.error("Cet email est déjà utilisé sur ce webinaire.");
@@ -253,6 +256,40 @@ function RegistrationsList({ event }) {
     toast.success("Participant modifié.");
     await reload();
     return true;
+  }
+
+  // ── Aperçu billet + envoi à l'unité ──
+  const [preview, setPreview]           = useState(null);  // inscription dont on prévisualise le billet
+  const [sendingOneId, setSendingOneId] = useState(null);  // id en cours d'envoi individuel
+
+  // Envoi du lien Zoom (en ligne) ou du billet QR (présentiel) à UN seul inscrit.
+  async function sendOne(r) {
+    const channel = r.mode_participation === "presentiel" ? "qr" : "zoom";
+    if (r.status !== "registered") { toast.error("Le participant doit être inscrit pour recevoir un envoi."); return false; }
+    if (channel === "zoom" && !event.zoom_link) { toast.error("Ajoutez d'abord le lien Zoom à l'événement (Modifier)."); return false; }
+    if (channel === "qr" && !event.lieu) { toast.error("Cet événement n'a pas de lieu : billet QR non applicable."); return false; }
+
+    const libelle = channel === "zoom" ? "le lien de connexion" : "le billet QR";
+    if (!window.confirm(`Envoyer ${libelle} à ${r.nom_complet} (${r.email}) ?`)) return false;
+
+    setSendingOneId(r.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("webinaire-billet", {
+        body: { event_id: event.id, channel, registration_ids: [r.id] },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      const res0 = (data?.results || [])[0];
+      if (res0 && String(res0.status).startsWith("erreur")) throw new Error(res0.status);
+      toast.success(channel === "zoom" ? "Lien envoyé." : "Billet envoyé.");
+      await reload();
+      return true;
+    } catch (err) {
+      toast.error("Erreur d'envoi : " + err.message);
+      return false;
+    } finally {
+      setSendingOneId(null);
+    }
   }
 
   // Suppression définitive d'un participant (la ligne est conservée si l'opération échoue)
@@ -431,11 +468,23 @@ function RegistrationsList({ event }) {
                   hasPresentiel={hasPresentiel} hasOnline={hasOnline}
                   onSave={saveParticipant} onDelete={deleteParticipant}
                   onMarkAttended={markAttended} onUnregister={unregister}
+                  onSendOne={sendOne} onPreview={setPreview}
+                  sendingOne={sendingOneId === r.id}
                 />
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Aperçu du billet QR (présentiel) avec envoi individuel */}
+      {preview && (
+        <BilletPreview
+          event={event} r={preview}
+          sending={sendingOneId === preview.id}
+          onClose={() => setPreview(null)}
+          onSend={async () => { const ok = await sendOne(preview); if (ok) setPreview(null); }}
+        />
       )}
     </div>
   );
@@ -483,12 +532,13 @@ function AddParticipantForm({ hasPresentiel, hasOnline, saving, onSave, onCancel
 
 // ── Ligne participant : affichage + édition inline ───────────────────────────
 
-function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkAttended, onUnregister }) {
+function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkAttended, onUnregister, onSendOne, onPreview, sendingOne }) {
   const [editing, setEditing] = useState(false);
   const [busy, setBusy]       = useState(false);
   const [form, setForm]       = useState({
     nom_complet: r.nom_complet || "", email: r.email || "",
     telephone: r.telephone || "", mode_participation: r.mode_participation || "",
+    status: r.status || "registered",
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -496,6 +546,7 @@ function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkA
     setForm({
       nom_complet: r.nom_complet || "", email: r.email || "",
       telephone: r.telephone || "", mode_participation: r.mode_participation || "",
+      status: r.status || "registered",
     });
     setEditing(true);
   }
@@ -512,7 +563,7 @@ function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkA
     return (
       <tr className="border-b border-border bg-muted/20">
         <td colSpan={8} className="px-3 py-3">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-2">
             <input className={inp} placeholder="Nom complet *"
               value={form.nom_complet} onChange={e => set("nom_complet", e.target.value)} />
             <input className={inp} type="email" placeholder="Email *"
@@ -521,9 +572,15 @@ function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkA
               value={form.telephone} onChange={e => set("telephone", e.target.value)} />
             <select className={sel} value={form.mode_participation}
               onChange={e => set("mode_participation", e.target.value)}>
-              <option value="">Indéfini</option>
+              <option value="">Mode : indéfini</option>
               {hasPresentiel && <option value="presentiel">Présentiel</option>}
               {hasOnline     && <option value="en_ligne">En ligne</option>}
+            </select>
+            <select className={sel} value={form.status}
+              onChange={e => set("status", e.target.value)}>
+              <option value="registered">Inscrit</option>
+              <option value="attended">Présent</option>
+              <option value="unregistered">Désinscrit</option>
             </select>
           </div>
           <div className="flex gap-2 mt-2">
@@ -593,6 +650,18 @@ function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkA
       </td>
       <td className="px-3 py-2.5">
         <div className="flex items-center gap-1 justify-end">
+          {r.status === "registered" && r.mode_participation === "presentiel" && (
+            <button onClick={() => onPreview(r)} title="Voir / envoyer le billet QR"
+              className="w-6 h-6 rounded-md bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center transition-colors">
+              <QrCode className="w-3 h-3" />
+            </button>
+          )}
+          {r.status === "registered" && r.mode_participation === "en_ligne" && (
+            <button onClick={() => onSendOne(r)} disabled={sendingOne} title="Envoyer le lien Zoom à ce participant"
+              className="w-6 h-6 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 disabled:opacity-50 flex items-center justify-center transition-colors">
+              {sendingOne ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+            </button>
+          )}
           {r.status === "registered" && (
             <button onClick={() => onMarkAttended(r.id)} title="Marquer présent"
               className="w-6 h-6 rounded-md bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors">
@@ -616,6 +685,75 @@ function ParticipantRow({ r, hasPresentiel, hasOnline, onSave, onDelete, onMarkA
         </div>
       </td>
     </tr>
+  );
+}
+
+// ── Aperçu du billet QR (rendu proche de l'email réellement envoyé) ──────────
+
+function BilletPreview({ event, r, sending, onClose, onSend }) {
+  // Même encodage que l'Edge Function webinaire-billet
+  const qrData = `MBP-WEBINAIRE|${event.id}|${r.id}|${r.nom_complet}|${r.email}|presentiel`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrData)}`;
+  const dateStr = event.date_time
+    ? new Intl.DateTimeFormat("fr-FR", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric",
+        hour: "2-digit", minute: "2-digit",
+      }).format(new Date(event.date_time))
+    : "Date à préciser";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+        {/* En-tête modale */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+          <p className="font-semibold text-sm text-foreground">Aperçu du billet</p>
+          <button onClick={onClose}
+            className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Billet — rendu proche de l'email envoyé */}
+        <div className="p-5">
+          <div className="rounded-xl overflow-hidden border border-border">
+            <div className="bg-[#14532d] text-center px-4 py-4">
+              <img src="/Logo%20Redesign1.png" alt="MBP"
+                className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white/40 object-cover"
+                onError={e => { e.target.style.display = "none"; }} />
+              <p className="text-white font-bold text-sm">Association Ma Belle Promo (MBP)</p>
+              <p className="text-white/70 text-[10px]">FDD · Université de Lomé · 1994–2000</p>
+            </div>
+            <div className="bg-white px-5 py-4 text-center">
+              <p className="text-[#111827] font-bold text-sm mb-1">{event.title}</p>
+              <p className="text-[#6b7280] text-xs mb-0.5">📅 {dateStr}</p>
+              {event.lieu && <p className="text-[#6b7280] text-xs mb-3">📍 {event.lieu}</p>}
+              <img src={qrUrl} alt="Billet QR" width="200" height="200"
+                className="mx-auto rounded-lg border border-gray-200 p-2 bg-white" />
+              <p className="text-[#111827] font-bold text-xs mt-3">Présentez ce QR code à l'entrée.</p>
+              <p className="text-[#6b7280] text-[11px] mt-2">{r.nom_complet} · {r.email}</p>
+            </div>
+          </div>
+          {r.qr_sent && (
+            <p className="text-[11px] text-emerald-500 mt-2 text-center">✓ Billet déjà envoyé à ce participant</p>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 px-5 pb-5">
+          <button onClick={onClose}
+            className="flex-1 h-9 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted transition-colors">
+            Fermer
+          </button>
+          <button onClick={onSend} disabled={sending}
+            className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5">
+            {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            {r.qr_sent ? "Renvoyer le billet" : "Envoyer le billet"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
