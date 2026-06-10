@@ -74,32 +74,35 @@
     @page { size: A4; margin: 0; }
     @media print {
       html, body { margin: 0; padding: 0; }
-      body { background: none; }
-      /* min-height: 100vh = au moins une feuille pleine → sur un courrier
-         court, le tableau remplit la page et pousse le pied (tfoot) tout
-         en bas (collé au bord). Sur un courrier long, 100vh est dépassé :
-         la pagination se fait naturellement. On force cette valeur pour
-         neutraliser le minHeight (multi-feuilles) injecté par
-         CourrierSection, qui sinon fausserait la répétition du pied. */
+      /* Le body est en flex+gap:24px à l'écran (espacement des feuilles) :
+         en impression on le repasse en bloc, sinon le gap de 24px entre
+         les pages décale tout et insère des feuilles parasites. */
+      body { background: none; display: block; }
+      /* Refonte pagination : CHAQUE .page = exactement une feuille A4.
+         Le script JS scinde le contenu pour qu'il tienne sur chaque
+         feuille, et le pied (table-row) est poussé au bas de chaque
+         feuille par la rangée de contenu (height:100%). Résultat : pied
+         collé au bas de TOUTES les feuilles, dernière incluse, sans
+         page parasite. min-height:0 neutralise le minHeight injecté par
+         CourrierSection (qui ferait déborder la feuille). */
       .page {
         box-shadow: none;
         width: var(--mbp-page-w);
-        height: auto !important;
-        min-height: 100vh !important;
+        /* 296mm (un poil < 297mm) : évite le débordement sous-pixel qui,
+           avec une feuille pile à 297mm, créait des feuilles blanches.
+           Le pied reste calé au bas via la rangée de contenu height:100%
+           (≈1mm au-dessus du bord physique, visuellement au ras). */
+        height: 296mm;
+        min-height: 0 !important;
+        /* On annule le page-break-after:always de base (qui, sur un
+           élément pleine feuille, insère une feuille blanche). */
+        page-break-after: auto;
       }
+      /* Chaque page suivante (dynamique) démarre sur une nouvelle feuille
+         via break-BEFORE → pas de chevauchement de frontière, pas de
+         feuille blanche finale. */
+      .page-dynamic { page-break-before: always; }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
-
-      /* ── Pied collé au bas de chaque feuille, sans chevauchement ──
-         On bascule les 3 rangées du tableau en groupes natifs :
-         - table-footer-group : le navigateur place le pied au BAS de
-           chaque feuille imprimée, le RÉPÈTE sur chaque page et réserve
-           sa hauteur (le contenu ne le recouvre jamais).
-         - L'en-tête en row-group : rendu une seule fois, page 1.
-         NB : sur une dernière page partielle, le pied suit le contenu
-         (comportement standard d'un tfoot). */
-      .page-header  { display: table-row-group; }
-      .page-content { display: table-row-group; }
-      .page-footer  { display: table-footer-group; }
     }
 
     /* ══════════════════════════════════════════════════
@@ -572,7 +575,15 @@
 
   /* ── Pagination dynamique MBP ── */
 
-  var PAGE_H;                              // mesuré à chaque paginate()
+  /* Budget de hauteur utile par feuille, en px (96 dpi).
+     Une feuille A4 = 1122,5px (297mm). On garde une MARGE DE SÉCURITÉ
+     (~70px) sous ce maximum : le découpage est calculé avant que
+     CourrierSection n'injecte son CSS (padding/marges) et avant le
+     rendu d'impression (mm ≠ px à l'arrondi près) ; sans marge, le
+     contenu dépasserait la feuille d'une fraction → feuilles parasites.
+     Valeur FIXE (on ne mesure plus la page, qui débordée renvoyait une
+     hauteur géante → aucune scission). */
+  var PAGE_H = 1080;
   var CORPS  = '.corps-lettre, .e-corps';  // classe selon version
 
   function textToHtml(t) {
@@ -659,24 +670,36 @@
   var _t;
   function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
 
-  function paginate() {
-    PAGE_H = document.querySelector('.page').offsetHeight;
-    var p1 = document.querySelector('.page:not(.page-dynamic)');
-    var c1 = p1.querySelector(CORPS);
+  /* Corps (main.body) d'une page, où réinsérer le bloc signature */
+  function bodyOf(page) {
+    var c = page.querySelector(CORPS);
+    return (c && c.parentElement) || page.querySelector('.body');
+  }
 
-    /* Rassembler tout le texte de toutes les pages */
+  function paginate() {
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    if (!p1) return;
+    var c1 = p1.querySelector(CORPS);
+    if (!c1) return;
+
+    /* Rassembler tout le texte du corps (toutes les pages) */
     var all = Array.from(document.querySelectorAll(CORPS))
       .map(function (e) { return e.innerText || ''; })
       .filter(Boolean).join('\n');
 
-    /* Supprimer les pages dynamiques */
+    /* Détacher le bloc politesse + signature : il doit terminer sur la
+       DERNIÈRE feuille, après tout le corps (et non rester en page 1). */
+    var closing = p1.querySelector('.closing-row, .closing');
+    if (closing && closing.parentNode) closing.parentNode.removeChild(closing);
+
+    /* Supprimer les pages dynamiques précédentes */
     document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
 
     /* Remettre le texte complet dans la page 1 */
     c1.innerHTML = textToHtml(all);
 
-    /* Créer les pages suivantes si débordement */
-    var cur = p1, guard = 20;
+    /* Scinder le corps sur des feuilles successives */
+    var cur = p1, guard = 40;
     while (isOver(cur) && guard-- > 0) {
       var ov = split(cur.querySelector(CORPS), cur);
       if (!ov.trim()) break;
@@ -685,12 +708,27 @@
       cur = np;
     }
 
-    /* Supprimer la dernière page dynamique si son corps est vide */
+    /* Réinsérer politesse + signature à la fin de la dernière feuille.
+       Si ça la fait déborder, les pousser sur une feuille de plus. */
+    if (closing) {
+      bodyOf(cur).appendChild(closing);
+      if (isOver(cur)) {
+        if (closing.parentNode) closing.parentNode.removeChild(closing);
+        var npc = makePage('');
+        bodyOf(npc).appendChild(closing);
+        cur.insertAdjacentElement('afterend', npc);
+        cur = npc;
+      }
+    }
+
+    /* Supprimer la dernière page dynamique si elle est vraiment vide
+       (corps vide ET pas de bloc signature). */
     var dynPages = document.querySelectorAll('.page-dynamic');
     if (dynPages.length > 0) {
       var last = dynPages[dynPages.length - 1];
-      var lastCorps = last.querySelector(CORPS);
-      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
+      var lc = last.querySelector(CORPS);
+      var hasClosing = last.querySelector('.closing-row, .closing');
+      if ((!lc || !lc.innerText.trim()) && !hasClosing) last.remove();
     }
   }
 

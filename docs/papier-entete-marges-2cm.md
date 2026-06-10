@@ -85,55 +85,68 @@ le contenu coulait jusqu'au bord et passait sous le pied.
 La tentative `margin-bottom` sur `.page-content` était inopérante
 (les marges sont ignorées sur un `display: table-row`).
 
-### Correctif retenu (vérifié au rendu PDF réel, Chrome headless)
+### Correctif retenu : REFONTE pagination (vérifié au rendu PDF réel)
 
-Le pied utilise les **groupes natifs de tableau** : il se cale au bas
-PHYSIQUE de chaque feuille, se répète et réserve sa hauteur. C'est ce qui
-le « colle au bas de page » — un pied `position: fixed` en était
-incapable (toujours décalé de la marge `@page`, jamais au ras du bord).
+Objectif final (demandé par Eric) : pied **au ras du bas de CHAQUE
+feuille, dernière page incluse**, sans page parasite. Aucune astuce CSS
+pure n'y arrive (un `tfoot` suit le contenu sur la dernière page ; un
+pied `position: fixed` + spacer crée des pages vides). On a donc refondu
+le **moteur de pagination JS** du template pour que **chaque `.page` =
+exactement une feuille A4**, avec le pied en bas via le tableau.
 
+**Principe :** le script scinde le corps pour qu'il tienne sur chaque
+feuille (recherche binaire au mot), crée une `.page` par feuille, et le
+pied (`table-row`) est poussé au bas par la rangée de contenu
+(`height:100%`). La signature est déplacée sur la **dernière** feuille.
+
+**Points clés du JS** (`<script>` du template) :
+- `var PAGE_H = 1080;` — budget de hauteur par feuille, en px. Volontaire-
+  ment < 1122,5px (feuille A4 @96dpi) : marge de sécurité car le découpage
+  est calculé AVANT l'injection du CSS de CourrierSection et le rendu mm.
+  **Ne plus mesurer `.page.offsetHeight`** (débordé = hauteur géante → 0
+  scission : c'était le bug d'origine).
+- `paginate()` détache le bloc politesse+signature, scinde le corps sur N
+  feuilles, puis **réinsère la signature à la fin de la dernière feuille**
+  (sur une feuille de plus si ça déborde).
+
+**Points clés du CSS `@media print` :**
 ```css
 @page { size: A4; margin: 0; }
-
 @media print {
-  /* min-height:100vh → un courrier COURT remplit la feuille et pousse le
-     pied (tfoot) tout en bas ; un courrier LONG dépasse 100vh et pagine
-     normalement. Neutralise aussi le minHeight injecté par CourrierSection. */
-  .page { height: auto !important; min-height: 100vh !important; }
-
-  /* En-tête rendu une seule fois ; pied au bas de chaque feuille, répété,
-     hauteur réservée (pas de chevauchement). */
-  .page-header  { display: table-row-group; }
-  .page-content { display: table-row-group; }
-  .page-footer  { display: table-footer-group; }
+  body { display: block; }          /* sinon flex+gap:24px insère des feuilles */
+  .page { height: 296mm; min-height: 0 !important; page-break-after: auto; }
+  .page-dynamic { page-break-before: always; } /* chaque page suivante sur sa feuille */
 }
 ```
+- `body { display: block }` : INDISPENSABLE — à l'écran le body est
+  `flex` avec `gap:24px` (espacement des feuilles) ; en impression ce gap
+  décalait tout et créait des feuilles parasites.
+- `.page { height: 296mm }` (un poil < 297mm) : évite le débordement
+  sous-pixel qui, à 297mm pile, créait des feuilles blanches.
+- `.page-dynamic { page-break-before: always }` : `break-BEFORE`, pas
+  `break-after` (qui, sur un élément pleine feuille, insère un blanc).
 
-Validation : PDF via Puppeteer (chemin identique à Ctrl+P,
-`preferCSSPageSize`), pipeline `injectValues` reproduit fidèlement.
-- **Court** → 1 page, pied **collé au bord inférieur**.
-- **Long** → 3 pages, en-tête une seule fois, pied collé en bas de chaque
-  page pleine, **zéro chevauchement**.
-
-**Limite connue acceptée :** sur une dernière page PARTIELLE d'un courrier
-multi-pages, le pied suit le contenu (au lieu d'être au ras du bas) —
-comportement standard d'un `tfoot`, rare en pratique (courriers 1 page).
+Validation PDF (Puppeteer, pipeline `injectValues` fidèle) : court → 1
+feuille, moyen → 2, long → 3. **DOM .page == feuilles PDF** (aucune
+parasite), pied **au ras du bas de chaque feuille**, signature sur la
+dernière, zéro chevauchement.
 
 ### Pièges écartés (ne pas y revenir)
-- `position: fixed; bottom: 0` + `@page margin-bottom` → laisse un blanc
-  sous le pied (le fixed est prisonnier de la zone de contenu).
+- `position: fixed` + `@page margin-bottom` → blanc sous le pied.
 - `bottom: -24mm` → éjecte le pied sur la page suivante.
-- `transform: translateY(24mm)` sur le pied fixe → pied clippé / déplacé.
-- `table-footer-group` AVEC `height: 297mm` ou `minHeight` forcé → casse
-  la pagination du tableau (pied bloqué au milieu). D'où `min-height:100vh`
-  + `height:auto`.
+- `transform: translateY` sur le pied fixe → clippé.
+- `table-footer-group` (tfoot) → ne se cale pas en bas d'une dernière
+  page partielle (suit le contenu).
+- pied fixe + spacer `tfoot` → crée une feuille quasi vide quand le texte
+  remplit presque une feuille.
+- `page-break-after: always` sur une `.page` pleine feuille → feuille blanche.
+- mesurer `PAGE_H` sur la page, ou `PAGE_H` trop proche de 1122,5px → débord.
 
 ### Repère pour V2 → V7
-- **Hauteur naturelle du pied V1 : 74 px.**
-- Recette portable sur tout modèle en `display: table` : passer en-tête →
-  `table-row-group`, contenu → `table-row-group`, pied → `table-footer-group`,
-  `@page margin:0`, `.page { height:auto; min-height:100vh }`. Les modèles
-  bâtis en **flex** doivent d'abord être restructurés en tableau.
+- Même refonte : modèle en `display: table` (en-tête/contenu/pied en
+  rangées), script de pagination avec `PAGE_H` à marge de sécurité,
+  `body { display:block }` + `.page-dynamic { break-before }` en print.
+  Les modèles en **flex** doivent d'abord être restructurés en tableau.
 
 ## Plan pour décliner V2 → V7 (séance suivante)
 
