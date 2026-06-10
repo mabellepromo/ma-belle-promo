@@ -254,6 +254,43 @@ const PAGINATE_CSS = `
   img[alt^="Cachet"] { height: 90px !important; width: auto !important; }
 `;
 
+// CSS d'impression STRUCTUREL commun aux modèles V2→V7 (V1 a déjà le sien
+// dans son HTML, verrouillé : on ne l'injecte donc PAS pour V1).
+// Tous ces modèles partagent le même squelette que V1 (.page table avec
+// rangées .page-header/.page-content/.page-footer). On bascule la .page en
+// FLEX colonne en impression → le contenu pousse le pied tout en bas de
+// CHAQUE feuille. Mêmes recettes que V1 (cf. docs/papier-entete-marges-2cm.md).
+const PRINT_CSS = `
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body { margin: 0 !important; padding: 0 !important; }
+    /* body en bloc (sinon un flex+gap insère des feuilles parasites) */
+    body { background: none !important; display: block !important; }
+    /* chaque .page = une feuille A4, en flex colonne */
+    .page {
+      box-shadow: none !important;
+      width: 210mm !important;
+      height: 296mm !important;        /* < 297mm : anti-débord sous-pixel */
+      min-height: 0 !important;        /* neutralise le minHeight injecté */
+      display: flex !important;
+      flex-direction: column !important;
+      page-break-after: auto !important;
+    }
+    .page-header  { display: block !important; flex: 0 0 auto !important; position: static !important; margin: 0 !important; }
+    /* margin:0 neutralise les restes de l'ancienne approche position:fixed
+       (ex. V7 : .page-content margin-bottom:93px) qui débordaient en flex */
+    .page-content { display: block !important; flex: 1 1 auto !important; position: static !important; margin: 0 !important; }
+    /* height:auto neutralise un éventuel .page-footer height:93px figé */
+    .page-footer  { display: block !important; flex: 0 0 auto !important; position: static !important; height: auto !important; margin: 0 !important; }
+    .page-cell    { display: block !important; width: auto !important; }
+    /* chaque feuille suivante démarre sur une nouvelle page */
+    .page-dynamic { page-break-before: always !important; }
+    /* pas de placeholder fantôme à l'impression */
+    [contenteditable]:empty::before { content: "" !important; }
+    .closing-row, .closing { break-inside: avoid !important; page-break-inside: avoid !important; }
+  }
+`;
+
 /**
  * Pagine le document `d` (iframe) : découpe le corps pour que CHAQUE .page
  * tienne sur une feuille A4, en gardant la signature collée à la fin du
@@ -264,8 +301,11 @@ const PAGINATE_CSS = `
  * (`script-src 'self'`) qui BLOQUE les scripts inline. On l'exécute donc
  * ici, dans le code de l'app (autorisé par la CSP), sur le DOM de l'iframe.
  */
-function paginateDoc(d) {
-  const PAGE_H = 1080;           // budget de hauteur utile par feuille (px)
+function paginateDoc(d, PAGE_H = 1080) {
+  // PAGE_H = budget de hauteur utile par feuille (px). 1080 pour V1
+  // (verrouillé). Les modèles V2-V7 passent une valeur plus basse (marge de
+  // sécurité plus large) car leurs en-têtes/pieds plus hauts, mesurés en
+  // police de repli pendant la pagination, débordent sinon d'un cran.
   let RESERVE = 0;              // place réservée pour la signature
   const CORPS = ".corps-lettre, .e-corps";
   const win = d.defaultView;
@@ -327,6 +367,11 @@ function paginateDoc(d) {
     bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
     const ftr = cloneFooter();
     pg.appendChild(fakeHdr); pg.appendChild(ct); if (ftr) pg.appendChild(ftr);
+    // Cadre décoratif (V7) : le cloner sur les pages dynamiques pour qu'elles
+    // aient aussi la bordure (sinon page 2+ sans cadre). Absolu inset:0 →
+    // recouvre la .page. Sans effet sur les modèles sans .deco-frame.
+    const deco = d.querySelector(".page:not(.page-dynamic) .deco-frame");
+    if (deco) pg.insertBefore(deco.cloneNode(true), pg.firstChild);
     return pg;
   }
   function bodyOf(page) {
@@ -396,7 +441,7 @@ function paginateDoc(d) {
 
 // Injection via iframe live — plus fiable que DOMParser dont outerHTML
 // ne reflète pas toujours les mutations DOM dans Chrome/Edge
-async function injectValues(html, form, compact = false) {
+async function injectValues(html, form, compact = false, templateId = null) {
   const iframe = document.createElement("iframe");
   // Hauteur 1200px (≈ une feuille) pour que la pagination mesure des
   // hauteurs d'éléments fiables ; l'iframe reste hors écran.
@@ -501,6 +546,14 @@ async function injectValues(html, form, compact = false) {
   paginateStyle.textContent = PAGINATE_CSS;
   d.head.appendChild(paginateStyle);
 
+  // CSS d'impression structurel pour V2→V7 (V1 a le sien dans son HTML,
+  // verrouillé → on ne l'injecte pas pour V1).
+  if (templateId && templateId !== "v1") {
+    const printStyle = d.createElement("style");
+    printStyle.textContent = PRINT_CSS;
+    d.head.appendChild(printStyle);
+  }
+
   if (compact) {
     const compactStyle = d.createElement("style");
     compactStyle.textContent = COMPACT_CSS;
@@ -519,7 +572,8 @@ async function injectValues(html, form, compact = false) {
   // de tableau .page-content/.page-footer (V1) ; try/catch de sécurité pour
   // ne jamais bloquer la génération d'un autre modèle.
   if (d.querySelector(".page-content") && d.querySelector(".page-footer")) {
-    try { paginateDoc(d); } catch (e) { /* repli : document non paginé */ }
+    // V1 verrouillé : 1080. V2-V7 : 1010 (marge de sécurité plus large).
+    try { paginateDoc(d, templateId === "v1" ? 1080 : 1010); } catch (e) { /* repli */ }
   }
 
   const pageEl = d.querySelector(".page");
@@ -568,7 +622,7 @@ export default function CourrierSection() {
           if (!resp.ok) throw new Error();
           htmlCacheRef.current[template.file] = await resp.text();
         }
-        const injected = await injectValues(htmlCacheRef.current[template.file], form, compact);
+        const injected = await injectValues(htmlCacheRef.current[template.file], form, compact, template.id);
 
         // Iframe hors-écran aux dimensions A4
         const iframe = document.createElement("iframe");
@@ -605,7 +659,7 @@ export default function CourrierSection() {
         if (!resp.ok) throw new Error("Modèle introuvable");
         htmlCacheRef.current[template.file] = await resp.text();
       }
-      const injected = await injectValues(htmlCacheRef.current[template.file], form, compact);
+      const injected = await injectValues(htmlCacheRef.current[template.file], form, compact, template.id);
       // Blob URL : plus fiable que document.write, évite les quirks de rendu
       const blob = new Blob([injected], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
