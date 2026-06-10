@@ -85,6 +85,24 @@ le contenu coulait jusqu'au bord et passait sous le pied.
 La tentative `margin-bottom` sur `.page-content` était inopérante
 (les marges sont ignorées sur un `display: table-row`).
 
+### ⚠️ Piège CSP (cause racine des échecs en production)
+
+Le document d'impression est ouvert dans un **blob:** qui **hérite de la
+CSP du dashboard** (`script-src 'self'` dans `vercel.json`). Cette CSP
+**bloque tout `<script>` inline** — donc le script de pagination *du
+template* ne s'exécute JAMAIS en production (console : « Refused to execute
+inline script »). Résultat : une seule `.page` géante, pied au milieu.
+
+→ La pagination DOIT être faite par le **code de l'app**
+(`paginateDoc()` dans `CourrierSection.jsx`, appelé depuis `injectValues`
+sur le DOM de l'iframe), qui est autorisé par la CSP. Le blob n'affiche
+plus que du HTML déjà paginé.
+
+**Tester une pagination de courrier = TOUJOURS poser la CSP
+`script-src 'self'` dans le test** (sinon le script inline tourne et donne
+un faux positif). Le script inline reste dans le template (utile en
+standalone hors-CSP, idempotent si jamais le blob l'exécute).
+
 ### Correctif retenu : REFONTE pagination (vérifié au rendu PDF réel)
 
 Objectif final (demandé par Eric) : pied **au ras du bas de CHAQUE
