@@ -15,6 +15,17 @@
       --bordure:     hsl(148, 30%, 84%);   /* Border */
       --texte:       hsl(150, 30%, 10%);   /* Foreground */
       --texte-muted: hsl(150, 10%, 45%);   /* Muted foreground */
+
+      /* ── Configuration A4 & zone de sécurité (réutilisable) ──
+         Unités en mm : rendu identique à l'écran (96 dpi) et à
+         l'impression. 20mm = 2 cm de marge sur les 4 côtés.
+         Le bandeau d'en-tête et le pied conservent leur fond
+         pleine largeur (full-bleed) ; ces variables cadrent le
+         CONTENU dans la zone de sécurité de 2 cm. */
+      --mbp-page-w:     210mm;   /* Largeur A4 */
+      --mbp-page-h:     297mm;   /* Hauteur A4 */
+      --mbp-margin:     20mm;    /* Marge / zone de sécurité = 2 cm */
+      --mbp-footer-h:   93px;    /* Hauteur réservée au pied en impression */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,14 +71,40 @@
     .page-footer  { display: table-row; }
     .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
     
-    @page { margin: 0; }
+    /* La marge BASSE de @page (24mm ≈ pied 74px + respiration) réserve,
+       sur CHAQUE feuille imprimée, la bande où se loge le pied fixe.
+       C'est ce qui empêche le contenu de chevaucher le pied — l'ancien
+       @page { margin:0 } ne réservait rien, d'où le débordement.
+       NB : @page n'accepte pas les var() CSS → valeur littérale. */
+    @page { size: A4; margin: 0 0 24mm 0; }
     @media print {
-      html, body { height: 100%; margin: 0; padding: 0; }
+      html, body { margin: 0; padding: 0; }
       body { background: none; }
-      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      /* On neutralise la hauteur fixe (et le minHeight injecté par
+         CourrierSection) : la pagination est gérée par @page, pas par
+         une hauteur forcée qui déborderait sur la zone réservée. */
+      .page {
+        box-shadow: none;
+        width: var(--mbp-page-w);
+        height: auto !important;
+        min-height: 0 !important;
+      }
       .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
-      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
-      .page-content { margin-bottom: 93px; }
+
+      /* Pied flottant : le navigateur le répète en bas de chaque feuille
+         imprimée, dans la bande réservée par la marge basse de @page. */
+      .page-footer {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+      }
+      /* position:fixed « blockifie » le pied ; sa cellule (table-cell)
+         créerait sinon un tableau anonyme qui se rétracte à la largeur
+         du contenu → bande tronquée. On la repasse en bloc pleine
+         largeur pour que le fond du pied couvre toute la feuille. */
+      .page-footer .page-cell {
+        display: block;
+        width: 100%;
+      }
     }
 
     /* ══════════════════════════════════════════════════
@@ -75,7 +112,9 @@
        ══════════════════════════════════════════════════ */
     .header {
       background: var(--vert-foret);
-      padding: 28px 40px 24px;
+      /* Fond pleine largeur ; le contenu (logo + titre) reste dans
+         la colonne de sécurité de 2 cm via le padding horizontal. */
+      padding: 28px var(--mbp-margin) 24px;
       display: flex;
       align-items: center;
       gap: 24px;
@@ -138,7 +177,9 @@
 
     /* ── Corps de la lettre ── */
     .body {
-      padding: 36px 48px 80px;
+      /* Corps confiné dans la zone de sécurité de 2 cm (gauche/droite).
+         Bas généreux pour ne jamais chevaucher le pied fixe. */
+      padding: 36px var(--mbp-margin) 80px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -331,7 +372,8 @@
     .footer {
       border-top: 1px solid var(--bordure);
       background: var(--fond-sauge);
-      padding: 14px 40px;
+      /* Fond pleine largeur ; contenu centré dans la zone 2 cm. */
+      padding: 14px var(--mbp-margin);
     }
 
     .footer-inner {
