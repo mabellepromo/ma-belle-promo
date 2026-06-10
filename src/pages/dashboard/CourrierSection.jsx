@@ -240,12 +240,162 @@ const COMPACT_CSS = `
   p { margin-bottom: 0.35em !important; margin-top: 0 !important; }
 `;
 
+// Style de normalisation pour une pagination fiable (équivalent de ce que
+// le <script> inline du template injectait — mais ce script est bloqué par
+// la CSP `script-src 'self'` dans le blob d'impression, donc on le fait ici).
+const PAGINATE_CSS = `
+  .corps-lettre, .e-corps { min-height: 0 !important; }
+  img[alt^="Cachet"] { height: 90px !important; width: auto !important; }
+`;
+
+/**
+ * Pagine le document `d` (iframe) : découpe le corps pour que CHAQUE .page
+ * tienne sur une feuille A4, en gardant la signature collée à la fin du
+ * corps sur la dernière feuille.
+ *
+ * Cette logique vivait dans un <script> inline du template HTML, mais le
+ * document d'impression (blob:) hérite de la CSP du dashboard
+ * (`script-src 'self'`) qui BLOQUE les scripts inline. On l'exécute donc
+ * ici, dans le code de l'app (autorisé par la CSP), sur le DOM de l'iframe.
+ */
+function paginateDoc(d) {
+  const PAGE_H = 1080;           // budget de hauteur utile par feuille (px)
+  let RESERVE = 0;              // place réservée pour la signature
+  const CORPS = ".corps-lettre, .e-corps";
+  const win = d.defaultView;
+
+  const textToHtml = t =>
+    t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+
+  function availH(page) {
+    const hdr = page.querySelector(".page-header");
+    const ftr = page.querySelector(".page-footer");
+    const corps = page.querySelector(CORPS);
+    const body = corps && corps.parentElement;
+    let used = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      const s = win.getComputedStyle(body);
+      const gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(c => { if (c !== corps) used += c.offsetHeight; });
+    }
+    return PAGE_H - used - RESERVE;
+  }
+  function isOver(page) {
+    const c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+  function split(corps, page) {
+    const tokens = (corps.innerText || "").split(/(\s+)/);
+    let lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = "hidden";
+    while (lo <= hi) {
+      const mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(""));
+      if (isOver(page)) hi = mid - 1; else { best = mid; lo = mid + 1; }
+    }
+    const over = tokens.slice(best).join("").replace(/^\s+/, "");
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(""));
+    corps.style.visibility = "";
+    return over;
+  }
+  function cloneFooter() {
+    const f = d.querySelector(".page:not(.page-dynamic) .page-footer");
+    return f ? f.cloneNode(true) : null;
+  }
+  function corpsClass() {
+    return d.querySelector(".e-corps") ? "e-corps" : "corps-lettre";
+  }
+  function makePage(text) {
+    const pg = d.createElement("div"); pg.className = "page page-dynamic";
+    const fakeHdr = d.createElement("div"); fakeHdr.className = "page-header";
+    const fakeHdrCell = d.createElement("div"); fakeHdrCell.className = "page-cell";
+    fakeHdrCell.style.padding = "0"; fakeHdrCell.style.height = "0";
+    fakeHdr.appendChild(fakeHdrCell);
+    const ct = d.createElement("div"); ct.className = "page-content";
+    const cl = d.createElement("div"); cl.className = "page-cell";
+    const bd = d.createElement("main"); bd.className = "body"; bd.style.paddingTop = "24px";
+    const cr = d.createElement("div"); cr.className = corpsClass();
+    cr.innerHTML = textToHtml(text);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    const ftr = cloneFooter();
+    pg.appendChild(fakeHdr); pg.appendChild(ct); if (ftr) pg.appendChild(ftr);
+    return pg;
+  }
+  function bodyOf(page) {
+    const c = page.querySelector(CORPS);
+    return (c && c.parentElement) || page.querySelector(".body");
+  }
+
+  const p1 = d.querySelector(".page:not(.page-dynamic)");
+  if (!p1) return;
+  const c1 = p1.querySelector(CORPS);
+  if (!c1) return;
+
+  const all = Array.from(d.querySelectorAll(CORPS))
+    .map(e => e.innerText || "").filter(Boolean).join("\n");
+
+  // Signature détachée (cherchée partout) pour finir sur la dernière feuille
+  const closing = d.querySelector(".closing-row, .closing");
+  const closingH = closing ? closing.offsetHeight + 24 : 0;
+  if (closing && closing.parentNode) closing.parentNode.removeChild(closing);
+
+  d.querySelectorAll(".page-dynamic").forEach(p => p.remove());
+  c1.innerHTML = textToHtml(all);
+
+  // 1) découpe du corps (sans réserve)
+  RESERVE = 0;
+  let cur = p1, guard = 40;
+  while (isOver(cur) && guard-- > 0) {
+    const ov = split(cur.querySelector(CORPS), cur);
+    if (!ov.trim()) break;
+    const np = makePage(ov);
+    cur.insertAdjacentElement("afterend", np);
+    cur = np;
+  }
+
+  // 2) réserve la place de la signature sur la DERNIÈRE feuille
+  if (closing) {
+    RESERVE = closingH;
+    let guard2 = 40;
+    while (isOver(cur) && guard2-- > 0) {
+      const ov2 = split(cur.querySelector(CORPS), cur);
+      if (!ov2.trim()) break;
+      const np2 = makePage(ov2);
+      cur.insertAdjacentElement("afterend", np2);
+      cur = np2;
+    }
+    RESERVE = 0;
+    // 3) réinsère politesse + signature à la fin de la dernière feuille
+    bodyOf(cur).appendChild(closing);
+    if (isOver(cur)) {
+      if (closing.parentNode) closing.parentNode.removeChild(closing);
+      const npc = makePage("");
+      bodyOf(npc).appendChild(closing);
+      cur.insertAdjacentElement("afterend", npc);
+      cur = npc;
+    }
+  }
+
+  // nettoyage d'une éventuelle dernière feuille vide
+  const dyn = d.querySelectorAll(".page-dynamic");
+  if (dyn.length > 0) {
+    const last = dyn[dyn.length - 1];
+    const lc = last.querySelector(CORPS);
+    const hasClosing = last.querySelector(".closing-row, .closing");
+    if ((!lc || !lc.innerText.trim()) && !hasClosing) last.remove();
+  }
+}
+
 // Injection via iframe live — plus fiable que DOMParser dont outerHTML
 // ne reflète pas toujours les mutations DOM dans Chrome/Edge
 async function injectValues(html, form, compact = false) {
   const iframe = document.createElement("iframe");
+  // Hauteur 1200px (≈ une feuille) pour que la pagination mesure des
+  // hauteurs d'éléments fiables ; l'iframe reste hors écran.
   iframe.style.cssText =
-    "position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;" +
+    "position:fixed;top:-9999px;left:-9999px;width:794px;height:1200px;" +
     "border:none;visibility:hidden;pointer-events:none";
   document.body.appendChild(iframe);
 
@@ -341,6 +491,10 @@ async function injectValues(html, form, compact = false) {
   injectStyle.textContent = INJECT_CSS;
   d.head.appendChild(injectStyle);
 
+  const paginateStyle = d.createElement("style");
+  paginateStyle.textContent = PAGINATE_CSS;
+  d.head.appendChild(paginateStyle);
+
   if (compact) {
     const compactStyle = d.createElement("style");
     compactStyle.textContent = COMPACT_CSS;
@@ -353,6 +507,15 @@ async function injectValues(html, form, compact = false) {
     d.fonts.ready,
     new Promise(r => setTimeout(r, 3000))
   ]);
+
+  // Pagination CÔTÉ APP (le <script> inline du template est bloqué par la
+  // CSP dans le blob d'impression). Seulement pour les modèles à structure
+  // de tableau .page-content/.page-footer (V1) ; try/catch de sécurité pour
+  // ne jamais bloquer la génération d'un autre modèle.
+  if (d.querySelector(".page-content") && d.querySelector(".page-footer")) {
+    try { paginateDoc(d); } catch (e) { /* repli : document non paginé */ }
+  }
+
   const pageEl = d.querySelector(".page");
   if (pageEl) {
     const h = pageEl.scrollHeight;
