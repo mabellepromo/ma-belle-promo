@@ -3,9 +3,10 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   UserPlus, Loader2, Check, X, Trash2, Mail, Phone,
-  ExternalLink, ChevronDown, ChevronUp, UserCheck, Target,
+  ExternalLink, ChevronDown, ChevronUp, UserCheck, Target, Printer,
 } from "lucide-react";
 import { useConfirm } from "@/hooks/useConfirm";
+import { genererFicheCandidature } from "@/lib/documentGenerators";
 import {
   PROFILE_TYPES, COUNTRIES, EXPERTISE_DOMAINS, LANGUAGES,
   PROJECT_INTERESTS, MISSION_TYPES, ENGAGEMENT_LEVELS, MODALITIES,
@@ -317,6 +318,11 @@ export default function CandidaturesSection({ embedded = false }) {
                       <button onClick={() => convertToBenevole(c)} disabled={busy === c.id || !!c.benevole_id}
                         className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/25 transition-colors disabled:opacity-50">
                         <UserCheck className="w-3.5 h-3.5" /> {c.benevole_id ? "Converti" : "Convertir en bénévole"}
+                      </button>
+
+                      <button onClick={() => genererFicheCandidature(c)}
+                        className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg bg-muted/50 text-foreground text-xs font-semibold hover:bg-muted transition-colors">
+                        <Printer className="w-3.5 h-3.5" /> Imprimer / PDF
                       </button>
 
                       <button onClick={() => remove(c)}

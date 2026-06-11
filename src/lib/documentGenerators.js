@@ -1,4 +1,10 @@
 ﻿import { supabase } from "./supabase";
+import {
+  PROFILE_TYPES, COUNTRIES, EXPERTISE_DOMAINS, LANGUAGES, PROJECT_INTERESTS,
+  MISSION_TYPES, ENGAGEMENT_LEVELS, ENGAGEMENT_DURATIONS, PREFERRED_SCHEDULES,
+  MODALITIES, EMPLOYMENT_SECTORS, UNIVERSITIES, STUDY_YEARS, TIMEZONES,
+  REFERRAL_SOURCES, NEWSLETTER_FREQUENCIES, labelOf, labelsOf,
+} from "./benevolatConstants";
 
 const MBP_STYLE = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
@@ -945,6 +951,149 @@ export function genererFicheAffectation(a) {
 </html>`;
 
   openDoc(html, `Fiche-affectation-${(a.volunteer_nom || "benevole").replace(/\s+/g, "-")}.html`);
+}
+
+// ── Helpers partagés pour les fiches bénévolat ──────────────────────────────
+const _escDoc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const _fmtDocDate = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "";
+const _docRow = (label, value) =>
+  (value && value !== "—")
+    ? `<tr>
+         <td style="padding:6px 0;font-size:11pt;color:#2a6040;font-weight:600;width:38%;vertical-align:top;">${label}</td>
+         <td style="padding:6px 0;font-size:11pt;color:#0a1f12;">${value}</td>
+       </tr>`
+    : "";
+const _docH3 = (txt) =>
+  `<h3 style="font-family:'Cormorant Garamond',serif;font-size:15pt;color:#0a1f12;margin:20px 0 6px;border-bottom:2px solid #f0a030;padding-bottom:4px;">${txt}</h3>`;
+
+function _ficheShell(title, ref, bodyInner, filename) {
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  <style>${MBP_STYLE}</style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="doc-body">
+      <div class="doc-title-block">
+        <div class="doc-title">${title}</div>
+        ${ref ? `<div class="doc-ref">${ref}</div>` : ""}
+      </div>
+      ${bodyInner}
+    </div>
+    <div class="doc-footer">
+      <div class="footer-text">
+        L'association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right">
+        Document interne.<br/>
+        Contact : contact@mabellepromo.org
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+  openDoc(html, filename);
+}
+
+// ── Fiche de candidature bénévole (impression / PDF) ────────────────────────
+export function genererFicheCandidature(c) {
+  const e = _escDoc;
+  const yn = (b) => b ? "Oui" : "Non";
+  const periode = (c.start_date) ? _fmtDocDate(c.start_date) : "";
+  const univ = c.university
+    ? `${e(labelOf(UNIVERSITIES, c.university))}${c.study_year ? " · " + e(labelOf(STUDY_YEARS, c.study_year)) : ""}`
+    : "";
+
+  const body = `
+    ${_docH3("Identification")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Nom complet", `<strong>${e(c.full_name)}</strong>`)}
+      ${_docRow("Profil", e(labelOf(PROFILE_TYPES, c.profile_type)))}
+      ${_docRow("Email", e(c.email))}
+      ${_docRow("Téléphone", e(c.phone))}
+      ${_docRow("Pays", e(labelOf(COUNTRIES, c.country_code)))}
+      ${_docRow("Titre / Poste", e(c.current_title))}
+      ${_docRow("Lien professionnel", c.professional_link ? `<a href="${e(c.professional_link)}">${e(c.professional_link)}</a>` : "")}
+      ${_docRow("Université", univ)}
+      ${_docRow("Spécialité", e(c.study_field))}
+    </table>
+
+    ${_docH3("Profil professionnel")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Domaines d'expertise", e(labelsOf(EXPERTISE_DOMAINS, c.expertise_domains)))}
+      ${_docRow("Années d'expérience", c.years_experience != null ? `${c.years_experience} an(s)` : "")}
+      ${_docRow("Secteur d'emploi", c.employment_sector ? e(labelOf(EMPLOYMENT_SECTORS, c.employment_sector)) : "")}
+      ${_docRow("Langues", e(labelsOf(LANGUAGES, c.languages)))}
+      ${_docRow("Compétences", e(c.skills_description))}
+    </table>
+
+    ${_docH3("Mission & disponibilité")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Projet visé", e(labelOf(PROJECT_INTERESTS, c.project_interest)))}
+      ${_docRow("Domaines d'action", e(labelsOf(MISSION_TYPES, c.mission_types)))}
+      ${_docRow("Engagement", e(labelOf(ENGAGEMENT_LEVELS, c.engagement_level)))}
+      ${_docRow("Durée envisagée", c.engagement_duration ? e(labelOf(ENGAGEMENT_DURATIONS, c.engagement_duration)) : "")}
+      ${_docRow("Date de début", periode)}
+      ${_docRow("Horaires", c.preferred_schedule ? e(labelOf(PREFERRED_SCHEDULES, c.preferred_schedule)) : "")}
+      ${_docRow("Modalité", e(labelOf(MODALITIES, c.modality)))}
+      ${_docRow("Fuseau horaire", c.timezone ? e(labelOf(TIMEZONES, c.timezone)) : "")}
+      ${_docRow("Dispo événements", c.available_for_events ? "Oui" : "")}
+    </table>
+
+    ${_docH3("Origine & motivation")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Connu via", e(labelOf(REFERRAL_SOURCES, c.referral_source)))}
+      ${_docRow("Recommandé par", e(c.referred_by))}
+    </table>
+    ${c.motivation ? `<p style="font-size:11pt;color:#0a1f12;line-height:1.6;margin-top:6px;white-space:pre-wrap;font-style:italic;">« ${e(c.motivation)} »</p>` : ""}
+
+    ${_docH3("Consentements")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Contact", yn(c.consent_contact))}
+      ${_docRow("Charte du bénévole", yn(c.consent_charter))}
+      ${_docRow("Traitement RGPD", yn(c.consent_data))}
+      ${_docRow("Visibilité communauté", yn(c.consent_visibility))}
+      ${_docRow("Newsletter", c.consent_newsletter ? `Oui${c.newsletter_frequency ? " (" + e(labelOf(NEWSLETTER_FREQUENCIES, c.newsletter_frequency)) + ")" : ""}` : "Non")}
+      ${_docRow("Vérification antécédents", yn(c.consent_background_check))}
+    </table>`;
+
+  const ref = `Candidature reçue le ${_fmtDocDate((c.created_at || "").slice(0, 10)) || "—"}`;
+  _ficheShell(`Fiche de candidature — ${e(c.full_name)}`, ref, body, `Candidature-${String(c.full_name || "benevole").replace(/\s+/g, "-")}.html`);
+}
+
+// ── Fiche bénévole (impression / PDF) ───────────────────────────────────────
+export function genererFicheBenevole(b) {
+  const e = _escDoc;
+  const STATUT = { actif: "Actif", inactif: "Inactif", ponctuel: "Ponctuel" };
+  const body = `
+    ${_docH3("Bénévole")}
+    <table style="width:100%;border-collapse:collapse;">
+      ${_docRow("Nom complet", `<strong>${e(b.nom)}</strong>`)}
+      ${_docRow("Statut", e(STATUT[b.statut] || b.statut))}
+      ${_docRow("Email", e(b.email))}
+      ${_docRow("Téléphone", e(b.telephone))}
+      ${_docRow("Compétences", e(b.competences))}
+      ${_docRow("Disponibilité", e(b.disponibilite))}
+      ${_docRow("Engagé depuis", _fmtDocDate(b.date_engagement))}
+    </table>
+    ${b.notes ? `${_docH3("Notes")}<p style="font-size:11pt;color:#0a1f12;line-height:1.6;white-space:pre-wrap;">${e(b.notes)}</p>` : ""}`;
+
+  _ficheShell(`Fiche bénévole — ${e(b.nom)}`, null, body, `Fiche-benevole-${String(b.nom || "benevole").replace(/\s+/g, "-")}.html`);
 }
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {

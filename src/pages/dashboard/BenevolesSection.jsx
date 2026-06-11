@@ -8,7 +8,7 @@ import {
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";
 import CandidaturesSection from "./CandidaturesSection.jsx";
-import { genererFicheAffectation } from "@/lib/documentGenerators";
+import { genererFicheAffectation, genererFicheBenevole } from "@/lib/documentGenerators";
 import { ASSIGNMENT_STATUSES, ROLE_SUGGESTIONS, statusLabel, statusColor, notifyAssignment } from "@/lib/affectations";
 
 // ── Config statuts ─────────────────────────────────────────────────────────
@@ -291,6 +291,12 @@ function FichesTab() {
                   {b.disponibilite && <p className="text-xs text-muted-foreground">Dispo : {b.disponibilite}</p>}
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    onClick={() => genererFicheBenevole(b)}
+                    title="Imprimer la fiche"
+                    className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                    <Printer className="w-3.5 h-3.5" />
+                  </button>
                   <button
                     onClick={() => setForm({ ...b, date_engagement: b.date_engagement || "" })}
                     className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
