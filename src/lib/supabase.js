@@ -60,6 +60,19 @@ export async function uploadImage(file) {
   return uploadToStorage(file, "images");
 }
 
+/**
+ * Uploader la photo d'un CANDIDAT bénévole (formulaire public, visiteur anonyme).
+ * Dossier dédié `candidatures/` : l'écriture anonyme est volontairement limitée à
+ * ce préfixe par la politique RLS Storage (pas au dossier `images/` partagé).
+ */
+export async function uploadCandidateAvatar(file) {
+  if (!ALLOWED_IMAGE_MIME.includes(file.type))
+    throw new Error("Format non autorisé. Utilisez JPEG ou PNG.");
+  if (file.size > 2 * 1024 * 1024)
+    throw new Error("Photo trop lourde (2 Mo max).");
+  return uploadToStorage(file, "candidatures");
+}
+
 /** Uploader un fichier vidéo dans Supabase Storage */
 export async function uploadVideo(file) {
   if (!ALLOWED_VIDEO_MIME.includes(file.type))

@@ -3,7 +3,7 @@ import {
   Menu, X, ChevronDown, Home, User, LayoutDashboard, LogOut,
   BookOpen, Users, Building2,
   Calendar, FolderOpen, Newspaper,
-  UserPlus,
+  UserPlus, HeartHandshake,
   Film, MessageSquare, Mail, ShoppingCart, ShoppingBag,
 } from "lucide-react";
 import MagneticButton from "@/components/MagneticButton";
@@ -34,6 +34,7 @@ const navItems = [
     children: [
       { icon: Users,    label: "Membres",              href: "/annuaire",              desc: "Nos membres" },
       { icon: UserPlus, label: "Adhésion",             href: "/implications/adhesion", desc: "Rejoindre l'association" },
+      { icon: HeartHandshake, label: "Bénévolat",      href: "/implications/benevolat", desc: "Donner de son temps" },
     ],
   },
   {

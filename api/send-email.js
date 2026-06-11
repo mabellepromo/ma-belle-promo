@@ -380,8 +380,9 @@ function buildOrderConfirmPayload({ email, nom, reference, methode, total, ligne
 
 function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   const labels = {
-    deletion_request:    { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
-    new_member_request:  { titre: "Nouvelle demande d'adhésion",      couleur: "#16a34a", badge: "À valider" },
+    deletion_request:           { titre: "Demande de suppression de compte", couleur: "#dc2626", badge: "Action requise" },
+    new_member_request:         { titre: "Nouvelle demande d'adhésion",      couleur: "#16a34a", badge: "À valider" },
+    new_volunteer_application:  { titre: "Nouvelle candidature bénévole",    couleur: "#f0a030", badge: "À examiner" },
   };
   const cfg = labels[alertType] || { titre: escHtml(alertType), couleur: "#6b7280", badge: "Alerte" };
   const content = `

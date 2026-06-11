@@ -12,7 +12,7 @@ import {
   Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock,
   ExternalLink, Search, Image, Images, Mail, MapPin, Star,
   LogOut, AlertTriangle, Briefcase, Edit2, Trash2, Globe,
-  UserCheck, Plus, Upload, Calendar, Tag,
+  UserCheck, UserPlus, Plus, Upload, Calendar, Tag,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
   Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool
 } from "lucide-react";
@@ -48,6 +48,7 @@ const FacturesSection        = lazy(() => import("./dashboard/FacturesSection"))
 const VentesSection          = lazy(() => import("./dashboard/VentesSection"));
 const RegistreLegalSection   = lazy(() => import("./dashboard/RegistreLegalSection"));
 const BenevolesSection       = lazy(() => import("./dashboard/BenevolesSection"));
+const CandidaturesSection    = lazy(() => import("./dashboard/CandidaturesSection.jsx"));
 const CheckinSection         = lazy(() => import("./dashboard/CheckinSection"));
 const WebinarsSection        = lazy(() => import("./dashboard/WebinarsSection"));
 const AssistantIA            = lazy(() => import("./dashboard/AssistantIA"));
@@ -132,6 +133,7 @@ export default function Dashboard() {
   const [renewDate,         setRenewDate]         = useState(`${new Date().getFullYear()}-12-31`);
   const [renewLoading,      setRenewLoading]      = useState(false);
   const [unreadCount,    setUnreadCount]    = useState(0);
+  const [candCount,      setCandCount]      = useState(0);
   const [tresoWidget,    setTresoWidget]    = useState(null);
   const [prochaineAG,   setProchaineAG]   = useState(null);
   const csvInputRef = useRef(null);
@@ -151,6 +153,23 @@ export default function Dashboard() {
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, fetchUnread)
       .subscribe();
 
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  // Compteur de candidatures bénévoles « nouvelles » (badge sidebar).
+  useEffect(() => {
+    async function fetchCand() {
+      const { count } = await supabase
+        .from("candidatures_benevoles")
+        .select("*", { count: "exact", head: true })
+        .eq("statut", "nouvelle");
+      setCandCount(count || 0);
+    }
+    fetchCand();
+    const channel = supabase
+      .channel("dashboard-candidatures-count")
+      .on("postgres_changes", { event: "*", schema: "public", table: "candidatures_benevoles" }, fetchCand)
+      .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
 
@@ -544,6 +563,7 @@ export default function Dashboard() {
         { key: "cotisations",  label: "Cotisations",    icon: Banknote },
         { key: "rapport",      label: "Rapport annuel", icon: BarChart2 },
         { key: "pending",      label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
+        { key: "candidatures", label: "Candidatures bénévoles", badge: candCount || null, badgeAlert: true, icon: UserPlus },
         { key: "messages",     label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
         { key: "acces",        label: "Accès membres", icon: KeyRound },
       ],
@@ -1460,6 +1480,7 @@ export default function Dashboard() {
           {tab === "assemblees"  && <AssembleesSection />}
           {tab === "registre"    && <RegistreLegalSection />}
           {tab === "benevoles"   && <BenevolesSection />}
+          {tab === "candidatures" && <CandidaturesSection />}
           {tab === "elections"   && <ElectionsSection />}
           {tab === "mandats"     && <MandatsSection />}
           {tab === "circulaire"      && <CirculaireSection />}
