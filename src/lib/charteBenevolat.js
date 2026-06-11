@@ -45,8 +45,7 @@ export const CHARTE = {
           "Tes contributions pourront être mises en avant dans nos communications, si tu y consens.",
           "Une référence ou une recommandation professionnelle pourra t'être fournie sur demande.",
         ]},
-        { title: "1.5 Protection et limites", items: [
-          "MBP s'efforce de te couvrir en responsabilité civile, selon la nature de la mission et les moyens de l'association.",
+        { title: "1.5 Protection et liberté", items: [
           "Tes données personnelles sont protégées conformément au RGPD.",
           "Tu peux te retirer librement à tout moment, sans subir de pénalité.",
           "L'équilibre entre ta vie privée et ton engagement sera toujours respecté.",
@@ -197,24 +196,14 @@ export const CHARTE = {
       ],
     },
     {
-      id: "section-6", num: 6, title: "Responsabilité et assurance",
+      id: "section-6", num: 6, title: "Statut et frais du bénévole",
       subs: [
-        { title: "6.1 Assurance responsabilité civile", items: [
-          "MBP s'efforce de souscrire une assurance en responsabilité civile, dans la limite de ses moyens. [à confirmer]",
-          "Cette assurance couvre les dommages corporels ou matériels involontaires causés dans le cadre d'une mission.",
-          "Elle exclut les dommages volontaires, la négligence grave et la malveillance.",
-        ]},
-        { title: "6.2 Limites de responsabilité", items: [
-          "MBP est responsable de l'encadrement, des ressources et du soutien qu'elle te fournit.",
-          "Tu es responsable de fournir un effort raisonnable et de respecter la présente charte.",
-          "La responsabilité de chacun reste proportionnée et s'exerce dans les limites prévues par la loi.",
-        ]},
-        { title: "6.3 Statut du bénévole", items: [
+        { title: "6.1 Statut du bénévole", items: [
           "Le bénévolat n'est pas un emploi : il n'implique ni contrat de travail, ni lien de subordination salarial.",
           "Aucune cotisation sociale n'est due au titre du bénévolat.",
           "Le bénévolat ne génère aucun revenu imposable.",
         ]},
-        { title: "6.4 Frais et reconnaissance", items: [
+        { title: "6.2 Frais et reconnaissance", items: [
           "Les frais raisonnables que tu engages pour ta mission peuvent être remboursés sur justificatifs et après accord préalable : transport, matériel nécessaire, ou formation demandée par MBP.",
           "Pour être remboursé·e, tu adresses une demande écrite accompagnée des justificatifs.",
           "Le bénévolat n'est pas rémunéré, mais des marques de reconnaissance non monétaires restent possibles.",
