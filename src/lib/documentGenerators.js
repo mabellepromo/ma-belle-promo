@@ -607,7 +607,7 @@ function _createOverlayShell(filename) {
 }
 
 // ── Ouvre un document HTML généré (attestation, reçu…) ──────────────────────
-export function openDoc(html, filename = "document-mbp.html") {
+export function openDoc(html, filename = "document-mbp.html", opts = {}) {
   const origin = window.location.origin;
   const resolved = html
     .replace(/src="\/Logo%20Redesign1\.png"/g, `src="${origin}/Logo%20Redesign1.png"`)
@@ -619,17 +619,21 @@ export function openDoc(html, filename = "document-mbp.html") {
 
   mkBarBtn("✕ Fermer",                "#1a5c38", remove);
   mkBarBtn("🖨 Imprimer / PDF",       "#b8861a", doPrint);
-  mkBarBtn("📎 Joindre à un message", "#1d4ed8", () => {
-    try {
-      const b64 = btoa(unescape(encodeURIComponent(resolved)));
-      window.dispatchEvent(new CustomEvent("mbp:compose-with-attachment", {
-        detail: { name: filename, content: b64 }
-      }));
-      remove();
-    } catch (e) {
-      alert("Erreur lors de la préparation de la pièce jointe.");
-    }
-  });
+  // « Joindre à un message » n'a de sens que dans le dashboard (qui écoute
+  // l'événement et ouvre la composition). Masqué pour les documents publics.
+  if (opts.allowAttach !== false) {
+    mkBarBtn("📎 Joindre à un message", "#1d4ed8", () => {
+      try {
+        const b64 = btoa(unescape(encodeURIComponent(resolved)));
+        window.dispatchEvent(new CustomEvent("mbp:compose-with-attachment", {
+          detail: { name: filename, content: b64 }
+        }));
+        remove();
+      } catch (e) {
+        alert("Erreur lors de la préparation de la pièce jointe.");
+      }
+    });
+  }
 
   frame.onload = () => {
     try {
@@ -1172,7 +1176,7 @@ export function genererCharteBenevolat() {
 </body>
 </html>`;
 
-  openDoc(html, "Charte-benevolat-MBP.html");
+  openDoc(html, "Charte-benevolat-MBP.html", { allowAttach: false });
 }
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {
