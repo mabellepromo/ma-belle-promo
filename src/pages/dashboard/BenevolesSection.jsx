@@ -3,10 +3,11 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Users, Briefcase, Clock, Check, X, Loader2,
-  Plus, Trash2, Edit2,
+  Plus, Trash2, Edit2, UserPlus,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";
+import CandidaturesSection from "./CandidaturesSection.jsx";
 
 // ── Config statuts ─────────────────────────────────────────────────────────
 const BEN_STATUT_CFG = {
@@ -661,12 +662,13 @@ function HeuresTab() {
 
 // ── Export principal ──────────────────────────────────────────────────────
 export default function BenevolesSection() {
-  const [activeTab, setActiveTab] = useState("fiches");
+  const [activeTab, setActiveTab] = useState("candidatures");
 
   const TABS = [
-    { key: "fiches",   label: "Fiches bénévoles", icon: Users },
-    { key: "missions", label: "Missions",          icon: Briefcase },
-    { key: "heures",   label: "Journal d'heures",  icon: Clock },
+    { key: "candidatures", label: "Candidatures",     icon: UserPlus },
+    { key: "fiches",       label: "Fiches bénévoles", icon: Users },
+    { key: "missions",     label: "Missions",         icon: Briefcase },
+    { key: "heures",       label: "Journal d'heures", icon: Clock },
   ];
 
   return (
@@ -695,9 +697,10 @@ export default function BenevolesSection() {
         ))}
       </div>
 
-      {activeTab === "fiches"   && <FichesTab />}
-      {activeTab === "missions" && <MissionsTab />}
-      {activeTab === "heures"   && <HeuresTab />}
+      {activeTab === "candidatures" && <CandidaturesSection embedded />}
+      {activeTab === "fiches"       && <FichesTab />}
+      {activeTab === "missions"     && <MissionsTab />}
+      {activeTab === "heures"       && <HeuresTab />}
     </div>
   );
 }

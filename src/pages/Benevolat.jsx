@@ -10,7 +10,7 @@ import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
 import { supabase, uploadCandidateAvatar } from "../lib/supabase";
 import {
-  PROFILE_TYPES, UNIVERSITIES, STUDY_YEARS, EXPERTISE_DOMAINS,
+  PROFILE_TYPES, UNIVERSITIES, EXPERTISE_DOMAINS,
   EMPLOYMENT_SECTORS, LANGUAGES, PROJECT_INTERESTS, MISSION_TYPES,
   ENGAGEMENT_LEVELS, ENGAGEMENT_DURATIONS, PREFERRED_SCHEDULES,
   MODALITIES, TIMEZONES, REFERRAL_SOURCES, NEWSLETTER_FREQUENCIES,
@@ -343,26 +343,17 @@ export default function Benevolat() {
                     </div>
                   )}
 
-                  {/* Conditionnel : étudiant → université / année / spécialité */}
+                  {/* Conditionnel : étudiant → université / spécialité (facultatifs) */}
                   {isStudent && (
                     <div className="grid sm:grid-cols-2 gap-4 p-4 rounded-xl bg-primary/5 border border-primary/15">
                       <div>
-                        <Label required>Université</Label>
+                        <Label>Université</Label>
                         <select className={inputCls} value={form.university} onChange={(e) => set("university", e.target.value)}>
-                          <option value="">— Sélectionner —</option>
+                          <option value="">— Sélectionner (facultatif) —</option>
                           {UNIVERSITIES.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
                         </select>
-                        <Err msg={errors.university} />
                       </div>
                       <div>
-                        <Label required>Année</Label>
-                        <select className={inputCls} value={form.study_year} onChange={(e) => set("study_year", e.target.value)}>
-                          <option value="">— Sélectionner —</option>
-                          {STUDY_YEARS.map((y) => <option key={y.value} value={y.value}>{y.label}</option>)}
-                        </select>
-                        <Err msg={errors.study_year} />
-                      </div>
-                      <div className="sm:col-span-2">
                         <Label>Spécialité / Domaine d'études</Label>
                         <input className={inputCls} value={form.study_field} onChange={(e) => set("study_field", e.target.value)} placeholder="Ex : Droit privé, Droit public…" />
                       </div>

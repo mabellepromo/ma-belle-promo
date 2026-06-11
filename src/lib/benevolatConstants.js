@@ -4,9 +4,8 @@
 
 /* ── Profils (segmentation principale, pilote les champs conditionnels) ── */
 export const PROFILE_TYPES = [
-  { value: "student",      label: "Étudiant·e L3 / M1 / M2 (Togo / Kara)" },
+  { value: "student",      label: "Étudiant·e" },
   { value: "professional", label: "Professionnel·le (avocat, juriste, autre)" },
-  { value: "tech",         label: "Tech / Développeur·se" },
   { value: "other",        label: "Autre (ONG, associatif, etc.)" },
 ];
 

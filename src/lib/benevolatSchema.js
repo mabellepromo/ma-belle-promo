@@ -134,14 +134,6 @@ export const volunteerSchema = z
   })
   // ── Champs conditionnels : étudiant ──
   .superRefine((data, ctx) => {
-    if (data.profile_type === "student") {
-      if (!data.university) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["university"], message: "Sélectionnez votre université." });
-      }
-      if (!data.study_year) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["study_year"], message: "Sélectionnez votre année." });
-      }
-    }
     // Modalité à distance / hybride → fuseau horaire requis
     if ((data.modality === "remote" || data.modality === "hybrid") && !data.timezone) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["timezone"], message: "Précisez votre fuseau horaire." });

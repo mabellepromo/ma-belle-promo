@@ -84,10 +84,13 @@ export default function SoutenirSection() {
               </div>
               <h3 className="font-heading text-2xl font-bold text-foreground mb-3">Bénévolat</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Vous pouvez faire une réelle différence en partageant vos connaissances, 
-                votre expertise et vos expériences avec les étudiants actuels. Ma Belle Promo 
+                Vous pouvez faire une réelle différence en partageant vos connaissances,
+                votre expertise et vos expériences avec les étudiants actuels. Ma Belle Promo
                 créera les conditions de votre épanouissement dans cet engagement.
               </p>
+              <Link to="/implications/benevolat" className="mt-5 inline-flex items-center gap-1.5 px-5 h-10 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+                Devenir bénévole →
+              </Link>
             </div>
           </motion.div>
 

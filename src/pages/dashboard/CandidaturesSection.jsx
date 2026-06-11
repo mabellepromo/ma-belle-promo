@@ -37,7 +37,7 @@ function Line({ label, value }) {
   );
 }
 
-export default function CandidaturesSection() {
+export default function CandidaturesSection({ embedded = false }) {
   const [items, setItems]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState("nouvelle");
@@ -133,15 +133,17 @@ export default function CandidaturesSection() {
     <div className="space-y-6">
       {ConfirmEl}
 
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <UserPlus className="w-5 h-5 text-primary" />
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <UserPlus className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-heading font-bold text-foreground text-lg">Candidatures bénévoles</h2>
+            <p className="text-xs text-muted-foreground">Candidatures reçues via le formulaire public — à examiner sous 7 jours ouvrés</p>
+          </div>
         </div>
-        <div>
-          <h2 className="font-heading font-bold text-foreground text-lg">Candidatures bénévoles</h2>
-          <p className="text-xs text-muted-foreground">Candidatures reçues via le formulaire public — à examiner sous 7 jours ouvrés</p>
-        </div>
-      </div>
+      )}
 
       {/* Filtres par statut */}
       <div className="flex items-center gap-1.5 flex-wrap">
@@ -209,7 +211,7 @@ export default function CandidaturesSection() {
 
                     <div className="grid md:grid-cols-2 gap-x-6 gap-y-1">
                       <Line label="Titre / Poste" value={c.current_title} />
-                      <Line label="Université" value={c.university && `${labelOf(UNIVERSITIES, c.university)} · ${labelOf(STUDY_YEARS, c.study_year)}`} />
+                      <Line label="Université" value={c.university && `${labelOf(UNIVERSITIES, c.university)}${c.study_year ? " · " + labelOf(STUDY_YEARS, c.study_year) : ""}`} />
                       <Line label="Spécialité" value={c.study_field} />
                       <Line label="Secteur d'emploi" value={c.employment_sector && labelOf(EMPLOYMENT_SECTORS, c.employment_sector)} />
                       <Line label="Expérience" value={c.years_experience != null ? `${c.years_experience} an(s)` : ""} />

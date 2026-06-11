@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import { HandHeart, Banknote, Phone, MapPin, Globe, Building2 } from "lucide-react";
@@ -64,6 +65,9 @@ export default function NousSoutenir() {
                 positives. Partagez vos connaissances, votre expertise et vos expériences. Ma Belle Promo
                 créera les conditions de votre épanouissement dans cet engagement.
               </p>
+              <Link to="/implications/benevolat" className="mt-4 inline-block text-sm text-primary font-medium hover:underline">
+                Devenir bénévole →
+              </Link>
             </div>
           </motion.div>
 
