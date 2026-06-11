@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   UserPlus, Loader2, Check, X, Trash2, Mail, Phone,
-  ExternalLink, ChevronDown, ChevronUp, UserCheck,
+  ExternalLink, ChevronDown, ChevronUp, UserCheck, Target,
 } from "lucide-react";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
@@ -38,25 +38,50 @@ function Line({ label, value }) {
 }
 
 export default function CandidaturesSection({ embedded = false }) {
-  const [items, setItems]     = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState("nouvelle");
-  const [openId, setOpenId]   = useState(null);
-  const [notes, setNotes]     = useState({});      // brouillons de notes par id
-  const [busy, setBusy]       = useState(null);    // id en cours d'action
+  const [items, setItems]       = useState([]);
+  const [missions, setMissions] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState("nouvelle");
+  const [openId, setOpenId]     = useState(null);
+  const [notes, setNotes]       = useState({});      // brouillons de notes par id
+  const [busy, setBusy]         = useState(null);    // id en cours d'action
   const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("candidatures_benevoles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) toast.error("Erreur chargement : " + error.message);
-    else setItems(data || []);
+    const [cRes, mRes] = await Promise.all([
+      supabase.from("candidatures_benevoles").select("*").order("created_at", { ascending: false }),
+      supabase.from("missions_benevoles").select("id, titre").order("titre"),
+    ]);
+    if (cRes.error) toast.error("Erreur chargement : " + cRes.error.message);
+    else setItems(cRes.data || []);
+    setMissions(mRes.data || []);
     setLoading(false);
+  }
+
+  // Matérialise les missions souhaitées par le candidat en affectations (statut « Pressenti »).
+  async function createInterestAssignments(c) {
+    const ids = Array.isArray(c.mission_interets) ? c.mission_interets : [];
+    if (ids.length === 0) return;
+    setBusy(c.id);
+    const { data: { user } } = await supabase.auth.getUser();
+    const rows = ids.map((mid) => ({
+      mission_id: mid,
+      volunteer_source: "CANDIDATE",
+      candidature_id: c.id,
+      assigned_role: "Bénévole",
+      assignment_status: "CANDIDATE",
+      assigned_date: new Date().toISOString().slice(0, 10),
+      created_by: user?.id || null,
+    }));
+    const { error } = await supabase
+      .from("affectations_benevoles")
+      .upsert(rows, { onConflict: "mission_id,candidature_id", ignoreDuplicates: true });
+    if (error) toast.error("Erreur : " + error.message);
+    else toast.success("Affectations créées — voir l'onglet « Affectations » pour préciser le rôle.");
+    setBusy(null);
   }
 
   async function setStatut(item, statut) {
@@ -238,6 +263,22 @@ export default function CandidaturesSection({ embedded = false }) {
                       <div className="text-xs bg-muted/30 rounded-xl p-3">
                         <span className="text-muted-foreground block mb-1">Motivation</span>
                         <span className="text-foreground italic">« {c.motivation} »</span>
+                      </div>
+                    )}
+
+                    {/* Missions souhaitées par le candidat → affectations */}
+                    {Array.isArray(c.mission_interets) && c.mission_interets.length > 0 && (
+                      <div className="text-xs bg-primary/5 border border-primary/15 rounded-xl p-3 flex items-start justify-between gap-3 flex-wrap">
+                        <div className="min-w-0">
+                          <span className="text-muted-foreground block mb-1">Missions souhaitées</span>
+                          <span className="text-foreground">
+                            {c.mission_interets.map((id) => missions.find((m) => m.id === id)?.titre || "Mission supprimée").join(", ")}
+                          </span>
+                        </div>
+                        <button onClick={() => createInterestAssignments(c)} disabled={busy === c.id}
+                          className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg bg-primary/15 text-primary text-xs font-semibold hover:bg-primary/25 transition-colors disabled:opacity-50 flex-shrink-0">
+                          <Target className="w-3.5 h-3.5" /> Créer les affectations
+                        </button>
                       </div>
                     )}
 

@@ -857,6 +857,96 @@ export function genererAttestation(member, validUntil) {
   openDoc(html, `Attestation-MBP-${member.nom.replace(/\s+/g, "-")}.html`);
 }
 
+// ── Fiche d'affectation bénévole ↔ mission (impression / PDF) ────────────────
+// Identique pour une candidature ou une fiche admin : on reçoit déjà les libellés
+// résolus (nom du bénévole, titre de mission, statut affiché…) depuis le dashboard.
+export function genererFicheAffectation(a) {
+  const fmtDate = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "—";
+  const row = (label, value) => value
+    ? `<tr>
+         <td style="padding:7px 0;font-size:11pt;color:#2a6040;font-weight:600;width:38%;vertical-align:top;">${label}</td>
+         <td style="padding:7px 0;font-size:11pt;color:#0a1f12;">${value}</td>
+       </tr>`
+    : "";
+  const sourceLabel = a.source === "CANDIDATE" ? "Candidature en ligne" : "Fiche bénévole (bureau)";
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiche d'affectation — ${a.volunteer_nom || "Bénévole"}</title>
+  <style>${MBP_STYLE}</style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Fiche d'affectation bénévole</div>
+        <div class="doc-ref">Statut : ${a.assignment_status_label || a.assignment_status || "—"}</div>
+      </div>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:15pt;color:#0a1f12;margin:18px 0 6px;border-bottom:2px solid #f0a030;padding-bottom:4px;">Mission</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        ${row("Intitulé de la mission", a.mission_titre)}
+        ${row("Responsable", a.mission_responsable)}
+        ${row("Rôle confié", `<strong>${a.assigned_role || "—"}</strong>`)}
+        ${row("Date d'affectation", fmtDate(a.assigned_date))}
+        ${row("Période", (a.start_date || a.end_date) ? `${fmtDate(a.start_date)} → ${fmtDate(a.end_date)}` : "")}
+      </table>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:15pt;color:#0a1f12;margin:22px 0 6px;border-bottom:2px solid #f0a030;padding-bottom:4px;">Bénévole</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        ${row("Nom", `<strong>${a.volunteer_nom || "—"}</strong>`)}
+        ${row("Origine", sourceLabel)}
+        ${row("Email", a.volunteer_email)}
+        ${row("Téléphone", a.volunteer_tel)}
+      </table>
+
+      ${a.admin_notes ? `
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:15pt;color:#0a1f12;margin:22px 0 6px;border-bottom:2px solid #f0a030;padding-bottom:4px;">Notes</h3>
+      <p style="font-size:11pt;color:#0a1f12;line-height:1.6;white-space:pre-wrap;">${a.admin_notes}</p>` : ""}
+
+      <div style="margin-top:46px;display:flex;justify-content:space-between;gap:40px;">
+        <div style="flex:1;border-top:1px solid #2a6040;padding-top:6px;font-size:10pt;color:#2a6040;">Le bénévole</div>
+        <div style="flex:1;border-top:1px solid #2a6040;padding-top:6px;font-size:10pt;color:#2a6040;text-align:right;">Le Bureau Exécutif</div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <div class="footer-text">
+        L'association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right">
+        Document interne d'affectation.<br/>
+        Contact : contact@mabellepromo.org
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  openDoc(html, `Fiche-affectation-${(a.volunteer_nom || "benevole").replace(/\s+/g, "-")}.html`);
+}
+
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {
   const ref = refNumber("REC", String(member.id ?? "").slice(0, 6).toUpperCase() || "MBP");
 

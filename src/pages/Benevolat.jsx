@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -132,6 +132,20 @@ export default function Benevolat() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving]   = useState(false);
   const [sent, setSent]       = useState(false);
+  const [openMissions, setOpenMissions] = useState([]);
+
+  // Missions ouvertes (planifiées / en cours) proposées au candidat.
+  // Lecture publique autorisée par la RLS (missions_ben_select_public_active).
+  useEffect(() => {
+    let active = true;
+    supabase
+      .from("missions_benevoles")
+      .select("id, titre")
+      .in("statut", ["planifiée", "en_cours"])
+      .order("titre")
+      .then(({ data }) => { if (active && data) setOpenMissions(data); });
+    return () => { active = false; };
+  }, []);
 
   const set = (field, val) => setForm((f) => ({ ...f, [field]: val }));
   const toggle = (field, val) =>
@@ -415,6 +429,18 @@ export default function Benevolat() {
                     <CheckboxGrid options={MISSION_TYPES} values={form.mission_types} onToggle={(v) => toggle("mission_types", v)} />
                     <Err msg={errors.mission_types} />
                   </div>
+
+                  {/* Optionnel : missions ouvertes qui intéressent le candidat */}
+                  {openMissions.length > 0 && (
+                    <div>
+                      <Label hint="Facultatif — le bureau te recontactera pour confirmer.">Des missions ouvertes t'intéressent ?</Label>
+                      <CheckboxGrid
+                        options={openMissions.map((m) => ({ value: m.id, label: m.titre }))}
+                        values={form.mission_interets}
+                        onToggle={(v) => toggle("mission_interets", v)}
+                      />
+                    </div>
+                  )}
                 </>
               )}
 

@@ -93,6 +93,8 @@ export const volunteerSchema = z
     mission_types: z
       .array(enumFrom(MISSION_TYPES, "Mission invalide."))
       .min(1, "Sélectionnez au moins un domaine d'action."),
+    // Missions ouvertes qui intéressent le candidat (ids → matérialisées par le bureau)
+    mission_interets: z.array(z.string().uuid()).optional().default([]),
 
     // ── Section 5 : disponibilité & engagement ──
     engagement_level: enumFrom(ENGAGEMENT_LEVELS, "Sélectionnez un niveau d'engagement."),
@@ -172,6 +174,7 @@ export function emptyVolunteer() {
     languages: ["fr"],
     project_interest: "",
     mission_types: [],
+    mission_interets: [],
     engagement_level: "",
     start_date: "",
     engagement_duration: "",
@@ -219,6 +222,7 @@ export function toVolunteerRow(data) {
     languages: data.languages,
     project_interest: data.project_interest,
     mission_types: data.mission_types,
+    mission_interets: Array.isArray(data.mission_interets) ? data.mission_interets : [],
     engagement_level: data.engagement_level,
     start_date: data.start_date,
     engagement_duration: orNull(data.engagement_duration),

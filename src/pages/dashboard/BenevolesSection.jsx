@@ -3,11 +3,13 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import {
   Users, Briefcase, Clock, Check, X, Loader2,
-  Plus, Trash2, Edit2, UserPlus,
+  Plus, Trash2, Edit2, UserPlus, Link2, Printer, Target,
 } from "lucide-react";
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";
 import CandidaturesSection from "./CandidaturesSection.jsx";
+import { genererFicheAffectation } from "@/lib/documentGenerators";
+import { ASSIGNMENT_STATUSES, ROLE_SUGGESTIONS, statusLabel, statusColor, notifyAssignment } from "@/lib/affectations";
 
 // ── Config statuts ─────────────────────────────────────────────────────────
 const BEN_STATUT_CFG = {
@@ -27,6 +29,7 @@ function emptyBen() {
   return {
     nom: "", email: "", telephone: "", competences: "",
     disponibilite: "", statut: "actif", date_engagement: "", notes: "",
+    assign_mission_id: "", assign_role: "", assign_status: "ASSIGNED",
   };
 }
 
@@ -36,25 +39,32 @@ function emptyMission() {
 
 // ── Onglet Fiches bénévoles ────────────────────────────────────────────────
 function FichesTab() {
-  const [items,   setItems]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter,  setFilter]  = useState("all");
-  const [form,    setForm]    = useState(null);
-  const [saving,  setSaving]  = useState(false);
+  const [items,    setItems]    = useState([]);
+  const [missions, setMissions] = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [filter,   setFilter]   = useState("all");
+  const [form,     setForm]     = useState(null);
+  const [saving,   setSaving]   = useState(false);
   const { confirm, ConfirmEl } = useConfirm();
 
   useEffect(() => { load(); }, []);
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase.from("benevoles").select("*").order("nom");
-    if (error) toast.error("Erreur chargement : " + error.message);
-    else setItems(data || []);
+    const [bRes, mRes] = await Promise.all([
+      supabase.from("benevoles").select("*").order("nom"),
+      supabase.from("missions_benevoles").select("id, titre").in("statut", ["planifiée", "en_cours"]).order("titre"),
+    ]);
+    if (bRes.error) toast.error("Erreur chargement : " + bRes.error.message);
+    else setItems(bRes.data || []);
+    setMissions(mRes.data || []);
     setLoading(false);
   }
 
   async function save() {
     if (!form.nom.trim()) { toast.error("Le nom est obligatoire."); return; }
+    const wantsAssign = !form.id && !!form.assign_mission_id;
+    if (wantsAssign && !form.assign_role.trim()) { toast.error("Indiquez le rôle pour la mission."); return; }
     setSaving(true);
     const payload = {
       nom:             form.nom.trim(),
@@ -66,11 +76,43 @@ function FichesTab() {
       date_engagement: form.date_engagement || null,
       notes:           form.notes || null,
     };
-    const { error } = form.id
-      ? await supabase.from("benevoles").update(payload).eq("id", form.id)
-      : await supabase.from("benevoles").insert(payload);
-    if (error) toast.error("Erreur : " + error.message);
-    else { toast.success(form.id ? "Fiche mise à jour." : "Bénévole ajouté."); setForm(null); load(); }
+
+    let benevoleId = form.id;
+    let error;
+    if (form.id) {
+      ({ error } = await supabase.from("benevoles").update(payload).eq("id", form.id));
+    } else {
+      const ins = await supabase.from("benevoles").insert(payload).select("id").single();
+      error = ins.error;
+      benevoleId = ins.data?.id;
+    }
+    if (error) { toast.error("Erreur : " + error.message); setSaving(false); return; }
+
+    // Cas A : affectation à une mission lors de la création de la fiche
+    if (wantsAssign && benevoleId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error: aErr } = await supabase.from("affectations_benevoles").insert({
+        mission_id:        form.assign_mission_id,
+        volunteer_source:  "SHEET",
+        benevole_id:       benevoleId,
+        assigned_role:     form.assign_role.trim(),
+        assignment_status: form.assign_status || "ASSIGNED",
+        assigned_date:     new Date().toISOString().slice(0, 10),
+        created_by:        user?.id || null,
+      });
+      if (aErr) {
+        toast.error("Fiche créée, mais affectation échouée : " + aErr.message);
+      } else {
+        const mission = missions.find((m) => m.id === form.assign_mission_id);
+        notifyAssignment({
+          to_email: form.email, to_name: form.nom, mission_titre: mission?.titre,
+          assigned_role: form.assign_role.trim(), assignment_status: form.assign_status || "ASSIGNED",
+        });
+      }
+    }
+    toast.success(form.id ? "Fiche mise à jour." : (wantsAssign ? "Bénévole ajouté et affecté." : "Bénévole ajouté."));
+    setForm(null);
+    load();
     setSaving(false);
   }
 
@@ -164,6 +206,36 @@ function FichesTab() {
                   placeholder="Observations, contexte particulier…" />
               </Field>
             </div>
+
+            {/* Cas A : affectation à une mission (création de fiche uniquement) */}
+            {!form.id && missions.length > 0 && (
+              <div className="md:col-span-2 grid md:grid-cols-3 gap-4 p-4 rounded-xl bg-primary/5 border border-primary/15">
+                <div className="md:col-span-3 -mb-1">
+                  <p className="text-xs font-semibold text-foreground">Affecter à une mission (optionnel)</p>
+                </div>
+                <Field label="Mission">
+                  <select className={inp} value={form.assign_mission_id}
+                    onChange={e => setForm(f => ({ ...f, assign_mission_id: e.target.value }))}>
+                    <option value="">— Aucune —</option>
+                    {missions.map(m => <option key={m.id} value={m.id}>{m.titre}</option>)}
+                  </select>
+                </Field>
+                <Field label="Rôle" required={!!form.assign_mission_id}>
+                  <input className={inp} list="role-suggestions-fiche" value={form.assign_role}
+                    onChange={e => setForm(f => ({ ...f, assign_role: e.target.value }))}
+                    placeholder="ex : Mentor" disabled={!form.assign_mission_id} />
+                  <datalist id="role-suggestions-fiche">
+                    {ROLE_SUGGESTIONS.map(r => <option key={r} value={r} />)}
+                  </datalist>
+                </Field>
+                <Field label="Statut">
+                  <select className={inp} value={form.assign_status} disabled={!form.assign_mission_id}
+                    onChange={e => setForm(f => ({ ...f, assign_status: e.target.value }))}>
+                    {ASSIGNMENT_STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                </Field>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-3 pt-2 border-t border-border justify-end">
             <button onClick={() => setForm(null)}
@@ -660,6 +732,283 @@ function HeuresTab() {
   );
 }
 
+// ── Onglet Affectations (bénévole/candidature ↔ mission) ───────────────────
+function AffectationsTab() {
+  const [items,        setItems]        = useState([]);
+  const [missions,     setMissions]     = useState([]);
+  const [benevoles,    setBenevoles]    = useState([]);
+  const [candidatures, setCandidatures] = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [form,         setForm]         = useState(null);
+  const [saving,       setSaving]       = useState(false);
+  const [busy,         setBusy]         = useState(null);
+  const { confirm, ConfirmEl } = useConfirm();
+
+  useEffect(() => { loadAll(); }, []);
+
+  async function loadAll() {
+    setLoading(true);
+    const [aRes, mRes, bRes, cRes] = await Promise.all([
+      supabase.from("affectations_benevoles")
+        .select("*, missions_benevoles(titre, responsable), benevoles(nom, email, telephone), candidatures_benevoles(full_name, email, phone)")
+        .order("created_at", { ascending: false }),
+      supabase.from("missions_benevoles").select("id, titre, responsable").in("statut", ["planifiée", "en_cours"]).order("titre"),
+      supabase.from("benevoles").select("id, nom, email, telephone").order("nom"),
+      supabase.from("candidatures_benevoles").select("id, full_name, email, phone").order("created_at", { ascending: false }),
+    ]);
+    if (aRes.error) toast.error("Erreur chargement : " + aRes.error.message);
+    else setItems(aRes.data || []);
+    setMissions(mRes.data || []);
+    setBenevoles(bRes.data || []);
+    setCandidatures(cRes.data || []);
+    setLoading(false);
+  }
+
+  function openForm() {
+    setForm({
+      volunteer_source: "SHEET",
+      benevole_id: benevoles[0]?.id || "",
+      candidature_id: candidatures[0]?.id || "",
+      mission_id: missions[0]?.id || "",
+      assigned_role: "",
+      assignment_status: "ASSIGNED",
+      start_date: "",
+      end_date: "",
+      admin_notes: "",
+    });
+  }
+
+  function volunteerInfo(f) {
+    if (f.volunteer_source === "SHEET") {
+      const b = benevoles.find((x) => x.id === f.benevole_id);
+      return b ? { nom: b.nom, email: b.email, tel: b.telephone } : null;
+    }
+    const c = candidatures.find((x) => x.id === f.candidature_id);
+    return c ? { nom: c.full_name, email: c.email, tel: c.phone } : null;
+  }
+
+  async function save() {
+    if (!form.mission_id)            { toast.error("Sélectionnez une mission."); return; }
+    if (!form.assigned_role.trim())  { toast.error("Le rôle est obligatoire."); return; }
+    const isSheet = form.volunteer_source === "SHEET";
+    if (isSheet && !form.benevole_id)        { toast.error("Sélectionnez un bénévole."); return; }
+    if (!isSheet && !form.candidature_id)    { toast.error("Sélectionnez une candidature."); return; }
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const payload = {
+      mission_id:        form.mission_id,
+      volunteer_source:  form.volunteer_source,
+      benevole_id:       isSheet ? form.benevole_id : null,
+      candidature_id:    isSheet ? null : form.candidature_id,
+      assigned_role:     form.assigned_role.trim(),
+      assignment_status: form.assignment_status,
+      assigned_date:     new Date().toISOString().slice(0, 10),
+      start_date:        form.start_date || null,
+      end_date:          form.end_date || null,
+      admin_notes:       form.admin_notes || null,
+      created_by:        user?.id || null,
+    };
+    const { error } = await supabase.from("affectations_benevoles").insert(payload);
+    if (error) {
+      // 23505 = violation d'unicité (déjà affecté à cette mission)
+      toast.error(error.code === "23505" ? "Ce bénévole est déjà affecté à cette mission." : "Erreur : " + error.message);
+      setSaving(false);
+      return;
+    }
+    const v = volunteerInfo(form);
+    const mission = missions.find((m) => m.id === form.mission_id);
+    notifyAssignment({
+      to_email: v?.email, to_name: v?.nom, mission_titre: mission?.titre,
+      assigned_role: payload.assigned_role, assignment_status: payload.assignment_status,
+      start_date: payload.start_date, end_date: payload.end_date,
+    });
+    toast.success(v?.email ? "Affectation créée — email de confirmation envoyé." : "Affectation créée.");
+    setForm(null);
+    setSaving(false);
+    loadAll();
+  }
+
+  async function setStatut(item, assignment_status) {
+    setBusy(item.id);
+    const { error } = await supabase.from("affectations_benevoles").update({ assignment_status }).eq("id", item.id);
+    if (error) toast.error("Erreur : " + error.message);
+    else { toast.success("Statut mis à jour : " + statusLabel(assignment_status)); loadAll(); }
+    setBusy(null);
+  }
+
+  async function remove(item) {
+    if (!await confirm("Supprimer cette affectation ?", "Cette action est irréversible.")) return;
+    const { error } = await supabase.from("affectations_benevoles").delete().eq("id", item.id);
+    if (error) toast.error("Erreur : " + error.message);
+    else { toast.success("Affectation supprimée."); loadAll(); }
+  }
+
+  function print(item) {
+    const isSheet = item.volunteer_source === "SHEET";
+    const v = isSheet ? item.benevoles : item.candidatures_benevoles;
+    genererFicheAffectation({
+      volunteer_nom:   isSheet ? v?.nom : v?.full_name,
+      volunteer_email: v?.email,
+      volunteer_tel:   isSheet ? v?.telephone : v?.phone,
+      source:          item.volunteer_source,
+      mission_titre:        item.missions_benevoles?.titre,
+      mission_responsable:  item.missions_benevoles?.responsable,
+      assigned_role:        item.assigned_role,
+      assignment_status:    item.assignment_status,
+      assignment_status_label: statusLabel(item.assignment_status),
+      assigned_date: item.assigned_date,
+      start_date:    item.start_date,
+      end_date:      item.end_date,
+      admin_notes:   item.admin_notes,
+    });
+  }
+
+  const isSheet = form?.volunteer_source === "SHEET";
+  const canAssign = missions.length > 0 && (benevoles.length > 0 || candidatures.length > 0);
+
+  return (
+    <div className="space-y-4">
+      {ConfirmEl}
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={openForm} disabled={!canAssign}
+          className="flex items-center gap-1.5 px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors">
+          <Plus className="w-4 h-4" /> Assigner un bénévole
+        </button>
+        <span className="text-xs text-muted-foreground">{items.length} affectation{items.length !== 1 ? "s" : ""}</span>
+        {!canAssign && (
+          <span className="text-xs text-amber-500">Créez d'abord une mission (onglet Missions) et au moins un bénévole / une candidature.</span>
+        )}
+      </div>
+
+      {form && (
+        <div className="bg-background border border-border rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="font-heading font-bold text-foreground text-sm">Nouvelle affectation</p>
+            <button onClick={() => setForm(null)} className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field label="Origine du bénévole" required>
+              <select className={inp} value={form.volunteer_source}
+                onChange={(e) => setForm((f) => ({ ...f, volunteer_source: e.target.value }))}>
+                <option value="SHEET">Fiche bénévole</option>
+                <option value="CANDIDATE">Candidature en ligne</option>
+              </select>
+            </Field>
+            <Field label={isSheet ? "Bénévole" : "Candidature"} required>
+              <select className={inp}
+                value={isSheet ? form.benevole_id : form.candidature_id}
+                onChange={(e) => setForm((f) => ({ ...f, [isSheet ? "benevole_id" : "candidature_id"]: e.target.value }))}>
+                {isSheet
+                  ? (benevoles.length ? benevoles.map((b) => <option key={b.id} value={b.id}>{b.nom}</option>) : <option value="">— Aucun bénévole —</option>)
+                  : (candidatures.length ? candidatures.map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>) : <option value="">— Aucune candidature —</option>)}
+              </select>
+            </Field>
+            <Field label="Mission" required>
+              <select className={inp} value={form.mission_id}
+                onChange={(e) => setForm((f) => ({ ...f, mission_id: e.target.value }))}>
+                {missions.map((m) => <option key={m.id} value={m.id}>{m.titre}</option>)}
+              </select>
+            </Field>
+            <Field label="Rôle confié" required>
+              <input className={inp} list="role-suggestions" value={form.assigned_role}
+                onChange={(e) => setForm((f) => ({ ...f, assigned_role: e.target.value }))}
+                placeholder="ex : Mentor, Conférencier…" />
+              <datalist id="role-suggestions">
+                {ROLE_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
+              </datalist>
+            </Field>
+            <Field label="Statut de l'affectation">
+              <select className={inp} value={form.assignment_status}
+                onChange={(e) => setForm((f) => ({ ...f, assignment_status: e.target.value }))}>
+                {ASSIGNMENT_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </Field>
+            <div />
+            <Field label="Date de début">
+              <input className={inp} type="date" value={form.start_date}
+                onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))} />
+            </Field>
+            <Field label="Date de fin">
+              <input className={inp} type="date" value={form.end_date}
+                onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))} />
+            </Field>
+            <div className="md:col-span-2">
+              <Field label="Notes internes">
+                <textarea className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:border-primary/50 resize-none"
+                  rows={2} value={form.admin_notes}
+                  onChange={(e) => setForm((f) => ({ ...f, admin_notes: e.target.value }))}
+                  placeholder="Précisions sur le rôle, contexte…" />
+              </Field>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 pt-2 border-t border-border justify-end">
+            <button onClick={() => setForm(null)} className="px-4 h-9 rounded-xl border border-border text-sm hover:bg-muted transition-colors">Annuler</button>
+            <button onClick={save} disabled={saving}
+              className="flex items-center gap-1.5 px-5 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 transition-colors">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Assigner
+            </button>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground text-sm italic">Aucune affectation. Cliquez sur « Assigner un bénévole ».</div>
+      ) : (
+        <div className="space-y-2">
+          {items.map((a) => {
+            const isS = a.volunteer_source === "SHEET";
+            const nom = isS ? a.benevoles?.nom : a.candidatures_benevoles?.full_name;
+            return (
+              <div key={a.id} className="bg-background border border-border rounded-2xl px-5 py-4 flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Link2 className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-foreground">{nom || "—"}</p>
+                    <span className="text-muted-foreground text-xs">→</span>
+                    <p className="text-sm font-medium text-foreground">{a.missions_benevoles?.titre || "—"}</p>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(a.assignment_status)}`}>{statusLabel(a.assignment_status)}</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-0.5 flex-wrap text-xs text-muted-foreground">
+                    <span>Rôle : {a.assigned_role}</span>
+                    <span>{isS ? "Fiche bureau" : "Candidature"}</span>
+                    {(a.start_date || a.end_date) && (
+                      <span>
+                        {a.start_date ? new Date(a.start_date + "T00:00:00").toLocaleDateString("fr-FR") : "?"}
+                        {" → "}
+                        {a.end_date ? new Date(a.end_date + "T00:00:00").toLocaleDateString("fr-FR") : "?"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <select value={a.assignment_status} onChange={(e) => setStatut(a, e.target.value)} disabled={busy === a.id}
+                    className="h-8 px-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus:border-primary/50">
+                    {ASSIGNMENT_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                  <button onClick={() => print(a)} title="Imprimer la fiche"
+                    className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                    <Printer className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => remove(a)} title="Supprimer"
+                    className="w-7 h-7 rounded-lg hover:bg-red-500/10 flex items-center justify-center text-muted-foreground hover:text-red-400 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Export principal ──────────────────────────────────────────────────────
 export default function BenevolesSection() {
   const [activeTab, setActiveTab] = useState("candidatures");
@@ -668,6 +1017,7 @@ export default function BenevolesSection() {
     { key: "candidatures", label: "Candidatures",     icon: UserPlus },
     { key: "fiches",       label: "Fiches bénévoles", icon: Users },
     { key: "missions",     label: "Missions",         icon: Briefcase },
+    { key: "affectations", label: "Affectations",     icon: Target },
     { key: "heures",       label: "Journal d'heures", icon: Clock },
   ];
 
@@ -700,6 +1050,7 @@ export default function BenevolesSection() {
       {activeTab === "candidatures" && <CandidaturesSection embedded />}
       {activeTab === "fiches"       && <FichesTab />}
       {activeTab === "missions"     && <MissionsTab />}
+      {activeTab === "affectations" && <AffectationsTab />}
       {activeTab === "heures"       && <HeuresTab />}
     </div>
   );

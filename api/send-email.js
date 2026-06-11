@@ -413,6 +413,58 @@ function buildAdminAlertPayload({ nom, email, alertType, detail }) {
   };
 }
 
+// ── Confirmation d'affectation bénévole → mission ────────────────────────────
+function buildVolunteerAssignmentPayload({ to_email, to_name, mission_titre, assigned_role, assignment_status, start_date, end_date }) {
+  const STATUS_LABELS = {
+    CANDIDATE: "Pressenti·e (à confirmer)",
+    ASSIGNED:  "Affecté·e",
+    ACTIVE:    "Mission active",
+    COMPLETED: "Mission terminée",
+    CANCELLED: "Affectation annulée",
+  };
+  const greeting = to_name ? `Bonjour <strong>${escHtml(to_name)}</strong>,` : "Bonjour,";
+  const statutTxt = escHtml(STATUS_LABELS[assignment_status] || assignment_status || "—");
+  const periode = (start_date || end_date)
+    ? `<tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:120px;">Période&nbsp;:</td>
+         <td style="padding:4px 0;font-size:13px;color:#111827;">${escHtml(start_date || "—")} → ${escHtml(end_date || "—")}</td></tr>`
+    : "";
+
+  const content = `
+    <p style="margin:0 0 20px;font-size:15px;color:#111827;">${greeting}</p>
+    <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.7;">
+      Nous vous remercions pour votre engagement auprès de <strong>Ma Belle Promo</strong>.
+      Voici le récapitulatif de votre affectation :
+    </p>
+    <div style="background:#f0fdf4;border-left:4px solid #2a6040;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:24px;">
+      <table cellpadding="0" cellspacing="0" style="width:100%;">
+        <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:120px;">Mission&nbsp;:</td>
+            <td style="padding:4px 0;font-size:14px;color:#14532d;font-weight:700;">${escHtml(mission_titre || "Mission MBP")}</td></tr>
+        <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Rôle&nbsp;:</td>
+            <td style="padding:4px 0;font-size:13px;color:#111827;">${escHtml(assigned_role || "—")}</td></tr>
+        <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;">Statut&nbsp;:</td>
+            <td style="padding:4px 0;font-size:13px;color:#111827;">${statutTxt}</td></tr>
+        ${periode}
+      </table>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b7280;">
+      Le bureau reviendra vers vous pour les détails pratiques. Pour toute question,
+      écrivez-nous à <a href="mailto:contact@mabellepromo.org" style="color:#16a34a;">contact@mabellepromo.org</a>.
+    </p>
+    <p style="margin:18px 0 0;font-size:13px;color:#6b7280;">
+      Cordialement,<br>
+      <strong style="color:#111827;">Le Bureau Exécutif</strong><br>
+      <span style="color:#16a34a;font-weight:600;">Ma Belle Promo — FDD Lomé · 1994–2000</span>
+    </p>`;
+
+  return {
+    sender: SENDER,
+    to: [{ email: to_email, name: to_name || to_email }],
+    replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
+    subject: `Votre affectation — ${escHtml(mission_titre || "Mission MBP")}`,
+    htmlContent: wrapHtml(content),
+  };
+}
+
 const METHOD_LABELS_PDF = {
   card: "Carte bancaire", paypal: "PayPal", wave: "Wave",
   tmoney: "T-Money", flooz: "Flooz", wire: "Virement ECOBANK",
@@ -673,7 +725,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "BREVO_API_KEY not configured" });
   }
 
-  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm", "webinar_confirmation", "webinar_reminder"];
+  const VALID_TYPES = ["contact", "reply", "newsletter_confirm", "admin_alert", "relance_cotisation", "sondage_invitation", "circulaire", "order_confirm", "webinar_confirmation", "webinar_reminder", "volunteer_assignment"];
   if (!VALID_TYPES.includes(type)) {
     return res.status(400).json({ error: `Invalid type. Use one of: ${VALID_TYPES.join(", ")}` });
   }
@@ -869,6 +921,8 @@ export default async function handler(req, res) {
     if (!isValidEmail(data.to_email)) return res.status(400).json({ error: "Adresse email invalide." });
     if (!data.event_title) return res.status(400).json({ error: "Titre de l'événement manquant." });
     if (!data.unregister_token) return res.status(400).json({ error: "Token de désinscription manquant." });
+  } else if (type === "volunteer_assignment") {
+    if (!isValidEmail(data.to_email)) return res.status(400).json({ error: "Adresse email invalide." });
   }
 
   try {
@@ -877,6 +931,7 @@ export default async function handler(req, res) {
     else if (type === "reply")           payload = buildReplyPayload(data);
     else if (type === "newsletter_confirm") payload = buildNewsletterConfirmPayload(data);
     else if (type === "webinar_confirmation") payload = buildWebinarConfirmationPayload(data);
+    else if (type === "volunteer_assignment") payload = buildVolunteerAssignmentPayload(data);
     else                                 payload = buildAdminAlertPayload(data);
 
     if (type === "reply" && Array.isArray(data.attachments) && data.attachments.length) {
