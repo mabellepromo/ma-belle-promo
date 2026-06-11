@@ -250,9 +250,9 @@ export const CHARTE = {
     {
       id: "section-8", num: 8, title: "Dispositions finales",
       subs: [
-        { title: "8.1 Droit applicable", items: [
-          "La charte est régie par le droit français pour les aspects relatifs au RGPD (CNIL) et respecte le droit togolais pour les actions menées localement.",
-          "La juridiction compétente est [à confirmer — Lomé ou Paris].",
+        { title: "8.1 Droit applicable et juridiction", items: [
+          "La présente charte est régie par le droit togolais. Pour la protection des données personnelles, MBP s'aligne en outre sur les standards du RGPD.",
+          "En cas de litige, les tribunaux de Lomé, au Togo, sont seuls compétents.",
           "La médiation est toujours privilégiée avant tout recours contentieux.",
           "En cas de doute d'interprétation, la version française fait foi.",
         ]},
