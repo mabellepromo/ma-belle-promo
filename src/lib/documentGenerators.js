@@ -1121,7 +1121,7 @@ export function genererCharteBenevolat() {
       --texte: #1a1a1a; --gris: #555;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    @page { size: A4 portrait; margin: 15mm; }
+    @page { size: A4 portrait; margin: 15mm 0; }
     @page :first { margin: 0; }
     body { font-family: "Lato", Arial, sans-serif; font-size: 10.5pt; line-height: 1.6; color: var(--texte); background: #9aa4a8; padding: 24px 0; }
     .no-print.print-btn { position: fixed; top: 16px; right: 16px; z-index: 10; background: var(--or-vif); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: "Lato", sans-serif; }
@@ -1147,11 +1147,12 @@ export function genererCharteBenevolat() {
     .cover-badge { background: var(--or); color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; padding: 4pt 12pt; border-radius: 2pt; }
 
     /* Contenu */
-    .content-head { background: var(--vert-fonce); padding: 10pt 22pt; display: flex; align-items: center; justify-content: space-between; border-radius: 4pt 4pt 0 0; }
+    .doc-content { padding: 0 15mm; }
+    .content-head { background: var(--vert-fonce); padding: 10pt 16pt; display: flex; align-items: center; justify-content: space-between; border-radius: 4pt 4pt 0 0; }
     .content-head img { height: 22pt; }
     .content-head span { font-family: "Cormorant Garamond", serif; font-size: 7.5pt; letter-spacing: 0.20em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
     .content-gold { height: 3pt; background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or)); }
-    .content-body { padding: 24pt 4pt 0; }
+    .content-body { padding: 24pt 0 0; }
     .eyebrow { font-size: 7.5pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--or-vif); margin-bottom: 5pt; display: block; }
     .s-title { font-family: "Cormorant Garamond", serif; font-size: 21pt; font-weight: 700; color: var(--vert-fonce); margin: 0 0 5pt; line-height: 1.1; break-after: avoid; }
     .s-rule { width: 40pt; height: 2pt; background: linear-gradient(to right, var(--or-vif), transparent); margin-bottom: 14pt; }
@@ -1196,6 +1197,7 @@ export function genererCharteBenevolat() {
     </div>
 
     <!-- Contenu -->
+    <div class="doc-content">
     <div class="content-head">
       <img src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
       <span>Charte de bénévolat · en vigueur au ${e(CHARTE_DATE)}</span>
@@ -1229,6 +1231,7 @@ export function genererCharteBenevolat() {
       </div>
 
       <div class="end-foot">© ${year} l'association Ma Belle Promo (MBP) · Lomé, Togo · mabellepromo.org · contact@mabellepromo.org</div>
+    </div>
     </div>
 
   </div>
