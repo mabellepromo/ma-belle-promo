@@ -1104,14 +1104,8 @@ export function genererFicheBenevole(b) {
 // ── Charte de bénévolat (impression / PDF, document multi-pages en flux) ────
 export function genererCharteBenevolat() {
   const e = _escDoc;
-  const sectionsHtml = CHARTE.sections.map((s) => `
-    <section>
-      <h2>${s.num}. ${e(s.title)}</h2>
-      ${s.subs.map((sub) => `
-        <h3>${e(sub.title)}</h3>
-        <ul>${sub.items.map((it) => `<li>${e(it)}</li>`).join("")}</ul>
-      `).join("")}
-    </section>`).join("");
+  const year = new Date().getFullYear();
+  const tags = ["Solidarité", "Intégrité", "Excellence", "Inclusion", "Responsabilité", "Flexibilité"];
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -1119,60 +1113,125 @@ export function genererCharteBenevolat() {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Charte de bénévolat — Ma Belle Promo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    @page { size: A4 portrait; margin: 20mm; }
-    body { font-family: 'Lato', Arial, sans-serif; color: #000; font-size: 11pt; line-height: 1.6; background: #fff; padding: 28px; }
-    .no-print.print-btn { position: fixed; top: 16px; right: 16px; z-index: 10; background: #f0a030; color: #0a1f12; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Lato', sans-serif; }
-    @media print { .no-print { display: none !important; } body { padding: 0; } }
-    .header { text-align: center; border-bottom: 3px solid #0a1f12; padding-bottom: 16px; margin-bottom: 24px; }
-    .header img { height: 56px; margin-bottom: 8px; }
-    .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 26pt; color: #0a1f12; letter-spacing: 0.5px; }
-    .header .sub { color: #2a6040; font-weight: 700; font-size: 11pt; margin-top: 2px; }
-    .header .meta { color: #666; font-size: 9pt; margin-top: 6px; }
-    .gold { height: 3px; background: #f0a030; margin: 0 auto 24px; max-width: 120px; }
-    h2 { font-family: 'Cormorant Garamond', serif; font-size: 17pt; color: #0a1f12; border-bottom: 2px solid #f0a030; padding-bottom: 4px; margin: 22px 0 8px; break-after: avoid; }
-    h3 { color: #2a6040; font-size: 12pt; font-weight: 700; margin: 12px 0 4px; break-after: avoid; }
-    p { margin-bottom: 8px; color: #111; }
-    ul { margin: 0 0 8px 0; padding-left: 0; list-style: none; }
-    li { position: relative; padding-left: 16px; margin-bottom: 4px; break-inside: avoid; }
-    li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: #f0a030; }
-    h3, li { break-inside: avoid; }
-    .preambule p { color: #333; }
-    .sig { margin-top: 40px; padding-top: 18px; border-top: 1px solid #2a6040; break-inside: avoid; }
-    .sig-line { margin-top: 28px; display: flex; justify-content: space-between; gap: 40px; font-size: 10pt; color: #2a6040; }
-    .sig-line div { flex: 1; border-top: 1px solid #666; padding-top: 6px; }
-    .foot { margin-top: 28px; text-align: center; font-size: 8.5pt; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
+    :root {
+      --vert: #1b6b45; --vert-clair: #e8f5ee; --vert-fonce: #0f3d28;
+      --or: #9a7118; --or-vif: #c8960a; --or-clair: #fdf6e3;
+      --texte: #1a1a1a; --gris: #555;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    @page { size: A4 portrait; margin: 15mm; }
+    @page :first { margin: 0; }
+    body { font-family: "Lato", Arial, sans-serif; font-size: 10.5pt; line-height: 1.6; color: var(--texte); background: #9aa4a8; padding: 24px 0; }
+    .no-print.print-btn { position: fixed; top: 16px; right: 16px; z-index: 10; background: var(--or-vif); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: "Lato", sans-serif; }
+    @media print { body { background: #fff; padding: 0; } .no-print { display: none !important; } .a4 { width: 100%; box-shadow: none; margin: 0; } }
+    .a4 { width: 210mm; margin: 0 auto; background: #fff; box-shadow: 0 6px 32px rgba(0,0,0,0.35); }
+
+    /* Couverture */
+    .cover { width: 210mm; min-height: 297mm; display: flex; flex-direction: column; background: var(--vert-fonce); color: #fff; overflow: hidden; page-break-after: always; break-after: page; }
+    .cover-band { height: 5pt; background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or)); }
+    .cover-inner { flex: 1; display: flex; flex-direction: column; padding: 40pt 46pt; position: relative; }
+    .cover-pattern { position: absolute; inset: 0; pointer-events: none; opacity: 0.04; background-image: repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 1px,transparent 18px), repeating-linear-gradient(-45deg,#fff 0,#fff 1px,transparent 1px,transparent 18px); }
+    .cover-logo { height: 62pt; align-self: flex-start; margin-bottom: 40pt; position: relative; }
+    .cover-eyebrow { font-family: "Cormorant Garamond", serif; font-size: 9pt; letter-spacing: 0.30em; text-transform: uppercase; color: var(--or-vif); margin-bottom: 10pt; position: relative; }
+    .cover-title { font-family: "Cormorant Garamond", serif; font-size: 48pt; font-weight: 700; line-height: 1.04; margin: 0 0 10pt; position: relative; }
+    .cover-title span { color: var(--or-vif); }
+    .cover-subtitle { font-family: "Cormorant Garamond", serif; font-size: 16pt; font-style: italic; color: rgba(255,255,255,0.65); margin-bottom: 32pt; position: relative; }
+    .cover-divider { width: 60pt; height: 2pt; background: linear-gradient(to right, var(--or-vif), transparent); margin-bottom: 26pt; position: relative; }
+    .cover-pitch { font-size: 11pt; color: rgba(255,255,255,0.82); line-height: 1.7; margin-bottom: auto; position: relative; }
+    .cover-tags { display: flex; flex-wrap: wrap; gap: 8pt; margin-top: 30pt; position: relative; }
+    .cover-tag { font-size: 8pt; letter-spacing: 0.10em; text-transform: uppercase; border: 1pt solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.65); padding: 4pt 10pt; border-radius: 20pt; }
+    .cover-footer { border-top: 1pt solid rgba(255,255,255,0.12); padding-top: 16pt; margin-top: 30pt; display: flex; align-items: center; justify-content: space-between; position: relative; }
+    .cover-footer p { font-size: 8pt; color: rgba(255,255,255,0.42); margin: 0; }
+    .cover-badge { background: var(--or); color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; padding: 4pt 12pt; border-radius: 2pt; }
+
+    /* Contenu */
+    .content-head { background: var(--vert-fonce); padding: 10pt 22pt; display: flex; align-items: center; justify-content: space-between; border-radius: 4pt 4pt 0 0; }
+    .content-head img { height: 22pt; }
+    .content-head span { font-family: "Cormorant Garamond", serif; font-size: 7.5pt; letter-spacing: 0.20em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .content-gold { height: 3pt; background: linear-gradient(to right, var(--or), #e6c84a 50%, var(--or)); }
+    .content-body { padding: 24pt 4pt 0; }
+    .eyebrow { font-size: 7.5pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--or-vif); margin-bottom: 5pt; display: block; }
+    .s-title { font-family: "Cormorant Garamond", serif; font-size: 21pt; font-weight: 700; color: var(--vert-fonce); margin: 0 0 5pt; line-height: 1.1; break-after: avoid; }
+    .s-rule { width: 40pt; height: 2pt; background: linear-gradient(to right, var(--or-vif), transparent); margin-bottom: 14pt; }
+    .intro { font-size: 10.5pt; color: #333; line-height: 1.75; text-align: justify; margin-bottom: 10pt; }
+    .pull-quote { border-left: 3pt solid var(--or-vif); padding: 10pt 16pt; margin: 14pt 0 22pt; background: var(--or-clair); border-radius: 0 4pt 4pt 0; break-inside: avoid; }
+    .pull-quote p { font-family: "Cormorant Garamond", serif; font-size: 13pt; font-style: italic; color: var(--vert-fonce); margin: 0; line-height: 1.5; }
+    .c-section { margin-top: 20pt; }
+    .sub-title { font-family: "Cormorant Garamond", serif; font-size: 13pt; font-weight: 700; color: var(--vert); margin: 13pt 0 5pt; break-after: avoid; }
+    .c-list { list-style: none; margin: 0 0 6pt; padding: 0; }
+    .c-list li { position: relative; padding-left: 16pt; margin-bottom: 5pt; font-size: 10pt; color: #2c2c2c; line-height: 1.55; break-inside: avoid; }
+    .c-list li::before { content: ""; position: absolute; left: 2pt; top: 6pt; width: 5pt; height: 5pt; border-radius: 50%; background: var(--or-vif); }
+    .sign-card { margin-top: 26pt; background: var(--vert-clair); border: 1pt solid rgba(27,107,69,0.2); border-radius: 8pt; padding: 16pt 20pt; break-inside: avoid; }
+    .sign-card > p { font-size: 10pt; color: var(--vert-fonce); margin: 0; }
+    .sign-lines { margin-top: 28pt; display: flex; justify-content: space-between; gap: 40pt; font-size: 9pt; color: var(--gris); }
+    .sign-lines div { flex: 1; border-top: 1pt solid #999; padding-top: 6pt; }
+    .end-foot { margin-top: 22pt; text-align: center; font-size: 8pt; color: #999; border-top: 1pt solid #e5e5e5; padding-top: 10pt; }
   </style>
 </head>
 <body>
   <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
 
-  <div class="header">
-    <img src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
-    <h1>Charte de Bénévolat</h1>
-    <div class="sub">Ma Belle Promo — Association d'Alumni</div>
-    <div class="meta">Faculté de Droit · Université de Lomé · Promotion 1994–2000<br/>Version ${e(CHARTE_VERSION)} · en vigueur au ${e(CHARTE_DATE)}</div>
-  </div>
-  <div class="gold"></div>
+  <div class="a4">
 
-  <div class="preambule">
-    <h2>Préambule</h2>
-    ${CHARTE.preambule.map((p) => `<p>${e(p)}</p>`).join("")}
-  </div>
-
-  ${sectionsHtml}
-
-  <div class="sig">
-    <p style="font-size:10.5pt;color:#0a1f12;"><strong>Acceptation.</strong> Je reconnais avoir lu et compris la présente charte (version ${e(CHARTE_VERSION)}) et je m'engage à la respecter.</p>
-    <div class="sig-line">
-      <div>Nom &amp; signature du bénévole</div>
-      <div style="text-align:right;">Date : __________________</div>
+    <!-- Couverture -->
+    <div class="cover">
+      <div class="cover-band"></div>
+      <div class="cover-inner">
+        <div class="cover-pattern"></div>
+        <img src="/Logo%20Redesign1.png" alt="Logo Ma Belle Promo" class="cover-logo" onerror="this.style.display='none'" />
+        <span class="cover-eyebrow">Charte du bénévole · ${e(CHARTE_VERSION)}</span>
+        <h1 class="cover-title">Charte de<br><span>Bénévolat</span></h1>
+        <p class="cover-subtitle">Nos engagements réciproques</p>
+        <div class="cover-divider"></div>
+        <p class="cover-pitch">${e(CHARTE.preambule[0])}</p>
+        <div class="cover-tags">${tags.map((t) => `<span class="cover-tag">${e(t)}</span>`).join("")}</div>
+        <div class="cover-footer">
+          <p>mabellepromo.org &nbsp;·&nbsp; Lomé, République du Togo</p>
+          <span class="cover-badge">Version ${e(CHARTE_VERSION)}</span>
+        </div>
+      </div>
+      <div class="cover-band"></div>
     </div>
-  </div>
 
-  <div class="foot">Ma Belle Promo · www.mabellepromo.org · contact@mabellepromo.org · © ${new Date().getFullYear()}</div>
+    <!-- Contenu -->
+    <div class="content-head">
+      <img src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <span>Charte de bénévolat · en vigueur au ${e(CHARTE_DATE)}</span>
+    </div>
+    <div class="content-gold"></div>
+
+    <div class="content-body">
+      <span class="eyebrow">Préambule</span>
+      <h2 class="s-title">Le bénévolat chez MBP</h2>
+      <div class="s-rule"></div>
+      ${CHARTE.preambule.slice(0, 3).map((p) => `<p class="intro">${e(p)}</p>`).join("")}
+      <div class="pull-quote"><p>${e(CHARTE.preambule[3])}</p></div>
+
+      ${CHARTE.sections.map((s) => `
+        <section class="c-section">
+          <span class="eyebrow">Section ${s.num}</span>
+          <h2 class="s-title">${e(s.title)}</h2>
+          <div class="s-rule"></div>
+          ${s.subs.map((sub) => `
+            <h3 class="sub-title">${e(sub.title)}</h3>
+            <ul class="c-list">${sub.items.map((it) => `<li>${e(it)}</li>`).join("")}</ul>
+          `).join("")}
+        </section>`).join("")}
+
+      <div class="sign-card">
+        <p><strong>Acceptation —</strong> Je reconnais avoir lu et compris la présente charte (version ${e(CHARTE_VERSION)}) et je m'engage à la respecter.</p>
+        <div class="sign-lines">
+          <div>Nom &amp; signature du bénévole</div>
+          <div style="text-align:right;">Date : __________________</div>
+        </div>
+      </div>
+
+      <div class="end-foot">© ${year} l'association Ma Belle Promo (MBP) · Lomé, Togo · mabellepromo.org · contact@mabellepromo.org</div>
+    </div>
+
+  </div>
 </body>
 </html>`;
 
