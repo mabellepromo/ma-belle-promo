@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import PageHero from "../components/PageHero";
 import SEO from "../components/SEO";
+import CharterModal from "../components/CharterModal";
 import { supabase, uploadCandidateAvatar } from "../lib/supabase";
 import {
   PROFILE_TYPES, UNIVERSITIES, EXPERTISE_DOMAINS,
@@ -133,6 +134,7 @@ export default function Benevolat() {
   const [saving, setSaving]   = useState(false);
   const [sent, setSent]       = useState(false);
   const [openMissions, setOpenMissions] = useState([]);
+  const [showCharter, setShowCharter]   = useState(false);
 
   // Missions ouvertes (planifiées / en cours) proposées au candidat.
   // Lecture publique autorisée par la RLS (missions_ben_select_public_active).
@@ -584,7 +586,12 @@ export default function Benevolat() {
                     </div>
                     <div>
                       <ConsentRow checked={form.consent_charter} onChange={(v) => set("consent_charter", v)} required>
-                        Je reconnais la <Link to="/confidentialite" className="text-primary hover:underline font-medium">charte du bénévole MBP</Link>.
+                        Je reconnais la{" "}
+                        <button type="button"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowCharter(true); }}
+                          className="text-primary hover:underline font-medium">
+                          charte du bénévole MBP
+                        </button>.
                       </ConsentRow>
                       <Err msg={errors.consent_charter} />
                     </div>
@@ -651,6 +658,13 @@ export default function Benevolat() {
           </div>
         </div>
       </section>
+
+      {showCharter && (
+        <CharterModal
+          onClose={() => setShowCharter(false)}
+          onAccept={() => { set("consent_charter", true); setShowCharter(false); }}
+        />
+      )}
     </div>
   );
 }

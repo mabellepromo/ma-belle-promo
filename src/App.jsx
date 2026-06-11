@@ -23,6 +23,7 @@ const PAGE_TITLES = {
   "/activites/plan-action-2026": "Plan d'Action 2026",
   "/implications/adhesion":      "Adhésion",
   "/implications/benevolat":     "Bénévolat",
+  "/implications/charte-benevole": "Charte de bénévolat",
   "/implications/cotisation":    "Cotisation",
   "/implications/soutenir":      "Nous Soutenir",
   "/informations/actualites":    "Actualités",
@@ -86,6 +87,7 @@ const ProjetDetail   = lazy(() => import('./pages/ProjetDetail'));
 const Programmes     = lazy(() => import('./pages/Programmes'));
 const Adhesion       = lazy(() => import('./pages/Adhesion'));
 const Benevolat      = lazy(() => import('./pages/Benevolat'));
+const CharteBenevolat = lazy(() => import('./pages/CharteBenevolat'));
 const Cotisation     = lazy(() => import('./pages/Cotisation'));
 const NousSoutenir   = lazy(() => import('./pages/NousSoutenir'));
 const Mediatheque    = lazy(() => import('./pages/Mediatheque'));
@@ -199,6 +201,7 @@ const AuthenticatedApp = () => {
         <Route path="/implications/adherents" element={<Navigate to="/annuaire" replace />} />
         <Route path="/implications/adhesion" element={<Adhesion />} />
         <Route path="/implications/benevolat" element={<Benevolat />} />
+        <Route path="/implications/charte-benevole" element={<CharteBenevolat />} />
         <Route path="/implications/cotisation" element={<Cotisation />} />
         <Route path="/implications/soutenir" element={<NousSoutenir />} />
         <Route path="/informations/actualites" element={<Actualites />} />

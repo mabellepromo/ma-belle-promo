@@ -16,6 +16,7 @@ import {
   MODALITIES, TIMEZONES, REFERRAL_SOURCES, NEWSLETTER_FREQUENCIES,
   COUNTRIES,
 } from "./benevolatConstants";
+import { CHARTE_VERSION } from "./charteBenevolat";
 
 /** Construit un z.enum à partir d'une liste {value,label}. */
 const enumFrom = (list, msg) =>
@@ -243,6 +244,10 @@ export function toVolunteerRow(data) {
     newsletter_frequency: data.consent_newsletter ? orNull(data.newsletter_frequency) : null,
     consent_photo: !!data.consent_photo,
     consent_background_check: !!data.consent_background_check,
+    // Traçabilité de l'acceptation de la charte (version + horodatage + user agent)
+    charter_version:     data.consent_charter ? CHARTE_VERSION : null,
+    charter_accepted_at: data.consent_charter ? new Date().toISOString() : null,
+    charter_user_agent:  (data.consent_charter && typeof navigator !== "undefined") ? navigator.userAgent : null,
     statut: "nouvelle",
   };
 }

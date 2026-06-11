@@ -5,6 +5,7 @@ import {
   MODALITIES, EMPLOYMENT_SECTORS, UNIVERSITIES, STUDY_YEARS, TIMEZONES,
   REFERRAL_SOURCES, NEWSLETTER_FREQUENCIES, labelOf, labelsOf,
 } from "./benevolatConstants";
+import { CHARTE, CHARTE_VERSION, CHARTE_DATE } from "./charteBenevolat";
 
 const MBP_STYLE = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
@@ -1065,7 +1066,7 @@ export function genererFicheCandidature(c) {
     ${_docH3("Consentements")}
     <table style="width:100%;border-collapse:collapse;">
       ${_docRow("Contact", yn(c.consent_contact))}
-      ${_docRow("Charte du bénévole", yn(c.consent_charter))}
+      ${_docRow("Charte du bénévole", c.charter_version ? `Acceptée (${e(c.charter_version)})${c.charter_accepted_at ? " le " + _fmtDocDate((c.charter_accepted_at || "").slice(0, 10)) : ""}` : yn(c.consent_charter))}
       ${_docRow("Traitement RGPD", yn(c.consent_data))}
       ${_docRow("Visibilité communauté", yn(c.consent_visibility))}
       ${_docRow("Newsletter", c.consent_newsletter ? `Oui${c.newsletter_frequency ? " (" + e(labelOf(NEWSLETTER_FREQUENCIES, c.newsletter_frequency)) + ")" : ""}` : "Non")}
@@ -1094,6 +1095,84 @@ export function genererFicheBenevole(b) {
     ${b.notes ? `${_docH3("Notes")}<p style="font-size:11pt;color:#0a1f12;line-height:1.6;white-space:pre-wrap;">${e(b.notes)}</p>` : ""}`;
 
   _ficheShell(`Fiche bénévole — ${e(b.nom)}`, null, body, `Fiche-benevole-${String(b.nom || "benevole").replace(/\s+/g, "-")}.html`);
+}
+
+// ── Charte de bénévolat (impression / PDF, document multi-pages en flux) ────
+export function genererCharteBenevolat() {
+  const e = _escDoc;
+  const sectionsHtml = CHARTE.sections.map((s) => `
+    <section>
+      <h2>${s.num}. ${e(s.title)}</h2>
+      ${s.subs.map((sub) => `
+        <h3>${e(sub.title)}</h3>
+        <ul>${sub.items.map((it) => `<li>${e(it)}</li>`).join("")}</ul>
+      `).join("")}
+    </section>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charte de bénévolat — Ma Belle Promo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { size: A4 portrait; margin: 20mm; }
+    body { font-family: 'Lato', Arial, sans-serif; color: #000; font-size: 11pt; line-height: 1.6; background: #fff; padding: 28px; }
+    .no-print.print-btn { position: fixed; top: 16px; right: 16px; z-index: 10; background: #f0a030; color: #0a1f12; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Lato', sans-serif; }
+    @media print { .no-print { display: none !important; } body { padding: 0; } }
+    .header { text-align: center; border-bottom: 3px solid #0a1f12; padding-bottom: 16px; margin-bottom: 24px; }
+    .header img { height: 56px; margin-bottom: 8px; }
+    .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 26pt; color: #0a1f12; letter-spacing: 0.5px; }
+    .header .sub { color: #2a6040; font-weight: 700; font-size: 11pt; margin-top: 2px; }
+    .header .meta { color: #666; font-size: 9pt; margin-top: 6px; }
+    .gold { height: 3px; background: #f0a030; margin: 0 auto 24px; max-width: 120px; }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: 17pt; color: #0a1f12; border-bottom: 2px solid #f0a030; padding-bottom: 4px; margin: 22px 0 8px; break-after: avoid; }
+    h3 { color: #2a6040; font-size: 12pt; font-weight: 700; margin: 12px 0 4px; break-after: avoid; }
+    p { margin-bottom: 8px; color: #111; }
+    ul { margin: 0 0 8px 0; padding-left: 0; list-style: none; }
+    li { position: relative; padding-left: 16px; margin-bottom: 4px; break-inside: avoid; }
+    li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: #f0a030; }
+    h3, li { break-inside: avoid; }
+    .preambule p { color: #333; }
+    .sig { margin-top: 40px; padding-top: 18px; border-top: 1px solid #2a6040; break-inside: avoid; }
+    .sig-line { margin-top: 28px; display: flex; justify-content: space-between; gap: 40px; font-size: 10pt; color: #2a6040; }
+    .sig-line div { flex: 1; border-top: 1px solid #666; padding-top: 6px; }
+    .foot { margin-top: 28px; text-align: center; font-size: 8.5pt; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+
+  <div class="header">
+    <img src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+    <h1>Charte de Bénévolat</h1>
+    <div class="sub">Ma Belle Promo — Association d'Alumni</div>
+    <div class="meta">Faculté de Droit · Université de Lomé · Promotion 1994–2000<br/>Version ${e(CHARTE_VERSION)} · en vigueur au ${e(CHARTE_DATE)}</div>
+  </div>
+  <div class="gold"></div>
+
+  <div class="preambule">
+    <h2>Préambule</h2>
+    ${CHARTE.preambule.map((p) => `<p>${e(p)}</p>`).join("")}
+  </div>
+
+  ${sectionsHtml}
+
+  <div class="sig">
+    <p style="font-size:10.5pt;color:#0a1f12;"><strong>Acceptation.</strong> Je reconnais avoir lu et compris la présente charte (version ${e(CHARTE_VERSION)}) et je m'engage à la respecter.</p>
+    <div class="sig-line">
+      <div>Nom &amp; signature du bénévole</div>
+      <div style="text-align:right;">Date : __________________</div>
+    </div>
+  </div>
+
+  <div class="foot">Ma Belle Promo · www.mabellepromo.org · contact@mabellepromo.org · © ${new Date().getFullYear()}</div>
+</body>
+</html>`;
+
+  openDoc(html, "Charte-benevolat-MBP.html");
 }
 
 export function genererRecu(member, annee, montant, datePaiement, modePaiement, montantAttendu, versements, statut) {

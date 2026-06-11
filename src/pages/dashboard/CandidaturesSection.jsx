@@ -127,6 +127,8 @@ export default function CandidaturesSection({ embedded = false }) {
         statut: "actif",
         date_engagement: item.start_date,
         notes: `Issu d'une candidature en ligne (${labelOf(PROJECT_INTERESTS, item.project_interest)}).`,
+        charter_version: item.charter_version || null,
+        charter_accepted_at: item.charter_accepted_at || null,
       })
       .select("id")
       .single();
@@ -252,6 +254,7 @@ export default function CandidaturesSection({ embedded = false }) {
                       <Line label="Recommandé par" value={c.referred_by} />
                       <Line label="Dispo événements" value={c.available_for_events ? "Oui" : null} />
                       <Line label="Newsletter" value={c.consent_newsletter ? labelOf(NEWSLETTER_FREQUENCIES, c.newsletter_frequency) : null} />
+                      <Line label="Charte acceptée" value={c.charter_accepted_at ? `${c.charter_version || ""} le ${new Date(c.charter_accepted_at).toLocaleDateString("fr-FR")}` : null} />
                     </div>
 
                     {c.skills_description && (
