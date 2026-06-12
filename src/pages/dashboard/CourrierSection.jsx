@@ -572,8 +572,14 @@ async function injectValues(html, form, compact = false, templateId = null) {
   // de tableau .page-content/.page-footer (V1) ; try/catch de sécurité pour
   // ne jamais bloquer la génération d'un autre modèle.
   if (d.querySelector(".page-content") && d.querySelector(".page-footer")) {
-    // V1 verrouillé : 1080. V2-V7 : 1010 (marge de sécurité plus large).
-    try { paginateDoc(d, templateId === "v1" ? 1080 : 1010); } catch (e) { /* repli */ }
+    // Budget de hauteur utile unifié à 1080 px (≈ 285,75 mm) pour TOUS les
+    // modèles. La feuille A4 fait 296 mm : plafonner le contenu à 1080 px
+    // laisse ~10 mm de marge en bas → le pied ne déborde jamais (vrai pour
+    // tous les modèles, y compris V6/V7 à grand en-tête, mesuré au PDF réel).
+    // V2-V7 utilisaient 1010 (trop prudent → sauts de page précoces, feuilles
+    // à moitié vides). La mesure est fiabilisée par `d.fonts.ready` ci-dessus,
+    // ce qui rend l'ancienne marge superflue. Tous alignés sur le moteur de V1.
+    try { paginateDoc(d, 1080); } catch (e) { /* repli */ }
   }
 
   const pageEl = d.querySelector(".page");
