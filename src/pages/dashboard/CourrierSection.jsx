@@ -389,7 +389,6 @@ function paginateDoc(d, PAGE_H = 1080) {
 
   // Signature détachée (cherchée partout) pour finir sur la dernière feuille
   const closing = d.querySelector(".closing-row, .closing");
-  const closingH = closing ? closing.offsetHeight + 24 : 0;
   if (closing && closing.parentNode) closing.parentNode.removeChild(closing);
 
   d.querySelectorAll(".page-dynamic").forEach(p => p.remove());
@@ -406,19 +405,14 @@ function paginateDoc(d, PAGE_H = 1080) {
     cur = np;
   }
 
-  // 2) réserve la place de la signature sur la DERNIÈRE feuille
+  // 2) Signature : on la pose à la fin de la DERNIÈRE feuille de corps (déjà
+  //    remplie à fond en phase 1). Si elle déborde, elle part seule sur une
+  //    feuille finale. On ne RÉSERVE PLUS sa hauteur en amont : réserver la
+  //    place de la signature sur l'avant-dernière feuille la tronquait, alors
+  //    que la signature finissait sur la feuille suivante → grand vide sur
+  //    l'avant-dernière feuille (bug visible sur V5/V6/V7, dont la carte de
+  //    signature est haute). Vérifié au rendu PDF réel sur les 6 modèles.
   if (closing) {
-    RESERVE = closingH;
-    let guard2 = 40;
-    while (isOver(cur) && guard2-- > 0) {
-      const ov2 = split(cur.querySelector(CORPS), cur);
-      if (!ov2.trim()) break;
-      const np2 = makePage(ov2);
-      cur.insertAdjacentElement("afterend", np2);
-      cur = np2;
-    }
-    RESERVE = 0;
-    // 3) réinsère politesse + signature à la fin de la dernière feuille
     bodyOf(cur).appendChild(closing);
     if (isOver(cur)) {
       if (closing.parentNode) closing.parentNode.removeChild(closing);
