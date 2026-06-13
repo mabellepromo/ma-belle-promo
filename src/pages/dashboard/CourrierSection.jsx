@@ -228,6 +228,15 @@ const INJECT_CSS = `
     align-self: flex-end !important;
   }
 
+  /* Signature : libellé + nom + titre décalés de 1 cm vers la gauche ; le
+     cachet (une <img>) garde sa position (décalé de 1 cm à droite côté JS).
+     (Eric, 13 juin 2026, répercuté sur tous les modèles) */
+  .signature-label, .sig-role, .sig-function,
+  .editable-signature, .editable-sig-name, .e-sig-name,
+  .signature-titre, .editable-sig-titre, .e-sig-titre {
+    margin-right: 10mm !important;
+  }
+
   main.body, .body {
     flex: none !important;
     padding-bottom: 16px !important;
@@ -516,9 +525,9 @@ async function injectValues(html, form, compact = false, templateId = null) {
   if (sigLabelEl) {
     const stamp = d.createElement("img");
     stamp.setAttribute("src", window.location.origin + "/images/FDD.webp");
-    // V1 : tampon décalé de 1 cm vers la droite (demande Eric, 13 juin 2026).
-    const stampShift = templateId === "v1" ? "margin-left:10mm;" : "";
-    stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;opacity:0.9;" + stampShift;
+    // Tampon décalé de 1 cm vers la droite, sur tous les modèles
+    // (demande Eric, 13 juin 2026).
+    stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;margin-left:10mm;opacity:0.9";
     stamp.setAttribute("alt", "Cachet de la Présidente");
     sigLabelEl.insertAdjacentElement("afterend", stamp);
   }
