@@ -514,7 +514,9 @@ async function injectValues(html, form, compact = false, templateId = null) {
   if (sigLabelEl) {
     const stamp = d.createElement("img");
     stamp.setAttribute("src", window.location.origin + "/images/FDD.webp");
-    stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;opacity:0.9";
+    // V1 : tampon décalé de 1 cm vers la droite (demande Eric, 13 juin 2026).
+    const stampShift = templateId === "v1" ? "margin-left:10mm;" : "";
+    stamp.style.cssText = "display:block;width:100px;height:auto;margin:4px 0;opacity:0.9;" + stampShift;
     stamp.setAttribute("alt", "Cachet de la Présidente");
     sigLabelEl.insertAdjacentElement("afterend", stamp);
   }
