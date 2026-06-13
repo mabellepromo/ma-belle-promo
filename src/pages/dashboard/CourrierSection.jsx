@@ -301,7 +301,7 @@ const PRINT_CSS = `
  * (`script-src 'self'`) qui BLOQUE les scripts inline. On l'exécute donc
  * ici, dans le code de l'app (autorisé par la CSP), sur le DOM de l'iframe.
  */
-function paginateDoc(d, PAGE_H = 1080) {
+function paginateDoc(d, PAGE_H = 1080, templateId = null) {
   // PAGE_H = budget de hauteur utile par feuille (px). 1080 pour V1
   // (verrouillé). Les modèles V2-V7 passent une valeur plus basse (marge de
   // sécurité plus large) car leurs en-têtes/pieds plus hauts, mesurés en
@@ -361,7 +361,11 @@ function paginateDoc(d, PAGE_H = 1080) {
     fakeHdr.appendChild(fakeHdrCell);
     const ct = d.createElement("div"); ct.className = "page-content";
     const cl = d.createElement("div"); cl.className = "page-cell";
-    const bd = d.createElement("main"); bd.className = "body"; bd.style.paddingTop = "24px";
+    // Décalage haut du corps sur les feuilles de continuation. V1 : 24px + 2cm
+    // (≈ 75,6px à 96 dpi) = ~100px, pour démarrer le texte 2 cm plus bas dès la
+    // 2e page (demande Eric, 13 juin 2026). Autres modèles : 24px inchangé.
+    const bd = d.createElement("main"); bd.className = "body";
+    bd.style.paddingTop = templateId === "v1" ? "100px" : "24px";
     const cr = d.createElement("div"); cr.className = corpsClass();
     cr.innerHTML = textToHtml(text);
     bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
@@ -573,7 +577,7 @@ async function injectValues(html, form, compact = false, templateId = null) {
     // V2-V7 utilisaient 1010 (trop prudent → sauts de page précoces, feuilles
     // à moitié vides). La mesure est fiabilisée par `d.fonts.ready` ci-dessus,
     // ce qui rend l'ancienne marge superflue. Tous alignés sur le moteur de V1.
-    try { paginateDoc(d, 1080); } catch (e) { /* repli */ }
+    try { paginateDoc(d, 1080, templateId); } catch (e) { /* repli */ }
   }
 
   const pageEl = d.querySelector(".page");
