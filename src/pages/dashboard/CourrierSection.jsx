@@ -205,7 +205,9 @@ const INJECT_CSS = `
   :root, html, body { color-scheme: light !important; }
 
   .corps-lettre, .e-corps {
-    color: hsl(150, 30%, 10%) !important;
+    /* Corps plus noir : DM Sans (traits fins) paraissait trop clair en
+       hsl(150,30%,10%). Quasi-noir avec une pointe de teinte. (Eric, 13 juin 2026) */
+    color: hsl(150, 18%, 6%) !important;
     visibility: visible !important;
     flex: 0 0 auto !important;
   }
