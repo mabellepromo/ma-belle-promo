@@ -451,6 +451,14 @@
       background: var(--vert-fonce);
       padding: 0;
     }
+    /* INJECT_CSS force le fond blanc des footers (footer.footer) ; on restaure
+       le fond vert foncé de ce modèle avec une règle plus spécifique, sinon le
+       texte blanc devient blanc sur blanc → illisible. (Eric, 13 juin 2026) */
+    .page-footer .footer {
+      background: var(--vert-fonce) !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
     .footer-top-bar {
       display: flex;
