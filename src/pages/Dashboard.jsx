@@ -1366,7 +1366,7 @@ export default function Dashboard() {
                           <img
                             src={m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=40`}
                             alt={m.nom} className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }}
-                            onError={e => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=40`; }} />
+                            onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=40`; }} />
                         </div>
                         <div className="min-w-0">
                           <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">{m.nom}</p>
@@ -1427,7 +1427,7 @@ export default function Dashboard() {
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted flex-shrink-0">
                       <img src={m.photo} alt={m.nom} className="w-full h-full object-cover"
-                        onError={e => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=56`; }} />
+                        onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=56`; }} />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-foreground">{m.nom}</h3>
@@ -1586,7 +1586,7 @@ export default function Dashboard() {
                   <img
                     src={memberDetail.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDetail.nom)}&background=064e3b&color=6ee7b7&size=80`}
                     alt={memberDetail.nom} className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }}
-                    onError={e => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDetail.nom)}&background=064e3b&color=6ee7b7&size=80`; }} />
+                    onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDetail.nom)}&background=064e3b&color=6ee7b7&size=80`; }} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-heading font-bold text-foreground text-base leading-tight">{memberDetail.nom}</h3>

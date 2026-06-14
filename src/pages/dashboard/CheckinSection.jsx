@@ -189,7 +189,7 @@ export default function CheckinSection() {
                 <div className="flex items-start gap-4 p-4">
                   {/* Image miniature */}
                   {evt.image ? (
-                    <img src={evt.image} alt={evt.titre} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" onError={e => e.target.style.display = "none"} />
+                    <img src={evt.image} alt={evt.titre} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" onError={e => e.currentTarget.style.display = "none"} />
                   ) : (
                     <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <Calendar className="w-6 h-6 text-primary/50" />

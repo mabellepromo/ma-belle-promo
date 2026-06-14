@@ -174,7 +174,7 @@ function EventCard({ event, isSelected, isRegistered, onClick }) {
         <div className="relative h-40 overflow-hidden">
           <img src={event.affiche} alt={event.title}
             className="w-full h-full object-cover"
-            onError={e => { e.target.parentElement.style.display = "none"; }} />
+            onError={e => { e.currentTarget.parentElement.style.display = "none"; }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           {countdown && (
             <span className="absolute bottom-3 right-3 text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500 text-white shadow">

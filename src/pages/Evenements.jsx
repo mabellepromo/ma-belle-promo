@@ -54,7 +54,7 @@ function HeroCard({ evt }) {
           src={evt.image}
           alt={evt.titre}
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-          onError={e => { e.target.style.display = "none"; }}
+          onError={e => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <TypeBadge type={evt.type} />
@@ -106,7 +106,7 @@ function GridCard({ evt, i }) {
           src={evt.image}
           alt={evt.titre}
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-          onError={e => { e.target.style.display = "none"; }}
+          onError={e => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute top-3 left-3 flex gap-2">

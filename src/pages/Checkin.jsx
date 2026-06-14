@@ -112,7 +112,7 @@ export default function Checkin() {
       <div className="flex-1 flex flex-col px-6 pt-8 pb-10 max-w-md mx-auto w-full">
         {/* Logo + Association */}
         <div className="flex items-center gap-3 mb-8">
-          <img src="/Logo%20Redesign1.png" alt="MBP" className="h-10 w-auto" onError={e => e.target.style.display = "none"} />
+          <img src="/Logo%20Redesign1.png" alt="MBP" className="h-10 w-auto" onError={e => e.currentTarget.style.display = "none"} />
           <div>
             <p className="text-white/90 text-xs font-semibold tracking-wide uppercase">Ma Belle Promo</p>
             <p className="text-white/50 text-xs">Check-in événement</p>

@@ -245,7 +245,7 @@ export default function ArticleDetail() {
                         src={`https://i.ytimg.com/vi/${ytId}/sddefault.jpg`}
                         alt={`Vidéo ${i + 1}`}
                         className="w-full h-full object-cover"
-                        onError={(e) => { e.target.onerror = null; e.target.src = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`; }}
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`; }}
                       />
                       <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
                         <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">

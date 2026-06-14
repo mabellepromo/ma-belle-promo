@@ -380,7 +380,7 @@ export function EvenementsSection() {
             <div key={e.id} className="bg-background border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-200 flex flex-col">
               {e.image && (
                 <div className="h-28 overflow-hidden flex-shrink-0">
-                  <img src={e.image} alt={e.titre || "Aperçu de l'événement"} className="w-full h-full object-cover" onError={ev => ev.target.style.display = "none"} />
+                  <img src={e.image} alt={e.titre || "Aperçu de l'événement"} className="w-full h-full object-cover" onError={ev => ev.currentTarget.style.display = "none"} />
                 </div>
               )}
               <div className="p-4 flex-1">
@@ -806,7 +806,7 @@ export function MediathequeSection() {
                 <Field label="Date"><input className={inp} placeholder="ex: Jan 2025" value={form.date} onChange={f("date")} /></Field>
                 <Field label="Type"><select className={sel} value={form.type} onChange={f("type")}>{TYPES_V.map(t => <option key={t}>{t}</option>)}</select></Field>
               </div>
-              {form.videoId && <img src={`https://i.ytimg.com/vi/${form.videoId}/sddefault.jpg`} alt="Aperçu de la vidéo YouTube" className="h-24 rounded-lg mt-2 object-cover" onError={e => e.target.style.display = "none"} />}
+              {form.videoId && <img src={`https://i.ytimg.com/vi/${form.videoId}/sddefault.jpg`} alt="Aperçu de la vidéo YouTube" className="h-24 rounded-lg mt-2 object-cover" onError={e => e.currentTarget.style.display = "none"} />}
             </FormPanel>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

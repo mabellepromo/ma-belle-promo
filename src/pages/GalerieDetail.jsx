@@ -129,7 +129,7 @@ export default function GalerieDetail() {
                     alt={`Photo ${i + 1}`}
                     loading="lazy"
                     onLoad={() => setLoaded(l => ({ ...l, [i]: true }))}
-                    onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }}
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; }}
                     className={`w-full h-auto object-cover transition-all duration-500 group-hover:scale-105 ${loaded[i] ? "opacity-100" : "opacity-0"}`}
                   />
                   {/* Overlay hover */}
@@ -200,7 +200,7 @@ export default function GalerieDetail() {
                   transition={{ duration: 0.25 }}
                   className="max-h-full max-w-full object-contain rounded-lg select-none"
                   draggable={false}
-                  onError={(e) => { e.target.onerror = null; e.target.style.opacity = "0"; }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.opacity = "0"; }}
                 />
               </AnimatePresence>
 

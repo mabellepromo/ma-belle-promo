@@ -152,7 +152,7 @@ export default function AnnuaireMembres() {
                   {m.photo
                     ? <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                         style={{ objectPosition: m.photoPosition === "center" ? "center" : "center 15%" }}
-                        onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
                     : <div className="w-full h-full flex items-center justify-center"><span className="text-primary-foreground font-heading font-bold text-sm">{m.nom.charAt(0)}</span></div>
                   }
                 </div>
@@ -177,7 +177,7 @@ export default function AnnuaireMembres() {
                     {m.photo
                       ? <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
                           style={{ objectPosition: m.photoPosition === "center" ? "center" : "center 15%" }}
-                          onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
+                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=200`; }} />
                       : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary/60">
                           <span className="text-primary-foreground font-heading font-bold text-xl">{m.nom.charAt(0)}</span>
                         </div>
@@ -249,7 +249,7 @@ function MemberModal({ member, onClose, session, onEdit }) {
           {member.photo
             ? <img loading="lazy" src={member.photo} alt={member.nom} className="w-full h-full object-cover"
                 style={{ objectPosition: member.photoPosition === "center" ? "50% 50%" : "50% 20%" }}
-                onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.nom)}&background=064e3b&color=6ee7b7&size=400`; }} />
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.nom)}&background=064e3b&color=6ee7b7&size=400`; }} />
             : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary/60">
                 <span className="text-primary-foreground font-heading font-bold text-6xl">{member.nom.charAt(0)}</span>
               </div>
@@ -434,7 +434,7 @@ function EditMemberModal({ member, onClose, onSave, isAdmin }) {
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoFile} />
             {form.photo && (
               <img src={form.photo} alt="Aperçu de la photo de profil" className="mt-2 h-16 rounded-xl object-cover border border-border"
-                onError={e => e.target.style.display="none"} />
+                onError={e => e.currentTarget.style.display="none"} />
             )}
           </div>
 
@@ -558,7 +558,7 @@ function AddMemberModal({ onClose, onSubmit }) {
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoFile} />
               {form.photo && (
                 <img src={form.photo} alt="Aperçu de la photo de profil" className="mt-2 h-16 rounded-xl object-cover border border-border"
-                  onError={e => e.target.style.display="none"} />
+                  onError={e => e.currentTarget.style.display="none"} />
               )}
             </div>
 
@@ -598,7 +598,7 @@ function AddMemberModal({ onClose, onSubmit }) {
               <div className="w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-primary/60 flex-shrink-0">
                 <img src={form.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(form.nom)}&background=064e3b&color=6ee7b7&size=56`}
                   alt={form.nom} className="w-full h-full object-cover"
-                  onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(form.nom)}&background=064e3b&color=6ee7b7&size=56`; }} />
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(form.nom)}&background=064e3b&color=6ee7b7&size=56`; }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-foreground text-sm">{form.nom}</p>
@@ -668,7 +668,7 @@ function ValidationModal({ pending, onValidate, onReject, onClose }) {
             <div key={m.id} className="flex items-center gap-4 p-4 rounded-xl bg-muted/40 border border-border">
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex-shrink-0">
                 <img loading="lazy" src={m.photo} alt={m.nom} className="w-full h-full object-cover"
-                  onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=48`; }} />
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nom)}&background=064e3b&color=6ee7b7&size=48`; }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-foreground text-sm truncate">{m.nom}</p>

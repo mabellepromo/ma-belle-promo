@@ -721,7 +721,7 @@ function BilletPreview({ event, r, sending, onClose, onSend }) {
             <div className="bg-[#14532d] text-center px-4 py-4">
               <img src="/Logo%20Redesign1.png" alt="MBP"
                 className="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white/40 object-cover"
-                onError={e => { e.target.style.display = "none"; }} />
+                onError={e => { e.currentTarget.style.display = "none"; }} />
               <p className="text-white font-bold text-sm">Association Ma Belle Promo (MBP)</p>
               <p className="text-white/70 text-[10px]">FDD · Université de Lomé · 1994–2000</p>
             </div>
@@ -1077,7 +1077,7 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
             <div className="relative flex-shrink-0">
               <img src={form.affiche} alt="Affiche"
                 className="h-24 w-auto rounded-xl border border-border object-cover"
-                onError={e => e.target.style.display = "none"} />
+                onError={e => e.currentTarget.style.display = "none"} />
               <button type="button" onClick={() => set("affiche", "")}
                 className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center">
                 <X className="w-3 h-3" />

@@ -41,3 +41,7 @@ base44/
 
 # Supabase CLI — fichiers temporaires de liaison
 supabase/.temp/
+
+# Playwright
+playwright-report/
+test-results/

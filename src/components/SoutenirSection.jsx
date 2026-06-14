@@ -74,7 +74,7 @@ export default function SoutenirSection() {
                 src="/images/benevoles.jpg"
                 alt="Bénévoles aidant les étudiants"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }}
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
             </div>
@@ -107,7 +107,7 @@ export default function SoutenirSection() {
                 src="/images/dons.jpg"
                 alt="Dons et générosité"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }}
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
             </div>

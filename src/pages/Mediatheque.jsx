@@ -32,7 +32,7 @@ export default function Mediatheque() {
                     src={`https://i.ytimg.com/vi/${v.videoId}/sddefault.jpg`}
                     alt={v.titre}
                     className="w-full h-44 object-cover bg-muted"
-                    onError={(e) => { e.target.onerror = null; e.target.src = `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`; }}
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`; }}
                   />
                   <a
                     href={`https://www.youtube.com/watch?v=${v.videoId}`}

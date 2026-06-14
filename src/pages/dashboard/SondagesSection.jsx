@@ -351,7 +351,7 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                         placeholder="URL de l'image (https://…)"
                       />
                       {q.options_images?.[i] && (
-                        <img src={q.options_images[i]} alt={`Illustration option ${i + 1}`} className="w-8 h-8 object-cover rounded border border-border" onError={e => e.target.style.display = "none"} />
+                        <img src={q.options_images[i]} alt={`Illustration option ${i + 1}`} className="w-8 h-8 object-cover rounded border border-border" onError={e => e.currentTarget.style.display = "none"} />
                       )}
                     </div>
                   )}

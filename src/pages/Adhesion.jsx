@@ -120,7 +120,7 @@ export default function Adhesion() {
     toast.success("Demande d'adhésion envoyée avec succès !");
   };
 
-  const Field = ({ label, required, children }) => (
+  const Field = ({ label, required = false, children }) => (
     <div>
       <label className="text-sm font-medium text-foreground mb-1.5 block">
         {label} {required && <span className="text-red-500">*</span>}

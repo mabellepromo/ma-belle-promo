@@ -272,7 +272,7 @@ export default function EspaceMembre() {
                   src={member.photo}
                   alt={user.full_name}
                   className="w-full h-full object-cover object-top"
-                  onError={e => { e.target.onerror = null; e.target.style.display = "none"; const initial = (user.full_name?.charAt(0) || "M").replace(/[<>&"']/g, ""); e.target.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center"><span class="text-primary-foreground font-bold text-3xl">${initial}</span></div>`; }}
+                  onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; const initial = (user.full_name?.charAt(0) || "M").replace(/[<>&"']/g, ""); e.currentTarget.parentElement.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center"><span class="text-primary-foreground font-bold text-3xl">${initial}</span></div>`; }}
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">

@@ -53,7 +53,7 @@ export default function NousSoutenir() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
             <div className="h-48 overflow-hidden">
-              <img loading="lazy" src="/images/benevoles.jpg" alt="Bénévolat" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />
+              <img loading="lazy" src="/images/benevoles.jpg" alt="Bénévolat" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; }} />
             </div>
             <div className="p-4 sm:p-7">
               <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
@@ -73,7 +73,7 @@ export default function NousSoutenir() {
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
             <div className="h-48 overflow-hidden">
-              <img loading="lazy" src="/images/dons.jpg" alt="Don" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />
+              <img loading="lazy" src="/images/dons.jpg" alt="Don" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; }} />
             </div>
             <div className="p-4 sm:p-7">
               <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4">

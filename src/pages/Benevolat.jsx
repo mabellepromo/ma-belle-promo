@@ -52,7 +52,7 @@ function Err({ msg }) {
   return msg ? <p className="text-xs text-red-500 mt-1">{msg}</p> : null;
 }
 
-function Label({ children, required, hint }) {
+function Label({ children, required = false, hint = null }) {
   return (
     <label className="block text-sm font-semibold text-foreground mb-1.5">
       {children}{required && <span className="text-red-500 ml-0.5">*</span>}

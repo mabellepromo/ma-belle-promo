@@ -9,7 +9,7 @@ export const inp = "w-full h-9 px-3 rounded-lg border border-border bg-backgroun
 export const ta  = "w-full px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:border-primary/50 resize-none";
 export const sel = "w-full h-9 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:border-primary/50";
 
-export function Field({ label, required, children }) {
+export function Field({ label, required = false, children }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-foreground mb-1">
@@ -61,7 +61,7 @@ export function ImgField({ label, value, onChange }) {
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
         {value && (
           <img src={value} alt="Aperçu de l'image" className="h-24 rounded-lg object-cover border border-border"
-            onError={e => e.target.style.display = "none"} />
+            onError={e => e.currentTarget.style.display = "none"} />
         )}
       </div>
     </div>
@@ -268,7 +268,7 @@ export function SectionLoader() {
   );
 }
 
-export function CrudHeader({ title, count, onAdd, seedBtn }) {
+export function CrudHeader({ title, count, onAdd, seedBtn = null }) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
@@ -339,7 +339,7 @@ export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDel
         {img !== undefined && (
           <div className="w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 flex-shrink-0 ring-2 ring-border group-hover:ring-primary/20 transition-all">
             {img && !img.startsWith("data:")
-              ? <img src={img} alt="Image de l'article" className="w-full h-full object-cover" onError={e => e.target.style.display = "none"} />
+              ? <img src={img} alt="Image de l'article" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display = "none"} />
               : <div className="w-full h-full flex items-center justify-center text-primary/30 text-xs">📷</div>}
           </div>
         )}
