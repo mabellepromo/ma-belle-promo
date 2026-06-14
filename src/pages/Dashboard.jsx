@@ -843,13 +843,13 @@ export default function Dashboard() {
                 {(() => {
                   const retardAlerte = pilotage.retardPct > 50 ? "rouge" : pilotage.retardPct > 30 ? "ambre" : "ok";
                   const retardCls = retardAlerte === "rouge"
-                    ? "border-red-500/30 bg-red-500/5"
+                    ? "border-red-500/60 bg-red-500/10"
                     : retardAlerte === "ambre"
-                      ? "border-amber-500/30 bg-amber-500/5"
+                      ? "border-amber-500/60 bg-amber-500/10"
                       : "border-border";
                   const retardTxt = retardAlerte === "rouge"
-                    ? "text-red-400"
-                    : retardAlerte === "ambre" ? "text-amber-400" : "text-foreground";
+                    ? "text-red-300"
+                    : retardAlerte === "ambre" ? "text-amber-300" : "text-foreground";
                   const engageBas = pilotage.engagementPct < 50;
                   return (
                     <>
