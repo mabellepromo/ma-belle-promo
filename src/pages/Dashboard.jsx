@@ -559,11 +559,20 @@ export default function Dashboard() {
       label: "Membres",
       items: [
         { key: "membres",      label: `Membres`, badge: allMembers.length, icon: Users },
-        { key: "cotisations",  label: "Cotisations",    icon: Banknote },
-        { key: "rapport",      label: "Rapport annuel", icon: BarChart2 },
         { key: "pending",      label: "En attente", badge: pendingMembers.length || null, badgeAlert: true, icon: Clock },
         { key: "messages",     label: "Messages", icon: MessageSquare, badge: unreadCount || null, badgeAlert: true },
         { key: "acces",        label: "Accès membres", icon: KeyRound },
+      ],
+    },
+    {
+      // Tout ce qui touche à l'argent regroupé pour une meilleure visibilité
+      label: "Finances",
+      items: [
+        { key: "cotisations",  label: "Cotisations",    icon: Banknote },
+        { key: "tresorerie",   label: "Trésorerie",     icon: Wallet },
+        { key: "factures",     label: "Factures",       icon: Receipt },
+        { key: "ventes",       label: "Ventes",         icon: ShoppingBag },
+        { key: "rapport",      label: "Rapport annuel", icon: BarChart2 },
       ],
     },
     {
@@ -596,9 +605,6 @@ export default function Dashboard() {
         { key: "sponsors",    label: "Partenaires",  icon: Globe },
         { key: "conventions", label: "Conventions",  icon: Handshake },
         { key: "signatures",  label: "Signatures",   icon: PenTool },
-        { key: "ventes",      label: "Ventes",       icon: ShoppingBag },
-        { key: "tresorerie",  label: "Trésorerie",   icon: Wallet },
-        { key: "factures",    label: "Factures",     icon: Receipt },
         { key: "assemblees",    label: "Assemblées",     icon: Building2 },
         { key: "elections",     label: "Élections",      icon: Vote },
         { key: "mandats",       label: "Mandats",        icon: Shield },
@@ -677,7 +683,7 @@ export default function Dashboard() {
           className="overflow-y-auto px-2 pb-4"
           style={{ maxHeight: "calc(100vh - 195px)" }}>
           {NAV_GROUPS.map((group, gi) => {
-            const groupColors = [null, "text-blue-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
+            const groupColors = [null, "text-blue-400", "text-green-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
             const gc = groupColors[gi] || "text-muted-foreground";
             return (
               <div key={gi} className={gi > 0 ? "mt-5" : ""}>
