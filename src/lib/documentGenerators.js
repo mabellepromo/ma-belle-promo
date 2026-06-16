@@ -1797,6 +1797,172 @@ export function genererRapportTresorerie(annee, transactions, budget = []) {
   openDoc(html, `Rapport-Tresorerie-MBP-${annee}.html`);
 }
 
+// ── Bilan financier consolidé (Vue comptable) ───────────────────────────────
+//
+// Synthèse comptable d'un exercice qui AGRÈGE les modules financiers existants
+// sans les recompter à tort : le résultat de l'exercice provient uniquement de
+// la trésorerie (la caisse fait foi). Cotisations, factures, subventions et
+// ventes sont présentées comme INDICATEURS COMPLÉMENTAIRES (recouvrement,
+// créances) et ne sont pas additionnées au résultat, pour éviter tout double
+// comptage. data = { transactions, cotisations, factures, subventions, ventes,
+// membersCount }.
+export function genererBilanComptable(annee, data = {}) {
+  const {
+    transactions = [], cotisations = [], factures = [],
+    subventions = [], ventes = [], membersCount = 0,
+  } = data;
+  const ref = refNumber("BIL", String(annee));
+  const fmt = n => new Intl.NumberFormat("fr-FR").format(Math.round(Math.abs(Number(n) || 0))) + " F CFA";
+
+  // — Résultat de l'exercice (source de vérité : trésorerie) —
+  const recettes = transactions.filter(t => t.type === "recette");
+  const depenses = transactions.filter(t => t.type === "depense");
+  const totalRec = recettes.reduce((s, t) => s + Number(t.montant || 0), 0);
+  const totalDep = depenses.reduce((s, t) => s + Number(t.montant || 0), 0);
+  const solde = totalRec - totalDep;
+
+  const byCategorie = (list) => {
+    const map = {};
+    list.forEach(t => { map[t.categorie || "Autres"] = (map[t.categorie || "Autres"] || 0) + Number(t.montant || 0); });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+  };
+  const ligneCat = (entries, color) => entries.map(([cat, montant]) => `<tr>
+      <td style="padding:5px 10px;font-size:8.5pt;color:#0f172a;">${cat}</td>
+      <td style="padding:5px 10px;font-size:8.5pt;text-align:right;font-weight:600;color:${color};">${fmt(montant)}</td>
+    </tr>`).join("");
+
+  // — Indicateurs complémentaires —
+  const cotisPayees = cotisations.filter(c => c.statut === "payé" || c.statut === "paye");
+  const totalCotis = cotisPayees.reduce((s, c) => s + Number(c.montant || 0), 0);
+  const facturesPayees = factures.filter(f => f.statut === "payée" || f.statut === "payee");
+  const facturesAttente = factures.filter(f => f.statut === "émise" || f.statut === "emise");
+  const totalFactPayees = facturesPayees.reduce((s, f) => s + Number(f.montant_ttc || 0), 0);
+  const totalCreances = facturesAttente.reduce((s, f) => s + Number(f.montant_ttc || 0), 0);
+  const totalSubAccord = subventions.reduce((s, x) => s + Number(x.montant_accorde || 0), 0);
+  const totalSubRecu = subventions.reduce((s, x) => s + Number(x.montant_recu || 0), 0);
+  const ventesPayees = ventes.filter(v => v.statut === "payée" || v.statut === "payee" || v.statut === "validée");
+  const totalVentes = ventesPayees.reduce((s, v) => s + Number(v.total || 0), 0);
+
+  const indicateurs = [
+    ["Cotisations encaissées", `${fmt(totalCotis)}`, `${cotisPayees.length}${membersCount ? " / " + membersCount + " membres" : " cotisation(s)"}`],
+    ["Factures réglées", `${fmt(totalFactPayees)}`, `${facturesPayees.length} facture(s)`],
+    ["Créances (factures émises non payées)", `${fmt(totalCreances)}`, `${facturesAttente.length} en attente`],
+    ["Subventions reçues", `${fmt(totalSubRecu)}`, `sur ${fmt(totalSubAccord)} accordé(s)`],
+    ["Ventes / boutique", `${fmt(totalVentes)}`, `${ventesPayees.length} commande(s)`],
+  ];
+  const lignesIndic = indicateurs.map(([lbl, val, sub]) => `<tr>
+      <td style="padding:6px 10px;font-size:8.5pt;color:#0f172a;">${lbl}</td>
+      <td style="padding:6px 10px;font-size:8.5pt;text-align:right;font-weight:600;color:#0a3d28;">${val}</td>
+      <td style="padding:6px 10px;font-size:8pt;text-align:right;color:#94a3b8;">${sub}</td>
+    </tr>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bilan financier ${annee} — FDD MBP</title>
+  <style>${MBP_STYLE}</style>
+  <style>
+    table { width:100%;border-collapse:collapse; }
+    thead th { background:#0a3d28;color:#fff;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px; }
+    thead th:not(:first-child) { text-align:right; }
+    tbody tr:nth-child(even) { background:#f8fafc; }
+    .section-title { font-family:'Cormorant Garamond',serif;font-size:11pt;font-weight:700;color:#0a3d28;margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid #e2e8f0; }
+    .stat-card { background:#f7faf8;border:1px solid #c8ddd2;border-radius:8px;padding:12px 16px;text-align:center; }
+    .stat-card .val { font-family:'Cormorant Garamond',serif;font-size:18pt;font-weight:700;line-height:1; }
+    .stat-card .lbl { font-size:7pt;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-top:3px; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+  <div class="a4">
+
+    <div class="doc-header">
+      <img class="doc-header-logo" src="/Logo%20Redesign1.png" alt="Logo MBP" onerror="this.style.display='none'" />
+      <div class="doc-header-asso">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé</p>
+        <p class="asso-sub">Promotion 1994 – 2000 · Lomé, Togo</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="doc-body">
+
+      <div class="doc-title-block">
+        <div class="doc-title">Bilan financier ${annee}</div>
+        <div class="doc-ref">Réf. ${ref} · Généré le ${today()}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        <div class="stat-card">
+          <div class="val" style="color:#065f46;">${fmt(totalRec)}</div>
+          <div class="lbl">Total Recettes</div>
+        </div>
+        <div class="stat-card">
+          <div class="val" style="color:#dc2626;">${fmt(totalDep)}</div>
+          <div class="lbl">Total Dépenses</div>
+        </div>
+        <div class="stat-card" style="background:${solde >= 0 ? "#d1fae5" : "#fee2e2"};border-color:${solde >= 0 ? "#6ee7b7" : "#fca5a5"};">
+          <div class="val" style="color:${solde >= 0 ? "#065f46" : "#b91c1c"};">${solde >= 0 ? "+" : "−"}${fmt(solde)}</div>
+          <div class="lbl">Résultat ${solde >= 0 ? "(Excédent)" : "(Déficit)"}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div class="section-title">Recettes par catégorie</div>
+          <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;">
+            <table>
+              <thead><tr><th style="text-align:left;">Catégorie</th><th>Réalisé</th></tr></thead>
+              <tbody>
+                ${ligneCat(byCategorie(recettes), "#065f46") || '<tr><td colspan="2" style="padding:10px;color:#94a3b8;text-align:center;font-size:8pt;">Aucune recette</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-title">Dépenses par catégorie</div>
+          <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;">
+            <table>
+              <thead><tr><th style="text-align:left;">Catégorie</th><th>Réalisé</th></tr></thead>
+              <tbody>
+                ${ligneCat(byCategorie(depenses), "#dc2626") || '<tr><td colspan="2" style="padding:10px;color:#94a3b8;text-align:center;font-size:8pt;">Aucune dépense</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Indicateurs complémentaires</div>
+      <p style="font-size:7.5pt;color:#94a3b8;margin:-2px 0 6px;">Ces montants éclairent la situation financière mais ne sont pas additionnés au résultat ci-dessus (qui provient de la trésorerie) afin d'éviter tout double comptage.</p>
+      <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;">
+        <table>
+          <thead><tr><th style="text-align:left;">Indicateur</th><th>Montant</th><th>Détail</th></tr></thead>
+          <tbody>${lignesIndic}</tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <div class="footer-text">
+        L'association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
+        Faculté de Droit — Université de Lomé, Togo
+      </div>
+      <div class="footer-text" style="text-align:right;">
+        Document interne — confidentiel<br/>
+        Généré le ${today()} · Réf. ${ref}
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  openDoc(html, `Bilan-Financier-MBP-${annee}.html`);
+}
+
 // ── Liste des participants en présentiel (feuille d'émargement) ──────────────
 //
 // Pour un événement présentiel ou hybride, génère la liste des inscrits qui

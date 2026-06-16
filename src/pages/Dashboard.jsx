@@ -14,7 +14,7 @@ import {
   LogOut, AlertTriangle, Briefcase, Edit2, Trash2, Globe,
   UserCheck, Plus, Upload, Calendar, Tag,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2,
-  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool
+  Bell, Vote, Wallet, Building2, Send, TrendingUp, TrendingDown, Minus, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool, Scale
 } from "lucide-react";
 import { FormPanel, ImgField, Field, inp } from "./dashboard/shared.jsx";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -36,6 +36,7 @@ const CotisationsSection     = lazy(() => import("./dashboard/CotisationsSection
 const RapportAnnuel          = lazy(() => import("./dashboard/RapportAnnuel.jsx"));
 const SondagesSection        = lazy(() => import("./dashboard/SondagesSection"));
 const TresorerieSection      = lazy(() => import("./dashboard/TresorerieSection"));
+const VueComptableSection    = lazy(() => import("./dashboard/VueComptableSection.jsx"));
 const AssembleesSection      = lazy(() => import("./dashboard/AssembleesSection"));
 const CirculaireSection      = lazy(() => import("./dashboard/CirculaireSection"));
 const CourrierSection        = lazy(() => import("./dashboard/CourrierSection"));
@@ -568,6 +569,7 @@ export default function Dashboard() {
       // Tout ce qui touche à l'argent regroupé pour une meilleure visibilité
       label: "Finances",
       items: [
+        { key: "vue-comptable", label: "Vue comptable",  icon: Scale },
         { key: "cotisations",  label: "Cotisations",    icon: Banknote },
         { key: "tresorerie",   label: "Trésorerie",     icon: Wallet },
         { key: "factures",     label: "Factures",       icon: Receipt },
@@ -1480,6 +1482,7 @@ export default function Dashboard() {
           {tab === "signatures"  && <SignaturesSection />}
           {tab === "ventes"      && <VentesSection />}
           {tab === "tresorerie"  && <TresorerieSection />}
+          {tab === "vue-comptable" && <VueComptableSection />}
           {tab === "factures"    && <FacturesSection />}
           {tab === "assemblees"  && <AssembleesSection />}
           {tab === "registre"    && <RegistreLegalSection />}
