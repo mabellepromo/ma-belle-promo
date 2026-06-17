@@ -147,6 +147,14 @@ function AdminRoute({ children }) {
 const AuthenticatedApp = () => {
   const location = useLocation();
 
+  // Clé d'animation/remount stable à l'intérieur du dashboard : tous les
+  // onglets (/dashboard/<tab>) partagent la même clé, donc changer d'onglet
+  // ne remonte pas le Dashboard (pas de re-fetch ni de réabonnement realtime)
+  // et ne déclenche pas le fondu de page. Les autres pages gardent leur fondu.
+  const pageKey = location.pathname.startsWith('/dashboard')
+    ? '/dashboard'
+    : location.pathname;
+
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard')) return;
     const block = (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); };
@@ -178,12 +186,12 @@ const AuthenticatedApp = () => {
     <div style={{ position: "relative" }}>
     <AnimatePresence mode="wait" initial={false}>
     <motion.div
-      key={location.key}
+      key={pageKey}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.22, ease: "easeInOut" }}
     >
     <Suspense fallback={<PageLoader />}>
-    <ErrorBoundary key={location.pathname}>
+    <ErrorBoundary key={pageKey}>
     <Routes location={location}>
       <Route path="/" element={<Home />} />
       <Route path="/boutique" element={<AdminRoute><Boutique /></AdminRoute>} />
@@ -232,6 +240,7 @@ const AuthenticatedApp = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
+      <Route path="/dashboard/:tab" element={<AdminRoute><Dashboard /></AdminRoute>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </ErrorBoundary>

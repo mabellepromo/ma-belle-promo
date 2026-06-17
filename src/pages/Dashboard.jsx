@@ -4,7 +4,7 @@ import { genererAttestation } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
 import { useArticles } from "../hooks/useArticles";
 import { useEvenements } from "../hooks/useEvenements";
@@ -120,6 +120,13 @@ const SECTION_COMPONENTS = {
 // Onglets dont le composant a besoin de la liste des membres en prop.
 const SECTIONS_WITH_MEMBERS = new Set(["cotisations", "rapport"]);
 
+// Onglets gérés directement dans Dashboard.jsx (JSX inline, hors table).
+const STATIC_TAB_KEYS = ["overview", "membres", "pending"];
+
+// Ensemble des clés d'onglet valides : sert à valider le segment d'URL
+// (/dashboard/<tab>) et à retomber sur "overview" si l'URL est inconnue.
+const ALL_TAB_KEYS = new Set([...STATIC_TAB_KEYS, ...Object.keys(SECTION_COMPONENTS)]);
+
 // Spinner affiché le temps qu'une section se télécharge.
 function SectionLoader() {
   return (
@@ -165,7 +172,13 @@ export default function Dashboard() {
 
   const sidebarNavRef = useRef(null);
 
-  const [tab,                setTab]               = useState("overview");
+  // L'onglet actif vit dans l'URL (/dashboard/<tab>) : F5 le conserve, les
+  // liens sont partageables, le bouton Précédent fonctionne. setTab navigue
+  // au lieu de muter un état local ; "overview" correspond à /dashboard nu.
+  const { tab: tabParam } = useParams();
+  const tab = ALL_TAB_KEYS.has(tabParam) ? tabParam : "overview";
+  const setTab = (key) => navigate(key === "overview" ? "/dashboard" : `/dashboard/${key}`);
+
   const [sidebarOpen,        setSidebarOpen]       = useState(false);
   const [search,             setSearch]            = useState("");
   const [compose,            setCompose]           = useState(false);
