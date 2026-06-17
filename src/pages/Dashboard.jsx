@@ -69,6 +69,57 @@ const DocumentsSection   = lazy(() => import("./dashboard/CrudSections.jsx").the
 const RessourcesSection  = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.RessourcesSection })));
 const GaleriesSection    = lazy(() => import("./dashboard/CrudSections.jsx").then(m => ({ default: m.GaleriesSection })));
 
+/*
+ * Table de correspondance unique « clé d'onglet → composant de section ».
+ * C'est la seule source de vérité pour le rendu des sections chargées à la
+ * demande : ajouter un onglet = une ligne ici (+ son entrée dans NAV_GROUPS).
+ * Les onglets overview / membres / pending ne figurent PAS ici : ils ont des
+ * props lourdes ou du JSX inline et restent gérés explicitement.
+ */
+const SECTION_COMPONENTS = {
+  messages:           MessagesSection,
+  articles:           ArticlesSection,
+  evenements:         EvenementsSection,
+  webinaires:         WebinarsSection,
+  checkin:            CheckinSection,
+  projets:            ProjetsSection,
+  programmes:         ProgrammesSection,
+  equipe:             EquipeSection,
+  sponsors:           SponsorsSection,
+  conventions:        ConventionsSection,
+  opportunites:       OpportunitesSection,
+  memoire:            MemoireSection,
+  signatures:         SignaturesSection,
+  ventes:             VentesSection,
+  tresorerie:         TresorerieSection,
+  "vue-comptable":    VueComptableSection,
+  factures:           FacturesSection,
+  assemblees:         AssembleesSection,
+  registre:           RegistreLegalSection,
+  benevoles:          BenevolesSection,
+  elections:          ElectionsSection,
+  mandats:            MandatsSection,
+  circulaire:         CirculaireSection,
+  courrier:           CourrierSection,
+  "bulk-email":       BulkEmailSection,
+  "newsletter-email": NewsletterEmailSection,
+  stats:              StatsSection,
+  automatisations:    AutomatisationsSection,
+  "assistant-ia":     AssistantIA,
+  communiques:        CommuniquesSection,
+  mediatheque:        MediathequeSection,
+  documents:          DocumentsSection,
+  galeries:           GaleriesSection,
+  ressources:         RessourcesSection,
+  sondages:           SondagesSection,
+  cotisations:        CotisationsSection,
+  rapport:            RapportAnnuel,
+  acces:              AccesSection,
+};
+
+// Onglets dont le composant a besoin de la liste des membres en prop.
+const SECTIONS_WITH_MEMBERS = new Set(["cotisations", "rapport"]);
+
 // Spinner affiché le temps qu'une section se télécharge.
 function SectionLoader() {
   return (
@@ -885,44 +936,14 @@ export default function Dashboard() {
           )}
 
           <Suspense fallback={<SectionLoader />}>
-          {tab === "messages"    && <MessagesSection />}
-          {tab === "articles"    && <ArticlesSection />}
-          {tab === "evenements"  && <EvenementsSection />}
-          {tab === "webinaires"  && <WebinarsSection />}
-          {tab === "checkin"     && <CheckinSection />}
-          {tab === "projets"     && <ProjetsSection />}
-          {tab === "programmes"  && <ProgrammesSection />}
-          {tab === "equipe"      && <EquipeSection />}
-          {tab === "sponsors"    && <SponsorsSection />}
-          {tab === "conventions" && <ConventionsSection />}
-          {tab === "opportunites" && <OpportunitesSection />}
-          {tab === "memoire"     && <MemoireSection />}
-          {tab === "signatures"  && <SignaturesSection />}
-          {tab === "ventes"      && <VentesSection />}
-          {tab === "tresorerie"  && <TresorerieSection />}
-          {tab === "vue-comptable" && <VueComptableSection />}
-          {tab === "factures"    && <FacturesSection />}
-          {tab === "assemblees"  && <AssembleesSection />}
-          {tab === "registre"    && <RegistreLegalSection />}
-          {tab === "benevoles"   && <BenevolesSection />}
-          {tab === "elections"   && <ElectionsSection />}
-          {tab === "mandats"     && <MandatsSection />}
-          {tab === "circulaire"      && <CirculaireSection />}
-          {tab === "courrier"        && <CourrierSection />}
-          {tab === "bulk-email"       && <BulkEmailSection />}
-          {tab === "newsletter-email" && <NewsletterEmailSection />}
-          {tab === "stats"           && <StatsSection />}
-          {tab === "automatisations" && <AutomatisationsSection />}
-          {tab === "assistant-ia"    && <AssistantIA />}
-          {tab === "communiques" && <CommuniquesSection />}
-          {tab === "mediatheque" && <MediathequeSection />}
-          {tab === "documents"   && <DocumentsSection />}
-          {tab === "galeries"    && <GaleriesSection />}
-          {tab === "ressources"  && <RessourcesSection />}
-          {tab === "sondages"    && <SondagesSection />}
-          {tab === "cotisations" && <CotisationsSection members={allMembers} />}
-          {tab === "rapport"     && <RapportAnnuel members={allMembers} />}
-          {tab === "acces"       && <AccesSection />}
+          {(() => {
+            const Section = SECTION_COMPONENTS[tab];
+            if (!Section) return null;
+            // Seuls cotisations et rapport ont besoin de la liste des membres.
+            return SECTIONS_WITH_MEMBERS.has(tab)
+              ? <Section members={allMembers} />
+              : <Section />;
+          })()}
           </Suspense>
 
         </div>
