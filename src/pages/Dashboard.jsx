@@ -9,7 +9,7 @@ import { useLocalAuth } from "../lib/LocalAuth";
 import { useArticles } from "../hooks/useArticles";
 import { useEvenements } from "../hooks/useEvenements";
 import {
-  Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock, Image, Images, Mail, MapPin, Star,
+  Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock, Image, Images, Mail, MapPin, Star, Search,
   LogOut, Briefcase, Edit2, Globe,
   UserCheck, Calendar, Tag,
   Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool, Scale
@@ -24,6 +24,7 @@ import { useMultiYearCotisations } from "../hooks/useMultiYearCotisations";
 import { useNotifications } from "../hooks/useNotifications";
 import OverviewSection from "./dashboard/OverviewSection.jsx";
 import MembresSection from "./dashboard/MembresSection.jsx";
+import CommandPalette from "../components/dashboard/CommandPalette.jsx";
 
 // ── Sections chargées à la demande (code-splitting) ──
 // Chaque module n'est téléchargé qu'à l'ouverture de son onglet : la première
@@ -181,6 +182,19 @@ export default function Dashboard() {
 
   const [sidebarOpen,        setSidebarOpen]       = useState(false);
   const [search,             setSearch]            = useState("");
+
+  // Accordéon de la sidebar : groupes repliés (par libellé), mémorisés.
+  // Plusieurs groupes peuvent rester ouverts simultanément.
+  const [collapsedGroups, setCollapsedGroups] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("mbp_dash_collapsed") || "[]")); }
+    catch { return new Set(); }
+  });
+  const toggleGroup = (label) => setCollapsedGroups(prev => {
+    const next = new Set(prev);
+    if (next.has(label)) next.delete(label); else next.add(label);
+    try { localStorage.setItem("mbp_dash_collapsed", JSON.stringify([...next])); } catch { /* quota indispo */ }
+    return next;
+  });
   const [compose,            setCompose]           = useState(false);
   const [pendingAttachment,  setPendingAttachment] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
@@ -692,6 +706,8 @@ export default function Dashboard() {
   ];
 
   const allNavItems = NAV_GROUPS.flatMap(g => g.items);
+  // Items à plat pour la palette Ctrl+K (chaque item garde son groupe d'origine).
+  const paletteItems = NAV_GROUPS.flatMap(g => g.items.map(it => ({ ...it, groupLabel: g.label })));
   const currentNavItem = allNavItems.find(i => i.key === tab);
   const CurrentIcon = currentNavItem?.icon || LayoutDashboard;
 
@@ -704,6 +720,11 @@ export default function Dashboard() {
 
   return (
     <div className="dark h-screen flex overflow-hidden bg-[#4a4a4a] text-foreground">
+
+      <CommandPalette
+        items={paletteItems}
+        onSelect={(key) => { setTab(key); setSidebarOpen(false); }}
+      />
 
       {compose && (
         <ComposeModal
@@ -739,6 +760,13 @@ export default function Dashboard() {
             className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98]">
             <PenSquare className="w-3.5 h-3.5" /> Composer
           </button>
+          {/* Déclencheur de la palette de recherche (raccourci Ctrl+K). */}
+          <button onClick={() => window.dispatchEvent(new CustomEvent("mbp:open-palette"))}
+            className="mt-2 w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground border border-border hover:bg-muted/40 hover:text-foreground transition-all">
+            <Search className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="flex-1 text-left">Rechercher…</span>
+            <kbd className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border">Ctrl K</kbd>
+          </button>
         </div>
 
         {/* Navigation */}
@@ -749,14 +777,31 @@ export default function Dashboard() {
           {NAV_GROUPS.map((group, gi) => {
             const groupColors = [null, "text-blue-400", "text-green-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
             const gc = groupColors[gi] || "text-muted-foreground";
+            // Liseré coloré en haut de chaque carte de groupe (rappel des cartes de stats).
+            const groupBars = [null, "border-t-blue-400", "border-t-green-400", "border-t-violet-400", "border-t-amber-400", "border-t-emerald-400", "border-t-pink-400"];
+            const gbar = groupBars[gi] || "border-t-border";
+            // Le groupe sans libellé (Vue d'ensemble) n'est pas repliable.
+            const collapsible = !!group.label;
+            const collapsed = collapsible && collapsedGroups.has(group.label);
+            // Compteur d'alertes du groupe (badges d'alerte) pour rester visible une fois replié.
+            const groupAlerts = group.items.reduce((n, it) => n + (it.badgeAlert && it.badge ? it.badge : 0), 0);
             return (
               <div key={gi} className={gi > 0 ? "mt-5" : ""}>
                 {group.label && (
-                  <p className={`px-3 pb-1.5 text-[9px] font-black uppercase tracking-[0.18em] ${gc}`}>
-                    {group.label}
-                  </p>
+                  <button onClick={() => toggleGroup(group.label)}
+                    className={`w-full group/hdr flex items-center gap-2 mb-1.5 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border/60 border-t-2 ${gbar} hover:bg-muted/70 transition-colors`}>
+                    <span className={`flex-1 text-left text-[10px] font-semibold uppercase tracking-[0.12em] ${gc}`}>
+                      {group.label}
+                    </span>
+                    {collapsed && groupAlerts > 0 && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">{groupAlerts}</span>
+                    )}
+                    <svg viewBox="0 0 24 24" className={`w-3 h-3 flex-shrink-0 opacity-50 transition-transform ${collapsed ? "-rotate-90" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
                 )}
-                <div className="space-y-0.5">
+                <div className={`space-y-0.5 ${collapsed ? "hidden" : ""}`}>
                   {group.items.map(({ key, label, icon: Icon, badge, badgeAlert }) => {
                     const active = tab === key;
                     return (
