@@ -214,7 +214,8 @@ export default function CotisationsSection({ members }) {
       {/* En-tête */}
       <div className="flex flex-wrap items-start gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Cotisations {annee}</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Cotisations {annee}</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">Suivi des cotisations annuelles des membres</p>
         </div>
         <div className="ml-auto flex items-center gap-2 flex-wrap">

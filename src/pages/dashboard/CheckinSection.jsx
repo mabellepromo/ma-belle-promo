@@ -103,7 +103,8 @@ export default function CheckinSection() {
       {/* En-tête */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Check-in QR Code</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Check-in QR Code</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">Générez un QR code par événement — les participants scannent pour s'enregistrer</p>
         </div>
         <button onClick={load} className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center text-muted-foreground transition-colors">

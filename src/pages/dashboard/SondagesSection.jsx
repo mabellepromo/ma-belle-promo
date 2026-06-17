@@ -837,7 +837,8 @@ export default function SondagesSection() {
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Sondages & formulaires</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Sondages & formulaires</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">7 types · sections · logique · thèmes · images · CSV · invitations</p>
         </div>
         <button onClick={openForm}

@@ -127,7 +127,8 @@ export default function StatsSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Statistiques & Analyses</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Statistiques & Analyses</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">Vue d'ensemble chiffrée de l'association</p>
         </div>
         <div className="flex items-center gap-2">

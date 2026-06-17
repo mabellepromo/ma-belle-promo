@@ -379,7 +379,8 @@ export default function BulkEmailSection() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-heading text-xl font-bold text-foreground">Email de masse</h2>
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Email de masse</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
         <p className="text-sm text-muted-foreground mt-0.5">
           Envoyez un email personnalisé aux membres actifs. Limite Brevo : 300 emails/jour.
         </p>

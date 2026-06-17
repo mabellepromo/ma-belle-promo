@@ -329,7 +329,8 @@ export function MessagesSection() {
       {compose && <ComposeModal onClose={() => setCompose(false)} />}
 
       <div className="flex items-center gap-3 mb-6">
-        <h2 className="font-heading text-xl font-bold text-foreground">Messages reçus</h2>
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Messages reçus</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
         {unread > 0 && (
           <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-400">
             {unread} non lu{unread > 1 ? "s" : ""}

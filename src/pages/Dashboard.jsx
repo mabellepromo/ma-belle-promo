@@ -712,10 +712,10 @@ export default function Dashboard() {
   const CurrentIcon = currentNavItem?.icon || LayoutDashboard;
 
   const STAT_COLORS = [
-    { bar: "bg-blue-500",    iconBg: "bg-blue-500/15",    iconCl: "text-blue-400" },
-    { bar: "bg-amber-500",   iconBg: "bg-amber-500/15",   iconCl: "text-amber-400" },
-    { bar: "bg-emerald-500", iconBg: "bg-emerald-500/15", iconCl: "text-emerald-400" },
-    { bar: "bg-indigo-500",  iconBg: "bg-indigo-500/15",  iconCl: "text-indigo-400" },
+    { bar: "bg-blue-500",    iconBg: "bg-blue-500/15",    iconCl: "text-blue-400",    ring: "hover:ring-blue-500/70" },
+    { bar: "bg-amber-500",   iconBg: "bg-amber-500/15",   iconCl: "text-amber-400",   ring: "hover:ring-amber-500/70" },
+    { bar: "bg-emerald-500", iconBg: "bg-emerald-500/15", iconCl: "text-emerald-400", ring: "hover:ring-emerald-500/70" },
+    { bar: "bg-indigo-500",  iconBg: "bg-indigo-500/15",  iconCl: "text-indigo-400",  ring: "hover:ring-indigo-500/70" },
   ];
 
   return (
@@ -861,12 +861,15 @@ export default function Dashboard() {
             <button className="md:hidden p-2 rounded-lg hover:bg-muted/40 text-foreground" onClick={() => setSidebarOpen(v => !v)}>
               <Menu className="w-5 h-5" />
             </button>
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10">
-              <CurrentIcon className="w-3.5 h-3.5 text-primary" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 ring-1 ring-[#e3c46a]/30">
+              <CurrentIcon className="w-4 h-4 text-primary" />
             </div>
-            <h2 className="font-heading font-bold text-foreground text-sm tracking-wide">
-              {currentNavItem?.label || "Vue d'ensemble"}
-            </h2>
+            <div className="flex flex-col">
+              <h2 className="font-heading font-bold text-foreground text-base leading-none">
+                {currentNavItem?.label || "Vue d'ensemble"}
+              </h2>
+              <span className="mt-1 h-px w-8" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
+            </div>
             {pendingMembers.length > 0 && tab !== "pending" && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">
                 {pendingMembers.length}

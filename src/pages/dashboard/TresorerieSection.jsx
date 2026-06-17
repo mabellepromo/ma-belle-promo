@@ -1183,7 +1183,8 @@ export default function TresorerieSection() {
       {/* En-tête */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Trésorerie</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Trésorerie</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">Recettes, dépenses et suivi budgétaire</p>
         </div>
         <select className={inp + " w-28"} value={year} onChange={e => setYear(Number(e.target.value))}>

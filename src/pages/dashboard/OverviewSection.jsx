@@ -25,18 +25,43 @@ export default function OverviewSection({
   return (
     <div className="space-y-6">
 
-      {/* Bannière */}
-      <div className="relative overflow-hidden rounded-2xl px-8 py-7"
-        style={{ background: "linear-gradient(135deg, var(--brand-dark) 0%, #1a3d2b 60%, #0f2a1e 100%)" }}>
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(52,211,153,0.08) 0%, transparent 60%)" }} />
-        <div className="absolute right-0 top-0 bottom-0 w-64 opacity-5"
-          style={{ backgroundImage: "repeating-linear-gradient(45deg, white 0px, white 1px, transparent 1px, transparent 12px)" }} />
-        <div className="relative">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "hsl(var(--primary))" }}>Bienvenue</p>
-          <h1 className="font-heading text-2xl md:text-3xl font-bold text-white leading-tight">Tableau de bord</h1>
-          <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>L'association Ma Belle Promo (MBP) · Lomé, Togo · Promotion 1994–2000</p>
-        </div>
-      </div>
+      {/* Bannière — accent institutionnel or + salutation personnalisée */}
+      {(() => {
+        const h = new Date().getHours();
+        const greeting = h < 18 ? "Bonjour" : "Bonsoir";
+        // Prénom = premier mot du nom réel (session.nom = user_metadata.nom ||
+        // full_name || préfixe email). Capitalisé. Vide si rien d'exploitable.
+        const raw = (session?.nom || "").trim().split(/\s+/)[0];
+        const prenom = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "";
+        const GOLD = "#e3c46a";
+        return (
+          <div className="relative overflow-hidden rounded-2xl px-8 py-8"
+            style={{ background: "linear-gradient(135deg, var(--brand-dark) 0%, #1a3d2b 60%, #0f2a1e 100%)" }}>
+            <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, rgba(52,211,153,0.08) 0%, transparent 60%)" }} />
+            <div className="absolute right-0 top-0 bottom-0 w-64 opacity-5"
+              style={{ backgroundImage: "repeating-linear-gradient(45deg, white 0px, white 1px, transparent 1px, transparent 12px)" }} />
+            <div className="relative flex items-center justify-between gap-6">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.25em] mb-2" style={{ color: GOLD }}>
+                  Association FDD · Ma Belle Promo
+                </p>
+                <h1 className="font-heading text-3xl md:text-4xl font-bold text-white leading-tight">
+                  {greeting}{prenom ? `, ${prenom}` : ""}
+                </h1>
+                <div className="mt-3 h-px w-16" style={{ background: `linear-gradient(to right, ${GOLD}, transparent)` }} />
+                <p className="text-sm mt-3" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  Tableau de bord · Promotion 1994–2000 · Lomé, Togo
+                </p>
+              </div>
+              {/* Monogramme MBP cerclé d'or */}
+              <div className="hidden md:flex w-16 h-16 rounded-full flex-shrink-0 items-center justify-center"
+                style={{ border: `2px solid ${GOLD}`, boxShadow: `0 0 0 4px rgba(227,196,106,0.08)` }}>
+                <span className="font-heading text-lg font-bold tracking-tight" style={{ color: GOLD }}>MBP</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Notifications navigateur */}
       {notifPermission !== "granted" && notifPermission !== "unsupported" && (
@@ -65,15 +90,15 @@ export default function OverviewSection({
         {stats.map(({ label, value, icon: Icon, sub, alert, trend, onClick }, i) => (
           <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
             onClick={onClick}
-            className={`bg-card rounded-2xl overflow-hidden border border-border shadow-sm group ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
+            className={`bg-card rounded-2xl overflow-hidden border border-border shadow-sm group ring-2 ring-transparent ${STAT_COLORS[i].ring} ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200" : ""}`}>
             <div className={`h-1 w-full ${STAT_COLORS[i].bar}`} />
             <div className="p-5">
               {alert && <span className="float-right w-2 h-2 rounded-full bg-amber-500 animate-pulse mt-1" />}
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${STAT_COLORS[i].iconBg}`}>
                 <Icon className={`w-4 h-4 ${STAT_COLORS[i].iconCl}`} />
               </div>
-              <div className="font-heading text-3xl font-black tracking-tight text-foreground">{value}</div>
-              <div className="text-sm font-semibold mt-0.5 text-foreground">{label}</div>
+              <div className="font-heading text-4xl font-black tracking-tight text-foreground leading-none">{value}</div>
+              <div className="text-sm font-semibold mt-1.5 text-foreground">{label}</div>
               <div className="text-xs mt-0.5 text-muted-foreground">{sub}</div>
               {trend && (
                 <div className={`flex items-center gap-1 text-xs font-semibold mt-1 ${trend.value > 0 ? "text-emerald-400" : "text-muted-foreground"}`}>
@@ -107,7 +132,7 @@ export default function OverviewSection({
                   <AlertTriangle className={`w-4 h-4 ${retardTxt}`} />
                   <p className="text-xs font-semibold text-muted-foreground">Cotisations en retard {currentYear}</p>
                 </div>
-                <div className={`font-heading text-2xl font-black ${retardTxt}`}>{pilotage.retardPct}%</div>
+                <div className={`font-heading text-3xl font-black ${retardTxt}`}>{pilotage.retardPct}%</div>
                 <p className="text-xs text-muted-foreground mt-0.5">{pilotage.enRetard} membre{pilotage.enRetard > 1 ? "s" : ""} concerné{pilotage.enRetard > 1 ? "s" : ""}</p>
               </div>
 
@@ -119,7 +144,7 @@ export default function OverviewSection({
                     Taux d'engagement (3 ans)
                   </p>
                 </div>
-                <div className={`font-heading text-2xl font-black ${engageBas ? "text-amber-400" : "text-emerald-400"}`}>{pilotage.engagementPct}%</div>
+                <div className={`font-heading text-3xl font-black ${engageBas ? "text-amber-400" : "text-emerald-400"}`}>{pilotage.engagementPct}%</div>
                 <p className="text-xs text-muted-foreground mt-0.5">{pilotage.engagedCount} / {pilotage.total} membres actifs</p>
               </div>
 
@@ -130,7 +155,7 @@ export default function OverviewSection({
                   <p className="text-xs font-semibold text-muted-foreground">Cotisations vs {currentYear - 1}</p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <div className="font-heading text-2xl font-black text-foreground">{pilotage.tauxCur}%</div>
+                  <div className="font-heading text-3xl font-black text-foreground">{pilotage.tauxCur}%</div>
                   <span className={`flex items-center gap-0.5 text-xs font-semibold ${pilotage.tauxDelta > 0 ? "text-emerald-400" : pilotage.tauxDelta < 0 ? "text-red-400" : "text-muted-foreground"}`}>
                     {pilotage.tauxDelta > 0 ? <TrendingUp className="w-3 h-3" /> : pilotage.tauxDelta < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
                     {pilotage.tauxDelta > 0 ? `+${pilotage.tauxDelta}` : pilotage.tauxDelta} pts

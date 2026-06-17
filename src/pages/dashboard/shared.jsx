@@ -268,12 +268,21 @@ export function SectionLoader() {
   );
 }
 
+// Fin filet doré — accent institutionnel MBP réutilisé dans les en-têtes.
+export function GoldRule({ className = "" }) {
+  return (
+    <div className={`h-px w-12 ${className}`}
+      style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
+  );
+}
+
 export function CrudHeader({ title, count, onAdd, seedBtn = null }) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
-        <h2 className="font-heading text-xl font-bold text-foreground">{title}</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">{title}</h2>
+        <GoldRule className="mt-1" />
+        <p className="text-xs text-muted-foreground mt-1.5">
           {count} élément{count !== 1 ? "s" : ""}
         </p>
       </div>
@@ -328,6 +337,37 @@ export function FormPanel({ title, onClose, onSave, children }) {
         </button>
       </div>
     </motion.div>
+  );
+}
+
+/*
+ * En-tête de section réutilisable (sections hors CRUD). Même grammaire visuelle
+ * que CrudHeader : titre Cormorant + filet doré + sous-titre, action optionnelle.
+ */
+export function SectionHeader({ title, subtitle, children }) {
+  return (
+    <div className="flex items-end justify-between gap-4 mb-6">
+      <div className="min-w-0">
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">{title}</h2>
+        <GoldRule className="mt-1" />
+        {subtitle && <p className="text-xs text-muted-foreground mt-1.5">{subtitle}</p>}
+      </div>
+      {children && <div className="flex items-center gap-2 flex-shrink-0">{children}</div>}
+    </div>
+  );
+}
+
+/*
+ * État vide soigné et cohérent : carte en pointillés, icône atténuée,
+ * titre Cormorant et indication facultative.
+ */
+export function EmptyState({ icon: Icon, title, hint }) {
+  return (
+    <div className="text-center py-16 bg-background border border-dashed border-border rounded-2xl">
+      {Icon && <Icon className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />}
+      <p className="font-heading text-lg font-bold text-foreground">{title}</p>
+      {hint && <p className="text-sm text-muted-foreground mt-1">{hint}</p>}
+    </div>
   );
 }
 

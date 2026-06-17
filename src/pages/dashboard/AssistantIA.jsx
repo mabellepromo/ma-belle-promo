@@ -114,7 +114,8 @@ export default function AssistantIA() {
             <Sparkles className="w-5 h-5" style={{ color: "#f0a030" }} />
           </div>
           <div>
-            <h2 className="font-heading text-xl font-bold text-foreground">Assistant IA</h2>
+            <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Assistant IA</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
             <p className="text-sm text-muted-foreground mt-0.5">
               Réservé au bureau · les données restent dans le périmètre de l'association.
             </p>

@@ -789,7 +789,8 @@ export default function MemoireSection() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-heading text-xl font-bold text-foreground">Mémoire & Passation</h2>
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Mémoire & Passation</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
         <p className="text-xs text-muted-foreground mt-0.5">
           Savoir-faire procédural interne et transmission entre bureaux — distinct des ressources documentaires téléchargeables.
         </p>

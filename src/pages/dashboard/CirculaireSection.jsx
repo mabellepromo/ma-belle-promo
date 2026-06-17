@@ -339,7 +339,8 @@ export default function CirculaireSection() {
 
       {/* En-tête + onglets */}
       <div>
-        <h2 className="font-heading text-xl font-bold text-foreground">Circulaire &amp; Publications</h2>
+        <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Circulaire &amp; Publications</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
         <p className="text-xs text-muted-foreground mt-0.5">Email groupé aux membres et calendrier éditorial</p>
       </div>
 

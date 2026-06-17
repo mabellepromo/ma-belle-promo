@@ -454,7 +454,8 @@ export default function AssembleesSection() {
       {ConfirmEl}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Assemblées Générales</h2>
+          <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Assemblées Générales</h2>
+          <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
           <p className="text-xs text-muted-foreground mt-0.5">Présences, résolutions, procès-verbaux avec signature</p>
         </div>
         <button onClick={() => { setForm({ ...emptyForm }); setSelectedId(null); }}

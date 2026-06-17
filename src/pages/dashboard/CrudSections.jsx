@@ -20,7 +20,7 @@ import { Globe, BookOpen, Images, Link2, Edit2, Trash2, Plus, Eye, EyeOff, Users
 import {
   inp, ta, sel,
   Field, ImgField, GalerieField, VideoField, FileField,
-  SectionLoader, CrudHeader, FormPanel, ItemRow,
+  SectionLoader, CrudHeader, FormPanel, ItemRow, EmptyState,
 } from "./shared.jsx";
 
 /* ─── Articles ─── */
@@ -187,9 +187,9 @@ export function ArticlesSection() {
 
       {/* Liste */}
       {filtered.length === 0 && (
-        <p className="text-center py-16 text-muted-foreground text-sm">
-          {statutFilter === "brouillon" ? "Aucun brouillon." : "Aucun article."}
-        </p>
+        <EmptyState icon={BookOpen}
+          title={statutFilter === "brouillon" ? "Aucun brouillon" : "Aucun article"}
+          hint="Cliquez sur « Ajouter » pour en créer un." />
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filtered.map(a => (
@@ -371,7 +371,7 @@ export function EvenementsSection() {
         </FormPanel>
       )}
 
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun événement.</p>}
+      {items.length === 0 && <EmptyState icon={BookOpen} title="Aucun événement" hint="Cliquez sur « Ajouter » pour en créer un." />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(e => {
@@ -520,7 +520,7 @@ export function ProjetsSection() {
           </div>
         </FormPanel>
       )}
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun projet.</p>}
+      {items.length === 0 && <EmptyState icon={Images} title="Aucun projet" hint="Cliquez sur « Ajouter » pour en créer un." />}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(p => (
           <ItemRow key={p.id} img={p.image} title={p.titre} subtitle={`${p.date} · ${p.categorie}`}
@@ -566,7 +566,7 @@ export function ProgrammesSection() {
           <Field label="Lien interne (optionnel)"><input className={inp} placeholder="/activites/projets" value={form.lien} onChange={f("lien")} /></Field>
         </FormPanel>
       )}
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun programme.</p>}
+      {items.length === 0 && <EmptyState icon={BookOpen} title="Aucun programme" hint="Cliquez sur « Ajouter » pour en créer un." />}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(p => (
           <ItemRow key={p.id} title={p.titre} subtitle={p.description.slice(0, 80) + "..."}
@@ -627,7 +627,7 @@ export function EquipeSection() {
           </div>
         </FormPanel>
       )}
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun membre dans l'équipe.</p>}
+      {items.length === 0 && <EmptyState icon={Users} title="Aucun membre dans l'équipe" hint="Cliquez sur « Ajouter » pour en créer un." />}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(m => (
           <ItemRow key={m.id} img={m.photo} title={m.nom}
@@ -671,12 +671,7 @@ export function SponsorsSection() {
           </div>
         </FormPanel>
       )}
-      {items.length === 0 && (
-        <div className="text-center py-16 text-muted-foreground">
-          <Globe className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Aucun partenaire. Cliquez sur <strong>+ Ajouter</strong> pour en créer un.</p>
-        </div>
-      )}
+      {items.length === 0 && <EmptyState icon={Globe} title="Aucun partenaire" hint="Cliquez sur « Ajouter » pour en créer un." />}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(s => (
           <ItemRow key={s.id} img={s.logo} title={s.nom} subtitle={s.niveau}
@@ -726,7 +721,7 @@ export function CommuniquesSection() {
           </div>
         </FormPanel>
       )}
-      {items.length === 0 && <p className="text-center py-16 text-muted-foreground text-sm">Aucun communiqué.</p>}
+      {items.length === 0 && <EmptyState icon={BookOpen} title="Aucun communiqué" hint="Cliquez sur « Ajouter » pour en créer un." />}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map(c => (
           <ItemRow key={c.id} title={c.titre} subtitle={`${c.date} · ${c.type}`}
