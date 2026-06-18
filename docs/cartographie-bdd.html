@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cartographie BDD — Ma Belle Promo</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose',
+    flowchart: { curve: 'basis', nodeSpacing: 35, rankSpacing: 45 } });
+</script>
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Lato', Arial, sans-serif;
+    color: #1f2a37; line-height: 1.45; font-size: 11px; margin: 0;
+  }
+  h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+       color: #6b1d2c; margin: 0 0 2px; }
+  h2 { font-size: 15px; color: #6b1d2c; border-bottom: 2px solid #e3c9ce;
+       padding-bottom: 3px; margin: 26px 0 10px; page-break-after: avoid; }
+  .sub { color: #6b7280; font-size: 11px; margin-bottom: 4px; }
+  .meta { background: #faf3f4; border: 1px solid #e3c9ce; border-radius: 6px;
+          padding: 8px 12px; font-size: 10.5px; margin: 12px 0 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 4px;
+          page-break-inside: avoid; }
+  th { background: #6b1d2c; color: #fff; text-align: left; padding: 5px 8px;
+       font-size: 10px; font-weight: 600; }
+  td { padding: 4px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; width: 52px;
+         color: #6b1d2c; font-weight: 600; }
+  .z td.n { color: #b0b0b0; font-weight: 400; }
+  code { background: #f3eef0; padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+  .mermaid { margin: 10px 0; text-align: center; }
+  .legend { font-size: 10px; color: #6b7280; }
+  ul { margin: 4px 0 4px 0; padding-left: 18px; }
+  li { margin: 3px 0; }
+  .pagebreak { page-break-before: always; }
+  .tag { display:inline-block; background:#e3f0e6; color:#1d6b34; border-radius:4px;
+         padding:1px 6px; font-size:9px; margin-left:4px; }
+  .tag.vide { background:#f0e3e3; color:#8a3b3b; }
+</style>
+</head>
+<body>
+
+<h1>Cartographie de la base de données Supabase</h1>
+<div class="sub">Association FDD Ma Belle Promo — promotion 1994-2000</div>
+<div class="meta">
+  Projet Supabase <code>zbimhhgefmhliqiuwzvb</code> · schéma <code>public</code> ·
+  <b>60 tables</b> · RLS activé partout · 11 domaines fonctionnels<br>
+  Instantané du 9 juin 2026 — la table pivot est <code>members</code> (48 lignes),
+  cible de la majorité des relations.
+</div>
+
+<h2>Schéma des relations</h2>
+<div class="mermaid">
+graph LR
+  classDef pivot fill:#6b1d2c,stroke:#4a121d,color:#fff,font-weight:bold;
+  classDef hub fill:#faf3f4,stroke:#c98a96,color:#6b1d2c;
+  classDef leaf fill:#f6f6f6,stroke:#cccccc,color:#444;
+
+  MEMBERS["members (48)"]:::pivot
+
+  EQUIPE["equipe"]:::leaf --> MEMBERS
+  MANDATS["mandats"]:::leaf --> MEMBERS
+  ATTEST["attestations"]:::leaf --> MEMBERS
+  COTIS["cotisations"]:::leaf --> MEMBERS
+
+  ASSEMB["assemblees"]:::hub
+  APRES["assemblee_presences"]:::leaf --> ASSEMB
+  APRES --> MEMBERS
+  ARESO["assemblee_resolutions"]:::leaf --> ASSEMB
+  PROC["procedures"]:::hub --> ASSEMB
+  PVER["procedure_versions"]:::leaf --> PROC
+
+  ELEC["elections"]:::hub
+  ECAND["election_candidats"]:::leaf --> ELEC
+  ECAND --> MEMBERS
+  EVOTE["election_votes"]:::leaf --> ECAND
+  EVOTE --> ELEC
+  EVOTE --> MEMBERS
+
+  EVT["evenements"]:::hub
+  EREG["event_registrations"]:::leaf --> EVT
+  EREG --> MEMBERS
+  EPRES["evenement_presences"]:::leaf --> EVT
+  EPRES --> MEMBERS
+
+  WEBE["webinar_events"]:::hub
+  WREG["webinar_registrations"]:::leaf --> WEBE
+  WMENT["webinar_mentors_auto"]:::leaf --> WEBE
+  WMENT --> WREG
+  WMENT --> MEMBERS
+
+  SOND["sondages"]:::hub
+  SSEC["sondage_sections"]:::leaf --> SOND
+  SQ["sondage_questions"]:::leaf --> SOND
+  SQ --> SSEC
+  SINV["sondage_invitations"]:::leaf --> SOND
+  SSOU["sondage_soumissions"]:::leaf --> SOND
+  SSOU --> SINV
+  SREP["sondage_reponses"]:::leaf --> SSOU
+  SREP --> SQ
+
+  BEN["benevoles"]:::hub
+  MIS["missions_benevoles"]:::hub
+  HRS["heures_benevoles"]:::leaf --> BEN
+  HRS --> MIS
+
+  PMOD["passation_modeles"]:::hub
+  PASS["passations"]:::leaf --> PMOD
+
+  TTRANS["tresorerie_transactions"]:::hub
+  TREMB["tresorerie_remboursements"]:::leaf --> TTRANS
+
+  AUTO["automations (18)"]:::hub
+  ALOG["automation_logs"]:::leaf --> AUTO
+</div>
+<div class="legend">
+  <b>Lecture :</b> une flèche A → B signifie « A possède une clé étrangère vers B ».
+  Rouge = table pivot, beige = table « hub » d'un module, gris = table de détail.
+  Les modules sans clé étrangère (contenu éditorial, finances autonomes, registres)
+  ne figurent pas sur ce schéma mais sont détaillés ci-dessous.
+</div>
+
+<div class="pagebreak"></div>
+
+<h2>1. Membres & équipe dirigeante</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td><b>members</b></td><td class="n">48</td><td>Annuaire des diplômés (table pivot du projet)</td></tr>
+<tr><td>equipe</td><td class="n">9</td><td>Bureau / organigramme du site → <code>member_id</code></td></tr>
+<tr><td>attestations</td><td class="n">9</td><td>Attestations d'appartenance générées → <code>member_id</code></td></tr>
+<tr class="z"><td>mandats</td><td class="n">0</td><td>Historique des postes occupés → <code>member_id</code></td></tr>
+</table>
+
+<h2>2. Contenu éditorial (site public)</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>articles</td><td class="n">23</td><td>Actualités / blog</td></tr>
+<tr><td>galeries</td><td class="n">9</td><td>Albums photos</td></tr>
+<tr><td>documents</td><td class="n">9</td><td>Documents téléchargeables</td></tr>
+<tr><td>projets</td><td class="n">6</td><td>Rubrique Projets</td></tr>
+<tr><td>media_photos</td><td class="n">6</td><td>Médiathèque photos</td></tr>
+<tr><td>communiques</td><td class="n">5</td><td>Communiqués officiels</td></tr>
+<tr><td>evenements</td><td class="n">5</td><td>Agenda / actualités événementielles</td></tr>
+<tr><td>media_videos</td><td class="n">3</td><td>Médiathèque vidéos (YouTube)</td></tr>
+<tr><td>programmes</td><td class="n">3</td><td>Programmes / chantiers</td></tr>
+<tr class="z"><td>ressources</td><td class="n">0</td><td>Ressources documentaires</td></tr>
+<tr class="z"><td>sponsors</td><td class="n">0</td><td>Partenaires / sponsors</td></tr>
+<tr class="z"><td>opportunites</td><td class="n">0</td><td>Offres / opportunités professionnelles</td></tr>
+</table>
+
+<h2>3. Cotisations & trésorerie</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>cotisations</td><td class="n">3</td><td>Suivi cotisations par membre/année → <code>member_id</code></td></tr>
+<tr><td>tresorerie_transactions</td><td class="n">2</td><td>Journal recettes / dépenses</td></tr>
+<tr><td>factures</td><td class="n">1</td><td>Facturation</td></tr>
+<tr><td>commandes</td><td class="n">1</td><td>Commandes (boutique)</td></tr>
+<tr class="z"><td>payments</td><td class="n">0</td><td>Transactions de paiement (FedaPay, en attente KYC)</td></tr>
+<tr class="z"><td>tresorerie_budget</td><td class="n">0</td><td>Budget prévisionnel par année</td></tr>
+<tr class="z"><td>tresorerie_remboursements</td><td class="n">0</td><td>Remboursements → <code>transaction_id</code></td></tr>
+<tr class="z"><td>tresorerie_subventions</td><td class="n">0</td><td>Subventions reçues</td></tr>
+</table>
+
+<h2>4. Gouvernance & vie associative</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>registre_documents_legaux</td><td class="n">4</td><td>Statuts, RI, documents légaux</td></tr>
+<tr><td>passation_modeles</td><td class="n">1</td><td>Modèles de passation de pouvoir</td></tr>
+<tr class="z"><td>assemblees</td><td class="n">0</td><td>Assemblées générales (PV, ordre du jour)</td></tr>
+<tr class="z"><td>assemblee_presences</td><td class="n">0</td><td>Émargement AG → <code>assemblee_id</code>, <code>member_id</code></td></tr>
+<tr class="z"><td>assemblee_resolutions</td><td class="n">0</td><td>Résolutions votées → <code>assemblee_id</code></td></tr>
+<tr class="z"><td>elections</td><td class="n">0</td><td>Élections du bureau</td></tr>
+<tr class="z"><td>election_candidats</td><td class="n">0</td><td>Candidats → <code>election_id</code>, <code>member_id</code></td></tr>
+<tr class="z"><td>election_votes</td><td class="n">0</td><td>Bulletins → <code>election_id</code>, <code>candidat_id</code>, <code>voter_id</code></td></tr>
+<tr class="z"><td>conventions</td><td class="n">0</td><td>Conventions de partenariat</td></tr>
+<tr class="z"><td>registre_conflits</td><td class="n">0</td><td>Registre des conflits d'intérêts</td></tr>
+<tr class="z"><td>procedures</td><td class="n">0</td><td>Procédures internes → <code>assemblee_id</code></td></tr>
+<tr class="z"><td>procedure_versions</td><td class="n">0</td><td>Versionnage → <code>procedure_id</code></td></tr>
+<tr class="z"><td>passations</td><td class="n">0</td><td>Passations bureau sortant/entrant → <code>modele_id</code></td></tr>
+</table>
+
+<div class="pagebreak"></div>
+
+<h2>5. Événements & présences</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr class="z"><td>event_registrations</td><td class="n">0</td><td>Inscriptions → <code>event_id</code>, <code>member_id</code></td></tr>
+<tr class="z"><td>evenement_presences</td><td class="n">0</td><td>Check-in → <code>evenement_id</code>, <code>membre_id</code></td></tr>
+</table>
+
+<h2>6. Webinaires</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>webinar_registrations</td><td class="n">13</td><td>Inscriptions → <code>event_id</code></td></tr>
+<tr><td>webinar_events</td><td class="n">1</td><td>Webinaires programmés</td></tr>
+<tr class="z"><td>webinar_mentors_auto</td><td class="n">0</td><td>Mentors auto-inclus → <code>webinar_id</code>, <code>person_id</code>, <code>registration_id</code></td></tr>
+</table>
+
+<h2>7. Sondages (formulaires dynamiques)</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr class="z"><td>sondages</td><td class="n">0</td><td>Sondages / formulaires</td></tr>
+<tr class="z"><td>sondage_sections</td><td class="n">0</td><td>Sections → <code>sondage_id</code></td></tr>
+<tr class="z"><td>sondage_questions</td><td class="n">0</td><td>Questions → <code>sondage_id</code>, <code>section_id</code></td></tr>
+<tr class="z"><td>sondage_invitations</td><td class="n">0</td><td>Invitations nominatives → <code>sondage_id</code></td></tr>
+<tr class="z"><td>sondage_soumissions</td><td class="n">0</td><td>Réponses soumises → <code>sondage_id</code>, <code>invitation_id</code></td></tr>
+<tr class="z"><td>sondage_reponses</td><td class="n">0</td><td>Réponses détaillées → <code>soumission_id</code>, <code>question_id</code></td></tr>
+</table>
+
+<h2>8. Bénévolat</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr class="z"><td>benevoles</td><td class="n">0</td><td>Bénévoles</td></tr>
+<tr class="z"><td>missions_benevoles</td><td class="n">0</td><td>Missions</td></tr>
+<tr class="z"><td>heures_benevoles</td><td class="n">0</td><td>Heures effectuées → <code>benevole_id</code>, <code>mission_id</code></td></tr>
+</table>
+
+<h2>9. Communication & emailing</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>automations</td><td class="n">18</td><td>Automatisations programmées (cron)</td></tr>
+<tr><td>messages</td><td class="n">1</td><td>Messages du formulaire de contact</td></tr>
+<tr><td>circulaires</td><td class="n">1</td><td>Circulaires envoyées en masse</td></tr>
+<tr><td>email_logs</td><td class="n">1</td><td>Journal des envois</td></tr>
+<tr class="z"><td>newsletter_subscribers</td><td class="n">0</td><td>Abonnés newsletter (double opt-in)</td></tr>
+<tr class="z"><td>bulk_emails</td><td class="n">0</td><td>Campagnes emails groupés</td></tr>
+<tr class="z"><td>automation_logs</td><td class="n">0</td><td>Journal des automatisations → <code>automation_id</code></td></tr>
+</table>
+
+<h2>10. Signatures électroniques</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr><td>signatures</td><td class="n">4</td><td>Suivi DocuSeal (registre manuel)</td></tr>
+</table>
+
+<h2>11. Legacy / dette technique</h2>
+<table>
+<tr><th>Table</th><th>Lignes</th><th>Rôle</th></tr>
+<tr class="z"><td>mbp_store</td><td class="n">0</td><td>Ancien store clé-valeur JSON — <b>plus utilisé</b>, candidat à suppression</td></tr>
+</table>
+
+<h2>Observations</h2>
+<ul>
+  <li><b>RLS activé sur les 60 tables.</b> Chantier sécurité en cours : migration
+      <code>user_metadata</code> → <code>app_metadata</code> à finaliser avant l'envoi
+      des invitations membres.</li>
+  <li><b>Modules vivants</b> (données réelles) : members (48), articles (23),
+      automations (18), webinar_registrations (13), galeries/documents/equipe/attestations (9).</li>
+  <li><b>Modules construits mais vides</b> (0 ligne) : sondages, bénévolat, élections,
+      assemblées, conventions, la majeure partie de la trésorerie, payments (FedaPay en attente KYC).
+      L'ossature est posée, en attente d'alimentation.</li>
+  <li><code>mbp_store</code> est vide et abandonné — candidat à une suppression définitive.</li>
+  <li><b>Incohérence de nommage des FK vers <code>members</code></b> :
+      <code>member_id</code> (majorité), mais aussi <code>membre_id</code> (evenement_presences),
+      <code>person_id</code> (webinar_mentors_auto), <code>voter_id</code> (election_votes).
+      Sans impact technique, mais à garder en tête.</li>
+</ul>
+
+</body>
+</html>
