@@ -744,9 +744,9 @@ export default function Dashboard() {
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary">
-              <span className="text-[10px] font-black text-primary-foreground tracking-tight">MBP</span>
-            </div>
+            <img src="/Logo Redesign1.webp" alt="Ma Belle Promo"
+              className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+
             <div className="min-w-0">
               <p className="font-heading font-bold text-sm text-foreground leading-tight">Ma Belle Promo</p>
               <p className="text-[10px] text-muted-foreground">Admin · FDD Lomé</p>
