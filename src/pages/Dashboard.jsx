@@ -775,12 +775,11 @@ export default function Dashboard() {
           className="overflow-y-auto px-2 pb-4"
           style={{ maxHeight: "calc(100vh - 195px)" }}>
           {NAV_GROUPS.map((group, gi) => {
-            // Sidebar volontairement sobre : en-têtes de groupe neutres. La couleur
-            // est réservée au sens — l'or (#e3c46a / primary) signale l'onglet actif,
-            // l'ambre signale une alerte (badges). Le reste reste gris pour ne pas
-            // saturer l'œil sur une navigation de ~40 entrées.
-            const gc = "text-muted-foreground";
-            const gbar = "border-t-border";
+            const groupColors = [null, "text-blue-400", "text-green-400", "text-violet-400", "text-amber-400", "text-emerald-400", "text-pink-400"];
+            const gc = groupColors[gi] || "text-muted-foreground";
+            // Liseré coloré en haut de chaque carte de groupe (rappel des cartes de stats).
+            const groupBars = [null, "border-t-blue-400", "border-t-green-400", "border-t-violet-400", "border-t-amber-400", "border-t-emerald-400", "border-t-pink-400"];
+            const gbar = groupBars[gi] || "border-t-border";
             // Le groupe sans libellé (Vue d'ensemble) n'est pas repliable.
             const collapsible = !!group.label;
             const collapsed = collapsible && collapsedGroups.has(group.label);
@@ -871,8 +870,19 @@ export default function Dashboard() {
               </h2>
               <span className="mt-1 h-px w-8" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
             </div>
+            {pendingMembers.length > 0 && tab !== "pending" && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white">
+                {pendingMembers.length}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-4">
+            {unreadCount > 0 && tab !== "messages" && (
+              <button onClick={() => setTab("messages")}
+                className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors">
+                <MessageSquare className="w-3.5 h-3.5" /> {unreadCount} non lu{unreadCount > 1 ? "s" : ""}
+              </button>
+            )}
             <p className="text-[11px] text-muted-foreground">
               {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </p>
