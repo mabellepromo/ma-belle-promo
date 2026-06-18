@@ -53,10 +53,10 @@ export default function OverviewSection({
                   Tableau de bord · Promotion 1994–2000 · Lomé, Togo
                 </p>
               </div>
-              {/* Monogramme MBP cerclé d'or */}
-              <div className="hidden md:flex w-16 h-16 rounded-full flex-shrink-0 items-center justify-center"
+              {/* Logo MBP cerclé d'or */}
+              <div className="hidden md:flex w-16 h-16 rounded-full flex-shrink-0 items-center justify-center overflow-hidden"
                 style={{ border: `2px solid ${GOLD}`, boxShadow: `0 0 0 4px rgba(227,196,106,0.08)` }}>
-                <span className="font-heading text-lg font-bold tracking-tight" style={{ color: GOLD }}>MBP</span>
+                <img src="/Logo Redesign1.webp" alt="Ma Belle Promo" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
