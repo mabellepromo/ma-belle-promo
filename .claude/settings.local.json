@@ -4,7 +4,8 @@
       "Bash(sed 's/<[^>]*>//g')",
       "Bash(git commit -m ' *)",
       "mcp__claude_ai_Supabase__execute_sql",
-      "PowerShell(supabase functions deploy cotisation-reminder event-reminder ag-convocation webinaire-reminder convention-reminder 2>&1 | Select-String -Pattern \"Deployed|error|Error\" | Select-Object -Last 5; \"EXIT=$LASTEXITCODE\")"
+      "PowerShell(supabase functions deploy cotisation-reminder event-reminder ag-convocation webinaire-reminder convention-reminder 2>&1 | Select-String -Pattern \"Deployed|error|Error\" | Select-Object -Last 5; \"EXIT=$LASTEXITCODE\")",
+      "Bash(powershell -NoProfile -Command \"\\(Get-Content 'docs/papier-entete-v1-classique.html' | Measure-Object -Line\\).Lines; \\(Get-Content 'public/docs/papier-entete-v1-classique.html' | Measure-Object -Line\\).Lines\")"
     ]
   }
 }

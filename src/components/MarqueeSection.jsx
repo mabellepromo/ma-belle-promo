@@ -39,23 +39,25 @@ const MARQUEE_CSS = `
 
 /* Tous les items sont des liens — internes { to } ou externes { href } */
 const ROW1 = [
-  { label: "Notre Credo",        to: "/association/credo" },
-  { label: "Notre Ambition",     to: "/association/ambition" },
+  { label: "Qui sommes-nous",    to: "/association/qui-sommes-nous" },
   { label: "Notre Équipe",       to: "/association/equipe" },
   { label: "Nos Partenaires",    to: "/association/sponsors" },
   { label: "Événements",         to: "/activites/evenements" },
   { label: "Nos Projets",        to: "/activites/projets" },
   { label: "Nos Programmes",     to: "/activites/programmes" },
+  { label: "Plan d'action 2026", to: "/activites/plan-action-2026" },
   { label: 'Programme "Passerelles" ↗', styledLabel: <>Programme <span style={{ color: "#f97316" }}>"Passerelles"</span> ↗</>, href: "https://passerelles.vercel.app" },
 ];
 
 const ROW2 = [
   { label: "Adhésion",           to: "/implications/adhesion" },
   { label: "Cotisation",         to: "/implications/cotisation" },
+  { label: "Bénévolat",          to: "/implications/benevolat" },
   { label: "Nous Soutenir",      to: "/implications/soutenir" },
   { label: "Faire un Don",       to: "/don" },
   { label: "Actualités",         to: "/informations/actualites" },
   { label: "Médiathèque",        to: "/informations/mediatheque" },
+  { label: "Galeries",           to: "/galeries" },
   { label: "Documents",          to: "/informations/documents" },
   { label: "Communiqués",        to: "/informations/communiques" },
   { label: "Annuaire",           to: "/annuaire" },
