@@ -45,7 +45,24 @@ export default defineConfig({
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,webp,png,svg,woff2}'],
+        // Purge les anciens caches de précache à chaque activation d'un nouveau service worker.
+        // Évite qu'un ancien index.html (pointant vers des JS disparus) reste servi.
+        cleanupOutdatedCaches: true,
+        // Pour les requêtes de navigation (la page elle-même), va d'abord chercher
+        // la version fraîche sur le réseau ; ne retombe sur le cache que hors-ligne.
+        // C'est ce qui élimine le bug du « bundle périmé » bloquant le démarrage de React.
+        navigateFallback: '/index.html',
         runtimeCaching: [
+          {
+            // index.html / navigation SPA : réseau d'abord
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 10, maxAgeSeconds: 86400 },
+            },
+          },
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
