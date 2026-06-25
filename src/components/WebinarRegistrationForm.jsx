@@ -297,20 +297,21 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
           <div className="grid sm:grid-cols-3 gap-2">
             <button
               type="button"
-              onClick={() => set("mode_participation", "presentiel")}
-              className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
-                form.mode_participation === "presentiel"
-                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                  : "border-border hover:border-primary/40 hover:bg-muted/40"
-              }`}
+              disabled
+              aria-disabled="true"
+              title="Les places en présentiel sont complètes"
+              className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-muted/40 text-left opacity-60 cursor-not-allowed"
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                form.mode_participation === "presentiel" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-              }`}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground">
                 <MapPin className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground leading-tight">En présentiel</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-semibold text-muted-foreground leading-tight">En présentiel</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
+                    Complet
+                  </span>
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
                   {event.lieu || "Sur place"}
                 </p>
