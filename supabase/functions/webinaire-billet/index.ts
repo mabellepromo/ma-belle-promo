@@ -79,6 +79,7 @@ function zoomEmail(opts: {
 // Bloc d'email pour le billet QR (participants présentiel)
 function qrEmail(opts: {
   prenom: string; titre: string; dateStr: string; lieu: string; qrUrl: string; infoUrl: string;
+  nom: string; modeLabel: string;
 }): string {
   const content = `
     <h2 style="margin:0 0 16px;font-size:18px;color:#111827;">${escHtml(opts.titre)}</h2>
@@ -86,6 +87,12 @@ function qrEmail(opts: {
       Bonjour ${escHtml(opts.prenom)},<br>
       Voici votre billet d'entrée pour la rencontre en présentiel.
     </p>
+    <div style="text-align:center;margin:0 0 16px;">
+      <p style="margin:0;font-size:16px;font-weight:bold;color:#14532d;">${escHtml(opts.nom)}</p>
+      <span style="display:inline-block;margin-top:4px;font-size:11px;font-weight:bold;color:#6d28d9;background:#ede9fe;border-radius:9999px;padding:3px 10px;">
+        ${escHtml(opts.modeLabel)}
+      </span>
+    </div>
     <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:20px;">
       <table cellpadding="0" cellspacing="0">
         <tr><td style="padding:4px 0;font-size:13px;color:#6b7280;width:80px;">📅 Date :</td>
@@ -159,13 +166,14 @@ serve(async (req) => {
   }
 
   // ── Inscrits ciblés ──
+  // Les inscrits « mixte » (présentiel + en ligne) reçoivent les deux canaux.
   const wantedMode = channel === "zoom" ? "en_ligne" : "presentiel";
   let query = db
     .from("webinar_registrations")
     .select("id, email, nom_complet, mode_participation, status")
     .eq("event_id", event_id)
     .eq("status", "registered")
-    .eq("mode_participation", wantedMode)
+    .in("mode_participation", [wantedMode, "mixte"])
     .not("email", "is", null);
   if (Array.isArray(registration_ids) && registration_ids.length) {
     query = query.in("id", registration_ids);
@@ -193,9 +201,13 @@ serve(async (req) => {
       if (channel === "zoom") {
         html = zoomEmail({ prenom, titre: ev.title as string, dateStr, zoomLink: ev.zoom_link as string, infoUrl });
       } else {
-        const qrData = `MBP-WEBINAIRE|${ev.id}|${r.id}|${r.nom_complet}|${r.email}|presentiel`;
+        const qrData = `MBP-WEBINAIRE|${ev.id}|${r.id}|${r.nom_complet}|${r.email}|${r.mode_participation}`;
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrData)}`;
-        html = qrEmail({ prenom, titre: ev.title as string, dateStr, lieu: ev.lieu as string, qrUrl, infoUrl });
+        const modeLabel = r.mode_participation === "mixte" ? "Présentiel + En ligne" : "Présentiel";
+        html = qrEmail({
+          prenom, titre: ev.title as string, dateStr, lieu: ev.lieu as string, qrUrl, infoUrl,
+          nom: (r.nom_complet as string) || "", modeLabel,
+        });
       }
 
       await sendBrevoEmail(apiKey, {

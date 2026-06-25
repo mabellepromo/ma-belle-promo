@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Check, Loader2, Mail, User, Phone, Briefcase, Building2, Video, AlertCircle, MapPin } from "lucide-react";
+import { Check, Loader2, Mail, User, Phone, Briefcase, Building2, Video, AlertCircle, MapPin, Users } from "lucide-react";
 import { registerToWebinar } from "@/hooks/useWebinars";
 import { useLocalAuth } from "@/lib/LocalAuth";
 
@@ -294,7 +294,7 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
           <label className="block text-xs font-semibold text-foreground mb-1.5">
             Comment souhaitez-vous participer ? <span className="text-red-500">*</span>
           </label>
-          <div className="grid sm:grid-cols-2 gap-2">
+          <div className="grid sm:grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => set("mode_participation", "presentiel")}
@@ -335,6 +335,28 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
                 <p className="text-sm font-semibold text-foreground leading-tight">En ligne</p>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
                   Diffusion {{zoom:"Zoom",meet:"Google Meet",teams:"Teams",facebook:"Facebook Live",youtube:"YouTube Live"}[event.plateforme] || "en ligne"} — lien par email
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => set("mode_participation", "mixte")}
+              className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                form.mode_participation === "mixte"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 hover:bg-muted/40"
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                form.mode_participation === "mixte" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+              }`}>
+                <Users className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground leading-tight">Présentiel + En ligne</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                  Vous recevrez le billet QR <em>et</em> le lien de connexion
                 </p>
               </div>
             </button>
