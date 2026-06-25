@@ -1987,7 +1987,7 @@ export function genererListePresentiel(event, registrations) {
   // Filtre : inscrits non désinscrits qui seront sur place.
   const candidats = (registrations ?? []).filter(r => {
     if (r.status === "unregistered" || r.status === "cancelled") return false;
-    if (event?.format === "hybride") return r.mode_participation === "presentiel";
+    if (event?.format === "hybride") return r.mode_participation === "presentiel" || r.mode_participation === "mixte";
     return true; // présentiel pur : tout le monde est sur place
   });
 
