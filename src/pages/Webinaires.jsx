@@ -63,7 +63,14 @@ function fmtTime(iso) {
 
 function daysUntil(iso) {
   if (!iso) return null;
-  const diff = Math.ceil((new Date(iso) - new Date()) / 86400000);
+  // On compare des jours CALENDAIRES (fuseau de Lomé), pas des fenêtres de 24 h :
+  // sinon un événement le soir même est compté comme « Demain » dès le matin.
+  const dayKey = (d) =>
+    new Intl.DateTimeFormat("en-CA", {
+      year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Africa/Lome",
+    }).format(d); // → "YYYY-MM-DD"
+  const toMidnight = (d) => new Date(`${dayKey(d)}T00:00:00Z`);
+  const diff = Math.round((toMidnight(new Date(iso)) - toMidnight(new Date())) / 86400000);
   if (diff < 0)  return null;
   if (diff === 0) return "Aujourd'hui";
   if (diff === 1) return "Demain";
