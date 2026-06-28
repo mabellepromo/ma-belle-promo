@@ -658,7 +658,7 @@ export default function Dashboard() {
       items: [
         { key: "articles",    label: "Articles",    icon: FileText },
         { key: "evenements",  label: "Événements",  icon: Calendar },
-        { key: "webinaires",  label: "Webinaires",  icon: Video    },
+        { key: "webinaires",  label: "Webinaires & Rencontres",  icon: Video    },
         { key: "checkin",     label: "Check-in QR", icon: QrCode   },
         { key: "projets",     label: "Projets",     icon: Star },
         { key: "programmes",  label: "Programmes",  icon: Tag },

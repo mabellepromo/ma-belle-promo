@@ -346,7 +346,7 @@ export default function Webinaires() {
             <Video className="w-4 h-4" /> Événements
           </div>
           <h1 className="font-heading text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
-            Webinaires &amp; Ateliers MBP
+            Webinaires &amp; Rencontres MBP
           </h1>
           <p className="text-emerald-200 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
             Rejoignez nos conférences, formations et échanges en ligne ouverts à tous les membres

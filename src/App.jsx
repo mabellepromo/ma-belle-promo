@@ -17,7 +17,7 @@ const PAGE_TITLES = {
   "/association/equipe":         "Notre Équipe",
   "/association/sponsors":       "Nos Partenaires",
   "/activites/evenements":       "Événements",
-  "/activites/webinaires":       "Webinaires & Ateliers",
+  "/activites/webinaires":       "Webinaires & Rencontres",
   "/activites/projets":          "Nos Réalisations",
   "/activites/programmes":       "Nos Programmes",
   "/activites/plan-action-2026": "Plan d'Action 2026",

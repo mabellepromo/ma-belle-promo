@@ -1474,7 +1474,7 @@ export default function WebinarsSection() {
       {/* En-tête */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="font-heading text-lg font-bold text-foreground">Webinaires</h2>
+          <h2 className="font-heading text-lg font-bold text-foreground">Webinaires &amp; Rencontres</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Gérez les événements en ligne et les inscriptions
           </p>
