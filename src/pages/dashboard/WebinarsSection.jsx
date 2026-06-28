@@ -5,10 +5,10 @@ import {
   Video, Plus, Edit2, Trash2, ChevronDown, ChevronUp, Download,
   Copy, Users, X, Loader2, Calendar, Link2, RefreshCw,
   UserCheck, Tag, Send, QrCode, Upload, FileText, Image, User, MapPin,
-  Search, Check
+  Search, Check, Archive, ArchiveRestore, Mail
 } from "lucide-react";
 import QRCodeLib from "qrcode";
-import { useWebinars, useWebinarRegistrations } from "@/hooks/useWebinars";
+import { useWebinars, useWebinarRegistrations, getPastAttendees } from "@/hooks/useWebinars";
 import { genererListePresentiel } from "@/lib/documentGenerators";
 import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
 import { inp, sel, Field } from "./shared";
@@ -1207,16 +1207,176 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
   );
 }
 
+// ── Modale : inviter les anciens participants ────────────────────────────────
+// Récupère les participants « présents » (attended) d'autres événements,
+// dédupliqués et hors déjà-inscrits, et envoie une invitation via l'Edge
+// Function event-invitation. Le serveur trace l'envoi dans event_invitations.
+
+function InvitationModal({ event, onClose }) {
+  const [loading, setLoading]   = useState(true);
+  const [people, setPeople]     = useState([]);          // [{ email, nom_complet, telephone, registration_id }]
+  const [selected, setSelected] = useState(new Set());   // emails cochés
+  const [sending, setSending]   = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      const list = await getPastAttendees(event.id);
+      if (!alive) return;
+      setPeople(list);
+      setSelected(new Set(list.map(p => p.email.toLowerCase()))); // tout coché par défaut
+      setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, [event.id]);
+
+  function toggle(email) {
+    const key = email.toLowerCase();
+    setSelected(s => {
+      const next = new Set(s);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  const allChecked = people.length > 0 && selected.size === people.length;
+  function toggleAll() {
+    setSelected(allChecked ? new Set() : new Set(people.map(p => p.email.toLowerCase())));
+  }
+
+  async function send() {
+    const recipients = people
+      .filter(p => selected.has(p.email.toLowerCase()))
+      .map(p => ({ email: p.email, name: p.nom_complet, registration_id: p.registration_id }));
+    if (!recipients.length) { toast.error("Sélectionnez au moins un destinataire."); return; }
+
+    const ok = window.confirm(
+      `Envoyer une invitation à ${recipients.length} ancien(s) participant(s) ?\n\nCette action envoie de vrais emails.`,
+    );
+    if (!ok) return;
+
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("event-invitation", {
+        body: { event_id: event.id, recipients },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      const nb = data?.sent ?? 0;
+      const echecs = (data?.results || []).filter(x => String(x.status).startsWith("erreur"));
+      if (echecs.length) {
+        toast.warning(`${nb} invitation(s) envoyée(s), ${echecs.length} en échec. Voir la console.`);
+        console.warn("[event-invitation] échecs :", echecs);
+      } else {
+        toast.success(`${nb} invitation(s) envoyée(s).`);
+      }
+      onClose();
+    } catch (err) {
+      toast.error("Erreur d'envoi : " + err.message);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+
+        {/* En-tête */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+          <div>
+            <p className="font-semibold text-sm text-foreground flex items-center gap-1.5">
+              <Mail className="w-4 h-4 text-primary" /> Inviter les anciens participants
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate max-w-[400px]">{event.title}</p>
+          </div>
+          <button onClick={onClose}
+            className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Corps */}
+        <div className="flex-1 overflow-y-auto p-5">
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            </div>
+          ) : people.length === 0 ? (
+            <div className="text-center py-10">
+              <Users className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-40" />
+              <p className="text-sm text-muted-foreground">Aucun ancien participant éligible.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Seuls les inscrits marqués « Présent » sur d'autres événements, et non déjà
+                inscrits à celui-ci, apparaissent ici.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-muted-foreground">
+                  {people.length} ancien(s) participant(s) · {selected.size} sélectionné(s)
+                </p>
+                <button onClick={toggleAll}
+                  className="text-xs font-semibold text-primary hover:underline">
+                  {allChecked ? "Tout décocher" : "Tout cocher"}
+                </button>
+              </div>
+              <div className="space-y-1.5">
+                {people.map(p => {
+                  const checked = selected.has(p.email.toLowerCase());
+                  return (
+                    <label key={p.email}
+                      className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-colors ${
+                        checked ? "border-primary/30 bg-primary/5" : "border-border hover:bg-muted/40"
+                      }`}>
+                      <input type="checkbox" checked={checked} onChange={() => toggle(p.email)}
+                        className="w-4 h-4 rounded border-border accent-primary" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-foreground truncate">{p.nom_complet}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{p.email}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 px-5 py-4 border-t border-border">
+          <button onClick={onClose}
+            className="flex-1 h-9 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted transition-colors">
+            Annuler
+          </button>
+          <button onClick={send} disabled={sending || loading || selected.size === 0}
+            className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5">
+            {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            Envoyer à {selected.size} participant(s)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Module principal ──────────────────────────────────────────────────────────
 
 export default function WebinarsSection() {
-  const { events, loading, saving, add, update, remove, reload } = useWebinars({ adminMode: true });
+  const [showArchived, setShowArchived] = useState(false);
+  const { events, loading, saving, add, update, archive, unarchive, remove, reload } =
+    useWebinars({ adminMode: true, includeArchived: showArchived });
   const [creating, setCreating]         = useState(false);
   const [editing, setEditing]           = useState(null); // event object
   const [expanded, setExpanded]         = useState(null); // event id — panel inscriptions
   const [registrationCounts, setRegistrationCounts] = useState({});
   const [qrModal, setQrModal]           = useState(null); // { event, dataUrl }
   const [cloningId, setCloningId]       = useState(null);
+  const [inviteEvent, setInviteEvent]   = useState(null); // événement dont on invite les anciens participants
 
   async function generateQR(event) {
     const url = `${window.location.origin}/activites/webinaires`;
@@ -1320,6 +1480,15 @@ export default function WebinarsSection() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => setShowArchived(v => !v)}
+            title={showArchived ? "Masquer les événements archivés" : "Afficher les événements archivés"}
+            className={`h-9 px-3 rounded-xl border text-sm transition-colors flex items-center gap-1.5 ${
+              showArchived
+                ? "border-primary/30 bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:bg-muted"
+            }`}>
+            <Archive className="w-3.5 h-3.5" /> {showArchived ? "Archivés affichés" : "Archivés"}
+          </button>
           <button onClick={reload}
             className="h-9 px-3 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors flex items-center gap-1.5">
             <RefreshCw className="w-3.5 h-3.5" />
@@ -1477,6 +1646,13 @@ export default function WebinarsSection() {
                   <Send className="w-3.5 h-3.5" />
                 </button>
                 <button
+                  onClick={() => setInviteEvent(event)}
+                  title="Inviter les anciens participants"
+                  className="w-7 h-7 rounded-lg border border-border text-muted-foreground hover:text-primary hover:bg-primary/10 flex items-center justify-center transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                </button>
+                <button
                   onClick={() => cloneEvent(event)}
                   title="Dupliquer cet événement"
                   disabled={cloningId === event.id}
@@ -1493,9 +1669,26 @@ export default function WebinarsSection() {
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
+                {event.status === "archived" ? (
+                  <button
+                    onClick={() => unarchive(event.id)}
+                    title="Désarchiver (repasse en Fermé)"
+                    className="w-7 h-7 rounded-lg border border-border text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10 flex items-center justify-center transition-colors"
+                  >
+                    <ArchiveRestore className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => archive(event.id)}
+                    title="Archiver (masque l'événement, conserve les inscriptions)"
+                    className="w-7 h-7 rounded-lg border border-border text-muted-foreground hover:text-amber-400 hover:bg-amber-500/10 flex items-center justify-center transition-colors"
+                  >
+                    <Archive className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={() => remove(event.id)}
-                  title="Supprimer"
+                  title="Supprimer définitivement"
                   className="w-7 h-7 rounded-lg border border-border text-muted-foreground hover:text-red-400 hover:bg-red-500/10 flex items-center justify-center transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -1533,6 +1726,11 @@ export default function WebinarsSection() {
           </AnimatePresence>
         </div>
       ))}
+
+      {/* ── Modale invitation des anciens participants ── */}
+      {inviteEvent && (
+        <InvitationModal event={inviteEvent} onClose={() => setInviteEvent(null)} />
+      )}
 
       {/* ── Modale QR code ── */}
       <AnimatePresence>

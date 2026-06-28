@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, Users, Video, ChevronRight, X, Clock, Tag,
@@ -324,6 +324,17 @@ export default function Webinaires() {
   function onSuccess() {
     if (selected) setRegistered(s => new Set([...s, selected.id]));
   }
+
+  // Ouverture automatique d'un événement via l'ancre #<id> (liens d'invitation,
+  // « Copier lien public »). On attend que les événements soient chargés.
+  useEffect(() => {
+    if (loading || !events.length) return;
+    const id = window.location.hash.replace(/^#/, "");
+    if (!id) return;
+    const evt = events.find(e => String(e.id) === id);
+    if (evt) openEvent(evt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, events]);
 
   return (
     <div className="min-h-screen bg-background">

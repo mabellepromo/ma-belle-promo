@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 
 // ── Gestion des événements webinaires (usage dashboard + page publique) ──────
 
-export function useWebinars({ adminMode = false } = {}) {
+export function useWebinars({ adminMode = false, includeArchived = false } = {}) {
   const [events, setEvents]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
@@ -21,6 +21,12 @@ export function useWebinars({ adminMode = false } = {}) {
       query = query.in("status", ["open", "closed"]);
     }
 
+    // L'archivage (soft-delete) passe par status='archived'. Au dashboard, on
+    // masque les archivés par défaut ; la vue « Archivés » passe includeArchived.
+    if (adminMode && !includeArchived) {
+      query = query.neq("status", "archived");
+    }
+
     const { data, error } = await query;
     if (error) {
       console.error("Erreur chargement webinaires :", error.message);
@@ -29,7 +35,7 @@ export function useWebinars({ adminMode = false } = {}) {
       setEvents(data ?? []);
     }
     setLoading(false);
-  }, [adminMode]);
+  }, [adminMode, includeArchived]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -62,19 +68,87 @@ export function useWebinars({ adminMode = false } = {}) {
     }
   }
 
-  async function remove(id) {
-    if (!confirm("Supprimer ce webinaire et toutes ses inscriptions ?")) return;
+  // Archivage (soft-delete) : status='archived'. L'événement disparaît du public
+  // (RLS) et du dashboard courant, mais toutes les inscriptions sont conservées
+  // (RGPD). Réversible via unarchive().
+  async function archive(id) {
     setSaving(true);
     try {
-      const { error } = await supabase.from("webinar_events").delete().eq("id", id);
-      if (error) toast.error("Erreur suppression : " + error.message);
-      else { toast.success("Webinaire supprimé."); await load(); }
+      const { error } = await supabase
+        .from("webinar_events")
+        .update({ status: "archived" })
+        .eq("id", id);
+      if (error) toast.error("Erreur archivage : " + error.message);
+      else { toast.success("Événement archivé."); await load(); }
     } finally {
       setSaving(false);
     }
   }
 
-  return { events, loading, saving, add, update, remove, reload: load };
+  // Désarchivage : on repasse l'événement en « Fermé » (visible au public,
+  // inscriptions closes) — défaut sûr pour un événement généralement passé.
+  async function unarchive(id) {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("webinar_events")
+        .update({ status: "closed" })
+        .eq("id", id);
+      if (error) toast.error("Erreur désarchivage : " + error.message);
+      else { toast.success("Événement restauré (statut : Fermé)."); await load(); }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Suppression DÉFINITIVE (hard-delete) : détruit l'événement et ses
+  // inscriptions en cascade. Action rare et délibérée (doublon, test, droit
+  // à l'effacement RGPD). À réserver à un garde-fou côté UI.
+  async function remove(id) {
+    if (!confirm("SUPPRESSION DÉFINITIVE : l'événement ET toutes ses inscriptions seront effacés et irrécupérables.\n\nPour simplement le retirer du site, utilisez plutôt « Archiver ».\n\nConfirmer la suppression définitive ?")) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("webinar_events").delete().eq("id", id);
+      if (error) toast.error("Erreur suppression : " + error.message);
+      else { toast.success("Événement supprimé définitivement."); await load(); }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return { events, loading, saving, add, update, archive, unarchive, remove, reload: load };
+}
+
+// ── Invitations des anciens participants (Phase 2) ────────────────────────────
+
+// Récupère les inscrits ayant le statut « attended » sur d'autres événements,
+// dédupliqués par email, en excluant l'événement cible et ceux déjà inscrits
+// à cet événement. Renvoie [{ email, nom_complet, telephone, registration_id }].
+export async function getPastAttendees(excludeEventId) {
+  // 1. Tous les participants « présents » sur les autres événements
+  const { data: attendees, error } = await supabase
+    .from("webinar_registrations")
+    .select("id, email, nom_complet, telephone, event_id, registration_date")
+    .eq("status", "attended")
+    .neq("event_id", excludeEventId)
+    .order("registration_date", { ascending: false });
+  if (error) { console.error("Erreur anciens participants :", error.message); return []; }
+
+  // 2. Emails déjà inscrits à l'événement cible (à exclure)
+  const { data: already } = await supabase
+    .from("webinar_registrations")
+    .select("email")
+    .eq("event_id", excludeEventId);
+  const alreadyEmails = new Set((already ?? []).map(r => r.email?.toLowerCase()));
+
+  // 3. Déduplication par email + exclusion des déjà inscrits
+  const seen = new Map();
+  for (const a of attendees ?? []) {
+    const key = a.email?.toLowerCase();
+    if (!key || alreadyEmails.has(key) || seen.has(key)) continue;
+    seen.set(key, { email: a.email, nom_complet: a.nom_complet, telephone: a.telephone, registration_id: a.id });
+  }
+  return [...seen.values()];
 }
 
 // ── Gestion des inscriptions pour un événement donné ─────────────────────────
