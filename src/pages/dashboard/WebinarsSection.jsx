@@ -71,6 +71,7 @@ const EMPTY_EVENT = {
   event_type:           "webinaire",
   status:               "draft",
   gdpr_consent_required: true,
+  presentiel_complet:   false,
   affiche:              "",
   intervenants:         [],
   documents:            [],
@@ -1121,6 +1122,18 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
             Consentement RGPD obligatoire
           </label>
         </div>
+
+        {/* Places présentiel complètes — uniquement présentiel / hybride */}
+        {hasPhysical && (
+          <div className="flex items-center gap-2 mt-1 sm:col-span-2">
+            <input type="checkbox" id="presentiel_complet_cb" checked={form.presentiel_complet}
+              onChange={e => set("presentiel_complet", e.target.checked)}
+              className="w-4 h-4 rounded border-border accent-primary" />
+            <label htmlFor="presentiel_complet_cb" className="text-xs font-medium text-foreground cursor-pointer">
+              Places en présentiel complètes (désactive l'inscription sur place sur la page publique)
+            </label>
+          </div>
+        )}
       </div>
 
       {/* ── Affiche / bannière ── */}

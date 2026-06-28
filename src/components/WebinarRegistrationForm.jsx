@@ -295,28 +295,52 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
             Comment souhaitez-vous participer ? <span className="text-red-500">*</span>
           </label>
           <div className="grid sm:grid-cols-3 gap-2">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Les places en présentiel sont complètes"
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-muted/40 text-left opacity-60 cursor-not-allowed"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-muted-foreground leading-tight">En présentiel</p>
-                  <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
-                    Complet
-                  </span>
+            {event.presentiel_complet ? (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Les places en présentiel sont complètes"
+                className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-muted/40 text-left opacity-60 cursor-not-allowed"
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
-                  {event.lieu || "Sur place"}
-                </p>
-              </div>
-            </button>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold text-muted-foreground leading-tight">En présentiel</p>
+                    <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
+                      Complet
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                    {event.lieu || "Sur place"}
+                  </p>
+                </div>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => set("mode_participation", "presentiel")}
+                className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                  form.mode_participation === "presentiel"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                    : "border-border hover:border-primary/40 hover:bg-muted/40"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  form.mode_participation === "presentiel" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                }`}>
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">En présentiel</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                    {event.lieu || "Sur place"}
+                  </p>
+                </div>
+              </button>
+            )}
 
             <button
               type="button"
@@ -340,28 +364,52 @@ export default function WebinarRegistrationForm({ event, onSuccess }) {
               </div>
             </button>
 
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Les places en présentiel sont complètes"
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-muted/40 text-left opacity-60 cursor-not-allowed"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground">
-                <Users className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-muted-foreground leading-tight">Présentiel + En ligne</p>
-                  <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
-                    Complet
-                  </span>
+            {event.presentiel_complet ? (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Les places en présentiel sont complètes"
+                className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-muted/40 text-left opacity-60 cursor-not-allowed"
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground">
+                  <Users className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
-                  Vous recevrez le billet QR <em>et</em> le lien de connexion
-                </p>
-              </div>
-            </button>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold text-muted-foreground leading-tight">Présentiel + En ligne</p>
+                    <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
+                      Complet
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                    Vous recevrez le billet QR <em>et</em> le lien de connexion
+                  </p>
+                </div>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => set("mode_participation", "mixte")}
+                className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                  form.mode_participation === "mixte"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                    : "border-border hover:border-primary/40 hover:bg-muted/40"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  form.mode_participation === "mixte" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                }`}>
+                  <Users className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">Présentiel + En ligne</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+                    Vous recevrez le billet QR <em>et</em> le lien de connexion
+                  </p>
+                </div>
+              </button>
+            )}
           </div>
         </div>
       )}
