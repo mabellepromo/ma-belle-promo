@@ -21,7 +21,12 @@ const STATUS_COLOR = {
   closed:   "bg-amber-500/15 text-amber-400",
   archived: "bg-muted/50 text-muted-foreground opacity-60",
 };
-const TYPE_LABEL = { webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion" };
+const TYPE_LABEL = {
+  webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion",
+  conference: "Conférence", formation: "Formation",
+  assemblee_generale: "Assemblée générale", table_ronde: "Table ronde",
+  seminaire: "Séminaire", ceremonie: "Cérémonie",
+};
 
 const FORMAT_LABEL = {
   en_ligne:   "En ligne",
@@ -1024,6 +1029,12 @@ function EventForm({ initial = EMPTY_EVENT, onSave, onCancel, saving }) {
             <option value="webinaire">Webinaire</option>
             <option value="atelier">Atelier</option>
             <option value="reunion">Réunion</option>
+            <option value="conference">Conférence</option>
+            <option value="formation">Formation</option>
+            <option value="assemblee_generale">Assemblée générale</option>
+            <option value="table_ronde">Table ronde</option>
+            <option value="seminaire">Séminaire</option>
+            <option value="ceremonie">Cérémonie</option>
           </select>
         </Field>
 

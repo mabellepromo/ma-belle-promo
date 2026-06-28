@@ -7,11 +7,22 @@ import {
 import { useWebinars } from "@/hooks/useWebinars";
 import WebinarRegistrationForm from "@/components/WebinarRegistrationForm";
 
-const EVENT_TYPE_LABEL = { webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion" };
+const EVENT_TYPE_LABEL = {
+  webinaire: "Webinaire", atelier: "Atelier", reunion: "Réunion",
+  conference: "Conférence", formation: "Formation",
+  assemblee_generale: "Assemblée générale", table_ronde: "Table ronde",
+  seminaire: "Séminaire", ceremonie: "Cérémonie",
+};
 const EVENT_TYPE_COLOR = {
-  webinaire: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  atelier:   "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-  reunion:   "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  webinaire:          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  atelier:            "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
+  reunion:            "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  conference:         "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  formation:          "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+  assemblee_generale: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
+  table_ronde:        "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+  seminaire:          "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
+  ceremonie:          "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
 };
 
 const FORMAT_LABEL = { en_ligne: "En ligne", presentiel: "Présentiel", hybride: "Hybride" };
