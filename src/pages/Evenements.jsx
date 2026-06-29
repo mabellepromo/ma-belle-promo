@@ -297,7 +297,17 @@ export default function Evenements() {
   const aVenir  = liste.filter(e => !isPastEvent(e));
   const passes  = liste.filter(e =>  isPastEvent(e));
   const filtres = filtre === "Tous" ? passes : passes.filter(e => e.type === filtre);
-  const numbered = filtres.map((e, i) => ({ ...e, num: i + 1 }));
+  // Tri par date décroissante : l'édition passée la plus récente en premier
+  // (= grande carte hero). Les dates illisibles sont reléguées en fin de liste.
+  const sorted = [...filtres].sort((a, b) => {
+    const da = parseEventDate(a.date);
+    const db = parseEventDate(b.date);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return db - da;
+  });
+  const numbered = sorted.map((e, i) => ({ ...e, num: i + 1 }));
 
   const [hero, ...rest] = numbered;
 
