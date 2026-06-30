@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, Printer, Loader2, AlertTriangle, CheckCircle2, Minimize2 } from "lucide-react";
+import { ChevronLeft, Printer, Loader2, AlertTriangle, CheckCircle2, Minimize2, Mail } from "lucide-react";
 import { inp, Field } from "./shared";
+import { buildCourrierEmail } from "@/lib/courrierEmail";
+import { openDoc } from "@/lib/documentGenerators";
 
 const TEMPLATES = [
   {
@@ -666,6 +668,15 @@ export default function CourrierSection() {
     return () => { cancelled = true; clearTimeout(timer); };
   }, [form.corps, form.appel, form.politesse, form.dest, form.sigNom, form.sigTitre, template, compact, step]);
 
+  // Aperçu de la version COURRIEL (email HTML) du courrier, dans l'overlay
+  // unifié. Indépendant de la génération papier/PDF ci-dessous (intacte).
+  function previewEmail() {
+    if (!form.objet.trim()) { toast.error("L'objet du courrier est obligatoire."); return; }
+    if (!form.corps.trim()) { toast.error("Le corps du message est obligatoire."); return; }
+    const html = buildCourrierEmail({ modelId: template.id, form });
+    openDoc(html, `courrier-email-${template.id}.html`, { allowAttach: false });
+  }
+
   async function generate() {
     if (!form.objet.trim()) { toast.error("L'objet du courrier est obligatoire."); return; }
     if (!form.corps.trim()) { toast.error("Le corps du message est obligatoire."); return; }
@@ -931,6 +942,17 @@ export default function CourrierSection() {
             </button>
             <p className="text-xs text-muted-foreground text-center -mt-2">
               S'ouvre dans un nouvel onglet · Ctrl+P pour exporter en PDF
+            </p>
+
+            {/* Aperçu version courriel (email HTML) — n'affecte pas l'impression */}
+            <button
+              onClick={previewEmail}
+              className="w-full flex items-center justify-center gap-2 px-5 py-2.5 border border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-semibold rounded-xl hover:bg-blue-500/20 transition-colors"
+            >
+              <Mail className="w-4 h-4" /> Aperçu version courriel
+            </button>
+            <p className="text-xs text-muted-foreground text-center -mt-2">
+              Rendu email du même courrier · l'envoi par email viendra ensuite
             </p>
 
           </div>
