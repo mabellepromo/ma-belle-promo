@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, Clock, ChevronRight } from "lucide-react";
 import { useArticles } from "../hooks/useArticles";
 import { useEvenements } from "../hooks/useEvenements";
+import { parseEventDate, isPastEvent } from "../lib/eventDate";
 
 const PLAN_IMAGE = "/Galeries/Reunion 18.05.2019/180519mbp-groupe1.webp";
 
@@ -78,8 +79,17 @@ function ArticleCard({ article, i }) {
 export default function ActualitesSection() {
   const { articles } = useArticles();
   const { evenements } = useEvenements();
+  // Événements à venir (date non dépassée), du plus proche au plus lointain
   const prochains = evenements
-    .filter(e => e.statut?.toLowerCase() !== "passé")
+    .filter(e => !isPastEvent(e))
+    .map(e => ({ e, d: parseEventDate(e.date) }))
+    .sort((a, b) => {
+      if (!a.d && !b.d) return 0;
+      if (!a.d) return 1;
+      if (!b.d) return -1;
+      return a.d - b.d;
+    })
+    .map(x => x.e)
     .slice(0, 3);
 
   return (

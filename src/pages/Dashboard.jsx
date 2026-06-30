@@ -418,9 +418,9 @@ export default function Dashboard() {
   const agendaCombine = useMemo(() => {
     const now = new Date(); now.setHours(0, 0, 0, 0);
     const items = [];
-    (evenements ?? []).filter(e => e.statut?.toLowerCase() !== "passé").forEach(e => {
-      let joursAvant = null;
-      try { const d = new Date(e.date); if (!isNaN(d)) joursAvant = Math.ceil((d - now) / 86400000); } catch {}
+    (evenements ?? []).filter(e => !isPastEvent(e)).forEach(e => {
+      const d = parseEventDate(e.date);
+      const joursAvant = d ? Math.ceil((d - now) / 86400000) : null;
       items.push({ type: "event", titre: e.titre, dateStr: e.date, lieu: e.lieu ?? null, joursAvant });
     });
     prochainsAnniversaires.forEach(m => {
