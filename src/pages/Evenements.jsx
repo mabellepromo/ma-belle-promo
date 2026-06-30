@@ -7,6 +7,7 @@ import { Calendar, MapPin, Clock, ArrowRight, ChevronRight } from "lucide-react"
 import TiltCard from "../components/TiltCard";
 import { useEvenements } from "../hooks/useEvenements";
 import { useArticles } from "../hooks/useArticles";
+import { parseEventDate, isPastEvent } from "../lib/eventDate";
 
 const mdComponents = {
   p:      ({ children }) => <p className="text-muted-foreground text-sm leading-relaxed mb-3 last:mb-0">{children}</p>,
@@ -232,35 +233,6 @@ function UpcomingCard({ evt }) {
       </div>
     </motion.div>
   );
-}
-
-// Mois français → index (0-11), avec et sans accents
-const MONTHS_FR = {
-  janvier: 0, février: 1, fevrier: 1, mars: 2, avril: 3, mai: 4, juin: 5,
-  juillet: 6, août: 7, aout: 7, septembre: 8, octobre: 9, novembre: 10,
-  décembre: 11, decembre: 11,
-};
-
-// Tente de lire une date texte « 26 Juin 2026 » → objet Date (à minuit), ou null
-function parseEventDate(str) {
-  if (!str) return null;
-  const m = String(str).trim().toLowerCase().match(/(\d{1,2})\s+([a-zà-ÿ]+)\s+(\d{4})/);
-  if (!m) return null;
-  const month = MONTHS_FR[m[2]];
-  if (month === undefined) return null;
-  return new Date(Number(m[3]), month, Number(m[1]));
-}
-
-// Un événement est « passé » si son statut est explicitement « passé » (forçage
-// manuel) OU si sa date est antérieure à aujourd'hui. Le jour même reste « à venir ».
-// Une date non interprétable conserve le comportement manuel (repli sur le statut).
-function isPastEvent(evt) {
-  if (evt.statut?.toLowerCase() === "passé") return true;
-  const d = parseEventDate(evt.date);
-  if (!d) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
 }
 
 export default function Evenements() {

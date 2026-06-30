@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { genererAttestation } from "../lib/documentGenerators";
 import { useMemberStore } from "../lib/memberStore";
 import { supabase } from "../lib/supabase";
+import { parseEventDate, isPastEvent } from "../lib/eventDate";
 import { motion } from "framer-motion";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLocalAuth } from "../lib/LocalAuth";
@@ -297,10 +298,20 @@ export default function Dashboard() {
     return { payes, total, taux: effectif > 0 ? Math.round((payes / effectif) * 100) : 0 };
   }, [allMembers, cotisationsAnnee]);
 
-  const prochainEvenement = useMemo(() =>
-    evenements.filter(e => e.statut?.toLowerCase() !== "passé")[0] ?? null,
-    [evenements]
-  );
+  // Prochain événement : le plus proche À VENIR (date non dépassée), pas le
+  // premier de la liste. Bascule automatiquement quand sa date est passée.
+  const prochainEvenement = useMemo(() => {
+    const upcoming = evenements
+      .filter(e => !isPastEvent(e))
+      .map(e => ({ e, d: parseEventDate(e.date) }))
+      .sort((a, b) => {
+        if (!a.d && !b.d) return 0;
+        if (!a.d) return 1;
+        if (!b.d) return -1;
+        return a.d - b.d; // le plus proche en premier
+      });
+    return upcoming[0]?.e ?? null;
+  }, [evenements]);
 
   const prochainsAnniversaires = useMemo(() => {
     const MOIS_FR = {
