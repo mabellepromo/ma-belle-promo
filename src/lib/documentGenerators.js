@@ -2127,6 +2127,162 @@ export function genererListePresentiel(event, registrations) {
   openDoc(html, `Liste-Presentiel-MBP-${slug}.html`);
 }
 
+// ── Liste des inscrits en ligne ──────────────────────────────────────────────
+// Variante de genererListePresentiel pour les participants en ligne.
+// Pas de colonne « Signature » (aucun émargement physique) : on affiche
+// l'email à la place, donnée utile pour le suivi des connexions à distance.
+export function genererListeEnLigne(event, registrations) {
+  const ref = refNumber("ENLN", String(event?.id ?? "").slice(0, 6).toUpperCase() || "MBP");
+
+  const FORMAT_LABEL = { en_ligne: "En ligne", presentiel: "Présentiel", hybride: "Hybride" };
+
+  const dateEvt = event?.date_time
+    ? new Date(event.date_time).toLocaleDateString("fr-FR", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric",
+        hour: "2-digit", minute: "2-digit",
+      })
+    : "Date à préciser";
+
+  // Filtre : inscrits non désinscrits qui participeront en ligne.
+  const candidats = (registrations ?? []).filter(r => {
+    if (r.status === "unregistered" || r.status === "cancelled") return false;
+    if (event?.format === "hybride") return r.mode_participation === "en_ligne" || r.mode_participation === "mixte";
+    return true; // en ligne pur : tout le monde est à distance
+  });
+
+  // Tri alphabétique sur le nom (locale française)
+  candidats.sort((a, b) => (a.nom_complet || "").localeCompare(b.nom_complet || "", "fr"));
+
+  const lignes = candidats.map((r, i) => `
+    <tr>
+      <td class="c-num">${i + 1}</td>
+      <td class="c-nom">${r.nom_complet || "—"}</td>
+      <td class="c-sec">${r.email || "—"}</td>
+      <td class="c-sec">${r.profession || "—"}</td>
+      <td class="c-sec">${r.telephone || "—"}</td>
+    </tr>`).join("");
+
+  const corps = candidats.length
+    ? lignes
+    : `<tr><td colspan="5" style="padding:18px;text-align:center;color:#94a3b8;font-size:9pt;">
+         Aucun inscrit en ligne pour le moment.
+       </td></tr>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liste en ligne — ${event?.title || "Événement"}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700&display=swap');
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page { size:A4 portrait; margin:14mm 12mm; }
+    body { font-family:'Lato',sans-serif; background:#f0f0f0; color:#1a1a1a; padding:20px 0 40px; }
+    @media print { body { background:#fff; padding:0; } .no-print { display:none!important; } }
+    .sheet { width:210mm; margin:0 auto; background:#fff; padding:0 0 10px; }
+    @media print { .sheet { width:100%; } }
+
+    .header { background:linear-gradient(135deg,#0a3d28,#1a7a4e); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+    .header .asso-name { font-family:'Cormorant Garamond',serif; font-size:14pt; font-weight:700; color:#fff; line-height:1.2; }
+    .header .asso-sub { font-size:8pt; color:rgba(255,255,255,0.65); }
+    .gold-bar { height:3px; background:linear-gradient(to right,#b8861a,#e6b84a,#b8861a); }
+
+    .body { padding:18px 24px 0; }
+    .title-block { text-align:center; padding-bottom:14px; border-bottom:1px solid #e2e8f0; margin-bottom:14px; }
+    .title { font-family:'Cormorant Garamond',serif; font-size:19pt; font-weight:700; color:#0a3d28; text-transform:uppercase; letter-spacing:0.03em; }
+    .subtitle { font-size:10pt; color:#334155; margin-top:4px; font-weight:700; }
+    .doc-ref { font-size:7.5pt; color:#999; letter-spacing:0.06em; margin-top:4px; }
+
+    .info-bar { display:flex; flex-wrap:wrap; gap:8px 20px; background:#f7faf8; border:1px solid #c8ddd2; border-radius:8px; padding:10px 16px; margin-bottom:14px; }
+    .info-item { font-size:8.5pt; color:#334155; }
+    .info-item strong { color:#0a3d28; font-weight:700; text-transform:uppercase; font-size:7pt; letter-spacing:0.08em; display:block; margin-bottom:1px; }
+    .badge-count { margin-left:auto; background:#0a3d28; color:#e6b84a; font-weight:700; font-size:9pt; padding:5px 12px; border-radius:99px; align-self:center; }
+
+    table { width:100%; border-collapse:collapse; }
+    thead { display:table-header-group; }
+    thead th { background:#0a3d28; color:#fff; font-size:8pt; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:8px 10px; text-align:left; }
+    tbody tr { break-inside:avoid; }
+    tbody tr:nth-child(even) { background:#f8fafc; }
+    tbody td { padding:9px 10px; font-size:9pt; border-bottom:1px solid #e2e8f0; vertical-align:middle; }
+    .c-num { width:30px; color:#94a3b8; text-align:center; }
+    .c-nom { font-weight:700; color:#0f172a; }
+    .c-sec { color:#475569; }
+
+    .footer { display:flex; justify-content:space-between; align-items:flex-end; margin:18px 24px 0; padding-top:10px; border-top:1px solid #e2e8f0; }
+    .footer-text { font-size:7.5pt; color:#94a3b8; line-height:1.5; }
+    .sig-org { text-align:right; }
+    .sig-org .sig-line { width:55mm; border-bottom:1px solid #cbd5e1; height:34px; margin-left:auto; }
+    .sig-org .sig-label { font-size:7.5pt; color:#64748b; margin-top:4px; }
+
+    .print-btn { position:fixed; bottom:24px; right:24px; background:#0a3d28; color:#fff; border:none; border-radius:50px; padding:12px 24px; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(10,61,40,.4); z-index:999; }
+  </style>
+</head>
+<body>
+  <button class="no-print print-btn" type="button">🖨 Imprimer / Enregistrer PDF</button>
+
+  <div class="sheet">
+
+    <div class="header">
+      <img src="/Logo%20Redesign1.png" alt="MBP" style="height:40px;width:auto;" onerror="this.style.display='none'" />
+      <div style="text-align:right;">
+        <p class="asso-name">L'association Ma Belle Promo (MBP)</p>
+        <p class="asso-sub">Faculté de Droit — Université de Lomé · Promotion 1994–2000</p>
+      </div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="body">
+
+      <div class="title-block">
+        <div class="title">Liste des inscrits — En ligne</div>
+        <div class="subtitle">${event?.title || "Événement"}</div>
+        <div class="doc-ref">Réf. ${ref} · Liste générée le ${today()}</div>
+      </div>
+
+      <div class="info-bar">
+        <div class="info-item"><strong>Date</strong>${dateEvt}</div>
+        <div class="info-item"><strong>Format</strong>${FORMAT_LABEL[event?.format] || "En ligne"}</div>
+        <span class="badge-count">${candidats.length} inscrit${candidats.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      <div style="border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th class="c-num" style="text-align:center;">#</th>
+              <th>Nom complet</th>
+              <th>Email</th>
+              <th>Profession</th>
+              <th>Téléphone</th>
+            </tr>
+          </thead>
+          <tbody>${corps}</tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div class="footer-text">
+        L'association Ma Belle Promo (MBP) · www.mabellepromo.org<br/>
+        Document interne · Réf. ${ref} · Généré le ${today()}
+      </div>
+      <div class="sig-org">
+        <div class="sig-line"></div>
+        <div class="sig-label">Liste arrêtée le ____ / ____ / ________ — Signature du responsable</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  const slug = (event?.title || "evenement").replace(/\s+/g, "-").toLowerCase().slice(0, 40);
+  openDoc(html, `Liste-En-Ligne-MBP-${slug}.html`);
+}
+
 // ── Facture ──────────────────────────────────────────────────────────────────
 export function genererFacture(facture) {
   const {

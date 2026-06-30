@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import QRCodeLib from "qrcode";
 import { useWebinars, useWebinarRegistrations, getPastAttendees } from "@/hooks/useWebinars";
-import { genererListePresentiel } from "@/lib/documentGenerators";
+import { genererListePresentiel, genererListeEnLigne } from "@/lib/documentGenerators";
 import { supabase, uploadImage, uploadFile } from "@/lib/supabase";
 import { inp, sel, Field } from "./shared";
 import RichEditor from "@/components/RichEditor";
@@ -139,6 +139,21 @@ function RegistrationsList({ event }) {
       return;
     }
     genererListePresentiel(event, registrations);
+  }
+
+  // Génère la liste PDF des inscrits en ligne.
+  // Disponible pour les événements en ligne ou hybride.
+  function exportEnLignePDF() {
+    const candidats = registrations.filter(r => {
+      if (r.status === "unregistered" || r.status === "cancelled") return false;
+      if (event.format === "hybride") return r.mode_participation === "en_ligne" || r.mode_participation === "mixte";
+      return true; // en ligne pur
+    });
+    if (!candidats.length) {
+      toast("Aucun inscrit en ligne à exporter.");
+      return;
+    }
+    genererListeEnLigne(event, registrations);
   }
 
   // Le mode présentiel n'existe que pour les formats « presentiel » et « hybride »
@@ -403,6 +418,13 @@ function RegistrationsList({ event }) {
             title="Feuille d'émargement des participants sur place"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors">
             <MapPin className="w-3.5 h-3.5" /> Liste présentiel (PDF)
+          </button>
+        )}
+        {hasOnline && (
+          <button onClick={exportEnLignePDF}
+            title="Liste des participants inscrits en ligne"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+            <Video className="w-3.5 h-3.5" /> Liste en ligne (PDF)
           </button>
         )}
         {hasOnline && (
