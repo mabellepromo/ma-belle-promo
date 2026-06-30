@@ -5,6 +5,7 @@ import { supabase, uploadImage, uploadVideo } from "@/lib/supabase";
 const RichEditor = lazy(() => import("../../components/RichEditor.jsx"));
 import { useArticles, formatDateFr } from "../../hooks/useArticles";
 import { useEvenements } from "../../hooks/useEvenements";
+import { isPastEvent } from "../../lib/eventDate";
 import { useProjets } from "../../hooks/useProjets";
 import { useEquipe } from "../../hooks/useEquipe";
 import { useCommuniques } from "../../hooks/useCommuniques";
@@ -386,9 +387,21 @@ export function EvenementsSection() {
               <div className="p-4 flex-1">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <p className="font-bold text-foreground line-clamp-2 leading-snug">{e.titre}</p>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    e.statut === "À venir" ? "bg-emerald-500/15 text-emerald-400" : e.statut === "En cours" ? "bg-blue-500/15 text-blue-400" : "bg-muted text-muted-foreground"
-                  }`}>{e.statut}</span>
+                  {(() => {
+                    // Statut effectif : si la date est dépassée, on affiche « Passé »
+                    // (cohérent avec la page publique), même si le champ statut dit
+                    // encore « À venir ». L'admin peut toujours forcer via le formulaire.
+                    const passe = isPastEvent(e);
+                    const label = passe ? "Passé" : e.statut;
+                    const color = passe
+                      ? "bg-muted text-muted-foreground"
+                      : e.statut === "À venir" ? "bg-emerald-500/15 text-emerald-400"
+                      : e.statut === "En cours" ? "bg-blue-500/15 text-blue-400"
+                      : "bg-muted text-muted-foreground";
+                    return (
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${color}`}>{label}</span>
+                    );
+                  })()}
                 </div>
                 <p className="text-sm text-muted-foreground">{e.date}{e.heures ? ` · ${e.heures}` : ""} · {e.lieu}</p>
               </div>
