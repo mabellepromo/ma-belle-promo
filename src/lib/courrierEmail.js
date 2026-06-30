@@ -24,7 +24,11 @@ const C = {
   muted:     "#6b7280",
 };
 
-const LOGO = "/Logo%20Redesign1.png"; // réécrit en URL absolue par openDoc (aperçu) ou côté envoi
+// Origine absolue (aperçu navigateur ET envoi email) — les clients mail
+// exigent des URL absolues pour les images.
+const ORIGIN = typeof window !== "undefined" ? window.location.origin : "https://www.mabellepromo.org";
+const LOGO = `${ORIGIN}/Logo%20Redesign1.png`;
+const STAMP = `${ORIGIN}/images/FDD.webp`; // cachet de la Présidente
 
 function esc(s) {
   if (typeof s !== "string") return "";
@@ -192,11 +196,13 @@ export function buildCourrierEmail({ modelId = "v6", form = {} }) {
 
     ${form.politesse ? `<p style="${pStyle}margin-top:18px;">${esc(form.politesse)}</p>` : ""}
 
-    <!-- Signature -->
+    <!-- Signature + cachet de la Présidente -->
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:26px;">
       <tr><td style="text-align:right;">
-        ${form.sigNom ? `<div style="font-size:14px;font-weight:bold;color:${C.ink};">${esc(form.sigNom)}</div>` : ""}
-        ${form.sigTitre ? `<div style="font-size:12px;color:${C.green};font-weight:600;margin-top:2px;">${esc(form.sigTitre)}</div>` : ""}
+        ${form.sigTitre ? `<div style="font-size:12px;color:${C.green};font-weight:600;">${esc(form.sigTitre)}</div>` : ""}
+        ${form.sigNom ? `<div style="font-size:14px;font-weight:bold;color:${C.ink};margin-top:2px;">${esc(form.sigNom)}</div>` : ""}
+        <img src="${STAMP}" alt="Cachet de la Présidente" width="100"
+          style="display:inline-block;width:100px;height:auto;margin-top:6px;opacity:0.92;" />
       </td></tr>
     </table>`;
 
