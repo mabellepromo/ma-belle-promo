@@ -1011,7 +1011,7 @@ export default function CourrierSection() {
               Envoyer par email
             </button>
             <p className="text-xs text-muted-foreground text-center -mt-2">
-              Envoie le courrier au format email · pièce jointe PDF à venir
+              Envoie le courrier au format email (mise en forme HTML)
             </p>
 
           </div>
