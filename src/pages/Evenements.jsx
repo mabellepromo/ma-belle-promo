@@ -27,8 +27,6 @@ const TYPE_STYLE = {
 
 const TYPES = ["Tous", "Webinaire", "Conférence", "Gala", "Projet éditorial"];
 
-const SESSION_ID = "session-de-partage-sur-le-nouvequ-code-du-travail-1776658409803";
-
 function TypeBadge({ type }) {
   const s = TYPE_STYLE[type] || TYPE_STYLE["Événement"];
   return (
@@ -241,29 +239,12 @@ export default function Evenements() {
   const [filtre, setFiltre] = useState("Tous");
 
   const liste = useMemo(() => {
-    const fromEvenements = evenements
-      .filter(e => String(e.id) !== "1")
-      .map((evt) => {
-        const articleId = evt.articleId || evt.articleid;
-        const article = articleId ? articles.find(a => a.id === articleId) : null;
-        return { ...evt, article, image: article?.image || evt.image };
-      });
-
-    const artSession = articles.find(a => a.id === SESSION_ID);
-    const sessionCard = artSession ? [{
-      id: artSession.id,
-      titre: artSession.titre,
-      date: artSession.date,
-      heures: "",
-      lieu: "",
-      type: artSession.categorie || "Événement",
-      statut: "Passé",
-      description: artSession.extrait,
-      image: artSession.image,
-      article: artSession,
-    }] : [];
-
-    return [...sessionCard, ...fromEvenements];
+    // Source unique : la table evenements (gérée depuis le dashboard).
+    return evenements.map((evt) => {
+      const articleId = evt.articleId || evt.articleid;
+      const article = articleId ? articles.find(a => a.id === articleId) : null;
+      return { ...evt, article, image: article?.image || evt.image };
+    });
   }, [evenements, articles]);
 
   const aVenir  = liste.filter(e => !isPastEvent(e));
