@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête (Version Créative)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-fonce:  hsl(150, 28%,  8%);
+      --vert-mid:    hsl(150, 28%, 16%);
+      --dore:        hsl(38,  70%, 55%);
+      --dore-clair:  hsl(38,  80%, 75%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #664d03;
+      max-width: 794px;
+      width: 100%;
+    }
+    .print-hint strong { font-weight: 600; }
+    @media print { .print-hint { display: none; } }
+
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+    
+    @page { margin: 0; }
+    @media print {
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       EN-TÊTE — Version Créative / Colorée
+       Concept : dégradé vert foncé + motif géométrique
+                 + logo centré + séquence décorative
+       ══════════════════════════════════════════════════ */
+
+    .header {
+      background: linear-gradient(135deg, var(--vert-fonce) 0%, var(--vert-mid) 40%, var(--vert-foret) 100%);
+      padding: 32px 48px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Motif géométrique en fond — cercles discrets */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 32px solid rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 20px;
+      right: 80px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 20px solid rgba(255,255,255,0.03);
+      pointer-events: none;
+    }
+
+    /* Ligne de top — logo + nom + méta */
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* LOGO — cercle blanc semi-transparent */
+    .header-logo {
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      border: 3px solid var(--dore-clair);
+    }
+    .header-logo img {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+    }
+
+    .header-text {
+      flex: 1;
+    }
+
+    .header-promo-tag {
+      display: inline-block;
+      background: var(--dore);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .header-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .header-name em {
+      font-style: italic;
+      color: var(--dore-clair);
+    }
+
+    .header-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      margin-top: 6px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    /* Méta (date / ref) en haut à droite */
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .meta-label {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--dore-clair);
+    }
+
+    .meta-value {
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+      outline: none;
+      text-align: right;
+      background: transparent;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      min-width: 80px;
+      padding: 1px 4px;
+    }
+    .meta-value:focus {
+      background: rgba(255,255,255,0.08);
+      border-bottom-color: var(--dore-clair);
+    }
+
+    /* Barre décorative en bas du header */
+    .header-bottom-bar {
+      display: flex;
+      height: 8px;
+      margin-top: 24px;
+    }
+    .bar-seg-1 { flex: 3; background: var(--dore); }
+    .bar-seg-2 { flex: 1; background: var(--dore-clair); }
+    .bar-seg-3 { flex: 6; background: rgba(255,255,255,0.12); }
+
+    /* ── Zone objet pleine largeur ── */
+    .objet-zone {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .objet-accent {
+      width: 4px;
+      background: var(--dore);
+      flex-shrink: 0;
+    }
+
+    .objet-inner {
+      flex: 1;
+      padding: 12px 24px;
+      background: var(--fond-sauge);
+      border-bottom: 1px solid var(--bordure);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .objet-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--vert-foret);
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border: 1.5px solid var(--vert-foret);
+      border-radius: 20px;
+    }
+
+    .editable-objet {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      background: transparent;
+    }
+    .editable-objet:focus { background: rgba(255,255,255,0.5); border-radius: 3px; }
+
+    /* ── Corps ── */
+    .body {
+      padding: 32px 20mm 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Ligne destinataire + date à gauche */
+    .dest-date-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+    }
+
+    .dest-bloc {
+      flex: 1;
+      max-width: 280px;
+    }
+
+    .dest-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+      margin-bottom: 6px;
+    }
+
+    .editable-dest {
+      display: block;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      padding: 10px 14px;
+      background: var(--fond-sauge);
+      border-radius: 8px;
+      border-left: 3px solid var(--dore);
+      min-height: 80px;
+    }
+    .editable-dest:focus { background: #fff; border-left-color: var(--vert-foret); }
+
+    .ville-date {
+      text-align: right;
+      min-width: 180px;
+    }
+
+    .ville-date-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+      margin-bottom: 4px;
+    }
+
+    .editable-ville-date {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 2px 4px;
+    }
+    .editable-ville-date:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Filet décoratif */
+    .separator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sep-line { flex: 1; height: 1px; background: var(--bordure); }
+    .sep-ornement {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      color: var(--dore);
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* Formule d'appel */
+    .formule-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Corps lettre */
+    .corps-lettre {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-size: 13.5px;
+      line-height: 1.78;
+      color: var(--texte);
+      text-align: justify;
+      outline: none;
+      min-height: 260px;
+      padding: 2px 4px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    /* Closing */
+    .closing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14.5px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 48px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .signature-bloc {
+      min-width: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      align-self: flex-end;
+    }
+
+    .sig-function {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--vert-foret);
+      margin-bottom: 24px;
+      padding: 4px 10px;
+      border: 1.5px solid var(--vert-foret);
+      border-radius: 20px;
+    }
+
+    .sig-line {
+      width: 100%;
+      height: 1px;
+      background: var(--bordure);
+      margin-bottom: 6px;
+    }
+
+    .editable-sig-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .editable-sig-titre {
+      font-size: 11px;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — créatif : fond vert foncé ══ */
+    .footer {
+      background: var(--vert-fonce);
+      padding: 0;
+    }
+    /* INJECT_CSS force le fond blanc des footers (footer.footer) ; on restaure
+       le fond vert foncé de ce modèle avec une règle plus spécifique, sinon le
+       texte blanc devient blanc sur blanc → illisible. (Eric, 13 juin 2026) */
+    .page-footer .footer {
+      background: var(--vert-fonce) !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .footer-top-bar {
+      display: flex;
+      height: 4px;
+    }
+    .ftb-1 { flex: 1; background: var(--dore); }
+    .ftb-2 { flex: 2; background: var(--vert-foret); }
+    .ftb-3 { flex: 1; background: var(--dore-clair); }
+
+    .footer-inner {
+      padding: 14px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-brand {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-item {
+      font-size: 10px;
+      /* Contraste rehaussé sur fond foncé : 60% -> 85% (Eric, 13 juin 2026) */
+      color: rgba(255,255,255,0.85);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .footer-sep {
+      color: var(--dore);
+      font-size: 10px;
+    }
+
+    /* Focus common */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.18);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  VERSION 3 — Créative / Colorée                    -->
+  <!--  Dégradé vert foncé · cercles géométriques         -->
+  <!--  · barre dorée · pied de page sombre               -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+  <div class="page-header"><div class="page-cell">
+    <!-- EN-TÊTE CRÉATIF -->
+    <header class="header">
+      <div class="header-top">
+
+        <!-- LOGO — chemin relatif depuis docs/ -->
+        <div class="header-logo">
+          <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+        </div>
+
+        <div class="header-text">
+          <div class="header-promo-tag">Promotion 1994 – 2000</div>
+          <div class="header-name">Ma <em>Belle</em> Promo</div>
+          <div class="header-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994 – 2000</div>
+        </div>
+
+        <div class="header-meta">
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+          </div>
+          <div class="meta-item" style="margin-top:6px">
+            <span class="meta-label">Référence</span>
+            <span class="meta-value" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barre décorative bas d'en-tête -->
+      <div class="header-bottom-bar">
+        <div class="bar-seg-1"></div>
+        <div class="bar-seg-2"></div>
+        <div class="bar-seg-3"></div>
+      </div>
+    </header>
+
+    <!-- ZONE OBJET -->
+    <div class="objet-zone">
+      <div class="objet-accent"></div>
+      <div class="objet-inner">
+        <span class="objet-label">Objet</span>
+        <span
+          class="editable-objet"
+          contenteditable="true"
+          data-placeholder="Saisissez l'objet du courrier"
+        >Objet du courrier</span>
+      </div>
+    </div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire + ville/date -->
+      <div class="dest-date-row">
+
+        <div class="dest-bloc">
+          <div class="dest-label">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction&#10;Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction<br>Organisation<br>Adresse</div>
+        </div>
+
+        <div class="ville-date">
+          <div class="ville-date-label">Lieu et date</div>
+          <span
+            class="editable-ville-date"
+            contenteditable="true"
+            data-placeholder="Lomé, le jj mois aaaa"
+          >Lomé, le 19 mai 2026</span>
+        </div>
+
+      </div>
+
+      <!-- Séparateur ornemental -->
+      <div class="separator">
+        <div class="sep-line"></div>
+        <div class="sep-ornement">✦</div>
+        <div class="sep-line"></div>
+      </div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps de la lettre -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="signature-bloc">
+          <div class="sig-function">La Présidente</div>
+          <div class="sig-line"></div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-top-bar">
+        <div class="ftb-1"></div>
+        <div class="ftb-2"></div>
+        <div class="ftb-3"></div>
+      </div>
+      <div class="footer-inner">
+        <div class="footer-brand">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <div class="footer-item">📞 +228 96 09 07 07</div>
+          <span class="footer-sep">·</span>
+          <div class="footer-item">✉ contact@mabellepromo.org</div>
+          <span class="footer-sep">·</span>
+          <div class="footer-item">🌐 facebook.com/mabellepromo</div>
+        </div>
+      </div>
+    </footer>
+  </div></div><!-- /page-footer -->
+
+  </div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  var PAGE_H;                // mesuré à chaque paginate()
+  var CORPS  = '.corps-lettre, .e-corps';
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  function paginate() {
+    PAGE_H = document.querySelector('.page').offsetHeight;
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    var c1 = p1.querySelector(CORPS);
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+    c1.innerHTML = textToHtml(all);
+    var cur = p1, guard = 20;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+
+    /* Supprimer la dernière page dynamique si son corps est vide */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lastCorps = last.querySelector(CORPS);
+      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>

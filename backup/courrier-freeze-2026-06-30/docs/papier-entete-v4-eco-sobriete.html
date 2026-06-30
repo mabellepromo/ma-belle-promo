@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête V4 Éco Sobriété</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Palette MBP — utilisée en filets et textes uniquement ── */
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-fonce:  hsl(150, 28%,  8%);
+      --dore:        hsl(38,  70%, 55%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #d4d4d4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #e8f5e9;
+      border: 1px solid #81c784;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 12.5px;
+      color: #2e7d32;
+      max-width: 794px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eco-badge {
+      background: #2e7d32;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      letter-spacing: 0.08em;
+    }
+    @media print { .print-hint { display: none; } }
+
+    /* ── Feuille A4 ── */
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+    
+    @page { margin: 0; }
+    @media print {
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       VERSION 4 — Éco Sobriété Totale
+       Concept : fond blanc 100 %, couleurs portées uniquement
+       par les filets, la typo et les icônes.
+       Couverture encre estimée : ~8 %
+       ══════════════════════════════════════════════════ */
+
+    /* Triple filet supérieur : épais doré + fin vert */
+    .top-rule {
+      height: 5px;
+      background: linear-gradient(90deg,
+        var(--dore) 0%,
+        var(--dore) 30%,
+        var(--vert-foret) 30%,
+        var(--vert-foret) 100%
+      );
+    }
+
+    /* En-tête — tout blanc, info en texte couleur */
+    .header {
+      padding: 24px 44px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--bordure);
+    }
+
+    /* LOGO : léger, sans fond ni cercle */
+    .logo-wrap {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+    }
+    .logo-wrap img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+
+    /* Séparateur vertical fin */
+    .header-divider {
+      width: 1px;
+      height: 48px;
+      background: var(--bordure);
+      flex-shrink: 0;
+    }
+
+    .header-text { flex: 1; }
+
+    .assoc-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--vert-foret);
+      letter-spacing: 0.01em;
+    }
+
+    .assoc-sub {
+      font-size: 10.5px;
+      color: var(--texte-muted);
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    .assoc-promo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11.5px;
+      font-style: italic;
+      color: var(--dore);
+      margin-top: 1px;
+    }
+
+    /* Méta date/réf à droite */
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .meta-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+    }
+    .meta-val {
+      font-size: 12.5px;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      border-bottom: 1px dashed var(--bordure);
+      min-width: 80px;
+      padding: 0 3px;
+    }
+    .meta-val:focus { border-bottom-color: var(--vert-foret); background: var(--fond-sauge); }
+
+    /* ── Objet ── */
+    .objet-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 10px 44px;
+      border-bottom: 1px solid var(--bordure);
+    }
+    .objet-lbl {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--vert-foret);
+      flex-shrink: 0;
+    }
+    .editable-objet {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      padding: 1px 4px;
+    }
+    .editable-objet:focus { background: var(--fond-sauge); border-radius: 3px; }
+
+    /* ── Corps ── */
+    .body {
+      padding: 32px 20mm 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Destinataire à droite (convention) */
+    .dest-wrapper {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .dest-bloc { max-width: 240px; }
+    .dest-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 5px;
+    }
+    .editable-dest {
+      display: block;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      padding: 6px 10px;
+      border: 1px solid var(--bordure);
+      border-left: 2px solid var(--dore);
+      border-radius: 0 4px 4px 0;
+      min-height: 72px;
+    }
+    .editable-dest:focus { border-color: var(--vert-foret); background: var(--fond-sauge); }
+
+    .thin-rule { height: 1px; background: var(--bordure); }
+
+    .formule-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: var(--fond-sauge); border-radius: 3px; }
+
+    .corps-lettre {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-size: 13.5px;
+      line-height: 1.78;
+      color: var(--texte);
+      text-align: justify;
+      outline: none;
+      min-height: 300px;
+      padding: 2px 4px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    .closing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 48px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: var(--fond-sauge); border-radius: 3px; }
+
+    .sig-bloc {
+      min-width: 190px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      align-self: flex-end;
+    }
+    .sig-role {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--texte-muted);
+      margin-bottom: 28px;
+    }
+    .sig-rule { width: 120px; height: 1px; background: var(--vert-foret); margin-bottom: 5px; align-self: flex-end; }
+    .editable-sig-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: var(--fond-sauge); border-radius: 3px; }
+    .editable-sig-titre {
+      font-size: 11px;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: var(--fond-sauge); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — fond blanc, texte seul ══ */
+    .footer {
+      padding: 12px 44px 16px;
+      border-top: 1px solid var(--bordure);
+    }
+
+    /* Filet doré fin au-dessus du footer */
+    .footer-accent { height: 2px; background: var(--dore); margin-bottom: 10px; }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .footer-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--vert-foret);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-item {
+      font-size: 9.5px;
+      /* Contraste rehaussé pour lisibilité (Eric, 13 juin 2026) */
+      color: hsl(150, 15%, 35%);
+    }
+
+    .footer-sep { color: var(--dore); }
+
+    /* Placeholder commun */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.14);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+  <!-- ══════════════════════════════════════════════════
+       VERSION 4 — Éco Sobriété Totale
+       Fond 100 % blanc · filets fins · typo colorée
+  ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+  <div class="page-header"><div class="page-cell">
+    <!-- Triple filet supérieur -->
+    <div class="top-rule"></div>
+
+    <!-- EN-TÊTE -->
+    <header class="header">
+
+      <!-- LOGO — pas de fond, pas de cercle, encre nulle -->
+      <div class="logo-wrap">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="header-divider"></div>
+
+      <div class="header-text">
+        <div class="assoc-name">Ma Belle Promo</div>
+        <div class="assoc-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé</div>
+        <div class="assoc-promo">Promotion 1994 – 2000</div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-row">
+          <span class="meta-lbl">Lomé, le</span>
+          <span class="meta-val" contenteditable="true" data-placeholder="date">19 mai 2026</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-lbl">Réf.</span>
+          <span class="meta-val" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- OBJET -->
+    <div class="objet-row">
+      <span class="objet-lbl">Objet :</span>
+      <span
+        class="editable-objet"
+        contenteditable="true"
+        data-placeholder="Saisissez l'objet du courrier"
+      >Objet du courrier</span>
+    </div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <div class="dest-wrapper">
+        <div class="dest-bloc">
+          <div class="dest-lbl">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction / Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction / Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <div class="thin-rule"></div>
+
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse.
+      </div>
+
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="sig-bloc">
+          <div class="sig-role">La Présidente</div>
+          <div class="sig-rule"></div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-accent"></div>
+      <div class="footer-inner">
+        <div class="footer-name">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <span class="footer-item">📞 +228 96 09 07 07</span>
+          <span class="footer-sep"> · </span>
+          <span class="footer-item">✉ contact@mabellepromo.org</span>
+          <span class="footer-sep"> · </span>
+          <span class="footer-item">🌐 facebook.com/mabellepromo</span>
+        </div>
+      </div>
+    </footer>
+  </div></div><!-- /page-footer -->
+
+  </div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  var PAGE_H;                // mesuré à chaque paginate()
+  var CORPS  = '.corps-lettre, .e-corps';
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  function paginate() {
+    PAGE_H = document.querySelector('.page').offsetHeight;
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    var c1 = p1.querySelector(CORPS);
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+    c1.innerHTML = textToHtml(all);
+    var cur = p1, guard = 20;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+
+    /* Supprimer la dernière page dynamique si son corps est vide */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lastCorps = last.querySelector(CORPS);
+      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>

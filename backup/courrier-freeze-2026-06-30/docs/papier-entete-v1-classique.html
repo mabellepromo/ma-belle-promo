@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête (Version Classique)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Palette officielle MBP ── */
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);   /* Primary */
+      --vert-fonce:  hsl(150, 28%,  8%);   /* Brand dark */
+      --dore:        hsl(38,  70%, 55%);   /* Accent */
+      --fond-sauge:  hsl(148, 38%, 95%);   /* Background */
+      --bordure:     hsl(148, 30%, 84%);   /* Border */
+      --texte:       hsl(150, 30%, 10%);   /* Foreground */
+      --texte-muted: hsl(150, 10%, 45%);   /* Muted foreground */
+
+      /* ── Configuration A4 & zone de sécurité (réutilisable) ──
+         Unités en mm : rendu identique à l'écran (96 dpi) et à
+         l'impression. 20mm = 2 cm de marge sur les 4 côtés.
+         Le bandeau d'en-tête et le pied conservent leur fond
+         pleine largeur (full-bleed) ; ces variables cadrent le
+         CONTENU dans la zone de sécurité de 2 cm. */
+      --mbp-page-w:     210mm;   /* Largeur A4 */
+      --mbp-page-h:     297mm;   /* Hauteur A4 */
+      --mbp-margin:     20mm;    /* Marge / zone de sécurité = 2 cm */
+      --mbp-footer-h:   93px;    /* Hauteur réservée au pied en impression */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    /* ── Bandeau d'instructions (hors impression) ── */
+    .print-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #664d03;
+      max-width: 794px;
+      width: 100%;
+    }
+    .print-hint strong { font-weight: 600; }
+    @media print { .print-hint { display: none; } }
+
+    /* ── Feuille A4 ── */
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      position: relative;
+      page-break-after: always;
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+    
+    @page { size: A4; margin: 0; }
+    @media print {
+      html, body { margin: 0; padding: 0; }
+      /* Le body est en flex+gap:24px à l'écran (espacement des feuilles) :
+         en impression on le repasse en bloc, sinon le gap de 24px entre
+         les pages décale tout et insère des feuilles parasites. */
+      body { background: none; display: block; }
+      /* Refonte pagination : CHAQUE .page = exactement une feuille A4.
+         Le script JS scinde le contenu pour qu'il tienne sur chaque
+         feuille. En IMPRESSION on passe la .page en FLEX colonne (plus
+         fiable que display:table+height:100% selon les navigateurs) : le
+         contenu prend flex:1 et POUSSE le pied tout en bas de chaque
+         feuille — dernière incluse. */
+      .page {
+        box-shadow: none;
+        width: var(--mbp-page-w);
+        /* 296mm (un poil < 297mm) : évite le débordement sous-pixel qui,
+           à 297mm pile, créait des feuilles blanches. */
+        height: 296mm;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        page-break-after: auto;
+      }
+      .page-header  { display: block !important; flex: 0 0 auto !important; }
+      .page-content { display: block !important; flex: 1 1 auto !important; }
+      .page-footer  { display: block !important; flex: 0 0 auto !important; }
+      .page-cell    { display: block !important; }
+      /* Pas de texte de remplacement fantôme à l'impression (les pages
+         dynamiques recréent un corps contenteditable avec placeholder). */
+      [contenteditable]:empty::before { content: "" !important; }
+      /* Chaque page suivante démarre sur une nouvelle feuille via
+         break-BEFORE (pas break-after, qui insère un blanc). */
+      .page-dynamic { page-break-before: always; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       EN-TÊTE — Version Classique / Institutionnelle
+       ══════════════════════════════════════════════════ */
+    .header {
+      background: var(--vert-foret);
+      /* Fond pleine largeur ; le contenu (logo + titre) reste dans
+         la colonne de sécurité de 2 cm via le padding horizontal. */
+      padding: 28px var(--mbp-margin) 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border-bottom: 4px solid var(--dore);
+    }
+
+    /* ── Zone logo ── */
+    .header-logo {
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    /* LOGO : remplacez le chemin si vous ouvrez ce fichier hors du dossier docs/ */
+    .header-logo img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .header-text { flex: 1; color: #fff; }
+
+    .header-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .header-sub {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.80);
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header-promo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--dore);
+      margin-top: 3px;
+    }
+
+    /* ── Bande décorative sous l'en-tête ── */
+    .header-stripe {
+      height: 6px;
+      background: linear-gradient(90deg, var(--dore) 0%, hsl(148,38%,80%) 100%);
+    }
+
+    /* ── Corps de la lettre ── */
+    .body {
+      /* Corps confiné dans la zone de sécurité de 2 cm (gauche/droite).
+         Bas généreux pour ne jamais chevaucher le pied fixe. */
+      padding: 36px var(--mbp-margin) 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Bloc destinataire + méta (date / réf / objet) */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+    }
+
+    .destinataire {
+      flex: 1;
+    }
+
+    .destinataire-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 6px;
+    }
+
+    .destinataire-bloc {
+      border-left: 3px solid var(--dore);
+      padding: 8px 14px;
+      background: var(--fond-sauge);
+      border-radius: 0 6px 6px 0;
+      min-height: 80px;
+    }
+
+    .editable-dest {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--texte);
+      min-height: 70px;
+      outline: none;
+      display: block;
+    }
+    .editable-dest:focus { background: rgba(255,255,255,0.6); }
+
+    .meta-col {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .meta-field {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--texte-muted);
+    }
+
+    .editable-meta {
+      font-size: 13px;
+      color: var(--texte);
+      border-bottom: 1px dashed var(--bordure);
+      outline: none;
+      padding: 1px 4px;
+      min-width: 80px;
+    }
+    .editable-meta:focus { border-bottom-color: var(--vert-foret); background: rgba(255,255,255,0.5); }
+
+    /* Objet */
+    .objet-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--fond-sauge);
+      border-radius: 6px;
+      border: 1px solid var(--bordure);
+    }
+    .objet-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--vert-foret);
+      flex-shrink: 0;
+    }
+    .editable-objet {
+      flex: 1;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      border: none;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .editable-objet:focus { background: rgba(255,255,255,0.5); border-radius: 3px; }
+
+    /* Séparateur */
+    .separator {
+      height: 1px;
+      background: var(--bordure);
+    }
+
+    /* Formule d'appel */
+    .formule-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+    }
+    .formule-appel:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Corps de la lettre */
+    .corps-lettre {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--texte);
+      text-align: justify;
+      outline: none;
+      min-height: 280px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    /* Politesse + signature */
+    .closing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      line-height: 1.6;
+      min-height: 48px;
+    }
+    .politesse:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .signature-bloc {
+      min-width: 200px;
+      text-align: right;
+      align-self: flex-end;
+    }
+    .signature-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 32px;
+      /* Décalé de 1 cm vers la gauche (demande Eric, 13 juin 2026) */
+      margin-right: 10mm;
+    }
+    .editable-signature {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      display: block;
+      min-height: 20px;
+      /* Aligné sur le titre, décalé de 1 cm vers la gauche (Eric, 13 juin 2026) */
+      margin-right: 10mm;
+    }
+    .editable-signature:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+    .signature-titre {
+      font-size: 11.5px;
+      color: var(--texte-muted);
+      outline: none;
+      text-align: right;
+      display: block;
+      min-height: 16px;
+      /* Décalé de 1 cm vers la gauche (demande Eric, 13 juin 2026) */
+      margin-right: 10mm;
+    }
+    .signature-titre:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE ══ */
+    .footer {
+      border-top: 1px solid var(--bordure);
+      background: var(--fond-sauge);
+      /* Fond pleine largeur ; contenu centré dans la zone 2 cm. */
+      padding: 14px var(--mbp-margin);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      /* Contraste rehaussé pour lisibilité (Eric, 13 juin 2026) */
+      color: hsl(150, 15%, 35%);
+    }
+
+    .footer-icon {
+      width: 12px;
+      height: 12px;
+      fill: var(--vert-foret);
+      flex-shrink: 0;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: var(--bordure);
+      margin-bottom: 10px;
+    }
+
+    .footer-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--vert-foret);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    /* Zones editables — style commun focus */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsl(153,50%,28%,0.18);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  VERSION 1 — Classique / Institutionnelle          -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+  <div class="page-header"><div class="page-cell">
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <!-- LOGO — chemin relatif depuis docs/ vers public/ -->
+      <div class="header-logo">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="header-text">
+        <div class="header-name">Ma Belle Promo</div>
+        <div class="header-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé</div>
+        <div class="header-promo">Promotion 1994 – 2000</div>
+      </div>
+    </header>
+    <div class="header-stripe"></div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire + méta -->
+      <div class="meta-row">
+
+        <div class="destinataire">
+          <div class="destinataire-label">À l'attention de</div>
+          <div class="destinataire-bloc">
+            <div
+              class="editable-dest"
+              contenteditable="true"
+              data-placeholder="M. / Mme Nom Prénom&#10;Fonction&#10;Organisation&#10;Adresse"
+            >M. / Mme Nom Prénom<br>Fonction<br>Organisation<br>Adresse</div>
+          </div>
+        </div>
+
+        <div class="meta-col">
+          <div class="meta-field">
+            <span class="meta-label">Lomé, le</span>
+            <span class="editable-meta" contenteditable="true" data-placeholder="date">19 mai 2026</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">Réf.</span>
+            <span class="editable-meta" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objet -->
+      <div class="objet-row">
+        <span class="objet-label">Objet :</span>
+        <span
+          class="editable-objet"
+          contenteditable="true"
+          data-placeholder="Saisissez l'objet de votre courrier"
+        >Objet du courrier</span>
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps de la lettre -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam.
+
+        <br><br>
+
+        Paragraph suivant. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="signature-bloc">
+          <div class="signature-label">La Présidente</div>
+          <span
+            class="editable-signature"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="signature-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-name">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+      <div class="footer-divider"></div>
+      <div class="footer-inner">
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          +228 96 09 07 07
+        </div>
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          contact@mabellepromo.org
+        </div>
+
+        <div class="footer-item">
+          <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          facebook.com/mabellepromo
+        </div>
+
+      </div>
+    </footer>
+  </div></div><!-- /page-footer -->
+
+  </div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  /* Budget de hauteur utile par feuille, en px (96 dpi).
+     Une feuille A4 = 1122,5px (297mm). On garde une MARGE DE SÉCURITÉ
+     (~70px) sous ce maximum : le découpage est calculé avant que
+     CourrierSection n'injecte son CSS (padding/marges) et avant le
+     rendu d'impression (mm ≠ px à l'arrondi près) ; sans marge, le
+     contenu dépasserait la feuille d'une fraction → feuilles parasites.
+     Valeur FIXE (on ne mesure plus la page, qui débordée renvoyait une
+     hauteur géante → aucune scission). */
+  var PAGE_H = 1080;
+  /* Hauteur réservée pour le bloc politesse+signature pendant la scission
+     du corps, afin qu'il reste collé à la fin du corps (et ne parte pas
+     seul sur une page). Recalculée dans paginate(). */
+  var RESERVE = 0;
+  var CORPS  = '.corps-lettre, .e-corps';  // classe selon version
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  /* Hauteur disponible pour .corps-lettre dans la page */
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used - RESERVE;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  /* Recherche binaire au niveau mot — retourne le texte en débordement */
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  /* Corps (main.body) d'une page, où réinsérer le bloc signature */
+  function bodyOf(page) {
+    var c = page.querySelector(CORPS);
+    return (c && c.parentElement) || page.querySelector('.body');
+  }
+
+  function paginate() {
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    if (!p1) return;
+    var c1 = p1.querySelector(CORPS);
+    if (!c1) return;
+
+    /* Rassembler tout le texte du corps (toutes les pages) */
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+
+    /* Détacher le bloc politesse + signature : il doit terminer sur la
+       DERNIÈRE feuille, après le corps. On le cherche N'IMPORTE OÙ
+       (idempotence : au 2e passage de pagination il est déjà sur la
+       dernière page) et on le détache AVANT de purger les pages
+       dynamiques, sinon il serait détruit avec elles. */
+    var closing = document.querySelector('.closing-row, .closing');
+    /* Mémoriser sa hauteur AVANT détachement (pour réserver sa place sur
+       la dernière feuille). +24 ≈ marge haute du bloc. */
+    var closingH = closing ? closing.offsetHeight + 24 : 0;
+    if (closing && closing.parentNode) closing.parentNode.removeChild(closing);
+
+    /* Supprimer les pages dynamiques précédentes */
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+
+    /* Remettre le texte complet dans la page 1 */
+    c1.innerHTML = textToHtml(all);
+
+    /* 1) Scinder le corps sur des feuilles successives (sans réserve). */
+    RESERVE = 0;
+    var cur = p1, guard = 40;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+
+    /* 2) Réserver la place de la signature SUR LA DERNIÈRE FEUILLE : si le
+       corps de cette feuille + la signature déborde, on repousse le surplus
+       de corps sur de nouvelles feuilles → la signature reste collée à la
+       fin du corps (et non seule, en haut d'une page presque vide). */
+    if (closing) {
+      RESERVE = closingH;
+      var guard2 = 40;
+      while (isOver(cur) && guard2-- > 0) {
+        var ov2 = split(cur.querySelector(CORPS), cur);
+        if (!ov2.trim()) break;
+        var np2 = makePage(ov2);
+        cur.insertAdjacentElement('afterend', np2);
+        cur = np2;
+      }
+      RESERVE = 0;
+
+      /* 3) Réinsérer politesse + signature à la fin de la dernière feuille. */
+      bodyOf(cur).appendChild(closing);
+      if (isOver(cur)) { // garde-fou ultime
+        if (closing.parentNode) closing.parentNode.removeChild(closing);
+        var npc = makePage('');
+        bodyOf(npc).appendChild(closing);
+        cur.insertAdjacentElement('afterend', npc);
+        cur = npc;
+      }
+    }
+
+    /* Supprimer la dernière page dynamique si elle est vraiment vide
+       (corps vide ET pas de bloc signature). */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lc = last.querySelector(CORPS);
+      var hasClosing = last.querySelector('.closing-row, .closing');
+      if ((!lc || !lc.innerText.trim()) && !hasClosing) last.remove();
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    /* Normalisations pour une pagination fiable :
+       - corps min-height:0 (sinon le min-height:280px de l'écran gonfle la
+         mesure d'un corps court → scissions prématurées) ;
+       - cachet à hauteur fixe (image chargée en asynchrone → sinon mesure
+         instable du bloc signature). */
+    var st = document.createElement('style');
+    st.textContent =
+      '.corps-lettre, .e-corps { min-height: 0 !important; }' +
+      'img[alt^="Cachet"] { height: 90px !important; width: auto !important; }';
+    document.head.appendChild(st);
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>

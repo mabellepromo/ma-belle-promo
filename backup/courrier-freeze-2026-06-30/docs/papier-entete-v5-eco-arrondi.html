@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête V5 Éco Arrondi Osé</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-pale:   hsl(153, 40%, 94%);   /* fond très clair, encre quasi nulle */
+      --vert-pale2:  hsl(153, 35%, 97%);
+      --dore:        hsl(38,  70%, 55%);
+      --dore-pale:   hsl(38,  60%, 92%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #d4d4d4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #e8f5e9;
+      border: 1px solid #81c784;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 12.5px;
+      color: #2e7d32;
+      max-width: 794px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eco-badge {
+      background: #2e7d32;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    @media print { .print-hint { display: none; } }
+
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+      /* Fond page : pur blanc = zéro encre */
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+    
+    @page { margin: 0; }
+    @media print {
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       VERSION 5 — Éco Arrondi / En-tête Osé
+       Concept : la carte d'en-tête "flotte" sur la page,
+       bords arrondis prononcés (28px), fond vert ultra-pâle,
+       bordure vert + accent doré. Fond général = blanc pur.
+       Couverture encre estimée : ~12 %
+       ══════════════════════════════════════════════════ */
+
+    /* Zone supérieure qui accueille la carte arrondie */
+    .header-zone {
+      padding: 28px 32px 0;
+      background: #fff;
+    }
+
+    /* La carte en-tête arrondie — l'élément "osé" */
+    .header-card {
+      background: var(--vert-pale2);
+      border: 1.5px solid var(--vert-foret);
+      border-radius: 28px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Accent doré en coin supérieur droit */
+    .header-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at top right,
+        hsla(38,70%,55%,0.12) 0%,
+        transparent 70%
+      );
+      border-radius: 0 28px 0 0;
+      pointer-events: none;
+    }
+
+    /* Pastille dorée décorative coin bas-gauche */
+    .header-card::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 40px;
+      width: 48px;
+      height: 48px;
+      background: var(--dore);
+      border-radius: 50%;
+      opacity: 0.10;
+      pointer-events: none;
+    }
+
+    /* LOGO — dans un cercle vert pâle avec bordure fine */
+    .header-logo {
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      background: #fff;
+      border-radius: 50%;
+      border: 1.5px solid var(--vert-foret);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 2px 8px hsla(153,50%,28%,0.12);
+    }
+    .header-logo img {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+    }
+
+    /* Identité textuelle */
+    .header-identity {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-eyebrow {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--dore);
+      margin-bottom: 5px;
+    }
+
+    .header-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--texte);
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .header-name span {
+      color: var(--vert-foret);
+    }
+
+    .header-sub {
+      font-size: 10.5px;
+      color: var(--texte-muted);
+      margin-top: 5px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Tags ronds décoratifs en bas de la carte */
+    .header-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--vert-foret);
+      border: 1px solid var(--vert-foret);
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+    .tag-gold {
+      color: var(--dore);
+      border-color: var(--dore);
+    }
+
+    /* Méta (date / réf) à droite de la carte */
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      position: relative;
+      z-index: 1;
+    }
+
+    .meta-group { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+    .meta-lbl {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--texte-muted);
+    }
+    .meta-val {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--texte);
+      outline: none;
+      text-align: right;
+      border-bottom: 1px dashed var(--bordure);
+      min-width: 90px;
+      padding: 0 3px;
+    }
+    .meta-val:focus { border-bottom-color: var(--vert-foret); background: #fff; border-radius: 3px; }
+
+    /* Espace sous la carte avant le corps */
+    .below-header {
+      padding: 0 32px;
+      background: #fff;
+    }
+
+    /* Objet — style pill/badge arrondi */
+    .objet-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 10px 20px;
+      border: 1.5px solid var(--bordure);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .objet-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #fff;
+      background: var(--vert-foret);
+      padding: 3px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .editable-objet {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--texte);
+      outline: none;
+      padding: 1px 4px;
+    }
+    .editable-objet:focus { background: var(--vert-pale2); border-radius: 4px; }
+
+    /* ── Corps ── */
+    .body {
+      padding: 24px 20mm 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Destinataire — encadré arrondi à droite */
+    .dest-wrapper { display: flex; justify-content: flex-end; }
+    .dest-bloc { max-width: 250px; }
+    .dest-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--texte-muted);
+      margin-bottom: 5px;
+    }
+    .editable-dest {
+      display: block;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      padding: 10px 14px;
+      border: 1.5px solid var(--bordure);
+      border-radius: 12px;
+      min-height: 76px;
+      background: var(--vert-pale2);
+    }
+    .editable-dest:focus { border-color: var(--vert-foret); background: #fff; }
+
+    /* Filet décoratif */
+    .thin-rule { height: 1px; background: var(--bordure); }
+
+    .formule-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: var(--vert-pale2); border-radius: 3px; }
+
+    .corps-lettre {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-size: 13.5px;
+      line-height: 1.78;
+      color: var(--texte);
+      text-align: justify;
+      outline: none;
+      min-height: 300px;
+      padding: 2px 4px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    .closing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 48px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: var(--vert-pale2); border-radius: 3px; }
+
+    /* Signature dans un encadré arrondi léger */
+    .sig-card {
+      min-width: 200px;
+      border: 1.5px solid var(--bordure);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      background: var(--vert-pale2);
+      align-self: flex-end;
+    }
+    .sig-role {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--vert-foret);
+      margin-bottom: 20px;
+    }
+    .sig-rule { width: 80px; height: 1px; background: var(--vert-foret); margin-bottom: 4px; align-self: flex-end; }
+    .editable-sig-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: #fff; border-radius: 3px; }
+    .editable-sig-titre {
+      font-size: 11px;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: #fff; border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — carte arrondie symétrique ══ */
+    .footer-zone {
+      padding: 0 32px 28px;
+      background: #fff;
+    }
+
+    .footer-card {
+      border: 1.5px solid var(--bordure);
+      border-radius: 14px;
+      padding: 12px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: var(--vert-pale2);
+    }
+
+    .footer-brand {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--vert-foret);
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Contraste rehaussé pour lisibilité (Eric, 13 juin 2026) */
+    .footer-item { font-size: 9.5px; color: hsl(150, 15%, 35%); }
+    .footer-sep { color: var(--dore); }
+
+    /* Placeholder + focus */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.16);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+  <!-- ══════════════════════════════════════════════════
+       VERSION 5 — Éco Arrondi / En-tête Osé
+       Carte arrondie qui flotte sur fond blanc pur
+  ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+  <div class="page-header"><div class="page-cell">
+    <!-- EN-TÊTE CARTE ARRONDIE -->
+    <div class="header-zone">
+      <div class="header-card">
+
+        <!-- LOGO — cercle blanc avec bordure vert -->
+        <div class="header-logo">
+          <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+        </div>
+
+        <!-- Identité -->
+        <div class="header-identity">
+          <div class="header-eyebrow">Association · Faculté de Droit · Université de Lomé</div>
+          <div class="header-name">Ma <span>Belle</span> Promo</div>
+          <div class="header-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994 – 2000</div>
+          <div class="header-tags">
+            <span class="tag">FDD · UL</span>
+            <span class="tag-gold tag">Promotion 1994 – 2000</span>
+          </div>
+        </div>
+
+        <!-- Méta -->
+        <div class="header-meta">
+          <div class="meta-group">
+            <span class="meta-lbl">Date</span>
+            <span class="meta-val" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+          </div>
+          <div class="meta-group">
+            <span class="meta-lbl">Référence</span>
+            <span class="meta-val" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Objet en pill arrondie -->
+      <div class="objet-pill">
+        <span class="objet-lbl">Objet</span>
+        <span
+          class="editable-objet"
+          contenteditable="true"
+          data-placeholder="Saisissez l'objet du courrier"
+        >Objet du courrier</span>
+      </div>
+    </div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <div class="dest-wrapper">
+        <div class="dest-bloc">
+          <div class="dest-lbl">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction / Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction / Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <div class="thin-rule"></div>
+
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
+      </div>
+
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="sig-card">
+          <div class="sig-role">La Présidente</div>
+          <div class="sig-rule"></div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE — carte arrondie symétrique -->
+    <div class="footer-zone">
+      <div class="footer-card">
+        <div class="footer-brand">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <span class="footer-item">📞 +228 96 09 07 07</span>
+          <span class="footer-sep"> · </span>
+          <span class="footer-item">✉ contact@mabellepromo.org</span>
+          <span class="footer-sep"> · </span>
+          <span class="footer-item">🌐 facebook.com/mabellepromo</span>
+        </div>
+      </div>
+    </div>
+  </div></div><!-- /page-footer -->
+
+  </div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  var HEADER_H = 228;
+  var FOOTER_H = 93;
+  var PAGE_H   = 1123;
+  var AVAIL_P1 = PAGE_H - HEADER_H - FOOTER_H - 40;
+  var AVAIL_PN = PAGE_H - FOOTER_H - 40;
+  var CORPS    = '.corps-lettre';
+
+  function isOver(corps, avail) {
+    return corps.scrollHeight > avail + 1;
+  }
+
+  function split(corps, avail) {
+    var words = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = words.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerText = words.slice(0, mid).join('');
+      if (corps.scrollHeight > avail + 1) { hi = mid - 1; }
+      else { best = mid; lo = mid + 1; }
+    }
+    var overflow = words.slice(best).join('').replace(/^\s+/, '');
+    corps.innerText = words.slice(0, best).join('');
+    corps.style.visibility = '';
+    return overflow;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    pg.style.cssText = [
+      'width:794px',
+      'height:1123px',
+      'background:#fff',
+      'display:flex',
+      'flex-direction:column',
+      'justify-content:space-between',
+      'box-sizing:border-box'
+    ].join(';');
+
+    var ct = document.createElement('div');
+    ct.style.cssText = 'flex:1; overflow:hidden; padding:24px 44px 0;';
+
+    var cr = document.createElement('div');
+    cr.className = 'corps-lettre';
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerText = text;
+    cr.style.cssText = 'min-height:unset;';
+    cr.addEventListener('input', schedule);
+
+    ct.appendChild(cr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 80); }
+
+  function paginate() {
+    var p1  = document.querySelector('.page:not(.page-dynamic)');
+    var c1  = p1.querySelector(CORPS);
+
+    var closing = p1.querySelector('.closing-row');
+    if (closing) closing.remove();
+
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function(e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+
+    document.querySelectorAll('.page-dynamic').forEach(function(p) { p.remove(); });
+
+    c1.innerText = all;
+
+    var cur = p1;
+    var avail = AVAIL_P1;
+    var guard = 20;
+
+    while (isOver(c1, avail) && guard-- > 0) {
+      var ov = split(c1, avail);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      c1 = np.querySelector(CORPS);
+      cur = np;
+      avail = AVAIL_PN;
+    }
+
+    var lastPage = document.querySelector('.page-dynamic:last-of-type') || p1;
+    var lastBody = lastPage.querySelector('.body') || lastPage.querySelector('[style*="flex"]');
+    if (closing && lastBody) lastBody.appendChild(closing);
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 200);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>

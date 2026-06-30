@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Papier en-tête (Version Moderne)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert-foret:  hsl(153, 50%, 28%);
+      --vert-fonce:  hsl(150, 28%,  8%);
+      --dore:        hsl(38,  70%, 55%);
+      --fond-sauge:  hsl(148, 38%, 95%);
+      --bordure:     hsl(148, 30%, 84%);
+      --texte:       hsl(150, 30%, 10%);
+      --texte-muted: hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+
+    .print-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #664d03;
+      max-width: 794px;
+      width: 100%;
+    }
+    .print-hint strong { font-weight: 600; }
+    @media print { .print-hint { display: none; } }
+
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; }
+    
+    @page { margin: 0; }
+    @media print {
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       EN-TÊTE — Version Moderne / Épurée
+       Concept : bandeau gauche coloré + typographie aérée
+       ══════════════════════════════════════════════════ */
+    .header {
+      display: flex;
+      align-items: stretch;
+      min-height: 110px;
+      border-bottom: 1px solid var(--bordure);
+    }
+
+    /* Accent vertical gauche */
+    .header-accent {
+      width: 6px;
+      background: linear-gradient(180deg, var(--vert-foret) 0%, var(--dore) 100%);
+      flex-shrink: 0;
+    }
+
+    /* Zone logo */
+    .header-logo-zone {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      background: var(--fond-sauge);
+      border-right: 1px solid var(--bordure);
+    }
+    .header-logo-zone img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    /* Texte identité */
+    .header-identity {
+      flex: 1;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .assoc-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--texte);
+      letter-spacing: -0.01em;
+    }
+
+    .assoc-name span {
+      color: var(--vert-foret);
+    }
+
+    .assoc-sub {
+      font-size: 11px;
+      color: var(--texte-muted);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Bloc méta en haut à droite */
+    .header-meta {
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 180px;
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .meta-chip-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+    }
+    .meta-chip-value {
+      font-size: 13px;
+      color: var(--texte);
+      font-weight: 500;
+      text-align: right;
+      outline: none;
+      min-width: 80px;
+      border-bottom: 1px solid transparent;
+    }
+    .meta-chip-value:focus {
+      border-bottom-color: var(--vert-foret);
+      background: hsl(148,38%,97%);
+    }
+
+    /* ── Bandeau objet ── */
+    .objet-band {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--vert-foret);
+      padding: 0;
+    }
+    .objet-band-label {
+      background: var(--dore);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 8px 16px;
+      flex-shrink: 0;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+    }
+    .objet-band-text {
+      flex: 1;
+      padding: 8px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      outline: none;
+      background: transparent;
+    }
+    .objet-band-text:focus {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── Corps ── */
+    .body {
+      padding: 36px 20mm 80px 20mm;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Destinataire */
+    .dest-wrapper {
+      display: flex;
+      gap: 48px;
+    }
+
+    .dest-spacer { flex: 1; }
+
+    .dest-bloc {
+      min-width: 220px;
+      max-width: 280px;
+    }
+
+    .dest-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--texte-muted);
+      margin-bottom: 8px;
+    }
+
+    .editable-dest {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--texte);
+      outline: none;
+      display: block;
+      padding: 8px 12px;
+      background: var(--fond-sauge);
+      border-radius: 4px;
+      border: 1px solid var(--bordure);
+      min-height: 80px;
+    }
+    .editable-dest:focus { border-color: var(--vert-foret); background: #fff; }
+
+    /* Séparateur décoratif */
+    .separator-modern {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sep-line { flex: 1; height: 1px; background: var(--bordure); }
+    .sep-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--dore);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Formule d'appel */
+    .formule-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--texte);
+      outline: none;
+      padding: 2px 4px;
+    }
+    .formule-appel:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* Corps de la lettre */
+    .corps-lettre {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-size: 13.5px;
+      line-height: 1.78;
+      color: var(--texte);
+      text-align: justify;
+      outline: none;
+      min-height: 280px;
+      padding: 2px 4px;
+    }
+    .corps-lettre:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    /* Closing */
+    .closing-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--texte);
+      outline: none;
+      min-height: 48px;
+      padding: 2px 4px;
+    }
+    .politesse:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    .signature-bloc {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      align-self: flex-end;
+    }
+    .sig-role {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--vert-foret);
+      margin-bottom: 28px;
+    }
+    .editable-sig-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--texte);
+      text-align: right;
+      outline: none;
+      display: block;
+      min-height: 20px;
+      padding: 1px 4px;
+    }
+    .editable-sig-name:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+    .editable-sig-titre {
+      font-size: 11.5px;
+      color: var(--texte-muted);
+      text-align: right;
+      outline: none;
+      display: block;
+      padding: 1px 4px;
+    }
+    .editable-sig-titre:focus { background: hsl(148,38%,97%); border-radius: 3px; }
+
+    /* ══ PIED DE PAGE — moderne : ligne fine + icônes ══ */
+    .footer {
+      border-top: 2px solid var(--vert-foret);
+      padding: 12px 40px 14px;
+    }
+
+    .footer-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .footer-brand {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--vert-foret);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-contacts {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      /* Contraste rehaussé pour lisibilité (Eric, 13 juin 2026) */
+      color: hsl(150, 15%, 35%);
+    }
+
+    .footer-dot {
+      display: inline-block;
+      width: 3px;
+      height: 3px;
+      background: var(--dore);
+      border-radius: 50%;
+    }
+
+    /* Focus common */
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--texte-muted);
+      font-style: italic;
+      pointer-events: none;
+    }
+    [contenteditable]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px hsla(153,50%,28%,0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  VERSION 2 — Moderne / Épurée                      -->
+  <!--  Concept : bandeau vertical gauche + espace blanc  -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="page">
+
+  <div class="page-header"><div class="page-cell">
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <div class="header-accent"></div>
+
+      <!-- LOGO — chemin relatif depuis docs/ -->
+      <div class="header-logo-zone">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="header-identity">
+        <div class="assoc-name">Ma <span>Belle</span> Promo</div>
+        <div class="assoc-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé · Promotion 1994 – 2000</div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-chip">
+          <span class="meta-chip-label">Date</span>
+          <span class="meta-chip-value" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+        </div>
+        <div class="meta-chip">
+          <span class="meta-chip-label">Réf.</span>
+          <span class="meta-chip-value" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BANDEAU OBJET -->
+    <div class="objet-band">
+      <div class="objet-band-label">Objet</div>
+      <div
+        class="objet-band-text"
+        contenteditable="true"
+        data-placeholder="Saisissez l'objet du courrier"
+      >Objet de votre courrier</div>
+    </div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <!-- Destinataire (aligné à droite, style courrier classique) -->
+      <div class="dest-wrapper">
+        <div class="dest-spacer"></div>
+        <div class="dest-bloc">
+          <div class="dest-label">À l'attention de</div>
+          <div
+            class="editable-dest"
+            contenteditable="true"
+            data-placeholder="M. / Mme Nom Prénom&#10;Fonction&#10;Organisation&#10;Adresse"
+          >M. / Mme Nom Prénom<br>Fonction<br>Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <!-- Séparateur décoratif -->
+      <div class="separator-modern">
+        <div class="sep-line"></div>
+        <div class="sep-dot"></div>
+        <div class="sep-line"></div>
+      </div>
+
+      <!-- Formule d'appel -->
+      <div
+        class="formule-appel"
+        contenteditable="true"
+        data-placeholder="Madame, Monsieur,"
+      >Madame, Monsieur,</div>
+
+      <!-- Corps -->
+      <div
+        class="corps-lettre"
+        contenteditable="true"
+        data-placeholder="Rédigez le corps de votre lettre ici…"
+      >
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor.
+      </div>
+
+      <!-- Politesse + signature -->
+      <div class="closing-row">
+        <div
+          class="politesse"
+          contenteditable="true"
+          data-placeholder="Formule de politesse…"
+        >Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="signature-bloc">
+          <div class="sig-role">La Présidente</div>
+          <span
+            class="editable-sig-name"
+            contenteditable="true"
+            data-placeholder="Nom Prénom"
+          >Nom Prénom</span>
+          <span
+            class="editable-sig-titre"
+            contenteditable="true"
+            data-placeholder="Titre / Fonction"
+          >Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="footer-brand">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <div class="footer-item">📞 +228 96 09 07 07</div>
+          <span class="footer-dot"></span>
+          <div class="footer-item">✉ contact@mabellepromo.org</div>
+          <span class="footer-dot"></span>
+          <div class="footer-item">🌐 facebook.com/mabellepromo</div>
+        </div>
+      </div>
+    </footer>
+  </div></div><!-- /page-footer -->
+
+  </div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  var PAGE_H;                // mesuré à chaque paginate()
+  var CORPS  = '.corps-lettre, .e-corps';
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  function paginate() {
+    PAGE_H = document.querySelector('.page').offsetHeight;
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    var c1 = p1.querySelector(CORPS);
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+    c1.innerHTML = textToHtml(all);
+    var cur = p1, guard = 20;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+
+    /* Supprimer la dernière page dynamique si son corps est vide */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lastCorps = last.querySelector(CORPS);
+      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>

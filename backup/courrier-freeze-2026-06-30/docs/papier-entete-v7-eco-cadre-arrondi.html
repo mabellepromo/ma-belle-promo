@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Belle Promo — Cadre Arrondi Décoratif Pleine Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vert:   hsl(153, 50%, 28%);
+      --dore:   hsl(38,  70%, 55%);
+      --pale:   hsl(153, 40%, 96%);
+      --border: hsl(148, 30%, 84%);
+      --texte:  hsl(150, 30%, 10%);
+      --muted:  hsl(150, 10%, 45%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #c8c8c8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 20px;
+    }
+
+    .print-hint {
+      max-width: 794px; width: 100%;
+      background: #e8f5e9; border: 1px solid #81c784; border-radius: 6px;
+      padding: 10px 18px; font-size: 12.5px; color: #2e7d32;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .eco-badge { background:#2e7d32; color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; flex-shrink:0; }
+    @media print { .print-hint { display: none; } }
+
+    /* ── Feuille A4 ── */
+    .page {
+      display: table;
+      table-layout: fixed;
+      width: 794px;
+      height: 1123px;
+      background: #fff;
+      position: relative;
+      box-shadow: 0 6px 40px rgba(0,0,0,0.18);
+    }
+    .page-header { display: table-row; }
+    .page-content { display: table-row; height: 100%; }
+    .page-footer  { display: table-row; }
+    .page-cell    { display: table-cell; width: 100%; vertical-align: top; position: relative; z-index: 1; }
+    
+    @page { margin: 0; }
+    @media print {
+      html, body { height: 100%; margin: 0; padding: 0; }
+      body { background: none; }
+      .page { box-shadow: none; width: 210mm; height: 297mm; }
+      .closing-row, .closing { break-inside: avoid; page-break-inside: avoid; }
+      .page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 93px; }
+      .page-content { margin-bottom: 93px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CADRE DÉCORATIF PLEINE PAGE
+       Calcul : outer inset 12px + radius 28px → coins à (40,40)
+                inner inset 19px + radius 21px → coins à (40,40) aussi
+       Les deux cadres ont leurs arcs concentriques au même centre.
+    ══════════════════════════════════════════════════════════ */
+    .deco-frame {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Cadre extérieur — vert forêt */
+    .frame-outer {
+      position: absolute;
+      inset: 12px;
+      border: 2px solid var(--vert);
+      border-radius: 28px;
+    }
+
+    /* Cadre intérieur — doré */
+    .frame-inner {
+      position: absolute;
+      inset: 19px;
+      border: 1px solid var(--dore);
+      border-radius: 21px;
+    }
+
+    /* ── Rosettes de coin (28×28, centrées à 40px de chaque bord adjacent) ── */
+    .co {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+    }
+    .co-tl { top:  26px; left:  26px; }
+    .co-tr { top:  26px; right: 26px; }
+    .co-bl { bottom: 26px; left:  26px; }
+    .co-br { bottom: 26px; right: 26px; }
+
+    /* ── Ornements mi-côtés ── */
+    .mo { position: absolute; }
+    /* top/bottom : SVG 50×14, centré sur la bordure à y=12 → top:5px */
+    .mo-top    { top:    5px; left: 50%; transform: translateX(-50%); }
+    .mo-bot    { bottom: 5px; left: 50%; transform: translateX(-50%); }
+    /* left/right : SVG 14×50, centré sur la bordure à x=12 → left:5px */
+    .mo-left   { left:   5px; top:  50%; transform: translateY(-50%); }
+    .mo-right  { right:  5px; top:  50%; transform: translateY(-50%); }
+
+    /* ══════════════════════════════════════════════════════════
+       CONTENU — padding pour rester bien à l'intérieur des cadres
+    ══════════════════════════════════════════════════════════ */
+    .page-header .page-cell { padding: 38px 46px 0; }
+    .page-content .page-cell { padding: 0 20mm; }
+    .page-footer  .page-cell { padding: 0 20mm 38px; }
+
+    /* ── EN-TÊTE ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 16px;
+    }
+
+    .logo-wrap img { width: 56px; height: 56px; object-fit: contain; }
+
+    .hdr-sep { width: 1px; height: 50px; background: var(--border); flex-shrink: 0; }
+
+    .hdr-id { flex: 1; }
+
+    .assoc-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 24px; font-weight: 700;
+      color: var(--texte); letter-spacing: -0.01em; line-height: 1;
+    }
+    .assoc-name .belle { color: var(--vert); }
+
+    .assoc-sub {
+      font-size: 10px; color: var(--muted);
+      margin-top: 4px; letter-spacing: 0.02em; line-height: 1.4;
+    }
+
+    .assoc-promo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11.5px; font-style: italic; color: var(--dore); margin-top: 3px;
+    }
+
+    .hdr-meta { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .meta-g { display: flex; gap: 6px; align-items: baseline; }
+    .meta-l { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+    .meta-v {
+      font-size: 12.5px; color: var(--texte);
+      outline: none; text-align: right;
+      border-bottom: 1px dashed var(--border);
+      min-width: 90px; padding: 0 2px;
+    }
+    .meta-v:focus { border-bottom-color: var(--vert); background: var(--pale); border-radius: 2px; }
+
+    /* Filet séparateur dégradé */
+    .hdr-rule {
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent 0%, var(--vert) 20%, var(--dore) 50%, var(--vert) 80%, transparent 100%);
+      margin-bottom: 16px;
+    }
+
+    /* ── OBJET ── */
+    .objet-row {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 9px 16px; margin-bottom: 18px;
+      background: var(--pale); border-radius: 8px;
+      border-left: 2.5px solid var(--dore);
+    }
+    .objet-lbl { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.13em; color: var(--vert); flex-shrink: 0; }
+    .e-objet {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 600; color: var(--texte);
+      outline: none; padding: 1px 4px; background: transparent;
+    }
+    .e-objet:focus { background: rgba(255,255,255,0.7); border-radius: 3px; }
+
+    /* ── CORPS ── */
+    .body { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+    .dest-wrap { display: flex; justify-content: flex-end; }
+    .dest-bloc { max-width: 230px; }
+    .dest-lbl { font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .e-dest {
+      display: block; font-size: 13px; line-height: 1.7; color: var(--texte);
+      outline: none; padding: 8px 12px;
+      background: var(--pale); border: 1px solid var(--border);
+      border-radius: 8px; min-height: 72px;
+    }
+    .e-dest:focus { border-color: var(--vert); background: #fff; }
+
+    .thin-rule { height: 1px; background: var(--border); }
+
+    .e-appel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-style: italic; color: var(--texte);
+      outline: none; padding: 2px 4px;
+    }
+    .e-appel:focus { background: var(--pale); border-radius: 3px; }
+
+    .e-corps {
+      flex: 1; font-family: 'DM Sans', sans-serif; font-style: italic;
+      font-size: 13.5px; line-height: 1.78; color: var(--texte);
+      text-align: justify; outline: none; min-height: 260px; padding: 2px 4px;
+    }
+    .e-corps:focus { background: hsl(148,38%,99%); border-radius: 3px; }
+
+    .closing { display: flex; flex-direction: column; gap: 16px; }
+
+    .e-politesse {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-style: italic; line-height: 1.65;
+      color: var(--texte); outline: none; min-height: 48px; padding: 2px 4px;
+    }
+    .e-politesse:focus { background: var(--pale); border-radius: 3px; }
+
+    .sig-bloc { min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; align-self: flex-end; }
+    .sig-role { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.13em; color: var(--muted); margin-bottom: 28px; }
+    .sig-rule { width: 120px; height: 1px; background: var(--vert); margin-bottom: 5px; }
+    .e-sig-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--texte);
+      text-align: right; outline: none; display: block; padding: 1px 4px;
+    }
+    .e-sig-name:focus { background: var(--pale); border-radius: 3px; }
+    .e-sig-titre {
+      font-size: 11px; color: var(--muted);
+      text-align: right; outline: none; display: block; padding: 1px 4px;
+    }
+    .e-sig-titre:focus { background: var(--pale); border-radius: 3px; }
+
+    /* ── PIED DE PAGE ── */
+    .footer { padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px; }
+    .footer-rule {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--vert), var(--dore), var(--vert), transparent);
+      margin-bottom: 10px;
+    }
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .footer-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-variant: small-caps; font-weight: 600;
+      letter-spacing: 0.10em; color: var(--vert);
+    }
+    .footer-contacts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    /* Contraste rehaussé pour lisibilité (Eric, 13 juin 2026) */
+    .footer-item { font-size: 9.5px; color: hsl(150, 15%, 35%); }
+    .footer-sep { color: var(--dore); }
+
+    [contenteditable]:empty:before { content: attr(data-placeholder); color: var(--muted); font-style: italic; pointer-events: none; }
+    [contenteditable]:focus { outline: none; box-shadow: 0 0 0 2px hsla(153,50%,28%,0.15); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="print-hint"><button onclick="generatePDF()">Télécharger PDF</button></div>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════════
+       CADRE DÉCORATIF — overlay non-interactif
+  ══════════════════════════════════════════════════ -->
+  <div class="deco-frame" aria-hidden="true">
+
+    <div class="frame-outer"></div>
+    <div class="frame-inner"></div>
+
+    <!-- ── Rosettes de coin ── -->
+    <!-- Toutes identiques : le cercle est symétrique -->
+
+    <div class="co co-tl">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="10" fill="white"/>
+        <circle cx="14" cy="14" r="9"  stroke="hsl(38,70%,55%)" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="6"  fill="hsl(153,50%,28%)"/>
+        <circle cx="14" cy="14" r="3.2" fill="white"/>
+        <circle cx="14" cy="14" r="1.6" fill="hsl(38,70%,55%)"/>
+        <line x1="14" y1="4"  x2="14" y2="7"  stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="14" y1="21" x2="14" y2="24" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="4"  y1="14" x2="7"  y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="21" y1="14" x2="24" y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="co co-tr">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="10" fill="white"/>
+        <circle cx="14" cy="14" r="9"  stroke="hsl(38,70%,55%)" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="6"  fill="hsl(153,50%,28%)"/>
+        <circle cx="14" cy="14" r="3.2" fill="white"/>
+        <circle cx="14" cy="14" r="1.6" fill="hsl(38,70%,55%)"/>
+        <line x1="14" y1="4"  x2="14" y2="7"  stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="14" y1="21" x2="14" y2="24" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="4"  y1="14" x2="7"  y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="21" y1="14" x2="24" y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="co co-bl">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="10" fill="white"/>
+        <circle cx="14" cy="14" r="9"  stroke="hsl(38,70%,55%)" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="6"  fill="hsl(153,50%,28%)"/>
+        <circle cx="14" cy="14" r="3.2" fill="white"/>
+        <circle cx="14" cy="14" r="1.6" fill="hsl(38,70%,55%)"/>
+        <line x1="14" y1="4"  x2="14" y2="7"  stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="14" y1="21" x2="14" y2="24" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="4"  y1="14" x2="7"  y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="21" y1="14" x2="24" y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="co co-br">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="10" fill="white"/>
+        <circle cx="14" cy="14" r="9"  stroke="hsl(38,70%,55%)" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="6"  fill="hsl(153,50%,28%)"/>
+        <circle cx="14" cy="14" r="3.2" fill="white"/>
+        <circle cx="14" cy="14" r="1.6" fill="hsl(38,70%,55%)"/>
+        <line x1="14" y1="4"  x2="14" y2="7"  stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="14" y1="21" x2="14" y2="24" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="4"  y1="14" x2="7"  y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="21" y1="14" x2="24" y2="14" stroke="hsl(38,70%,55%)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- ── Ornements mi-côtés — diamant + traits ── -->
+
+    <!-- Haut (SVG horizontal 50×14) -->
+    <div class="mo mo-top">
+      <svg width="50" height="14" viewBox="0 0 50 14" fill="none">
+        <line x1="0" y1="7" x2="17" y2="7" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M25,1.5 L31,7 L25,12.5 L19,7 Z" fill="hsl(38,70%,55%)" stroke="hsl(153,50%,28%)" stroke-width="0.6"/>
+        <circle cx="25" cy="7" r="2" fill="white"/>
+        <circle cx="25" cy="7" r="1" fill="hsl(38,70%,55%)"/>
+        <line x1="33" y1="7" x2="50" y2="7" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Bas -->
+    <div class="mo mo-bot">
+      <svg width="50" height="14" viewBox="0 0 50 14" fill="none">
+        <line x1="0" y1="7" x2="17" y2="7" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M25,1.5 L31,7 L25,12.5 L19,7 Z" fill="hsl(38,70%,55%)" stroke="hsl(153,50%,28%)" stroke-width="0.6"/>
+        <circle cx="25" cy="7" r="2" fill="white"/>
+        <circle cx="25" cy="7" r="1" fill="hsl(38,70%,55%)"/>
+        <line x1="33" y1="7" x2="50" y2="7" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Gauche (SVG vertical 14×50) -->
+    <div class="mo mo-left">
+      <svg width="14" height="50" viewBox="0 0 14 50" fill="none">
+        <line x1="7" y1="0"  x2="7" y2="17" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M1.5,25 L7,19 L12.5,25 L7,31 Z" fill="hsl(38,70%,55%)" stroke="hsl(153,50%,28%)" stroke-width="0.6"/>
+        <circle cx="7" cy="25" r="2" fill="white"/>
+        <circle cx="7" cy="25" r="1" fill="hsl(38,70%,55%)"/>
+        <line x1="7" y1="33" x2="7" y2="50" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Droite -->
+    <div class="mo mo-right">
+      <svg width="14" height="50" viewBox="0 0 14 50" fill="none">
+        <line x1="7" y1="0"  x2="7" y2="17" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M1.5,25 L7,19 L12.5,25 L7,31 Z" fill="hsl(38,70%,55%)" stroke="hsl(153,50%,28%)" stroke-width="0.6"/>
+        <circle cx="7" cy="25" r="2" fill="white"/>
+        <circle cx="7" cy="25" r="1" fill="hsl(38,70%,55%)"/>
+        <line x1="7" y1="33" x2="7" y2="50" stroke="hsl(153,50%,28%)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+  </div><!-- /.deco-frame -->
+
+  <!-- ══════════════════════════════════════════════════
+       CONTENU — à l'intérieur des deux cadres
+  ══════════════════════════════════════════════════ -->
+  <div class="page-header"><div class="page-cell">
+    <!-- EN-TÊTE -->
+    <header class="header">
+
+      <!-- LOGO — pas de fond, encre nulle -->
+      <div class="logo-wrap">
+        <img src="../public/logo-mbp.png" alt="Logo Ma Belle Promo" />
+      </div>
+
+      <div class="hdr-sep"></div>
+
+      <div class="hdr-id">
+        <div class="assoc-name">Ma <span class="belle">Belle</span> Promo</div>
+        <div class="assoc-sub">Association des Anciens Diplômés · Faculté de Droit · Université de Lomé</div>
+        <div class="assoc-promo">Promotion 1994 – 2000</div>
+      </div>
+
+      <div class="hdr-meta">
+        <div class="meta-g">
+          <span class="meta-l">Date</span>
+          <span class="meta-v" contenteditable="true" data-placeholder="jj/mm/aaaa">19 mai 2026</span>
+        </div>
+        <div class="meta-g">
+          <span class="meta-l">Réf.</span>
+          <span class="meta-v" contenteditable="true" data-placeholder="MBP/2026/001">MBP/2026/001</span>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- Filet dégradé -->
+    <div class="hdr-rule"></div>
+
+    <!-- OBJET -->
+    <div class="objet-row">
+      <span class="objet-lbl">Objet :</span>
+      <span class="e-objet" contenteditable="true" data-placeholder="Saisissez l'objet du courrier">Objet du courrier</span>
+    </div>
+  </div></div><!-- /page-header -->
+
+  <div class="page-content"><div class="page-cell">
+    <!-- CORPS -->
+    <main class="body">
+
+      <div class="dest-wrap">
+        <div class="dest-bloc">
+          <div class="dest-lbl">À l'attention de</div>
+          <div class="e-dest" contenteditable="true" data-placeholder="M. / Mme Nom Prénom&#10;Fonction / Organisation&#10;Adresse">M. / Mme Nom Prénom<br>Fonction / Organisation<br>Adresse</div>
+        </div>
+      </div>
+
+      <div class="thin-rule"></div>
+
+      <div class="e-appel" contenteditable="true" data-placeholder="Madame, Monsieur,">Madame, Monsieur,</div>
+
+      <div class="e-corps" contenteditable="true" data-placeholder="Rédigez le corps de votre lettre ici…">
+        Rédigez le corps de votre lettre ici. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+        <br><br>
+
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </div>
+
+      <div class="closing">
+        <div class="e-politesse" contenteditable="true" data-placeholder="Formule de politesse…">Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
+
+        <div class="sig-bloc">
+          <div class="sig-role">La Présidente</div>
+          <div class="sig-rule"></div>
+          <span class="e-sig-name" contenteditable="true" data-placeholder="Nom Prénom">Nom Prénom</span>
+          <span class="e-sig-titre" contenteditable="true" data-placeholder="Titre / Fonction">Présidente de l'association</span>
+        </div>
+      </div>
+
+    </main>
+  </div></div><!-- /page-content -->
+
+  <div class="page-footer"><div class="page-cell">
+    <!-- PIED DE PAGE -->
+    <footer class="footer">
+      <div class="footer-rule"></div>
+      <div class="footer-inner">
+        <div class="footer-name">Association Ma Belle Promo (MBP) · Lomé · Togo</div>
+        <div class="footer-contacts">
+          <span class="footer-item">📞 +228 96 09 07 07</span>
+          <span class="footer-sep"> ✦ </span>
+          <span class="footer-item">✉ contact@mabellepromo.org</span>
+          <span class="footer-sep"> ✦ </span>
+          <span class="footer-item">🌐 facebook.com/mabellepromo</span>
+        </div>
+      </div>
+    </footer>
+  </div></div><!-- /page-footer -->
+
+</div><!-- /.page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Pagination dynamique MBP ── */
+
+  var PAGE_H;                // mesuré à chaque paginate()
+  var CORPS  = '.corps-lettre, .e-corps';
+
+  function textToHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  function availH(page) {
+    var hdr   = page.querySelector('.page-header');
+    var ftr   = page.querySelector('.page-footer');
+    var corps = page.querySelector(CORPS);
+    var body  = corps && corps.parentElement;
+    var used  = (hdr ? hdr.offsetHeight : 0) + (ftr ? ftr.offsetHeight : 0);
+    if (body) {
+      var s   = getComputedStyle(body);
+      var gap = parseFloat(s.rowGap) || parseFloat(s.gap) || 0;
+      used   += parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+      used   += gap * Math.max(0, body.children.length - 1);
+      Array.from(body.children).forEach(function (c) {
+        if (c !== corps) used += c.offsetHeight;
+      });
+    }
+    return PAGE_H - used;
+  }
+
+  function isOver(page) {
+    var c = page.querySelector(CORPS);
+    return !!c && c.scrollHeight > availH(page) + 1;
+  }
+
+  function split(corps, page) {
+    var tokens = (corps.innerText || '').split(/(\s+)/);
+    var lo = 1, hi = tokens.length, best = 0;
+    corps.style.visibility = 'hidden';
+    while (lo <= hi) {
+      var mid = lo + ((hi - lo) >> 1);
+      corps.innerHTML = textToHtml(tokens.slice(0, mid).join(''));
+      if (isOver(page)) { hi = mid - 1; } else { best = mid; lo = mid + 1; }
+    }
+    var over = tokens.slice(best).join('').replace(/^\s+/, '');
+    corps.innerHTML = textToHtml(tokens.slice(0, best).join(''));
+    corps.style.visibility = '';
+    return over;
+  }
+
+  function cloneFooter() {
+    return document.querySelector('.page:not(.page-dynamic) .page-footer').cloneNode(true);
+  }
+
+  function corpsClass() {
+    return document.querySelector('.e-corps') ? 'e-corps' : 'corps-lettre';
+  }
+
+  function makePage(text) {
+    var pg = document.createElement('div');
+    pg.className = 'page page-dynamic';
+    /* Faux header vide pour maintenir la structure table à 3 rows */
+    var fakeHdr = document.createElement('div');
+    fakeHdr.className = 'page-header';
+    var fakeHdrCell = document.createElement('div');
+    fakeHdrCell.className = 'page-cell';
+    fakeHdrCell.style.padding = '0';
+    fakeHdrCell.style.height = '0';
+    fakeHdr.appendChild(fakeHdrCell);
+    /* Contenu */
+    var ct = document.createElement('div'); ct.className = 'page-content';
+    var cl = document.createElement('div'); cl.className = 'page-cell';
+    var bd = document.createElement('main'); bd.className = 'body';
+    bd.style.paddingTop = '24px';
+    var cr = document.createElement('div');
+    cr.className = corpsClass();
+    cr.contentEditable = 'true';
+    cr.dataset.placeholder = 'Suite du courrier…';
+    cr.innerHTML = textToHtml(text);
+    cr.addEventListener('input', schedule);
+    bd.appendChild(cr); cl.appendChild(bd); ct.appendChild(cl);
+    pg.appendChild(fakeHdr);
+    pg.appendChild(ct);
+    pg.appendChild(cloneFooter());
+    return pg;
+  }
+
+  var _t;
+  function schedule() { clearTimeout(_t); _t = setTimeout(paginate, 60); }
+
+  function paginate() {
+    PAGE_H = document.querySelector('.page').offsetHeight;
+    var p1 = document.querySelector('.page:not(.page-dynamic)');
+    var c1 = p1.querySelector(CORPS);
+    var all = Array.from(document.querySelectorAll(CORPS))
+      .map(function (e) { return e.innerText || ''; })
+      .filter(Boolean).join('\n');
+    document.querySelectorAll('.page-dynamic').forEach(function (p) { p.remove(); });
+    c1.innerHTML = textToHtml(all);
+    var cur = p1, guard = 20;
+    while (isOver(cur) && guard-- > 0) {
+      var ov = split(cur.querySelector(CORPS), cur);
+      if (!ov.trim()) break;
+      var np = makePage(ov);
+      cur.insertAdjacentElement('afterend', np);
+      cur = np;
+    }
+
+    /* Supprimer la dernière page dynamique si son corps est vide */
+    var dynPages = document.querySelectorAll('.page-dynamic');
+    if (dynPages.length > 0) {
+      var last = dynPages[dynPages.length - 1];
+      var lastCorps = last.querySelector(CORPS);
+      if (!lastCorps || !lastCorps.innerText.trim()) last.remove();
+    }
+  }
+
+  function init() {
+    var c = document.querySelector(CORPS);
+    if (!c) return;
+    c.addEventListener('input', schedule);
+    setTimeout(paginate, 150);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
+})();
+</script>
+<script>
+async function generatePDF() {
+  const res = await fetch('http://localhost:3000/generate-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: document.documentElement.outerHTML })
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'courrier-mbp.pdf';
+  a.click();
+}
+</script>
+</body>
+</html>
