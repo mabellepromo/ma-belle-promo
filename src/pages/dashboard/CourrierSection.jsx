@@ -4,6 +4,7 @@ import { ChevronLeft, Printer, Loader2, AlertTriangle, CheckCircle2, Minimize2, 
 import { inp, Field } from "./shared";
 import { buildCourrierEmail } from "@/lib/courrierEmail";
 import { openDoc } from "@/lib/documentGenerators";
+import { supabase } from "@/lib/supabase";
 
 const TEMPLATES = [
   {
@@ -185,6 +186,8 @@ const INITIAL = {
   ref:       `MBP/${YEAR}/001`,
   objet:     "",
   dest:      "",
+  emailTo:   "",
+  emailCc:   "",
   appel:     "Madame, Monsieur,",
   corps:     "",
   politesse: "Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.",
@@ -613,6 +616,7 @@ export default function CourrierSection() {
   const [template, setTemplate]     = useState(null);
   const [form, setForm]             = useState(INITIAL);
   const [generating, setGenerating] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [pageStatus, setPageStatus] = useState(null); // null | "checking" | "ok" | "overflow"
   const [compact, setCompact]       = useState(false);
   const htmlCacheRef                = useRef({});
@@ -675,6 +679,34 @@ export default function CourrierSection() {
     if (!form.corps.trim()) { toast.error("Le corps du message est obligatoire."); return; }
     const html = buildCourrierEmail({ modelId: template.id, form });
     openDoc(html, `courrier-email-${template.id}.html`, { allowAttach: false });
+  }
+
+  // Envoi du courrier par email via l'Edge Function courrier-email (Brevo).
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  async function sendEmail() {
+    if (!form.objet.trim()) { toast.error("L'objet du courrier est obligatoire."); return; }
+    if (!form.corps.trim()) { toast.error("Le corps du message est obligatoire."); return; }
+    const to = form.emailTo.trim().toLowerCase();
+    const cc = form.emailCc.trim().toLowerCase();
+    if (!EMAIL_RE.test(to)) { toast.error("Renseignez un email de destinataire valide."); return; }
+    if (cc && !EMAIL_RE.test(cc)) { toast.error("L'email en copie (CC) n'est pas valide."); return; }
+
+    if (!window.confirm(`Envoyer ce courrier par email à ${to}${cc ? ` (copie : ${cc})` : ""} ?\n\nCette action envoie un vrai email.`)) return;
+
+    setSendingEmail(true);
+    try {
+      const html = buildCourrierEmail({ modelId: template.id, form });
+      const { data, error } = await supabase.functions.invoke("courrier-email", {
+        body: { to, cc: cc || null, subject: form.objet.trim(), html },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success("Courrier envoyé par email.");
+    } catch (err) {
+      toast.error("Erreur d'envoi : " + err.message);
+    } finally {
+      setSendingEmail(false);
+    }
   }
 
   async function generate() {
@@ -881,13 +913,31 @@ export default function CourrierSection() {
               <div className="px-5 py-3 border-b border-border bg-muted/20">
                 <p className="text-sm font-semibold text-foreground">Destinataire</p>
               </div>
-              <div className="p-5">
+              <div className="p-5 space-y-3">
                 <Field label="À l'attention de">
                   <textarea
                     className={inp + " !h-24 resize-none py-2"}
                     value={form.dest}
                     onChange={f("dest")}
                     placeholder={"M. Jean Dupont\nDirecteur\nOrganisation\nVille"}
+                  />
+                </Field>
+                <Field label="Email du destinataire (pour l'envoi par courriel)">
+                  <input
+                    className={inp}
+                    type="email"
+                    value={form.emailTo}
+                    onChange={f("emailTo")}
+                    placeholder="destinataire@exemple.org"
+                  />
+                </Field>
+                <Field label="Copie (CC) — optionnel">
+                  <input
+                    className={inp}
+                    type="email"
+                    value={form.emailCc}
+                    onChange={f("emailCc")}
+                    placeholder="copie@exemple.org"
                   />
                 </Field>
               </div>
@@ -951,8 +1001,17 @@ export default function CourrierSection() {
             >
               <Mail className="w-4 h-4" /> Aperçu version courriel
             </button>
+
+            <button
+              onClick={sendEmail}
+              disabled={sendingEmail}
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {sendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+              Envoyer par email
+            </button>
             <p className="text-xs text-muted-foreground text-center -mt-2">
-              Rendu email du même courrier · l'envoi par email viendra ensuite
+              Envoie le courrier au format email · pièce jointe PDF à venir
             </p>
 
           </div>

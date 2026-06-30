@@ -62,6 +62,7 @@ export function wrapHtml(content: string): string {
 
 export interface EmailPayload {
   to: Array<{ email: string; name?: string }>;
+  cc?: Array<{ email: string; name?: string }>;
   subject: string;
   htmlContent: string;
   replyTo?: { email: string; name?: string };
@@ -88,10 +89,11 @@ export async function sendBrevoEmail(apiKey: string, payload: EmailPayload): Pro
     if (last && now - last < TEST_DEDUP_WINDOW_MS) return;
     recentTestSends.set(dedupKey, now);
 
-    const originalRecipients = payload.to.map((r) => r.email).join(", ");
+    const originalRecipients = [...payload.to, ...(payload.cc ?? [])].map((r) => r.email).join(", ");
     payload = {
       ...payload,
       to: [{ email: testRedirect, name: "TEST" }],
+      cc: undefined, // en mode test, aucun CC réel ne doit partir
       subject: `[TEST → ${originalRecipients}] ${payload.subject}`,
     };
   }
