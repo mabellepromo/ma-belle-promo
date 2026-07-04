@@ -371,7 +371,7 @@ export function EmptyState({ icon: Icon, title, hint }) {
   );
 }
 
-export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDelete, extraLink }) {
+export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDelete, extraLink, extraAction }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="group bg-background border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col gap-4">
@@ -401,6 +401,7 @@ export function ItemRow({ img, title, subtitle, badge, badgeColor, onEdit, onDel
           </a>
         )}
         <div className="ml-auto flex items-center gap-1.5">
+          {extraAction}
           <button onClick={onEdit}
             className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-lg hover:bg-primary/8 transition-colors">
             <Edit2 className="w-3.5 h-3.5" /> Modifier

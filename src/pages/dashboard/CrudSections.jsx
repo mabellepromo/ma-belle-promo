@@ -54,6 +54,12 @@ export function ArticlesSection() {
     setForm(null);
   }
 
+  // Bascule rapide publié ↔ brouillon en un clic, sans ouvrir le formulaire
+  async function toggleStatut(a) {
+    const next = (a.statut || "publie") === "publie" ? "brouillon" : "publie";
+    await update(a.id, { ...a, statut: next });
+  }
+
   async function handleSeed() {
     if (!confirm(`Importer les ${articlesStatic.length} articles statiques ? Les articles existants seront mis à jour.`)) return;
     setSeeding(true);
@@ -210,6 +216,19 @@ export function ArticlesSection() {
             <ItemRow img={a.image} title={a.titre}
               subtitle={[a.date || (a.date_iso ? formatDateFr(a.date_iso) : ""), a.categorie, a.auteur].filter(Boolean).join(" · ")}
               extraLink={`/actualites/${a.id}`}
+              extraAction={
+                (a.statut || "publie") === "publie" ? (
+                  <button onClick={() => toggleStatut(a)} title="Repasser en brouillon (masquer du site)"
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-amber-500 px-3 py-1.5 rounded-lg hover:bg-amber-500/15 transition-colors">
+                    <EyeOff className="w-3.5 h-3.5" /> Dépublier
+                  </button>
+                ) : (
+                  <button onClick={() => toggleStatut(a)} title="Publier sur le site public"
+                    className="flex items-center gap-1.5 text-xs font-medium text-emerald-500 hover:text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-500/15 transition-colors">
+                    <Eye className="w-3.5 h-3.5" /> Publier
+                  </button>
+                )
+              }
               onEdit={() => setForm({ ...a, tags: a.tags || [], _editing: a.id })}
               onDelete={() => remove(a.id)} />
           </div>
