@@ -68,13 +68,50 @@ export interface EmailPayload {
   replyTo?: { email: string; name?: string };
 }
 
+// Options de journalisation dans email_logs (trace consultable au dashboard).
+// skip: true → la fonction appelante journalise elle-même (ex. envois en masse
+// qui écrivent une ligne de synthèse plutôt qu'une ligne par destinataire).
+export interface EmailLogInfo {
+  source?: string;  // ex. 'courrier', 'event-invitation' ; défaut 'automatisation'
+  sentBy?: string;  // email du membre du bureau à l'origine de l'envoi
+  skip?: boolean;
+}
+
+// Insertion dans email_logs via l'API REST (service role, injecté par Supabase).
+// Ne doit JAMAIS faire échouer l'envoi : toute erreur est avalée et loggée.
+async function logEmail(row: Record<string, unknown>): Promise<void> {
+  try {
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return;
+    const resp = await fetch(`${url}/rest/v1/email_logs`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(row),
+    });
+    if (!resp.ok) console.error("email_logs insert failed:", resp.status, await resp.text());
+  } catch (err) {
+    console.error("email_logs insert error:", (err as Error).message);
+  }
+}
+
 // Mémoire courte (mode test) : évite que les automatisations qui bouclent sur tous
 // les membres envoient des dizaines de copies identiques à l'adresse de test.
 // Clé = sujet + contenu ; on ignore un doublon vu il y a moins de 2 minutes.
 const recentTestSends = new Map<string, number>();
 const TEST_DEDUP_WINDOW_MS = 120_000;
 
-export async function sendBrevoEmail(apiKey: string, payload: EmailPayload): Promise<void> {
+export async function sendBrevoEmail(apiKey: string, payload: EmailPayload, log?: EmailLogInfo): Promise<void> {
+  // Trace : destinataires réels et sujet AVANT la redirection éventuelle du mode test.
+  const logRecipients = payload.to.map((r) => r.email);
+  const logCc = payload.cc?.map((r) => r.email) ?? null;
+  const logSubject = payload.subject;
+
   // Mode test : si le secret TEST_REDIRECT_EMAIL est défini, TOUS les emails sont
   // redirigés vers cette unique adresse (les vrais destinataires ne reçoivent rien).
   // Le sujet est préfixé par le destinataire réel pour garder la traçabilité.
@@ -108,10 +145,29 @@ export async function sendBrevoEmail(apiKey: string, payload: EmailPayload): Pro
     body: JSON.stringify({ sender: SENDER, ...payload }),
   });
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message || `Brevo HTTP ${response.status}`);
+  // Journalisation centralisée : chaque envoi laisse une trace dans email_logs,
+  // sauf si l'appelant journalise lui-même (log.skip).
+  const errMessage = response.ok
+    ? null
+    : ((await response.json().catch(() => ({}))) as { message?: string }).message ||
+      `Brevo HTTP ${response.status}`;
+
+  if (!log?.skip) {
+    await logEmail({
+      source: log?.source || "automatisation",
+      sent_by: log?.sentBy || null,
+      subject: logSubject,
+      recipients: logRecipients,
+      cc: logCc,
+      recipient_count: logRecipients.length + (logCc?.length ?? 0),
+      html_content: payload.htmlContent,
+      status: errMessage ? "error" : "success",
+      error_message: errMessage,
+      test_redirect: Boolean(testRedirect),
+    });
   }
+
+  if (errMessage) throw new Error(errMessage);
 }
 
 // Formate une date en français lisible

@@ -13,7 +13,7 @@ import {
   Users, FileText, Clock, Check, X, Shield, LayoutDashboard, Lock, Image, Images, Mail, MapPin, Star, Search,
   LogOut, Briefcase, Edit2, Globe,
   UserCheck, Calendar, Tag,
-  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool, Scale
+  Link2, Download, MessageSquare, PenSquare, BookOpen, KeyRound, Banknote, BarChart2, Vote, Wallet, Building2, Send, TrendingUp, Receipt, ShoppingBag, Zap, QrCode, Cake, Menu, ScrollText, Video, Sparkles, Handshake, ClipboardList, PenTool, Scale, History
 } from "lucide-react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AttestationDialog from "../components/AttestationDialog";
@@ -56,6 +56,7 @@ const ConventionsSection     = lazy(() => import("./dashboard/ConventionsSection
 const OpportunitesSection    = lazy(() => import("./dashboard/OpportunitesSection.jsx"));
 const MemoireSection         = lazy(() => import("./dashboard/MemoireSection.jsx"));
 const SignaturesSection      = lazy(() => import("./dashboard/SignaturesSection.jsx"));
+const HistoriqueEmailsSection = lazy(() => import("./dashboard/HistoriqueEmailsSection.jsx"));
 
 // CrudSections regroupe 11 sections dans un seul fichier : on charge ce module
 // une seule fois, au premier de ces onglets ouvert.
@@ -105,6 +106,7 @@ const SECTION_COMPONENTS = {
   courrier:           CourrierSection,
   "bulk-email":       BulkEmailSection,
   "newsletter-email": NewsletterEmailSection,
+  "historique-emails": HistoriqueEmailsSection,
   stats:              StatsSection,
   automatisations:    AutomatisationsSection,
   "assistant-ia":     AssistantIA,
@@ -709,6 +711,7 @@ export default function Dashboard() {
         { key: "courrier",        label: "Courrier",        icon: ScrollText },
         { key: "bulk-email",      label: "Email de masse",  icon: Mail },
         { key: "newsletter-email", label: "Newsletter",      icon: UserCheck },
+        { key: "historique-emails", label: "Historique emails", icon: History },
         { key: "stats",           label: "Statistiques",    icon: TrendingUp },
         { key: "automatisations", label: "Automatisations", icon: Zap },
         { key: "assistant-ia",    label: "Assistant IA",    icon: Sparkles },

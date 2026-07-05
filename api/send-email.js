@@ -69,6 +69,43 @@ function checkRateLimit(ip) {
   return true;
 }
 
+/* ── Journalisation dans email_logs (Supabase, service role) ──
+   Trace consultable au dashboard (Historique des emails). Ne doit JAMAIS
+   faire échouer l'envoi : toute erreur est avalée et loggée en console.
+   Nécessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY en variables
+   d'environnement Vercel (la service role reste côté serveur). */
+async function logEmail({ source, recipients, cc, subject, htmlContent, status, errorMessage, sentBy }) {
+  try {
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return; // non configuré : on n'empêche pas l'envoi
+    const resp = await fetch(`${url}/rest/v1/email_logs`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        source,
+        recipients,
+        cc: cc || null,
+        subject,
+        recipient_count: recipients.length + (cc ? cc.length : 0),
+        html_content: htmlContent || null,
+        status: status || "success",
+        error_message: errorMessage || null,
+        sent_by: sentBy || null,
+        sent_at: new Date().toISOString(),
+      }),
+    });
+    if (!resp.ok) console.error("email_logs insert failed:", resp.status, await resp.text());
+  } catch (err) {
+    console.error("email_logs insert error:", err.message);
+  }
+}
+
 /* ── Échappement HTML pour les données utilisateur ── */
 function escHtml(str) {
   if (typeof str !== "string") return "";
@@ -698,6 +735,15 @@ async function handleWebinarReminder(BREVO_API_KEY, data) {
   );
   const sent   = results.filter(r => r.status === "fulfilled").length;
   const errors = results.map((r, i) => r.status === "rejected" ? { nom: valides[i].nom_complet, reason: r.reason?.message } : null).filter(Boolean);
+
+  await logEmail({
+    source: "rappel-webinaire",
+    recipients: results.map((r, i) => r.status === "fulfilled" ? valides[i].email : null).filter(Boolean),
+    subject: `Rappel — ${event_title} · Ma Belle Promo`,
+    status: sent === 0 ? "error" : "success",
+    errorMessage: errors.length ? errors.map(e => `${e.nom}: ${e.reason}`).join(" | ") : null,
+  });
+
   return { status: 200, body: { success: true, sent, total: valides.length, errors } };
 }
 
@@ -788,6 +834,17 @@ export default async function handler(req, res) {
     );
     const sent   = results.filter(r => r.status === "fulfilled").length;
     const errors = results.map((r, i) => r.status === "rejected" ? { nom: valides[i].nom, reason: r.reason?.message } : null).filter(Boolean);
+
+    await logEmail({
+      source: "circulaire",
+      recipients: results.map((r, i) => r.status === "fulfilled" ? valides[i].email : null).filter(Boolean),
+      subject: sujet,
+      htmlContent: corps_html,
+      status: sent === 0 ? "error" : "success",
+      errorMessage: errors.length ? errors.map(e => `${e.nom}: ${e.reason}`).join(" | ") : null,
+      sentBy: expediteur || null,
+    });
+
     return res.status(200).json({ success: true, sent, total: valides.length, errors });
   }
 
@@ -835,6 +892,15 @@ export default async function handler(req, res) {
     ];
 
     console.log(`Relance cotisation ${annee}: ${sent} envoyés, ${errors.length} erreurs`);
+
+    await logEmail({
+      source: "relance-cotisation",
+      recipients: results.map((r, i) => r.status === "fulfilled" ? membresValides[i].email : null).filter(Boolean),
+      subject: `[MBP] Rappel cotisation ${annee}`,
+      status: sent === 0 ? "error" : "success",
+      errorMessage: errors.length ? errors.map(e => `${e.nom}: ${e.reason}`).join(" | ") : null,
+    });
+
     return res.status(200).json({ success: true, sent, total: membres.length, errors });
   }
 
@@ -880,6 +946,15 @@ export default async function handler(req, res) {
       .filter(Boolean);
 
     console.log(`Invitations sondage "${sondageTitre}": ${sentIds.length} envoyées, ${errors.length} erreurs`);
+
+    await logEmail({
+      source: "invitation-sondage",
+      recipients: results.map((r, i) => r.status === "fulfilled" ? valides[i].email : null).filter(Boolean),
+      subject: `Sondage MBP : ${sondageTitre || "Sondage"}`,
+      status: sentIds.length === 0 ? "error" : "success",
+      errorMessage: errors.length ? errors.map(e => `${e.email}: ${e.reason}`).join(" | ") : null,
+    });
+
     return res.status(200).json({ success: true, sent: sentIds.length, sentIds, errors });
   }
 
@@ -899,6 +974,14 @@ export default async function handler(req, res) {
         body: JSON.stringify(emailPayload),
       });
       const result = await resp.json();
+      await logEmail({
+        source: "boutique-commande",
+        recipients: [data.email],
+        subject: emailPayload.subject,
+        htmlContent: emailPayload.htmlContent,
+        status: resp.ok ? "success" : "error",
+        errorMessage: resp.ok ? null : JSON.stringify(result),
+      });
       if (!resp.ok) { console.error("Brevo order_confirm error:", result); return res.status(502).json({ error: result }); }
       return res.status(200).json({ success: true, messageId: result.messageId });
     } catch (err) {
@@ -949,6 +1032,26 @@ export default async function handler(req, res) {
     });
 
     const result = await response.json();
+
+    // Libellés de source lisibles dans l'Historique des emails
+    const SOURCE_LABELS = {
+      contact: "formulaire-contact",
+      reply: "reponse-message",
+      newsletter_confirm: "newsletter-confirmation",
+      admin_alert: "alerte-admin",
+      webinar_confirmation: "webinaire-confirmation",
+      volunteer_assignment: "affectation-benevole",
+    };
+    await logEmail({
+      source: SOURCE_LABELS[type] || type,
+      recipients: (payload.to || []).map(r => r.email),
+      subject: payload.subject,
+      htmlContent: payload.htmlContent,
+      status: response.ok ? "success" : "error",
+      errorMessage: response.ok ? null : JSON.stringify(result),
+      sentBy: type === "reply" ? data.sender_name || null : null,
+    });
+
     if (!response.ok) {
       console.error(`Brevo error [${type}]:`, JSON.stringify(result));
       return res.status(502).json({ error: result });

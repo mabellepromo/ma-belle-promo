@@ -154,12 +154,13 @@ serve(async (req) => {
         eventUrl,
       });
 
+      // skip : cette fonction écrit elle-même UNE ligne de synthèse dans email_logs
       await sendBrevoEmail(apiKey, {
         to: [{ email, name: r.name || "" }],
         subject,
         htmlContent: html,
         replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
-      });
+      }, { skip: true });
 
       traces.push({
         event_id,
@@ -183,7 +184,9 @@ serve(async (req) => {
   const status: "success" | "error" = sent === 0 ? "error" : "success";
 
   await db.from("email_logs").insert({
+    source: "event-invitation",
     subject,
+    recipients: results.filter(x => x.status === "envoyé").map(x => x.email),
     recipient_count: sent,
     status,
     error_message: results.filter(x => x.status.startsWith("erreur")).map(x => `${x.email}: ${x.status}`).join(" | ") || null,

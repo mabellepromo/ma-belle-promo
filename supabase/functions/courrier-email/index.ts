@@ -10,7 +10,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getServiceClient, corsHeaders, jsonResponse } from "../_shared/db.ts";
+import { corsHeaders, jsonResponse } from "../_shared/db.ts";
 import { sendBrevoEmail } from "../_shared/brevo.ts";
 
 interface RequestBody {
@@ -55,35 +55,19 @@ serve(async (req) => {
   if (!subject) return jsonResponse({ error: "Objet (subject) obligatoire" }, 400);
   if (!html) return jsonResponse({ error: "Contenu HTML manquant" }, 400);
 
-  const db = getServiceClient();
-
   try {
+    // La journalisation dans email_logs (succès comme erreur) est assurée
+    // par sendBrevoEmail — plus besoin d'insert manuel ici.
     await sendBrevoEmail(apiKey, {
       to: [{ email: to }],
       cc: cc ? [{ email: cc }] : undefined,
       subject,
       htmlContent: html,
       replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
-    });
-
-    await db.from("email_logs").insert({
-      subject,
-      recipient_count: cc ? 2 : 1,
-      status: "success",
-      sent_by: user.email || null,
-      sent_at: new Date().toISOString(),
-    });
+    }, { source: "courrier", sentBy: user.email || undefined });
 
     return jsonResponse({ success: true, sent: 1 });
   } catch (err) {
-    await db.from("email_logs").insert({
-      subject,
-      recipient_count: 0,
-      status: "error",
-      error_message: `${to}: ${(err as Error).message}`,
-      sent_by: user.email || null,
-      sent_at: new Date().toISOString(),
-    });
     return jsonResponse({ error: (err as Error).message }, 500);
   }
 });

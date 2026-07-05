@@ -136,8 +136,11 @@ serve(async (req) => {
   const status: "success" | "error" = errors.length > 0 && sent === 0 ? "error" : "success";
 
   await db.from("email_logs").insert({
+    source: "envoi-masse",
     subject,
+    recipients: recipients.map(r => r.email),
     recipient_count: sent,
+    html_content: wrappedHtml,
     status,
     error_message: errors.length > 0 ? errors.join(" | ") : null,
     sent_by: sentBy || user.email || null,

@@ -210,12 +210,13 @@ serve(async (req) => {
         });
       }
 
+      // skip : cette fonction écrit elle-même UNE ligne de synthèse dans email_logs
       await sendBrevoEmail(apiKey, {
         to: [{ email: r.email as string, name: (r.nom_complet as string) || "" }],
         subject,
         htmlContent: html,
         replyTo: { email: "contact@mabellepromo.org", name: "Ma Belle Promo" },
-      });
+      }, { skip: true });
 
       // Mise à jour des flags de suivi
       const patch = channel === "zoom"
@@ -233,7 +234,9 @@ serve(async (req) => {
   const status: "success" | "error" = sent === 0 ? "error" : "success";
 
   await db.from("email_logs").insert({
+    source: "webinaire-billet",
     subject,
+    recipients: results.filter(x => x.status === "envoyé").map(x => x.email),
     recipient_count: sent,
     status,
     error_message: results.filter(x => x.status.startsWith("erreur")).map(x => `${x.email}: ${x.status}`).join(" | ") || null,
