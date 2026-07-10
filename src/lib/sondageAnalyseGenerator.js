@@ -28,10 +28,20 @@ function barRow(label, count, total, color, isTop) {
     </div>`;
 }
 
+// Index sentinelle de l'option « Autre (précisez) » dans valeur_options
+const OTHER_INDEX = -1;
+
 // Analyse d'une question à choix (single / multiple / dropdown / ouinon)
 function choiceAnalysis(q, qr) {
-  const options = q.type === "ouinon" ? ["Oui", "Non"] : (q.options || []);
+  const options = q.type === "ouinon" ? ["Oui", "Non"] : [...(q.options || [])];
   const counts = options.map((_, i) => qr.filter((r) => r.valeur_options?.includes(i)).length);
+  const otherRows = q.type !== "ouinon" && q.config?.allow_other
+    ? qr.filter((r) => r.valeur_options?.includes(OTHER_INDEX))
+    : [];
+  if (q.config?.allow_other && q.type !== "ouinon") {
+    options.push("Autre");
+    counts.push(otherRows.length);
+  }
   const answered = qr.length;
   const max = Math.max(...counts, 0);
   const topIdx = counts.indexOf(max);
@@ -42,7 +52,28 @@ function choiceAnalysis(q, qr) {
     answered === 0
       ? "Aucune réponse pour cette question."
       : `Réponse la plus fréquente : <strong>${esc(options[topIdx])}</strong> (${Math.round((max / answered) * 100)}&nbsp;% des ${answered} répondant${answered !== 1 ? "s" : ""}).`;
-  return `${bars}<p class="q-synthese">${synthese}</p>`;
+  const otherVerbatims = otherRows.filter((r) => r.valeur_texte).length
+    ? `<p class="q-synthese">Réponses « Autre » :</p><ul class="verbatims">${otherRows.filter((r) => r.valeur_texte).map((r) => `<li>${esc(r.valeur_texte)}</li>`).join("")}</ul>`
+    : "";
+  return `${bars}<p class="q-synthese">${synthese}</p>${otherVerbatims}`;
+}
+
+// Analyse d'une question échelle 1–10
+function echelleAnalysis(qr) {
+  const notes = qr.map((r) => r.valeur_note).filter((v) => v != null);
+  if (!notes.length) return `<p class="q-synthese">Aucune réponse pour cette question.</p>`;
+  const avg = notes.reduce((a, b) => a + b, 0) / notes.length;
+  const bars = Array.from({ length: 10 }, (_, i) => 10 - i)
+    .map((n) => {
+      const c = notes.filter((v) => v === n).length;
+      if (!c) return "";
+      return barRow(String(n), c, notes.length, n >= 8 ? "#0f5c3a" : n >= 5 ? "#b8861a" : "#b91c1c", false);
+    })
+    .join("");
+  const appreciation = avg >= 8 ? "très positive" : avg >= 6.5 ? "positive" : avg >= 5 ? "mitigée" : "faible";
+  return `
+    <div class="note-avg">Moyenne : <strong>${avg.toFixed(1).replace(".", ",")}/10</strong> — appréciation ${appreciation} (${notes.length} réponse${notes.length !== 1 ? "s" : ""})</div>
+    ${bars}`;
 }
 
 // Analyse d'une question note /5
@@ -86,6 +117,7 @@ function dateAnalysis(qr) {
 const Q_TYPE_LABELS = {
   ouinon: "Oui / Non", single: "Choix unique", multiple: "Choix multiple",
   dropdown: "Liste déroulante", texte: "Texte libre", date: "Date", note: "Note /5",
+  echelle: "Échelle 1–10",
 };
 
 /**
@@ -130,15 +162,23 @@ export function generateSondageAnalyse(sondage, { soumissions = [], reponses = [
       if (q.type === "texte") body = texteAnalysis(qr);
       else if (q.type === "date") body = dateAnalysis(qr);
       else if (q.type === "note") body = noteAnalysis(qr);
+      else if (q.type === "echelle") body = echelleAnalysis(qr);
       else body = choiceAnalysis(q, qr);
       const answeredPct = total > 0 ? Math.round((qr.length / total) * 100) : 0;
+      // Sous-question conditionnelle : rappeler sa condition d'affichage
+      const cond = q.config?.condition;
+      const parent = cond ? questions.find(p => p.id === cond.question_id) : null;
+      const parentOpts = parent ? (parent.type === "ouinon" ? ["Oui", "Non"] : parent.options || []) : [];
+      const condLabel = parent
+        ? ` · sous-question (si « ${esc(parent.libelle)} » = ${esc(parentOpts[cond.option_index] ?? "?")})`
+        : "";
       return `
       <div class="q-block">
         <div class="q-head">
           <span class="q-num">${i + 1}</span>
           <div class="q-head-txt">
             <div class="q-libelle">${esc(q.libelle)}</div>
-            <div class="q-meta">${Q_TYPE_LABELS[q.type] || q.type} · ${qr.length}/${total} répondant${total !== 1 ? "s" : ""} (${answeredPct} %)</div>
+            <div class="q-meta">${Q_TYPE_LABELS[q.type] || q.type} · ${qr.length}/${total} répondant${total !== 1 ? "s" : ""} (${answeredPct} %)${condLabel}</div>
           </div>
         </div>
         ${body}

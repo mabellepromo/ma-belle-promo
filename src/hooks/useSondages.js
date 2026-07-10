@@ -96,8 +96,24 @@ export function useSondages({ adminMode = false } = {}) {
           section_id: q._sectionTempId ? (sectionIdMap[q._sectionTempId] || null) : null,
         };
       });
-      const { error: qErr } = await supabase.from("sondage_questions").insert(rows);
+      const { data: insertedQs, error: qErr } = await supabase
+        .from("sondage_questions").insert(rows).select();
       if (qErr) return qErr;
+
+      // Deuxième passe : re-lier les sous-questions conditionnelles.
+      // Dans le builder, config.condition.question_id référence l'_id temporaire
+      // de la question parente ; on le remplace par l'uuid réel.
+      const qIdMap = {};
+      (insertedQs || []).forEach((row, i) => { qIdMap[questions[i]._id] = row.id; });
+      for (let i = 0; i < (insertedQs || []).length; i++) {
+        const cond = insertedQs[i].config?.condition;
+        if (cond?.question_id && qIdMap[cond.question_id]) {
+          const { error: condErr } = await supabase.from("sondage_questions")
+            .update({ config: { ...insertedQs[i].config, condition: { ...cond, question_id: qIdMap[cond.question_id] } } })
+            .eq("id", insertedQs[i].id);
+          if (condErr) return condErr;
+        }
+      }
     }
     refresh();
     return null;
@@ -138,6 +154,7 @@ export function useSondages({ adminMode = false } = {}) {
 
     // Questions : maj des existantes, insertion des nouvelles
     const keptQuestionIds = [];
+    const questionIdMap = {}; // _id du builder (temp ou réel) → uuid réel
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
       const rawLogic = q.logic || {};
@@ -163,11 +180,26 @@ export function useSondages({ adminMode = false } = {}) {
         const { error: qErr } = await supabase.from("sondage_questions").update(row).eq("id", q.id);
         if (qErr) return qErr;
         keptQuestionIds.push(q.id);
+        questionIdMap[q._id ?? q.id] = q.id;
       } else {
         const { data: inserted, error: qErr } = await supabase
           .from("sondage_questions").insert({ ...row, sondage_id: id }).select().single();
         if (qErr) return qErr;
         keptQuestionIds.push(inserted.id);
+        questionIdMap[q._id] = inserted.id;
+      }
+    }
+
+    // Deuxième passe : re-lier les conditions des sous-questions dont le
+    // parent vient d'être créé (id temporaire du builder → uuid réel)
+    for (let i = 0; i < questions.length; i++) {
+      const cond = questions[i].config?.condition;
+      const mapped = cond?.question_id ? questionIdMap[cond.question_id] : null;
+      if (mapped && mapped !== cond.question_id) {
+        const { error: condErr } = await supabase.from("sondage_questions")
+          .update({ config: { ...(questions[i].config || {}), condition: { ...cond, question_id: mapped } } })
+          .eq("id", keptQuestionIds[i]);
+        if (condErr) return condErr;
       }
     }
     // Suppression des questions retirées (leurs réponses partent en cascade)
@@ -198,6 +230,9 @@ export function useSondages({ adminMode = false } = {}) {
         description: sondage.description || null,
         actif: false,
         theme: sondage.theme || {},
+        settings: sondage.settings || {},
+        anonyme: sondage.anonyme || false,
+        mention_rgpd: sondage.mention_rgpd || null,
       })
       .select().single();
     if (error) return error;
@@ -248,6 +283,15 @@ export async function getSondageWithQuestions(id) {
     sections: (data.sondage_sections || []).sort((a, b) => a.ordre - b.ordre),
     questions: (data.sondage_questions || []).sort((a, b) => a.ordre - b.ordre),
   };
+}
+
+// Nombre de réponses déjà reçues (pour le quota max_soumissions)
+export async function getSoumissionsCount(sondageId) {
+  const { count } = await supabase
+    .from("sondage_soumissions")
+    .select("id", { count: "exact", head: true })
+    .eq("sondage_id", sondageId);
+  return count || 0;
 }
 
 export async function hasVoted(sondageId, fingerprint) {

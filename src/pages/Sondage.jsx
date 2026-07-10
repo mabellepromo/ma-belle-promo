@@ -4,7 +4,11 @@ import SEO from "../components/SEO";
 import {
   getSondageWithQuestions, hasVoted, submitSondage,
   getSondageResults, getFingerprint, getInvitationByToken, getTheme,
+  getSoumissionsCount,
 } from "../hooks/useSondages";
+
+// Index sentinelle de l'option « Autre (précisez) » dans valeur_options
+const OTHER_INDEX = -1;
 import { Check, ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react";
 
 // ── Résultats après vote ───────────────────────────────────────────────────
@@ -15,6 +19,16 @@ function PublicQuestionResults({ question, reponses, theme }) {
     return (
       <p className="text-sm text-muted-foreground italic">
         {qr.length} réponse{qr.length !== 1 ? "s" : ""} reçue{qr.length !== 1 ? "s" : ""}.
+      </p>
+    );
+  }
+
+  if (question.type === "echelle") {
+    const notes = qr.map(r => r.valeur_note).filter(v => v != null);
+    const avg = notes.length ? (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1) : "—";
+    return (
+      <p className="text-sm text-muted-foreground">
+        Moyenne : <strong className="text-foreground">{avg} / 10</strong> ({notes.length} réponse{notes.length !== 1 ? "s" : ""})
       </p>
     );
   }
@@ -42,8 +56,13 @@ function PublicQuestionResults({ question, reponses, theme }) {
     );
   }
 
-  const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
-  const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
+  const baseOptions = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
+  const counts = baseOptions.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
+  const options = [...baseOptions];
+  if (question.type !== "ouinon" && question.config?.allow_other) {
+    options.push("Autre");
+    counts.push(qr.filter(r => r.valeur_options?.includes(OTHER_INDEX)).length);
+  }
   const qTotal = qr.length;
 
   return (
@@ -90,11 +109,27 @@ function QuestionInput({ question, answer, onChange, theme }) {
     );
   }
 
+  // Champ de saisie « Autre (précisez) » partagé par les types à choix
+  const otherSelected = val.valeur_options?.includes(OTHER_INDEX);
+  const otherInput = otherSelected ? (
+    <input
+      className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background mt-1"
+      value={val.valeur_texte || ""}
+      onChange={e => onChange({ ...val, valeur_texte: e.target.value })}
+      placeholder="Précisez…"
+      autoFocus
+    />
+  ) : null;
+
   if (question.type === "single") {
+    const allOptions = [
+      ...(question.options || []).map((opt, i) => ({ opt, i })),
+      ...(question.config?.allow_other ? [{ opt: "Autre (précisez)", i: OTHER_INDEX }] : []),
+    ];
     return (
       <div className="space-y-2">
-        {(question.options || []).map((opt, i) => {
-          const img = question.options_images?.[i];
+        {allOptions.map(({ opt, i }) => {
+          const img = i >= 0 ? question.options_images?.[i] : null;
           const selected = val.valeur_options?.includes(i);
           return (
             <button key={i} type="button" onClick={() => onChange({ valeur_options: [i] })}
@@ -111,6 +146,7 @@ function QuestionInput({ question, answer, onChange, theme }) {
             </button>
           );
         })}
+        {otherInput}
       </div>
     );
   }
@@ -118,12 +154,16 @@ function QuestionInput({ question, answer, onChange, theme }) {
   if (question.type === "multiple") {
     function toggle(i) {
       const curr = val.valeur_options || [];
-      onChange({ valeur_options: curr.includes(i) ? curr.filter(x => x !== i) : [...curr, i] });
+      onChange({ ...val, valeur_options: curr.includes(i) ? curr.filter(x => x !== i) : [...curr, i] });
     }
+    const allOptions = [
+      ...(question.options || []).map((opt, i) => ({ opt, i })),
+      ...(question.config?.allow_other ? [{ opt: "Autre (précisez)", i: OTHER_INDEX }] : []),
+    ];
     return (
       <div className="space-y-2">
-        {(question.options || []).map((opt, i) => {
-          const img = question.options_images?.[i];
+        {allOptions.map(({ opt, i }) => {
+          const img = i >= 0 ? question.options_images?.[i] : null;
           const selected = val.valeur_options?.includes(i);
           return (
             <button key={i} type="button" onClick={() => toggle(i)}
@@ -140,26 +180,31 @@ function QuestionInput({ question, answer, onChange, theme }) {
             </button>
           );
         })}
+        {otherInput}
       </div>
     );
   }
 
   if (question.type === "dropdown") {
     return (
-      <select
-        value={val.valeur_options?.[0] ?? ""}
-        onChange={e => {
-          const v = e.target.value;
-          onChange(v === "" ? {} : { valeur_options: [Number(v)] });
-        }}
-        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:border-primary bg-background"
-        style={{ "--tw-ring-color": theme.primary + "4d" }}
-      >
-        <option value="">— Sélectionner —</option>
-        {(question.options || []).map((opt, i) => (
-          <option key={i} value={i}>{opt}</option>
-        ))}
-      </select>
+      <div className="space-y-1">
+        <select
+          value={val.valeur_options?.[0] ?? ""}
+          onChange={e => {
+            const v = e.target.value;
+            onChange(v === "" ? {} : { valeur_options: [Number(v)] });
+          }}
+          className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:border-primary bg-background"
+          style={{ "--tw-ring-color": theme.primary + "4d" }}
+        >
+          <option value="">— Sélectionner —</option>
+          {(question.options || []).map((opt, i) => (
+            <option key={i} value={i}>{opt}</option>
+          ))}
+          {question.config?.allow_other && <option value={OTHER_INDEX}>Autre (précisez)</option>}
+        </select>
+        {otherInput}
+      </div>
     );
   }
 
@@ -216,16 +261,43 @@ function QuestionInput({ question, answer, onChange, theme }) {
     );
   }
 
+  if (question.type === "echelle") {
+    return (
+      <div>
+        <div className="flex gap-1.5 flex-wrap">
+          {Array.from({ length: 10 }, (_, idx) => idx + 1).map(n => (
+            <button key={n} type="button" onClick={() => onChange({ valeur_note: n })}
+              className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center text-sm font-bold transition-all ${
+                val.valeur_note === n
+                  ? "text-white"
+                  : "border-border hover:border-primary/40 text-muted-foreground bg-background"
+              }`}
+              style={val.valeur_note === n ? { background: theme.primary, borderColor: theme.primary } : undefined}>
+              {n}
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground mt-1.5 px-0.5">
+          <span>1 = pas du tout</span>
+          <span>10 = tout à fait</span>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }
 
 // ── Validation d'une réponse ───────────────────────────────────────────────
 function validateAnswer(q, a) {
+  // Option « Autre » cochée → la précision est requise, même si optionnelle
+  if (a?.valeur_options?.includes(OTHER_INDEX) && !a?.valeur_texte?.trim())
+    return `Merci de préciser votre réponse « Autre » à la question "${q.libelle}".`;
   if (!q.obligatoire) return null;
   const missing =
     ((q.type === "single" || q.type === "multiple" || q.type === "ouinon" || q.type === "dropdown") && (!a?.valeur_options?.length)) ||
     ((q.type === "texte" || q.type === "date") && !a?.valeur_texte?.trim()) ||
-    (q.type === "note" && !a?.valeur_note);
+    ((q.type === "note" || q.type === "echelle") && !a?.valeur_note);
   if (missing) return `La question "${q.libelle}" est obligatoire.`;
 
   if (q.type === "texte" && a?.valeur_texte?.trim()) {
@@ -277,6 +349,17 @@ export default function Sondage() {
   const currentPage = useSections ? pages[currentPageIdx] : null;
   const visibleQuestions = useSections ? (currentPage?.questions || []) : (sondage?.questions || []);
 
+  // Sous-question conditionnelle : visible seulement si l'option attendue
+  // a été choisie à la question parente. Parent introuvable → on affiche.
+  function isQuestionVisible(q) {
+    const cond = q.config?.condition;
+    if (!cond?.question_id) return true;
+    if (!(sondage?.questions || []).some(p => p.id === cond.question_id)) return true;
+    const a = answers[cond.question_id];
+    return !!a?.valeur_options?.includes(cond.option_index);
+  }
+  const shownQuestions = visibleQuestions.filter(isQuestionVisible);
+
   const theme = useMemo(() => getTheme(sondage), [sondage]);
 
   // Progression
@@ -312,6 +395,10 @@ export default function Sondage() {
       if (data.expires_at && new Date(data.expires_at) < new Date()) { setStatus("expired"); return; }
       if (!data.actif) { setStatus("expired"); return; }
 
+      // Quota de réponses atteint → sondage clôturé
+      const maxSub = data.settings?.max_soumissions;
+      if (maxSub && (await getSoumissionsCount(id)) >= maxSub) { setStatus("expired"); return; }
+
       const init = {};
       (data.questions || []).forEach(q => { init[q.id] = {}; });
       setAnswers(init);
@@ -339,8 +426,8 @@ export default function Sondage() {
   }
 
   async function handleNext() {
-    // Valider les questions de la page actuelle
-    for (const q of visibleQuestions) {
+    // Valider les questions affichées de la page actuelle
+    for (const q of shownQuestions) {
       const err = validateAnswer(q, answers[q.id]);
       if (err) { alert(err); return; }
     }
@@ -373,10 +460,16 @@ export default function Sondage() {
 
   async function doSubmit() {
     setSubmitting(true);
+    // Écarter les réponses des sous-questions masquées (ex : le répondant a
+    // répondu à « précisez » puis a changé la réponse de la question parente)
+    const submittedAnswers = {};
+    (sondage?.questions || []).forEach(q => {
+      if (isQuestionVisible(q) && answers[q.id]) submittedAnswers[q.id] = answers[q.id];
+    });
     const fp = invitation ? null : getFingerprint();
     const nominatif = !sondage?.anonyme;
     const error = await submitSondage(
-      id, answers, fp,
+      id, submittedAnswers, fp,
       invitation?.id || null,
       nominatif ? (invitation?.nom || null) : null,
       nominatif ? (invitation?.email || null) : null,
@@ -464,19 +557,29 @@ export default function Sondage() {
                   <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                     <Check className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-sm font-semibold text-emerald-800">Votre réponse a bien été enregistrée.</p>
+                  <p className="text-sm font-semibold text-emerald-800">
+                    {sondage.settings?.thanks_message || "Votre réponse a bien été enregistrée."}
+                  </p>
                 </div>
                 <h2 className="font-heading text-xl font-bold text-foreground mb-1">{sondage.titre}</h2>
                 {sondage.description && <p className="text-sm text-muted-foreground mb-4">{sondage.description}</p>}
-                <p className="text-xs text-muted-foreground mb-6">{results.total} réponse{results.total !== 1 ? "s" : ""} au total</p>
-                <div className="space-y-6">
-                  {(sondage.questions || []).map((q, i) => (
-                    <div key={q.id}>
-                      <p className="text-sm font-semibold text-foreground mb-3">{i + 1}. {q.libelle}</p>
-                      <PublicQuestionResults question={q} reponses={results.reponses} theme={theme} />
+                {sondage.settings?.show_results === false ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    Les résultats de cette consultation ne sont pas publics — ils seront communiqués par l'association.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-6">{results.total} réponse{results.total !== 1 ? "s" : ""} au total</p>
+                    <div className="space-y-6">
+                      {(sondage.questions || []).map((q, i) => (
+                        <div key={q.id}>
+                          <p className="text-sm font-semibold text-foreground mb-3">{i + 1}. {q.libelle}</p>
+                          <PublicQuestionResults question={q} reponses={results.reponses} theme={theme} />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -519,15 +622,22 @@ export default function Sondage() {
 
                 {/* Questions */}
                 <div className="space-y-8">
-                  {visibleQuestions.map((q, i) => (
-                    <div key={q.id}>
-                      <p className="text-sm font-semibold text-foreground mb-3">
-                        {i + 1}. {q.libelle}
-                        {!q.obligatoire && <span className="ml-1.5 text-xs font-normal text-muted-foreground">(optionnel)</span>}
-                      </p>
-                      <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme} />
-                    </div>
-                  ))}
+                  {shownQuestions.map((q, i) => {
+                    const isSub = !!q.config?.condition;
+                    // Numérotation : les sous-questions ne comptent pas
+                    const num = shownQuestions.slice(0, i + 1).filter(x => !x.config?.condition).length;
+                    return (
+                      <div key={q.id} className={isSub ? "pl-4 border-l-2 rounded-sm" : ""}
+                        style={isSub ? { borderColor: theme.primary + "55" } : undefined}>
+                        <p className={`text-sm font-semibold text-foreground ${q.config?.aide ? "mb-1" : "mb-3"}`}>
+                          {isSub ? "↳ " : `${num}. `}{q.libelle}
+                          {!q.obligatoire && <span className="ml-1.5 text-xs font-normal text-muted-foreground">(optionnel)</span>}
+                        </p>
+                        {q.config?.aide && <p className="text-xs text-muted-foreground mb-3">{q.config.aide}</p>}
+                        <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme} />
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Consentement RGPD — affiché sur la dernière page uniquement */}

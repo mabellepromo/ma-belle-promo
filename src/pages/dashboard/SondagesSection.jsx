@@ -26,12 +26,17 @@ const Q_TYPES = [
   { value: "texte",    label: "Texte libre" },
   { value: "date",     label: "Date" },
   { value: "note",     label: "Note /5" },
+  { value: "echelle",  label: "Échelle 1–10" },
 ];
 
 const Q_TYPE_LABELS = {
   ouinon: "Oui/Non", single: "Choix unique", multiple: "Choix multiple",
   dropdown: "Déroulante", texte: "Texte libre", date: "Date", note: "Note /5",
+  echelle: "Échelle 1–10",
 };
+
+// Index sentinelle de l'option « Autre (précisez) » dans valeur_options
+const OTHER_INDEX = -1;
 
 const VALIDATIONS = [
   { value: "",          label: "Texte libre" },
@@ -59,12 +64,19 @@ async function exportCSV(sondage) {
       const rep = (reponses || []).find(r => r.soumission_id === s.id && r.question_id === q.id);
       if (!rep) return "";
       if (q.type === "texte" || q.type === "date") return rep.valeur_texte || "";
-      if (q.type === "note") return rep.valeur_note ?? "";
+      if (q.type === "note" || q.type === "echelle") return rep.valeur_note ?? "";
       if (q.type === "ouinon") return rep.valeur_options?.includes(0) ? "Oui" : rep.valeur_options?.includes(1) ? "Non" : "";
+      const otherLabel = () => `Autre : ${rep.valeur_texte || ""}`;
       if (q.type === "single" || q.type === "dropdown") {
-        const idx = rep.valeur_options?.[0]; return idx != null ? (q.options?.[idx] || "") : "";
+        const idx = rep.valeur_options?.[0];
+        if (idx === OTHER_INDEX) return otherLabel();
+        return idx != null ? (q.options?.[idx] || "") : "";
       }
-      if (q.type === "multiple") return (rep.valeur_options || []).map(i => q.options?.[i]).filter(Boolean).join("; ");
+      if (q.type === "multiple") {
+        return (rep.valeur_options || [])
+          .map(i => i === OTHER_INDEX ? otherLabel() : q.options?.[i])
+          .filter(Boolean).join("; ");
+      }
       return "";
     });
     return [date, nom, email, ...vals];
@@ -116,6 +128,31 @@ function QuestionResults({ question, reponses, total }) {
     );
   }
 
+  if (question.type === "echelle") {
+    const notes = qr.map(r => r.valeur_note).filter(v => v != null);
+    const avg = notes.length ? (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1) : "—";
+    const scale = Array.from({ length: 10 }, (_, i) => i + 1);
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-2">Moyenne : <strong className="text-foreground">{avg}/10</strong> · {notes.length} réponse{notes.length !== 1 ? "s" : ""}</p>
+        {scale.map(n => {
+          const c = notes.filter(v => v === n).length;
+          const pct = notes.length ? Math.round((c / notes.length) * 100) : 0;
+          if (c === 0) return null;
+          return (
+            <div key={n} className="flex items-center gap-2 mb-1">
+              <span className="text-xs w-5 text-center text-muted-foreground">{n}</span>
+              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className={`h-full rounded-full ${n >= 8 ? "bg-emerald-500" : n >= 5 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${pct}%` }} />
+              </div>
+              <span className="text-xs w-5 text-right text-muted-foreground">{c}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   if (question.type === "note") {
     const notes = qr.map(r => r.valeur_note).filter(v => v != null);
     const avg = notes.length ? (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1) : "—";
@@ -139,8 +176,12 @@ function QuestionResults({ question, reponses, total }) {
     );
   }
 
+  const allowOther = question.type !== "ouinon" && question.config?.allow_other;
   const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
   const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
+  const otherResponses = allowOther ? qr.filter(r => r.valeur_options?.includes(OTHER_INDEX)) : [];
+  if (allowOther) counts.push(otherResponses.length);
+  const displayOptions = allowOther ? [...options, "Autre"] : options;
   const qTotal = qr.length;
   const maxCount = Math.max(...counts, 0);
   const topIdx = counts.indexOf(maxCount);
@@ -150,7 +191,7 @@ function QuestionResults({ question, reponses, total }) {
         {qTotal} réponse{qTotal !== 1 ? "s" : ""}
         {total > 0 && qTotal < total && <span> · {total - qTotal} sans réponse</span>}
       </p>
-      {options.map((opt, i) => {
+      {displayOptions.map((opt, i) => {
         const pct = qTotal > 0 ? Math.round((counts[i] / qTotal) * 100) : 0;
         const isTop = maxCount > 0 && i === topIdx;
         return (
@@ -167,6 +208,13 @@ function QuestionResults({ question, reponses, total }) {
           </div>
         );
       })}
+      {otherResponses.filter(r => r.valeur_texte).length > 0 && (
+        <div className="mt-1.5 space-y-1">
+          {otherResponses.filter(r => r.valeur_texte).map((r, i) => (
+            <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5 italic">Autre : {r.valeur_texte}</div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -248,8 +296,77 @@ function LogicBuilder({ q, onChange, sectionItems }) {
   );
 }
 
+// ── Sous-question conditionnelle ────────────────────────────────────────────
+// Permet de n'afficher cette question que si une option précise a été choisie
+// à une question à choix précédente (ex : « Si Oui → précisez »).
+function ConditionBuilder({ q, onChange, prevChoiceQuestions }) {
+  const [open, setOpen] = useState(false);
+  if (prevChoiceQuestions.length === 0) return null;
+
+  const cond = q.config?.condition || null;
+  const parent = prevChoiceQuestions.find(p => p._id === cond?.question_id);
+  const parentOptions = parent
+    ? (parent.type === "ouinon" ? ["Oui", "Non"] : (parent.options || []).filter(o => o.trim()))
+    : [];
+
+  function setParent(parentId) {
+    if (!parentId) {
+      const { condition, ...rest } = q.config || {};
+      onChange({ ...q, config: rest });
+      return;
+    }
+    onChange({ ...q, config: { ...q.config, condition: { question_id: parentId, option_index: 0 } } });
+  }
+  function setOption(idx) {
+    onChange({ ...q, config: { ...q.config, condition: { ...cond, option_index: idx } } });
+  }
+
+  return (
+    <div className="mt-2 border-t border-dashed border-border pt-2">
+      <button type="button" onClick={() => setOpen(!open)}
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${cond ? "text-sky-400" : "text-muted-foreground hover:text-sky-400"}`}>
+        <GitBranch className="w-3 h-3 rotate-90" />
+        Sous-question
+        {cond && parent && (
+          <span className="px-1.5 py-0.5 bg-sky-500/15 text-sky-400 rounded-full truncate max-w-[220px]">
+            si « {parent.libelle} » = {parentOptions[cond.option_index] ?? "?"}
+          </span>
+        )}
+        <span className="ml-auto">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="mt-2 space-y-1.5 pl-2">
+          <p className="text-xs text-muted-foreground">N'afficher cette question que si :</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <select value={cond?.question_id || ""}
+              onChange={e => setParent(e.target.value || null)}
+              className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-sky-300 max-w-[240px]">
+              <option value="">— Toujours affichée —</option>
+              {prevChoiceQuestions.map(p => (
+                <option key={p._id} value={p._id}>{p.libelle}</option>
+              ))}
+            </select>
+            {cond && parent && (
+              <>
+                <span className="text-xs text-muted-foreground">a pour réponse</span>
+                <select value={cond.option_index}
+                  onChange={e => setOption(Number(e.target.value))}
+                  className="text-xs border border-border rounded-lg px-2 py-1 bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-sky-300 max-w-[200px]">
+                  {parentOptions.map((opt, i) => (
+                    <option key={i} value={i}>{opt}</option>
+                  ))}
+                </select>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Constructeur de question ───────────────────────────────────────────────
-function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionItems }) {
+function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionItems, prevChoiceQuestions }) {
   const [showImageInputs, setShowImageInputs] = useState({});
   const needsOptions = q.type === "single" || q.type === "multiple" || q.type === "dropdown";
 
@@ -284,7 +401,9 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
   }
   function changeType(newType) {
     const needsOpts = newType === "single" || newType === "multiple" || newType === "dropdown";
-    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [], config: {}, logic: {} });
+    // On préserve la condition de sous-question : elle ne dépend pas du type
+    const keptConfig = q.config?.condition ? { condition: q.config.condition } : {};
+    onChange({ ...q, type: newType, options: needsOpts ? (q.options?.length >= 2 ? q.options : ["", ""]) : [], config: keptConfig, logic: {} });
   }
 
   return (
@@ -319,6 +438,10 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
           <input className={inp} value={q.libelle}
             onChange={e => onChange({ ...q, libelle: e.target.value })}
             placeholder="Libellé de la question…" />
+
+          <input className={`${inp} text-xs`} value={q.config?.aide || ""}
+            onChange={e => onChange({ ...q, config: { ...q.config, aide: e.target.value || undefined } })}
+            placeholder="Texte d'aide affiché sous la question (optionnel)…" />
 
           {needsOptions && (
             <div className="space-y-1.5 pl-1">
@@ -367,10 +490,18 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
                   )}
                 </div>
               ))}
-              <button type="button" onClick={addOpt}
-                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
-                <Plus className="w-3.5 h-3.5" /> Ajouter une option
-              </button>
+              <div className="flex items-center gap-4 flex-wrap">
+                <button type="button" onClick={addOpt}
+                  className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium">
+                  <Plus className="w-3.5 h-3.5" /> Ajouter une option
+                </button>
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                  <input type="checkbox" checked={!!q.config?.allow_other}
+                    onChange={e => onChange({ ...q, config: { ...q.config, allow_other: e.target.checked || undefined } })}
+                    className="w-3.5 h-3.5 rounded accent-primary" />
+                  <span className="text-xs text-muted-foreground">Option « Autre (précisez) »</span>
+                </label>
+              </div>
             </div>
           )}
 
@@ -420,7 +551,16 @@ function QuestionBuilder({ q, idx, total, onChange, onRemove, onMove, sectionIte
               <span className="text-xs text-muted-foreground ml-1">de 1 à 5</span>
             </div>
           )}
+          {q.type === "echelle" && (
+            <div className="flex gap-1 items-center flex-wrap">
+              {Array.from({ length: 10 }, (_, i) => (
+                <span key={i} className="w-6 h-6 rounded border border-border flex items-center justify-center text-xs text-muted-foreground">{i + 1}</span>
+              ))}
+              <span className="text-xs text-muted-foreground ml-1">de 1 à 10</span>
+            </div>
+          )}
 
+          <ConditionBuilder q={q} onChange={onChange} prevChoiceQuestions={prevChoiceQuestions} />
           <LogicBuilder q={q} onChange={onChange} sectionItems={sectionItems} />
         </div>
 
@@ -706,7 +846,11 @@ const emptySection = () => ({
   _id: Date.now() + Math.random(), _type: "section",
   titre: "Nouvelle section", description: "",
 });
-const emptyForm = { titre: "", description: "", actif: true, expires_at: "", theme: { preset: "mbp" }, anonyme: false, mention_rgpd: "" };
+const emptyForm = {
+  titre: "", description: "", actif: true, expires_at: "", theme: { preset: "mbp" },
+  anonyme: false, mention_rgpd: "",
+  max_soumissions: "", thanks_message: "", show_results: true,
+};
 
 // ── Composant principal ────────────────────────────────────────────────────
 export default function SondagesSection() {
@@ -753,6 +897,9 @@ export default function SondagesSection() {
       theme: s.theme || { preset: "mbp" },
       anonyme: s.anonyme || false,
       mention_rgpd: s.mention_rgpd || "",
+      max_soumissions: s.settings?.max_soumissions || "",
+      thanks_message: s.settings?.thanks_message || "",
+      show_results: s.settings?.show_results !== false,
     });
     setItems(nextItems);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -815,6 +962,11 @@ export default function SondagesSection() {
       theme: form.theme || {},
       anonyme: form.anonyme || false,
       mention_rgpd: form.mention_rgpd?.trim() || null,
+      settings: {
+        max_soumissions: Number(form.max_soumissions) > 0 ? Number(form.max_soumissions) : null,
+        thanks_message: form.thanks_message?.trim() || null,
+        show_results: form.show_results !== false,
+      },
       sections,
       questions: questionsWithSection,
     };
@@ -913,7 +1065,7 @@ export default function SondagesSection() {
         <div>
           <h2 className="font-heading text-2xl font-bold text-foreground leading-tight">Sondages & formulaires</h2>
           <div className="mt-1 h-px w-12" style={{ background: "linear-gradient(to right, #e3c46a, transparent)" }} />
-          <p className="text-xs text-muted-foreground mt-0.5">7 types · sections · logique · thèmes · images · CSV · invitations</p>
+          <p className="text-xs text-muted-foreground mt-0.5">8 types · sections · logique · sous-questions · quota · thèmes · CSV · invitations · analyse</p>
         </div>
         <button onClick={openForm}
           className="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
@@ -944,6 +1096,33 @@ export default function SondagesSection() {
               </div>
               <div className="md:col-span-2">
                 <ThemePicker value={form.theme} onChange={theme => setForm(p => ({ ...p, theme }))} />
+              </div>
+
+              {/* Paramètres avancés */}
+              <div className="md:col-span-2 bg-muted/30 border border-border rounded-xl p-4 space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Paramètres avancés</p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label="Nombre maximum de réponses (optionnel)">
+                    <input type="number" min="1" className={inp} value={form.max_soumissions}
+                      onChange={e => setForm(p => ({ ...p, max_soumissions: e.target.value }))}
+                      placeholder="Illimité si vide — clôture automatique au quota" />
+                  </Field>
+                  <div className="flex items-center pt-5">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input type="checkbox" checked={form.show_results !== false}
+                        onChange={e => setForm(p => ({ ...p, show_results: e.target.checked }))}
+                        className="w-4 h-4 rounded accent-primary" />
+                      <span className="text-sm text-foreground">Montrer les résultats aux répondants après leur vote</span>
+                    </label>
+                  </div>
+                  <div className="md:col-span-2">
+                    <Field label="Message de remerciement personnalisé (optionnel)">
+                      <textarea className={inp} rows={2} value={form.thanks_message}
+                        onChange={e => setForm(p => ({ ...p, thanks_message: e.target.value }))}
+                        placeholder="Ex : Merci pour votre participation, les résultats seront présentés à l'AG…" />
+                    </Field>
+                  </div>
+                </div>
               </div>
 
               {/* RGPD */}
@@ -1006,6 +1185,12 @@ export default function SondagesSection() {
                   }
                   // Question item
                   const qIdx = items.slice(0, globalIdx + 1).filter(i => i._type === "question").length - 1;
+                  // Questions à choix précédentes — parents possibles d'une sous-question
+                  const prevChoiceQuestions = items.slice(0, globalIdx).filter(i =>
+                    i._type === "question" &&
+                    ["single", "multiple", "dropdown", "ouinon"].includes(i.type) &&
+                    i.libelle.trim()
+                  );
                   return (
                     <QuestionBuilder key={item._id}
                       q={item} idx={qIdx} total={questionItems.length}
@@ -1013,6 +1198,7 @@ export default function SondagesSection() {
                       onRemove={() => removeItem(item._id)}
                       onMove={(_, dir) => moveItem(item._id, dir)}
                       sectionItems={sectionItems}
+                      prevChoiceQuestions={prevChoiceQuestions}
                     />
                   );
                 })}
