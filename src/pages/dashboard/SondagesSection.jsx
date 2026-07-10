@@ -3,9 +3,11 @@ import { toast } from "sonner";
 import {
   Plus, Trash2, Link2, BarChart2, Eye, EyeOff, Loader2, X,
   ChevronUp, ChevronDown, Send, Check, Clock, UserPlus, Download,
-  RefreshCw, Copy, Palette, Image, GitBranch, Columns, ShieldCheck,
+  RefreshCw, Copy, Palette, Image, GitBranch, Columns, ShieldCheck, Printer, Pencil,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { openDoc } from "@/lib/documentGenerators";
+import { generateSondageAnalyse } from "@/lib/sondageAnalyseGenerator";
 import {
   useSondages, getSondageResults, getInvitationStats,
   createInvitations, markInvitationsSent, SONDAGE_THEMES, anonymiserSoumissions,
@@ -81,7 +83,7 @@ async function exportCSV(sondage) {
 }
 
 // ── Résultats par question (dashboard) ────────────────────────────────────
-function QuestionResults({ question, reponses }) {
+function QuestionResults({ question, reponses, total }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
   if (question.type === "texte") {
@@ -140,15 +142,23 @@ function QuestionResults({ question, reponses }) {
   const options = question.type === "ouinon" ? ["Oui", "Non"] : (question.options || []);
   const counts = options.map((_, i) => qr.filter(r => r.valeur_options?.includes(i)).length);
   const qTotal = qr.length;
+  const maxCount = Math.max(...counts, 0);
+  const topIdx = counts.indexOf(maxCount);
   return (
     <div className="space-y-1.5">
-      <p className="text-xs text-muted-foreground mb-1">{qTotal} réponse{qTotal !== 1 ? "s" : ""}</p>
+      <p className="text-xs text-muted-foreground mb-1">
+        {qTotal} réponse{qTotal !== 1 ? "s" : ""}
+        {total > 0 && qTotal < total && <span> · {total - qTotal} sans réponse</span>}
+      </p>
       {options.map((opt, i) => {
         const pct = qTotal > 0 ? Math.round((counts[i] / qTotal) * 100) : 0;
+        const isTop = maxCount > 0 && i === topIdx;
         return (
           <div key={i}>
             <div className="flex justify-between text-xs mb-0.5">
-              <span className="truncate flex-1 mr-2 text-foreground">{opt}</span>
+              <span className={`truncate flex-1 mr-2 ${isTop ? "font-semibold text-foreground" : "text-foreground"}`}>
+                {isTop && <span className="text-amber-400 mr-1">★</span>}{opt}
+              </span>
               <span className="font-bold text-foreground">{pct}% ({counts[i]})</span>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -700,7 +710,7 @@ const emptyForm = { titre: "", description: "", actif: true, expires_at: "", the
 
 // ── Composant principal ────────────────────────────────────────────────────
 export default function SondagesSection() {
-  const { sondages, loading, createSondage, updateSondage, deleteSondage, duplicateSondage } = useSondages({ adminMode: true });
+  const { sondages, loading, createSondage, updateSondage, updateSondageFull, deleteSondage, duplicateSondage } = useSondages({ adminMode: true });
   const { confirm, ConfirmEl } = useConfirm();
   const [form, setForm] = useState(null);
   const [items, setItems] = useState([emptyQ()]); // flat list: questions + section breaks
@@ -715,6 +725,38 @@ export default function SondagesSection() {
   const questionItems = useMemo(() => items.filter(i => i._type === "question"), [items]);
 
   function openForm() { setForm({ ...emptyForm }); setItems([emptyQ()]); }
+
+  // Pré-remplit le formulaire avec un sondage existant pour le modifier.
+  // Les _id des items reprennent les uuid réels : la logique conditionnelle
+  // (goto_section_id) reste ainsi correctement reliée aux sections.
+  function openEdit(s) {
+    const toItemQ = q => ({
+      _id: q.id, _type: "question", id: q.id,
+      type: q.type, libelle: q.libelle,
+      options: q.options || [], options_images: q.options_images || {},
+      obligatoire: q.obligatoire ?? true, config: q.config || {}, logic: q.logic || {},
+    });
+    const qs = s.questions || [];
+    const nextItems = qs.filter(q => !q.section_id).map(toItemQ);
+    (s.sections || []).forEach(sec => {
+      nextItems.push({ _id: sec.id, _type: "section", id: sec.id, titre: sec.titre, description: sec.description || "" });
+      qs.filter(q => q.section_id === sec.id).forEach(q => nextItems.push(toItemQ(q)));
+    });
+    if (!nextItems.some(i => i._type === "question")) nextItems.push(emptyQ());
+
+    setForm({
+      id: s.id,
+      titre: s.titre,
+      description: s.description || "",
+      actif: s.actif,
+      expires_at: s.expires_at ? s.expires_at.slice(0, 10) : "",
+      theme: s.theme || { preset: "mbp" },
+      anonyme: s.anonyme || false,
+      mention_rgpd: s.mention_rgpd || "",
+    });
+    setItems(nextItems);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function updateItem(id, updated) {
     setItems(prev => prev.map(it => it._id === id ? updated : it));
@@ -762,11 +804,10 @@ export default function SondagesSection() {
     });
 
     const sections = sectionItems.map(sec => ({
-      _tempId: sec._id, titre: sec.titre || "Section", description: sec.description || "",
+      _tempId: sec._id, id: sec.id || null, titre: sec.titre || "Section", description: sec.description || "",
     }));
 
-    setSaving(true);
-    const error = await createSondage({
+    const payload = {
       titre: form.titre.trim(),
       description: form.description?.trim() || null,
       actif: form.actif,
@@ -776,10 +817,15 @@ export default function SondagesSection() {
       mention_rgpd: form.mention_rgpd?.trim() || null,
       sections,
       questions: questionsWithSection,
-    });
+    };
+
+    setSaving(true);
+    const error = form.id
+      ? await updateSondageFull(form.id, payload)
+      : await createSondage(payload);
     setSaving(false);
     if (error) { toast.error("Erreur : " + error.message); return; }
-    toast.success("Sondage créé !"); setForm(null);
+    toast.success(form.id ? "Sondage modifié !" : "Sondage créé !"); setForm(null);
   }
 
   async function loadResults(sondageId) {
@@ -811,6 +857,34 @@ export default function SondagesSection() {
     const err = await duplicateSondage(s);
     if (err) toast.error("Erreur : " + err.message);
     else toast.success(`Copie de « ${s.titre} » créée.`);
+  }
+
+  // Génère et ouvre le rapport d'analyse imprimable (overlay unifié openDoc)
+  async function openAnalyse(s) {
+    const toastId = toast.loading("Préparation du rapport d'analyse…");
+    try {
+      const { data: soumissions } = await supabase
+        .from("sondage_soumissions")
+        .select("id, created_at")
+        .eq("sondage_id", s.id)
+        .order("created_at");
+      const ids = (soumissions || []).map(sub => sub.id);
+      const { data: reponses } = ids.length
+        ? await supabase.from("sondage_reponses").select("*").in("soumission_id", ids)
+        : { data: [] };
+      const invitations = await getInvitationStats(s.id);
+
+      const html = generateSondageAnalyse(s, {
+        soumissions: soumissions || [],
+        reponses: reponses || [],
+        invitations,
+      });
+      const filename = `analyse-sondage-${s.titre.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.html`;
+      openDoc(html, filename);
+      toast.dismiss(toastId);
+    } catch (e) {
+      toast.error("Erreur : " + e.message, { id: toastId });
+    }
   }
 
   async function handleAnonymize(s) {
@@ -850,7 +924,7 @@ export default function SondagesSection() {
       {form && (
         <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <p className="font-semibold text-foreground text-sm">Nouveau sondage / formulaire</p>
+            <p className="font-semibold text-foreground text-sm">{form.id ? "Modifier le sondage" : "Nouveau sondage / formulaire"}</p>
             <button onClick={() => setForm(null)} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
           </div>
           <div className="p-5 space-y-5">
@@ -895,6 +969,13 @@ export default function SondagesSection() {
             </div>
 
             <div>
+              {form.id && (
+                <div className="mb-3 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2 text-xs text-amber-500">
+                  ⚠️ Les questions conservées gardent leurs réponses déjà reçues. Supprimer une question
+                  supprime définitivement ses réponses ; modifier l'ordre des options d'une question à choix
+                  peut fausser l'interprétation des réponses existantes.
+                </div>
+              )}
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Questions & sections ({questionItems.length} question{questionItems.length !== 1 ? "s" : ""}{sectionItems.length > 0 ? `, ${sectionItems.length} section${sectionItems.length !== 1 ? "s" : ""}` : ""})
               </p>
@@ -950,7 +1031,7 @@ export default function SondagesSection() {
             <button onClick={() => setForm(null)} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
             <button onClick={handleSubmit} disabled={saving}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
-              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Créer le sondage
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} {form.id ? "Enregistrer les modifications" : "Créer le sondage"}
             </button>
           </div>
         </div>
@@ -997,6 +1078,14 @@ export default function SondagesSection() {
                         className="w-8 h-8 rounded-lg hover:bg-blue-500/15 flex items-center justify-center text-muted-foreground hover:text-blue-400 transition-colors">
                         <Send className="w-3.5 h-3.5" />
                       </button>
+                      <button onClick={() => openEdit(s)} title="Modifier le sondage"
+                        className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => openAnalyse(s)} title="Rapport d'analyse (imprimable)"
+                        className="w-8 h-8 rounded-lg hover:bg-violet-500/15 flex items-center justify-center text-muted-foreground hover:text-violet-400 transition-colors">
+                        <Printer className="w-3.5 h-3.5" />
+                      </button>
                       <button onClick={() => exportCSV(s)} title="Exporter CSV"
                         className="w-8 h-8 rounded-lg hover:bg-emerald-500/15 flex items-center justify-center text-muted-foreground hover:text-emerald-400 transition-colors">
                         <Download className="w-3.5 h-3.5" />
@@ -1034,6 +1123,12 @@ export default function SondagesSection() {
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                               {res.total} réponse{res.total !== 1 ? "s" : ""}
                             </p>
+                            {res.total > 0 && (
+                              <button onClick={() => openAnalyse(s)}
+                                className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 transition-colors">
+                                <Printer className="w-3 h-3" /> Rapport d'analyse
+                              </button>
+                            )}
                             {!s.anonyme && res.total > 0 && (
                               <button onClick={() => handleAnonymize(s)}
                                 className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg text-amber-500 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-colors">

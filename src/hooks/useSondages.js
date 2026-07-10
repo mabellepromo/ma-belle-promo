@@ -103,6 +103,83 @@ export function useSondages({ adminMode = false } = {}) {
     return null;
   }
 
+  // Mise à jour complète : sondage + sections + questions.
+  // Les questions existantes sont mises à jour par leur id (leurs réponses
+  // sont conservées) ; seules les questions retirées du formulaire sont
+  // supprimées (avec leurs réponses, par cascade).
+  async function updateSondageFull(id, { questions = [], sections = [], ...sondageData }) {
+    const { error } = await supabase.from("sondages").update(sondageData).eq("id", id);
+    if (error) return error;
+
+    // Sections : maj des existantes, insertion des nouvelles
+    const sectionIdMap = {}; // _tempId → uuid réel
+    const keptSectionIds = [];
+    for (let i = 0; i < sections.length; i++) {
+      const sec = sections[i];
+      const row = { titre: sec.titre || "Section", description: sec.description || "", ordre: i };
+      if (sec.id) {
+        const { error: secErr } = await supabase.from("sondage_sections").update(row).eq("id", sec.id);
+        if (secErr) return secErr;
+        sectionIdMap[sec._tempId] = sec.id;
+        keptSectionIds.push(sec.id);
+      } else {
+        const { data: inserted, error: secErr } = await supabase
+          .from("sondage_sections").insert({ ...row, sondage_id: id }).select().single();
+        if (secErr) return secErr;
+        sectionIdMap[sec._tempId] = inserted.id;
+        keptSectionIds.push(inserted.id);
+      }
+    }
+    // Suppression des sections retirées
+    let delSec = supabase.from("sondage_sections").delete().eq("sondage_id", id);
+    if (keptSectionIds.length) delSec = delSec.not("id", "in", `(${keptSectionIds.join(",")})`);
+    const { error: delSecErr } = await delSec;
+    if (delSecErr) return delSecErr;
+
+    // Questions : maj des existantes, insertion des nouvelles
+    const keptQuestionIds = [];
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      const rawLogic = q.logic || {};
+      const mappedLogic = rawLogic.rules?.length
+        ? { rules: rawLogic.rules.map(r => ({
+            option_index: r.option_index,
+            goto_section_id: r.goto_section_id === "__end__"
+              ? "__end__"
+              : (sectionIdMap[r.goto_section_id] || r.goto_section_id),
+          })) }
+        : {};
+      const row = {
+        ordre: i, type: q.type,
+        libelle: q.libelle.trim(),
+        options: (q.options || []).filter(o => o.trim()),
+        options_images: q.options_images || {},
+        obligatoire: q.obligatoire ?? true,
+        config: q.config || {},
+        logic: mappedLogic,
+        section_id: q._sectionTempId ? (sectionIdMap[q._sectionTempId] || null) : null,
+      };
+      if (q.id) {
+        const { error: qErr } = await supabase.from("sondage_questions").update(row).eq("id", q.id);
+        if (qErr) return qErr;
+        keptQuestionIds.push(q.id);
+      } else {
+        const { data: inserted, error: qErr } = await supabase
+          .from("sondage_questions").insert({ ...row, sondage_id: id }).select().single();
+        if (qErr) return qErr;
+        keptQuestionIds.push(inserted.id);
+      }
+    }
+    // Suppression des questions retirées (leurs réponses partent en cascade)
+    let delQ = supabase.from("sondage_questions").delete().eq("sondage_id", id);
+    if (keptQuestionIds.length) delQ = delQ.not("id", "in", `(${keptQuestionIds.join(",")})`);
+    const { error: delQErr } = await delQ;
+    if (delQErr) return delQErr;
+
+    refresh();
+    return null;
+  }
+
   async function updateSondage(id, data) {
     await supabase.from("sondages").update(data).eq("id", id);
     refresh();
@@ -154,7 +231,7 @@ export function useSondages({ adminMode = false } = {}) {
     return null;
   }
 
-  return { sondages, loading, createSondage, updateSondage, deleteSondage, duplicateSondage };
+  return { sondages, loading, createSondage, updateSondage, updateSondageFull, deleteSondage, duplicateSondage };
 }
 
 // ── Page publique ──────────────────────────────────────────────────────────
