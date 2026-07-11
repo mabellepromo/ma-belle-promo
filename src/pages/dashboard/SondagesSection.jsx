@@ -301,7 +301,7 @@ function AnswerEditor({ q, val, onChange }) {
 }
 
 // ── Modal d'édition d'une soumission ───────────────────────────────────────
-function EditSoumissionModal({ sondage, soumission, numero, onClose, onSaved }) {
+function EditSoumissionModal({ sondage, soumission, numero, displayName, onClose, onSaved }) {
   const [answers, setAnswers] = useState(() => {
     const init = {};
     (soumission.reponses || []).forEach(r => {
@@ -331,7 +331,7 @@ function EditSoumissionModal({ sondage, soumission, numero, onClose, onSaved }) 
           <div>
             <p className="font-semibold text-foreground text-sm">Modifier l'inscription{numero ? ` n°${numero}` : ""}</p>
             <p className="text-xs text-muted-foreground truncate max-w-xs">
-              {soumission.repondant_nom || "Anonyme"}
+              {displayName || soumission.repondant_nom || "Anonyme"}
               {soumission.repondant_email ? ` · ${soumission.repondant_email}` : ""}
               {" · "}{new Date(soumission.created_at).toLocaleDateString("fr-FR")}
             </p>
@@ -366,13 +366,25 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
   const [editing, setEditing] = useState(null);
 
   async function load() { setRows(await getSoumissionsDetail(sondage.id)); }
+
+  // Nom affiché : identité d'invitation si présente, sinon la réponse à la
+  // première question texte de type « nom » du formulaire (lien public)
+  const nameQuestion =
+    (sondage.questions || []).find(q => q.type === "texte" && /nom/i.test(q.libelle)) ||
+    (sondage.questions || []).find(q => q.type === "texte");
+  function displayName(sub) {
+    return sub.repondant_nom
+      || sub.reponses.find(r => r.question_id === nameQuestion?.id)?.valeur_texte
+      || "Anonyme";
+  }
   function toggle() {
     if (!open && rows === null) load();
     setOpen(!open);
   }
 
   async function handleDelete(sub) {
-    const who = sub.repondant_nom || sub.repondant_email || "cette inscription anonyme";
+    const who = sub.repondant_nom || sub.repondant_email
+      || (displayName(sub) !== "Anonyme" ? displayName(sub) : "cette inscription anonyme");
     if (!await confirm(`Supprimer l'inscription de ${who} ?`, "Ses réponses seront supprimées définitivement. Si elle provenait d'une invitation, la personne pourra répondre à nouveau.")) return;
     const error = await deleteSoumission(sub.id);
     if (error) { toast.error("Erreur : " + error.message); return; }
@@ -385,6 +397,7 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
       {editing && (
         <EditSoumissionModal sondage={sondage} soumission={editing}
           numero={rows ? rows.length - rows.findIndex(r => r.id === editing.id) : null}
+          displayName={displayName(editing)}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); load(); onChanged(); }} />
       )}
@@ -411,7 +424,7 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
                 <button onClick={() => setEditing(sub)} title="Cliquer pour modifier les réponses"
                   className="min-w-0 flex-1 text-left cursor-pointer">
                   <p className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline transition-colors">
-                    {sub.repondant_nom || "Anonyme"}
+                    {displayName(sub)}
                     {sub.repondant_email && <span className="font-normal text-muted-foreground no-underline"> · {sub.repondant_email}</span>}
                   </p>
                   <p className="text-xs text-muted-foreground">
