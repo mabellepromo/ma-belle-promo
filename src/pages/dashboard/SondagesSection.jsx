@@ -107,7 +107,12 @@ function QuestionResults({ question, reponses, total }) {
         <div className="space-y-1 max-h-36 overflow-y-auto">
           {textes.length === 0
             ? <p className="text-xs italic text-muted-foreground">Aucune réponse.</p>
-            : textes.map((t, i) => <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5">{t}</div>)}
+            : textes.map((t, i) => (
+              <div key={i} className="flex items-start gap-2 text-xs bg-muted/60 rounded-lg px-2.5 py-1.5">
+                <span className="font-bold text-primary flex-shrink-0">{i + 1}.</span>
+                <span>{t}</span>
+              </div>
+            ))}
         </div>
       </div>
     );

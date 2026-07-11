@@ -338,7 +338,8 @@ export async function getSondageResults(sondageId) {
   const { data: soumissions } = await supabase
     .from("sondage_soumissions")
     .select("id")
-    .eq("sondage_id", sondageId);
+    .eq("sondage_id", sondageId)
+    .order("created_at", { ascending: true });
 
   const total = soumissions?.length || 0;
   if (!total) return { total: 0, reponses: [] };
@@ -349,7 +350,13 @@ export async function getSondageResults(sondageId) {
     .select("*")
     .in("soumission_id", ids);
 
-  return { total, reponses: reponses || [] };
+  // Trier les réponses dans l'ordre chronologique des soumissions, pour que
+  // les listes numérotées (ex : « Nom de la famille ») suivent l'ordre
+  // d'inscription (n°1 = première inscription)
+  const rank = new Map(ids.map((sid, i) => [sid, i]));
+  const sorted = (reponses || []).sort((a, b) => (rank.get(a.soumission_id) ?? 0) - (rank.get(b.soumission_id) ?? 0));
+
+  return { total, reponses: sorted };
 }
 
 // ── Gestion des soumissions individuelles (dashboard) ─────────────────────
