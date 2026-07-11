@@ -324,7 +324,10 @@ export default function Sondage() {
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [results, setResults] = useState(null);
-  const [currentPageIdx, setCurrentPageIdx] = useState(0);
+  // Pile des pages visitées : la dernière est la page courante. À l'envoi,
+  // seules les réponses des pages réellement parcourues sont soumises.
+  const [pageStack, setPageStack] = useState([0]);
+  const currentPageIdx = pageStack[pageStack.length - 1];
   const [rgpdConsent, setRgpdConsent] = useState(false);
 
   // Regrouper les questions par section pour la navigation
@@ -453,17 +456,21 @@ export default function Sondage() {
     if (nextIdx >= pages.length) {
       await doSubmit();
     } else {
-      setCurrentPageIdx(nextIdx);
+      setPageStack(s => [...s, nextIdx]);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
   async function doSubmit() {
     setSubmitting(true);
-    // Écarter les réponses des sous-questions masquées (ex : le répondant a
-    // répondu à « précisez » puis a changé la réponse de la question parente)
+    // Ne soumettre que les questions des pages réellement parcourues
+    // (une sortie anticipée « Terminer le sondage » ne doit jamais envoyer
+    // les réponses des pages sautées), et écarter les sous-questions masquées.
+    const allowedQuestions = useSections
+      ? pageStack.map(idx => pages[idx]).filter(Boolean).flatMap(p => p.questions)
+      : (sondage?.questions || []);
     const submittedAnswers = {};
-    (sondage?.questions || []).forEach(q => {
+    allowedQuestions.forEach(q => {
       if (isQuestionVisible(q) && answers[q.id]) submittedAnswers[q.id] = answers[q.id];
     });
     const fp = invitation ? null : getFingerprint();
@@ -677,8 +684,8 @@ export default function Sondage() {
 
                 {/* Navigation */}
                 <div className="mt-6 flex items-center gap-3">
-                  {useSections && currentPageIdx > 0 && (
-                    <button onClick={() => { setCurrentPageIdx(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  {useSections && pageStack.length > 1 && (
+                    <button onClick={() => { setPageStack(s => s.slice(0, -1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                       className="flex items-center gap-1.5 px-5 py-3 rounded-xl border border-border font-medium text-sm text-foreground hover:bg-muted transition-all">
                       <ChevronLeft className="w-4 h-4" /> Précédent
                     </button>

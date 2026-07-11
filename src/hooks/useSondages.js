@@ -352,6 +352,55 @@ export async function getSondageResults(sondageId) {
   return { total, reponses: reponses || [] };
 }
 
+// ── Gestion des soumissions individuelles (dashboard) ─────────────────────
+
+/** Liste détaillée des soumissions d'un sondage avec leurs réponses */
+export async function getSoumissionsDetail(sondageId) {
+  const { data: soumissions } = await supabase
+    .from("sondage_soumissions")
+    .select("*")
+    .eq("sondage_id", sondageId)
+    .order("created_at", { ascending: false });
+  const ids = (soumissions || []).map(s => s.id);
+  const { data: reponses } = ids.length
+    ? await supabase.from("sondage_reponses").select("*").in("soumission_id", ids)
+    : { data: [] };
+  return (soumissions || []).map(s => ({
+    ...s,
+    reponses: (reponses || []).filter(r => r.soumission_id === s.id),
+  }));
+}
+
+/** Supprime une soumission (et ses réponses, par cascade). Si elle était
+ *  liée à une invitation, l'invité pourra répondre à nouveau. */
+export async function deleteSoumission(soumissionId) {
+  const { error } = await supabase
+    .from("sondage_soumissions").delete().eq("id", soumissionId);
+  return error;
+}
+
+/** Remplace les réponses d'une soumission par celles éditées au dashboard */
+export async function updateSoumissionReponses(soumissionId, answers) {
+  const { error: delErr } = await supabase
+    .from("sondage_reponses").delete().eq("soumission_id", soumissionId);
+  if (delErr) return delErr;
+
+  const rows = Object.entries(answers)
+    .filter(([, v]) => v.valeur_texte != null || v.valeur_options?.length || v.valeur_note != null)
+    .map(([question_id, v]) => ({
+      soumission_id: soumissionId,
+      question_id,
+      valeur_texte: v.valeur_texte ?? null,
+      valeur_options: v.valeur_options?.length ? v.valeur_options : null,
+      valeur_note: v.valeur_note ?? null,
+    }));
+  if (rows.length) {
+    const { error } = await supabase.from("sondage_reponses").insert(rows);
+    if (error) return error;
+  }
+  return null;
+}
+
 // ── Invitations ────────────────────────────────────────────────────────────
 
 export async function createInvitations(sondageId, recipients) {

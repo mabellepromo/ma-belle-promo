@@ -11,6 +11,7 @@ import { generateSondageAnalyse } from "@/lib/sondageAnalyseGenerator";
 import {
   useSondages, getSondageResults, getInvitationStats,
   createInvitations, markInvitationsSent, SONDAGE_THEMES, anonymiserSoumissions,
+  getSoumissionsDetail, deleteSoumission, updateSoumissionReponses,
 } from "../../hooks/useSondages";
 import { inp, Field } from "./shared";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -212,6 +213,212 @@ function QuestionResults({ question, reponses, total }) {
         <div className="mt-1.5 space-y-1">
           {otherResponses.filter(r => r.valeur_texte).map((r, i) => (
             <div key={i} className="text-xs bg-muted/60 rounded-lg px-2.5 py-1.5 italic">Autre : {r.valeur_texte}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Éditeur d'une réponse individuelle (par type de question) ──────────────
+function AnswerEditor({ q, val, onChange }) {
+  const v = val || {};
+
+  if (q.type === "texte") {
+    return <input className={`${inp} text-sm`} value={v.valeur_texte || ""}
+      onChange={e => onChange({ ...v, valeur_texte: e.target.value || null })} placeholder="—" />;
+  }
+  if (q.type === "date") {
+    return <input type="date" className={`${inp} text-sm`} value={v.valeur_texte || ""}
+      onChange={e => onChange({ ...v, valeur_texte: e.target.value || null })} />;
+  }
+  if (q.type === "note" || q.type === "echelle") {
+    const max = q.type === "note" ? 5 : 10;
+    return (
+      <select className={`${inp} text-sm`} value={v.valeur_note ?? ""}
+        onChange={e => onChange({ valeur_note: e.target.value === "" ? null : Number(e.target.value) })}>
+        <option value="">— Sans réponse —</option>
+        {Array.from({ length: max }, (_, i) => i + 1).map(n => (
+          <option key={n} value={n}>{n} / {max}</option>
+        ))}
+      </select>
+    );
+  }
+
+  // Types à choix
+  const options = q.type === "ouinon" ? ["Oui", "Non"] : (q.options || []);
+  const allowOther = q.type !== "ouinon" && q.config?.allow_other;
+  const otherSelected = v.valeur_options?.includes(OTHER_INDEX);
+
+  if (q.type === "multiple") {
+    function toggle(i) {
+      const curr = v.valeur_options || [];
+      const next = curr.includes(i) ? curr.filter(x => x !== i) : [...curr, i];
+      onChange({ ...v, valeur_options: next.length ? next : null });
+    }
+    return (
+      <div className="space-y-1">
+        {options.map((opt, i) => (
+          <label key={i} className="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" checked={!!v.valeur_options?.includes(i)} onChange={() => toggle(i)}
+              className="w-3.5 h-3.5 rounded accent-primary" />
+            <span className="text-sm text-foreground">{opt}</span>
+          </label>
+        ))}
+        {allowOther && (
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" checked={!!otherSelected} onChange={() => toggle(OTHER_INDEX)}
+              className="w-3.5 h-3.5 rounded accent-primary" />
+            <span className="text-sm text-foreground">Autre (précisez)</span>
+          </label>
+        )}
+        {otherSelected && (
+          <input className={`${inp} text-sm mt-1`} value={v.valeur_texte || ""}
+            onChange={e => onChange({ ...v, valeur_texte: e.target.value || null })} placeholder="Précisez…" />
+        )}
+      </div>
+    );
+  }
+
+  // single / dropdown / ouinon
+  return (
+    <div className="space-y-1">
+      <select className={`${inp} text-sm`} value={v.valeur_options?.[0] ?? ""}
+        onChange={e => {
+          const raw = e.target.value;
+          onChange(raw === "" ? {} : { ...v, valeur_options: [Number(raw)] });
+        }}>
+        <option value="">— Sans réponse —</option>
+        {options.map((opt, i) => <option key={i} value={i}>{opt}</option>)}
+        {allowOther && <option value={OTHER_INDEX}>Autre (précisez)</option>}
+      </select>
+      {otherSelected && (
+        <input className={`${inp} text-sm`} value={v.valeur_texte || ""}
+          onChange={e => onChange({ ...v, valeur_texte: e.target.value || null })} placeholder="Précisez…" />
+      )}
+    </div>
+  );
+}
+
+// ── Modal d'édition d'une soumission ───────────────────────────────────────
+function EditSoumissionModal({ sondage, soumission, onClose, onSaved }) {
+  const [answers, setAnswers] = useState(() => {
+    const init = {};
+    (soumission.reponses || []).forEach(r => {
+      init[r.question_id] = {
+        valeur_texte: r.valeur_texte,
+        valeur_options: r.valeur_options,
+        valeur_note: r.valeur_note,
+      };
+    });
+    return init;
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    const error = await updateSoumissionReponses(soumission.id, answers);
+    setSaving(false);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success("Réponses mises à jour.");
+    onSaved();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
+          <div>
+            <p className="font-semibold text-foreground text-sm">Modifier l'inscription</p>
+            <p className="text-xs text-muted-foreground truncate max-w-xs">
+              {soumission.repondant_nom || "Anonyme"}
+              {soumission.repondant_email ? ` · ${soumission.repondant_email}` : ""}
+              {" · "}{new Date(soumission.created_at).toLocaleDateString("fr-FR")}
+            </p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" /></button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {(sondage.questions || []).map((q, i) => (
+            <div key={q.id}>
+              <p className="text-xs font-semibold text-foreground mb-1.5">{i + 1}. {q.libelle}</p>
+              <AnswerEditor q={q} val={answers[q.id]}
+                onChange={val => setAnswers(p => ({ ...p, [q.id]: val }))} />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end gap-2 px-5 py-4 border-t border-border bg-muted/30 flex-shrink-0">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-xl hover:bg-muted">Annuler</button>
+          <button onClick={handleSave} disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 disabled:opacity-50">
+            {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Liste des soumissions individuelles ────────────────────────────────────
+function SoumissionsList({ sondage, confirm, onChanged }) {
+  const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState(null);
+  const [editing, setEditing] = useState(null);
+
+  async function load() { setRows(await getSoumissionsDetail(sondage.id)); }
+  function toggle() {
+    if (!open && rows === null) load();
+    setOpen(!open);
+  }
+
+  async function handleDelete(sub) {
+    const who = sub.repondant_nom || sub.repondant_email || "cette inscription anonyme";
+    if (!await confirm(`Supprimer l'inscription de ${who} ?`, "Ses réponses seront supprimées définitivement. Si elle provenait d'une invitation, la personne pourra répondre à nouveau.")) return;
+    const error = await deleteSoumission(sub.id);
+    if (error) { toast.error("Erreur : " + error.message); return; }
+    toast.success("Inscription supprimée.");
+    load(); onChanged();
+  }
+
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      {editing && (
+        <EditSoumissionModal sondage={sondage} soumission={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => { setEditing(null); load(); onChanged(); }} />
+      )}
+      <button onClick={toggle}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted/40 transition-colors">
+        <span className="uppercase tracking-wide">Réponses individuelles</span>
+        <span>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="border-t border-border/60 divide-y divide-border/60">
+          {rows === null ? (
+            <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Chargement…</div>
+          ) : rows.length === 0 ? (
+            <p className="px-3 py-3 text-xs text-muted-foreground italic">Aucune réponse.</p>
+          ) : rows.map(sub => (
+            <div key={sub.id} className="flex items-center gap-3 px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {sub.repondant_nom || "Anonyme"}
+                  {sub.repondant_email && <span className="font-normal text-muted-foreground"> · {sub.repondant_email}</span>}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(sub.created_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
+                  {" · "}{sub.reponses.length} réponse{sub.reponses.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+              <button onClick={() => setEditing(sub)} title="Modifier les réponses"
+                className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => handleDelete(sub)} title="Supprimer / annuler l'inscription"
+                className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -1345,6 +1552,10 @@ export default function SondagesSection() {
                                 </span>
                               ))}
                             </div>
+                          )}
+
+                          {res.total > 0 && (
+                            <SoumissionsList sondage={s} confirm={confirm} onChanged={() => loadResults(s.id)} />
                           )}
 
                           {(s.questions || []).map((q, i) => (
