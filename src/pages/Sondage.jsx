@@ -587,10 +587,6 @@ export default function Sondage() {
       />
 
       <header className="bg-white border-b border-border shadow-sm px-6 py-4 flex items-center gap-4">
-        <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-          <ChevronLeft className="w-4 h-4" /> Accueil
-        </Link>
-        <div className="h-4 w-px bg-border" />
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: theme.primary }}>
             <span className="text-white text-xs font-bold">S</span>
@@ -792,7 +788,7 @@ export default function Sondage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-white/60">
-        l'association Ma Belle Promo (MBP) · <Link to="/" className="text-white/80 hover:text-white underline-offset-2 hover:underline">mabellepromo.org</Link>
+        l'association Ma Belle Promo (MBP)
       </footer>
     </div>
   );
