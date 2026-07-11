@@ -301,7 +301,7 @@ function AnswerEditor({ q, val, onChange }) {
 }
 
 // ── Modal d'édition d'une soumission ───────────────────────────────────────
-function EditSoumissionModal({ sondage, soumission, onClose, onSaved }) {
+function EditSoumissionModal({ sondage, soumission, numero, onClose, onSaved }) {
   const [answers, setAnswers] = useState(() => {
     const init = {};
     (soumission.reponses || []).forEach(r => {
@@ -329,7 +329,7 @@ function EditSoumissionModal({ sondage, soumission, onClose, onSaved }) {
       <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
           <div>
-            <p className="font-semibold text-foreground text-sm">Modifier l'inscription</p>
+            <p className="font-semibold text-foreground text-sm">Modifier l'inscription{numero ? ` n°${numero}` : ""}</p>
             <p className="text-xs text-muted-foreground truncate max-w-xs">
               {soumission.repondant_nom || "Anonyme"}
               {soumission.repondant_email ? ` · ${soumission.repondant_email}` : ""}
@@ -384,6 +384,7 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
     <div className="border border-border rounded-xl overflow-hidden">
       {editing && (
         <EditSoumissionModal sondage={sondage} soumission={editing}
+          numero={rows ? rows.length - rows.findIndex(r => r.id === editing.id) : null}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); load(); onChanged(); }} />
       )}
@@ -398,28 +399,38 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
             <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Chargement…</div>
           ) : rows.length === 0 ? (
             <p className="px-3 py-3 text-xs text-muted-foreground italic">Aucune réponse.</p>
-          ) : rows.map(sub => (
-            <div key={sub.id} className="flex items-center gap-3 px-3 py-2">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {sub.repondant_nom || "Anonyme"}
-                  {sub.repondant_email && <span className="font-normal text-muted-foreground"> · {sub.repondant_email}</span>}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(sub.created_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
-                  {" · "}{sub.reponses.length} réponse{sub.reponses.length !== 1 ? "s" : ""}
-                </p>
+          ) : rows.map((sub, idx) => {
+            // N° d'inscription chronologique : la liste est triée du plus
+            // récent au plus ancien → n° 1 = première inscription reçue
+            const num = rows.length - idx;
+            return (
+              <div key={sub.id} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/40 transition-colors">
+                <span className="w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0">
+                  {num}
+                </span>
+                <button onClick={() => setEditing(sub)} title="Cliquer pour modifier les réponses"
+                  className="min-w-0 flex-1 text-left cursor-pointer">
+                  <p className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline transition-colors">
+                    {sub.repondant_nom || "Anonyme"}
+                    {sub.repondant_email && <span className="font-normal text-muted-foreground no-underline"> · {sub.repondant_email}</span>}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Inscription n°{num}
+                    {" · "}{new Date(sub.created_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
+                    {" · "}{sub.reponses.length} réponse{sub.reponses.length !== 1 ? "s" : ""}
+                  </p>
+                </button>
+                <button onClick={() => setEditing(sub)} title="Modifier les réponses"
+                  className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => handleDelete(sub)} title="Supprimer / annuler l'inscription"
+                  className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button onClick={() => setEditing(sub)} title="Modifier les réponses"
-                className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => handleDelete(sub)} title="Supprimer / annuler l'inscription"
-                className="w-7 h-7 rounded-lg hover:bg-red-500/15 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
