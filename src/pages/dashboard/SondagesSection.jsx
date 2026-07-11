@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { openDoc } from "@/lib/documentGenerators";
-import { generateSondageAnalyse } from "@/lib/sondageAnalyseGenerator";
+import { generateSondageAnalyse, generateFicheInscription } from "@/lib/sondageAnalyseGenerator";
 import {
   useSondages, getSondageResults, getInvitationStats,
   createInvitations, markInvitationsSent, SONDAGE_THEMES, anonymiserSoumissions,
@@ -387,6 +387,17 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
     setOpen(!open);
   }
 
+  // Fiche analytique individuelle — générée uniquement au clic, jamais stockée
+  function openFiche(sub, num) {
+    const html = generateFicheInscription(sondage, sub, {
+      numero: num,
+      displayName: displayName(sub),
+      allReponses: (rows || []).flatMap(r => r.reponses),
+      totalSoumissions: (rows || []).length,
+    });
+    openDoc(html, `inscription-n${num}-${(displayName(sub) || "anonyme").replace(/[^a-z0-9]/gi, "-").toLowerCase()}.html`);
+  }
+
   async function handleDelete(sub) {
     const who = sub.repondant_nom || sub.repondant_email
       || (displayName(sub) !== "Anonyme" ? displayName(sub) : "cette inscription anonyme");
@@ -437,6 +448,10 @@ function SoumissionsList({ sondage, confirm, onChanged }) {
                     {" · "}{new Date(sub.created_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
                     {" · "}{sub.reponses.length} réponse{sub.reponses.length !== 1 ? "s" : ""}
                   </p>
+                </button>
+                <button onClick={() => openFiche(sub, num)} title="Fiche analytique individuelle (imprimable)"
+                  className="w-7 h-7 rounded-lg hover:bg-violet-500/15 flex items-center justify-center text-muted-foreground hover:text-violet-400 transition-colors">
+                  <BarChart2 className="w-3.5 h-3.5" />
                 </button>
                 <button onClick={() => setEditing(sub)} title="Modifier les réponses"
                   className="w-7 h-7 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">

@@ -88,9 +88,19 @@ function PublicQuestionResults({ question, reponses, theme }) {
   );
 }
 
+// Or MBP — signale les options qui ouvrent une précision (sous-question)
+const GOLD = "#b8861a";
+const TriggerHint = () => (
+  <span className="ml-auto flex items-center gap-1 text-xs font-medium flex-shrink-0" style={{ color: GOLD }}>
+    <span className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD }} />
+    précision demandée
+  </span>
+);
+
 // ── Saisie par type ────────────────────────────────────────────────────────
-function QuestionInput({ question, answer, onChange, theme }) {
+function QuestionInput({ question, answer, onChange, theme, triggerOptions }) {
   const val = answer || {};
+  const isTrigger = i => !!triggerOptions?.has(i);
 
   if (question.type === "ouinon") {
     return (
@@ -101,8 +111,9 @@ function QuestionInput({ question, answer, onChange, theme }) {
               val.valeur_options?.includes(i)
                 ? i === 0 ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-red-400 bg-red-50 text-red-700"
                 : "border-border hover:border-muted-foreground text-foreground bg-background"
-            }`}>
-            {opt}
+            }`}
+            style={!val.valeur_options?.includes(i) && isTrigger(i) ? { borderColor: GOLD, background: GOLD + "0d" } : undefined}>
+            {opt}{isTrigger(i) && <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full align-middle" style={{ background: GOLD }} />}
           </button>
         ))}
       </div>
@@ -135,13 +146,15 @@ function QuestionInput({ question, answer, onChange, theme }) {
             <button key={i} type="button" onClick={() => onChange({ valeur_options: [i] })}
               className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
                 selected ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
-              }`}>
+              }`}
+              style={!selected && isTrigger(i) ? { borderColor: GOLD, background: GOLD + "0d" } : undefined}>
               <div className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                   {selected && <Check className="w-3 h-3 text-white" />}
                 </div>
                 {img && <img src={img} alt="Illustration de l'option" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.currentTarget.style.display = "none"} />}
                 {opt}
+                {isTrigger(i) && <TriggerHint />}
               </div>
             </button>
           );
@@ -169,13 +182,15 @@ function QuestionInput({ question, answer, onChange, theme }) {
             <button key={i} type="button" onClick={() => toggle(i)}
               className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
                 selected ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/40 hover:bg-muted/50 text-foreground bg-background"
-              }`}>
+              }`}
+              style={!selected && isTrigger(i) ? { borderColor: GOLD, background: GOLD + "0d" } : undefined}>
               <div className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selected ? "border-primary bg-primary" : "border-border"}`}>
                   {selected && <Check className="w-3 h-3 text-white" />}
                 </div>
                 {img && <img src={img} alt="Illustration de l'option" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => e.currentTarget.style.display = "none"} />}
                 {opt}
+                {isTrigger(i) && <TriggerHint />}
               </div>
             </button>
           );
@@ -199,7 +214,7 @@ function QuestionInput({ question, answer, onChange, theme }) {
         >
           <option value="">— Sélectionner —</option>
           {(question.options || []).map((opt, i) => (
-            <option key={i} value={i}>{opt}</option>
+            <option key={i} value={i}>{opt}{isTrigger(i) ? " ● (précision demandée)" : ""}</option>
           ))}
           {question.config?.allow_other && <option value={OTHER_INDEX}>Autre (précisez)</option>}
         </select>
@@ -365,6 +380,28 @@ export default function Sondage() {
 
   const theme = useMemo(() => getTheme(sondage), [sondage]);
 
+  // Options qui déclenchent une sous-question : question_id → Set(option_index)
+  const triggerMap = useMemo(() => {
+    const map = {};
+    (sondage?.questions || []).forEach(q => {
+      const cond = q.config?.condition;
+      if (cond?.question_id != null && cond?.option_index != null) {
+        (map[cond.question_id] = map[cond.question_id] || new Set()).add(cond.option_index);
+      }
+    });
+    return map;
+  }, [sondage]);
+
+  // Fond de page élégant : dégradé profond du thème + halos dorés
+  const pageBackground = {
+    background: [
+      `radial-gradient(900px 420px at 85% -5%, ${theme.accent}40, transparent 62%)`,
+      `radial-gradient(720px 480px at -8% 108%, ${theme.accent}2e, transparent 60%)`,
+      `radial-gradient(560px 320px at 50% 118%, ${theme.primary}66, transparent 65%)`,
+      `linear-gradient(158deg, ${theme.primary} 0%, ${theme.primary} 35%, #101d17 100%)`,
+    ].join(", "),
+  };
+
   // Progression
   const progressPct = useSections
     ? Math.round(((currentPageIdx) / pages.length) * 100)
@@ -428,12 +465,59 @@ export default function Sondage() {
     return null;
   }
 
+  // Règles de cohérence configurées dans settings.sum_rules : la somme de
+  // questions numériques (« parts ») doit être égale à un total annoncé.
+  // Le total est lu dans la liste « total » : la dernière question visible
+  // et renseignée l'emporte (ex : la sous-question « nombre exact » prime
+  // sur l'option « 5 personnes et + » du menu déroulant).
+  function checkSumRules(pageQuestions) {
+    const rules = sondage?.settings?.sum_rules || [];
+    const pageIds = new Set(pageQuestions.map(q => q.id));
+    for (const rule of rules) {
+      if (!(rule.parts || []).some(qid => pageIds.has(qid))) continue;
+
+      let total = null;
+      for (const qid of rule.total || []) {
+        const q = (sondage?.questions || []).find(x => x.id === qid);
+        if (!q || !isQuestionVisible(q)) continue;
+        const a = answers[qid];
+        if (q.type === "texte") {
+          const n = Number(a?.valeur_texte);
+          if (a?.valeur_texte?.trim() && !isNaN(n)) total = n;
+        } else if (a?.valeur_options?.length) {
+          const n = parseInt((q.options || [])[a.valeur_options[0]], 10);
+          if (!isNaN(n)) total = n;
+        }
+      }
+      if (total == null) continue;
+
+      let sum = 0, filled = false;
+      for (const qid of rule.parts || []) {
+        const q = (sondage?.questions || []).find(x => x.id === qid);
+        if (!q || !isQuestionVisible(q)) continue;
+        const n = Number(answers[qid]?.valeur_texte);
+        if (answers[qid]?.valeur_texte?.trim() && !isNaN(n)) { sum += n; filled = true; }
+      }
+      if (!filled) continue;
+
+      if (sum !== total) {
+        return (rule.message || "La somme des détails doit être égale au total annoncé.")
+          + ` (annoncé : ${total} — détaillé : ${sum})`;
+      }
+    }
+    return null;
+  }
+
   async function handleNext() {
     // Valider les questions affichées de la page actuelle
     for (const q of shownQuestions) {
       const err = validateAnswer(q, answers[q.id]);
       if (err) { alert(err); return; }
     }
+
+    // Règles de cohérence (sommes) portant sur cette page
+    const sumErr = checkSumRules(shownQuestions);
+    if (sumErr) { alert(sumErr); return; }
 
     if (!useSections) {
       // Single-page : soumettre directement
@@ -495,7 +579,7 @@ export default function Sondage() {
   const isLastPage = !useSections || currentPageIdx === pages.length - 1;
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex flex-col`}>
+    <div className="min-h-screen flex flex-col" style={pageBackground}>
       <SEO
         title={sondage?.titre ? `${sondage.titre} — Sondage MBP` : "Sondage — Ma Belle Promo"}
         description="Participez au sondage de l'association Ma Belle Promo."
@@ -641,7 +725,8 @@ export default function Sondage() {
                           {!q.obligatoire && <span className="ml-1.5 text-xs font-normal text-muted-foreground">(optionnel)</span>}
                         </p>
                         {q.config?.aide && <p className="text-xs text-muted-foreground mb-3">{q.config.aide}</p>}
-                        <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme} />
+                        <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme}
+                          triggerOptions={triggerMap[q.id]} />
                       </div>
                     );
                   })}
@@ -706,8 +791,8 @@ export default function Sondage() {
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs text-muted-foreground">
-        l'association Ma Belle Promo (MBP) · <Link to="/" className="hover:text-primary">mabellepromo.org</Link>
+      <footer className="py-6 text-center text-xs text-white/60">
+        l'association Ma Belle Promo (MBP) · <Link to="/" className="text-white/80 hover:text-white underline-offset-2 hover:underline">mabellepromo.org</Link>
       </footer>
     </div>
   );
