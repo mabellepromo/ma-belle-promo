@@ -15,7 +15,7 @@ import { Check, ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-r
 function PublicQuestionResults({ question, reponses, theme }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
-  if (question.type === "texte" || question.type === "date") {
+  if (question.type === "texte" || question.type === "date" || question.type === "effectifs") {
     return (
       <p className="text-sm text-muted-foreground italic">
         {qr.length} réponse{qr.length !== 1 ? "s" : ""} reçue{qr.length !== 1 ? "s" : ""}.
@@ -98,9 +98,80 @@ const TriggerHint = () => (
 );
 
 // ── Saisie par type ────────────────────────────────────────────────────────
-function QuestionInput({ question, answer, onChange, theme, triggerOptions }) {
+function QuestionInput({ question, answer, onChange, theme, triggerOptions, sourceQuestion, sourceAnswer }) {
   const val = answer || {};
   const isTrigger = i => !!triggerOptions?.has(i);
+
+  // Libellé d'une option de la question source (type « effectifs »)
+  const sourceLabelOf = i => i === OTHER_INDEX
+    ? (sourceAnswer?.valeur_texte?.trim() || "Autre")
+    : (sourceQuestion?.options?.[i] ?? `Option ${i + 1}`);
+
+  // « effectifs » : si une option source est décochée après coup, on purge
+  // son compteur pour ne pas soumettre une valeur fantôme.
+  useEffect(() => {
+    if (question.type !== "effectifs" || !sourceQuestion) return;
+    const selected = sourceAnswer?.valeur_options || [];
+    const eff = val.effectifs || {};
+    const kept = Object.fromEntries(Object.entries(eff).filter(([k]) => selected.includes(Number(k))));
+    if (Object.keys(kept).length !== Object.keys(eff).length) {
+      const texte = selected.filter(j => kept[j] != null).map(j => `${sourceLabelOf(j)} : ${kept[j]}`).join(" | ");
+      onChange({ effectifs: kept, valeur_texte: texte || undefined });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceAnswer?.valeur_options]);
+
+  // Effectif par option choisie à la question source : une déroulante par activité
+  if (question.type === "effectifs" && sourceQuestion) {
+    const selected = (sourceAnswer?.valeur_options || []).slice().sort((a, b) => a - b);
+    if (selected.length === 0) {
+      return (
+        <p className="text-sm italic text-muted-foreground">
+          Choisissez d'abord au moins une option à la question « {sourceQuestion.libelle} ».
+        </p>
+      );
+    }
+    const max = Number(question.config?.max) || 15;
+    const eff = val.effectifs || {};
+    function setCount(i, raw) {
+      const next = { ...eff };
+      if (raw === "") delete next[i]; else next[i] = Number(raw);
+      const texte = selected.filter(j => next[j] != null).map(j => `${sourceLabelOf(j)} : ${next[j]}`).join(" | ");
+      onChange({ effectifs: next, valeur_texte: texte || undefined });
+    }
+    return (
+      <div className="space-y-2">
+        {selected.map(i => (
+          <div key={i} className="flex items-center gap-3 border border-border rounded-xl px-4 py-2.5 bg-background">
+            <span className="flex-1 text-sm font-medium text-foreground">{sourceLabelOf(i)}</span>
+            <select
+              value={eff[i] ?? ""}
+              onChange={e => setCount(i, e.target.value)}
+              className="border border-border rounded-lg px-3 py-2 text-sm text-foreground bg-background focus:outline-none focus:ring-2 focus:border-primary"
+              style={{ "--tw-ring-color": theme.primary + "4d" }}
+            >
+              <option value="">—</option>
+              {Array.from({ length: max }, (_, k) => k + 1).map(n => (
+                <option key={n} value={n}>{n} personne{n > 1 ? "s" : ""}</option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  // « effectifs » sans question source configurée : repli en saisie libre
+  if (question.type === "effectifs") {
+    return (
+      <textarea
+        className="w-full border border-border rounded-xl px-4 py-3 text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background"
+        rows={3}
+        value={val.valeur_texte || ""}
+        onChange={e => onChange({ valeur_texte: e.target.value })}
+        placeholder="Votre réponse…"
+      />
+    );
+  }
 
   if (question.type === "ouinon") {
     return (
@@ -304,10 +375,24 @@ function QuestionInput({ question, answer, onChange, theme, triggerOptions }) {
 }
 
 // ── Validation d'une réponse ───────────────────────────────────────────────
-function validateAnswer(q, a) {
+function validateAnswer(q, a, ctx) {
   // Option « Autre » cochée → la précision est requise, même si optionnelle
   if (a?.valeur_options?.includes(OTHER_INDEX) && !a?.valeur_texte?.trim())
     return `Merci de préciser votre réponse « Autre » à la question "${q.libelle}".`;
+
+  // « effectifs » : chaque option choisie à la question source doit avoir son nombre
+  if (q.type === "effectifs") {
+    const src = ctx?.questions?.find(p => p.id === q.config?.source_question_id);
+    if (src) {
+      const selected = ctx?.answers?.[src.id]?.valeur_options || [];
+      if (q.obligatoire && selected.length > 0 && selected.some(i => (a?.effectifs || {})[i] == null))
+        return `Merci d'indiquer le nombre de personnes pour chaque option choisie ("${q.libelle}").`;
+      return null;
+    }
+    if (q.obligatoire && !a?.valeur_texte?.trim()) return `La question "${q.libelle}" est obligatoire.`;
+    return null;
+  }
+
   if (!q.obligatoire) return null;
   const missing =
     ((q.type === "single" || q.type === "multiple" || q.type === "ouinon" || q.type === "dropdown") && (!a?.valeur_options?.length)) ||
@@ -520,7 +605,7 @@ export default function Sondage() {
   async function handleNext() {
     // Valider les questions affichées de la page actuelle
     for (const q of shownQuestions) {
-      const err = validateAnswer(q, answers[q.id]);
+      const err = validateAnswer(q, answers[q.id], { questions: sondage?.questions || [], answers });
       if (err) { alert(err); return; }
     }
 
@@ -731,7 +816,9 @@ export default function Sondage() {
                         </p>
                         {q.config?.aide && <p className="text-xs text-muted-foreground mb-3">{q.config.aide}</p>}
                         <QuestionInput question={q} answer={answers[q.id]} onChange={val => setAnswer(q.id, val)} theme={theme}
-                          triggerOptions={triggerMap[q.id]} />
+                          triggerOptions={triggerMap[q.id]}
+                          sourceQuestion={(sondage?.questions || []).find(p => p.id === q.config?.source_question_id)}
+                          sourceAnswer={answers[q.config?.source_question_id]} />
                       </div>
                     );
                   })}

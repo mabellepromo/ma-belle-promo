@@ -28,12 +28,13 @@ const Q_TYPES = [
   { value: "date",     label: "Date" },
   { value: "note",     label: "Note /5" },
   { value: "echelle",  label: "Échelle 1–10" },
+  { value: "effectifs", label: "Effectifs par option" },
 ];
 
 const Q_TYPE_LABELS = {
   ouinon: "Oui/Non", single: "Choix unique", multiple: "Choix multiple",
   dropdown: "Déroulante", texte: "Texte libre", date: "Date", note: "Note /5",
-  echelle: "Échelle 1–10",
+  echelle: "Échelle 1–10", effectifs: "Effectifs par option",
 };
 
 // Index sentinelle de l'option « Autre (précisez) » dans valeur_options
@@ -64,7 +65,7 @@ async function exportCSV(sondage) {
     const vals = questions.map(q => {
       const rep = (reponses || []).find(r => r.soumission_id === s.id && r.question_id === q.id);
       if (!rep) return "";
-      if (q.type === "texte" || q.type === "date") return rep.valeur_texte || "";
+      if (q.type === "texte" || q.type === "date" || q.type === "effectifs") return rep.valeur_texte || "";
       if (q.type === "note" || q.type === "echelle") return rep.valeur_note ?? "";
       if (q.type === "ouinon") return rep.valeur_options?.includes(0) ? "Oui" : rep.valeur_options?.includes(1) ? "Non" : "";
       const otherLabel = () => `Autre : ${rep.valeur_texte || ""}`;
@@ -99,7 +100,7 @@ async function exportCSV(sondage) {
 function QuestionResults({ question, reponses, total }) {
   const qr = reponses.filter(r => r.question_id === question.id);
 
-  if (question.type === "texte") {
+  if (question.type === "texte" || question.type === "effectifs") {
     const textes = qr.map(r => r.valeur_texte).filter(Boolean);
     return (
       <div>
@@ -229,7 +230,7 @@ function QuestionResults({ question, reponses, total }) {
 function AnswerEditor({ q, val, onChange }) {
   const v = val || {};
 
-  if (q.type === "texte") {
+  if (q.type === "texte" || q.type === "effectifs") {
     return <input className={`${inp} text-sm`} value={v.valeur_texte || ""}
       onChange={e => onChange({ ...v, valeur_texte: e.target.value || null })} placeholder="—" />;
   }
