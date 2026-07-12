@@ -392,13 +392,22 @@ export default function Sondage() {
     return map;
   }, [sondage]);
 
-  // Fond de page élégant : dégradé profond du thème + halos dorés
+  // Fond de page premium : vignette + voile satiné + halos dorés doux + dégradé profond
+  // (CSS pur, aucune image à charger — important pour le mobile)
   const pageBackground = {
     background: [
-      `radial-gradient(900px 420px at 85% -5%, ${theme.accent}40, transparent 62%)`,
-      `radial-gradient(720px 480px at -8% 108%, ${theme.accent}2e, transparent 60%)`,
-      `radial-gradient(560px 320px at 50% 118%, ${theme.primary}66, transparent 65%)`,
-      `linear-gradient(158deg, ${theme.primary} 0%, ${theme.primary} 35%, #101d17 100%)`,
+      // Vignette discrète qui recentre le regard sur la carte
+      `radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,0.28) 100%)`,
+      // Voile satiné diagonal très léger (effet tissu)
+      `repeating-linear-gradient(115deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 9px)`,
+      // Halo doré principal en haut à droite, plus doux qu'avant
+      `radial-gradient(1100px 520px at 88% -8%, ${theme.accent}33, transparent 65%)`,
+      // Lueur dorée basse gauche, à peine perceptible
+      `radial-gradient(800px 520px at -10% 110%, ${theme.accent}24, transparent 62%)`,
+      // Respiration claire du thème au centre bas
+      `radial-gradient(640px 360px at 50% 120%, ${theme.primary}59, transparent 68%)`,
+      // Base : dégradé profond du vert du thème vers un noir-vert velouté
+      `linear-gradient(160deg, ${theme.primary} 0%, ${theme.primary} 30%, #0c1712 78%, #08100c 100%)`,
     ].join(", "),
   };
 
