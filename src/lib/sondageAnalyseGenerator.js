@@ -117,7 +117,7 @@ function dateAnalysis(qr) {
 const Q_TYPE_LABELS = {
   ouinon: "Oui / Non", single: "Choix unique", multiple: "Choix multiple",
   dropdown: "Liste déroulante", texte: "Texte libre", date: "Date", note: "Note /5",
-  echelle: "Échelle 1–10",
+  echelle: "Échelle 1–10", effectifs: "Effectifs par option",
 };
 
 /**
@@ -139,7 +139,7 @@ export function generateFicheInscription(sondage, soumission, { numero, displayN
     const gq = group(q.id);
     let body;
 
-    if (q.type === "texte" || q.type === "date") {
+    if (q.type === "texte" || q.type === "date" || q.type === "effectifs") {
       const txt = rep?.valeur_texte
         ? (q.type === "date" ? fmtDate(rep.valeur_texte) : rep.valeur_texte)
         : null;
@@ -307,7 +307,7 @@ export function generateSondageAnalyse(sondage, { soumissions = [], reponses = [
     .map((q, i) => {
       const qr = reponses.filter((r) => r.question_id === q.id);
       let body;
-      if (q.type === "texte") body = texteAnalysis(qr);
+      if (q.type === "texte" || q.type === "effectifs") body = texteAnalysis(qr);
       else if (q.type === "date") body = dateAnalysis(qr);
       else if (q.type === "note") body = noteAnalysis(qr);
       else if (q.type === "echelle") body = echelleAnalysis(qr);
