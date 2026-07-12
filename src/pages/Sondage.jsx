@@ -761,6 +761,24 @@ export default function Sondage() {
                     </div>
                   </>
                 )}
+
+                {/* Formulaire d'inscription : permettre volontairement une nouvelle
+                    soumission depuis le même appareil (ex. 2 familles, 1 téléphone).
+                    On régénère l'empreinte anti-doublon puis on recharge le formulaire. */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem("mbp_voter_fp");
+                    window.location.href = window.location.pathname; // retire aussi un éventuel ?token=
+                  }}
+                  className="mt-8 w-full py-3 rounded-xl border-2 font-semibold text-sm transition-all hover:opacity-90 text-white"
+                  style={{ background: theme.primary, borderColor: theme.primary }}
+                >
+                  Faire une nouvelle inscription
+                </button>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Pour inscrire une autre famille depuis cet appareil.
+                </p>
               </div>
             </div>
           )}
