@@ -234,6 +234,9 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/verifier" element={<Verifier />} />
       <Route path="/sondage/:id" element={<Sondage />} />
+      {/* Lien court d'inscription (doublon client de la redirection vercel.json,
+          nécessaire quand le service worker PWA sert l'app depuis le cache) */}
+      <Route path="/retrouvailles2026" element={<Navigate to="/sondage/73250433-5249-4b85-908a-5da9e79881b0" replace />} />
       <Route path="/checkin/:id" element={<Checkin />} />
       <Route path="/activites/webinaires" element={<Webinaires />} />
       <Route path="/webinaires/desinscrire/:token" element={<WebinarDesinscrire />} />
