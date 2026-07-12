@@ -101,6 +101,67 @@ function texteAnalysis(qr) {
     <ul class="verbatims">${textes.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`;
 }
 
+// Analyse d'une question texte numérique — total, moyenne, extrêmes
+function nombreAnalysis(qr) {
+  const nums = qr
+    .map((r) => r.valeur_texte?.trim())
+    .filter((t) => t && !isNaN(Number(t)))
+    .map(Number);
+  if (!nums.length) return `<p class="q-synthese">Aucune réponse pour cette question.</p>`;
+  const sum = nums.reduce((a, b) => a + b, 0);
+  const avg = sum / nums.length;
+  return `
+    <div class="note-avg">Total : <strong>${sum}</strong> — moyenne : ${avg.toFixed(1).replace(".", ",")} par répondant (${nums.length} réponse${nums.length !== 1 ? "s" : ""}, min ${Math.min(...nums)}, max ${Math.max(...nums)})</div>`;
+}
+// Analyse d'une question « effectifs » — totaux agrégés par option choisie.
+// Les réponses sont stockées en texte « Padel : 3 | Karting : 2 » ; on parse
+// chaque segment et on rattache le libellé aux options de la question source
+// (insensible à la casse) pour fusionner les saisies libres historiques.
+function effectifsAnalysis(q, qr, questions) {
+  const source = (questions || []).find((p) => p.id === q.config?.source_question_id);
+  const canon = (label) => {
+    const found = (source?.options || []).find((o) => o.trim().toLowerCase() === label.trim().toLowerCase());
+    return found || label.trim();
+  };
+  const totals = {};   // label → { personnes, familles }
+  const unparsed = [];
+  let answered = 0;
+  qr.forEach((r) => {
+    const txt = (r.valeur_texte || "").trim();
+    if (!txt) return;
+    answered++;
+    let matchedAny = false;
+    txt.split(/[|\n;,]+/).forEach((seg) => {
+      const m = seg.match(/^\s*(.+?)\s*[:\-–]?\s*(\d+)\s*$/);
+      if (!m) return;
+      const label = canon(m[1]);
+      const n = Number(m[2]);
+      (totals[label] = totals[label] || { personnes: 0, familles: 0 });
+      totals[label].personnes += n;
+      totals[label].familles += 1;
+      matchedAny = true;
+    });
+    if (!matchedAny) unparsed.push(txt);
+  });
+
+  const entries = Object.entries(totals).sort((a, b) => b[1].personnes - a[1].personnes);
+  if (!entries.length && !unparsed.length) return `<p class="q-synthese">Aucune réponse pour cette question.</p>`;
+
+  const grandTotal = entries.reduce((a, [, v]) => a + v.personnes, 0);
+  const bars = entries
+    .map(([label, v], i) =>
+      barRow(`${label} — ${v.personnes} pers.`, v.personnes, grandTotal, BAR_COLORS[i % BAR_COLORS.length], i === 0))
+    .join("");
+  const synthese = entries.length
+    ? `Total : <strong>${grandTotal} personne${grandTotal !== 1 ? "s" : ""}</strong> sur ${entries.length} activité${entries.length !== 1 ? "s" : ""} (${answered} réponse${answered !== 1 ? "s" : ""}). ` +
+      entries.map(([label, v]) => `<strong>${esc(label)}</strong> : ${v.personnes} pers. (${v.familles} famille${v.familles !== 1 ? "s" : ""})`).join(" · ") + "."
+    : "";
+  const verbatims = unparsed.length
+    ? `<p class="q-synthese">Réponses non chiffrables :</p><ul class="verbatims">${unparsed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`
+    : "";
+  return `${bars}<p class="q-synthese">${synthese}</p>${verbatims}`;
+}
+
 // Analyse d'une question date — regroupement par valeur
 function dateAnalysis(qr) {
   const dates = qr.map((r) => r.valeur_texte).filter(Boolean);
@@ -307,7 +368,8 @@ export function generateSondageAnalyse(sondage, { soumissions = [], reponses = [
     .map((q, i) => {
       const qr = reponses.filter((r) => r.question_id === q.id);
       let body;
-      if (q.type === "texte" || q.type === "effectifs") body = texteAnalysis(qr);
+      if (q.type === "effectifs") body = effectifsAnalysis(q, qr, questions);
+      else if (q.type === "texte") body = q.config?.validation === "nombre" ? nombreAnalysis(qr) : texteAnalysis(qr);
       else if (q.type === "date") body = dateAnalysis(qr);
       else if (q.type === "note") body = noteAnalysis(qr);
       else if (q.type === "echelle") body = echelleAnalysis(qr);
