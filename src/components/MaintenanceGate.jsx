@@ -11,6 +11,8 @@ const STORAGE_KEY = "mbp_access_granted";
 const PUBLIC_PATHS = [
   "/activites/webinaires",
   "/webinaires/desinscrire/",
+  "/sondage/",
+  "/retrouvailles2026",
 ];
 function isPublicPath(pathname) {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p));
