@@ -37,6 +37,11 @@ function TypeBadge({ type }) {
   );
 }
 
+/* Cadrage vertical de l'image : décalé vers le bas pour les Assurances */
+function imagePositionClass(evt) {
+  return /assurance/i.test(evt.titre || "") ? "object-[center_25%]" : "object-top";
+}
+
 /* ── Carte hero (1er événement passé) — image en haut, texte en bas ── */
 function HeroCard({ evt }) {
   const inner = (
@@ -52,7 +57,7 @@ function HeroCard({ evt }) {
         <img
           src={evt.image}
           alt={evt.titre}
-          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+          className={`w-full h-full object-cover ${imagePositionClass(evt)} group-hover:scale-105 transition-transform duration-700`}
           onError={e => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute top-4 left-4 flex items-center gap-2">
@@ -104,7 +109,7 @@ function GridCard({ evt, i }) {
         <img
           src={evt.image}
           alt={evt.titre}
-          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+          className={`w-full h-full object-cover ${imagePositionClass(evt)} group-hover:scale-105 transition-transform duration-700`}
           onError={e => { e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
