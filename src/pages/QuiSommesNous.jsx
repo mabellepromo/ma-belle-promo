@@ -111,7 +111,7 @@ export default function QuiSommesNous() {
           transition={{ duration: 0.7 }}
           className="relative overflow-hidden rounded-3xl"
           style={{
-            background: "linear-gradient(135deg, rgba(5,18,11,0.98) 0%, rgba(10,35,20,0.98) 100%)",
+            background: "linear-gradient(135deg, #1a3c2e 0%, #23503c 100%)",
             border: "1px solid rgba(52,211,153,0.20)",
           }}
         >
@@ -191,15 +191,8 @@ export default function QuiSommesNous() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/40 border border-border rounded-2xl"
+          className="flex justify-center"
         >
-          <p className="text-muted-foreground text-center sm:text-left text-sm">
-            Association officiellement reconnue par les autorités togolaises depuis le{" "}
-            <strong className="text-foreground">03 octobre 2019</strong>
-            <span className="block text-xs text-primary font-semibold mt-0.5">
-              Récépissé N°0920/MATDCL-SG-DLPAP-DOCA
-            </span>
-          </p>
           <Link
             to="/implications/adhesion"
             className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
