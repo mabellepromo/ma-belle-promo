@@ -25,7 +25,7 @@ const taCls     = "w-full px-3.5 py-2.5 rounded-xl border border-border bg-backg
 
 /* ─── Métadonnées des étapes ─── */
 const STEPS = [
-  { key: "profil",        title: "Toi d'abord",            icon: User },
+  { key: "profil",        title: "Faisons connaissance",         icon: User },
   { key: "identite",      title: "Identification",         icon: IdCard },
   { key: "pro",           title: "Profil professionnel",   icon: Briefcase },
   { key: "mission",       title: "Mission & projet",       icon: Target },
